@@ -253,9 +253,9 @@ Reguły sprawdza `src/engine/scoring.test.ts` (przykłady organizatora, granice 
 
 #### Automated
 
-- [ ] 1.1 Testy silnika i żądań przechodzą: `bun test`
-- [ ] 1.2 Dane pokazowe wgrywają się bez błędu: `bun run seed`
-- [ ] 1.4 Test uruchomienia: `GET /account` odpowiada, a plik z `public/` jest zwracany
+- [x] 1.1 Testy silnika i żądań przechodzą: `bun test` — 99629ad
+- [x] 1.2 Dane pokazowe wgrywają się bez błędu: `bun run seed` — 130bae9
+- [x] 1.4 Test uruchomienia: `GET /account` odpowiada, a plik z `public/` jest zwracany — 99629ad
 
 #### Manual
 
