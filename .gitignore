@@ -1,5 +1,6 @@
-node_modules/
-*.sqlite
-*.sqlite-*
 .DS_Store
 .env*
+*.sqlite
+*.sqlite-*
+# deps
+node_modules/
