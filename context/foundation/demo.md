@@ -34,6 +34,10 @@ Trzy konta: Marek (oceniający), Piotr (oceniany), Joanna (kadry). Dwa telefony 
 - **Kryteria dodatkowe w kroku 1.** Marek wybiera „Orientacja na klienta/interesanta” (ma wgraną notatkę z 04.08.2025) i „Myślenie analityczne” (bez notatek, żeby ekran „Przed rozmową” miał kryterium bez żadnej notatki). Oba podpowiada tabela „rodzaj obowiązku → kryterium”.
 - **Ostrzeżenie „fakty tylko z ostatniego miesiąca”.** Wywołuje je notatka z 12.11.2026: jedyna przy kryterium „Wykorzystywanie wiedzy i doskonalenie zawodowe”.
 - **Ocena „1” w kroku 4.** Marek stawia ją przy „Rzetelności”, bo są do niej notatki sprzed zmiany zadań i po niej, a z nich składa się uzasadnienie.
+- **Daty systemowe kroków.** Krok 1: 9.12.2024. Krok 2: 11.03.2026. Krok 3: 10.11.2026. Krok 4: 21.11.2026. Krok 5: 22.11.2026 (termin sprzeciwu wypada 30.11.2026).
+- **Notatka z 11.03.2026.** Jest we wgranych danych, a w kroku 2 Marek pisze ją na żywo. Pełny pokaz i wersja 5-minutowa wgrywają dane z opcją, która tę jedną notatkę pomija (`bun run seed -- --live-step-2`). Wersja 90-sekundowa używa danych domyślnych, bo pomija krok 2.
+- **Fikcja zapoznania w wersji 5-minutowej.** Pokazywana w osobnym przebiegu od czystych danych, zamiast potwierdzenia Piotra: potwierdzenie zamyka ocenę i fikcji na tej samej ocenie nie da się już stwierdzić.
+- **Przejęcie wydziału przez Marka.** 5.12.2024, przed pierwszym dniem pokazu; od tego dnia Marek jest oceniającym Ewy.
 - **Zespół Marka w danych.** Ewa, Piotr i Maria. Maria nie ma konta ani notatek; na niej widać zdanie „O Marii nie masz żadnej notatki…”.
 
 ## Kto jest w danych pokazowych
