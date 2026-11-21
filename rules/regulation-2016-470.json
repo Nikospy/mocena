@@ -1,17 +1,17 @@
 {
-  "wersja": "2016-470/1",
-  "obowiazujeOd": "2016-04-22",
-  "zrodlo": {
-    "akt": "Rozporządzenie Prezesa Rady Ministrów z dnia 4 kwietnia 2016 r. w sprawie warunków i sposobu przeprowadzania ocen okresowych urzędników służby cywilnej i pracowników służby cywilnej",
-    "publikator": "Dz.U. 2016 poz. 470",
+  "version": "2016-470/1",
+  "effectiveFrom": "2016-04-23",
+  "source": {
+    "act": "Rozporządzenie Prezesa Rady Ministrów z dnia 4 kwietnia 2016 r. w sprawie warunków i sposobu przeprowadzania ocen okresowych urzędników służby cywilnej i pracowników służby cywilnej",
+    "publisher": "Dz.U. 2016 poz. 470",
     "url": "https://api.sejm.gov.pl/eli/acts/DU/2016/470/text.html",
     "status": "obowiązujący (sprawdzone w API Sejmu 2026-11-19)",
-    "podstawa": "art. 82 ustawy z dnia 21 listopada 2008 r. o służbie cywilnej (t.j. Dz.U. 2026 poz. 590)"
+    "basis": "art. 82 ustawy z dnia 21 listopada 2008 r. o służbie cywilnej (t.j. Dz.U. 2026 poz. 590)"
   },
-  "arkusze": {
+  "sheets": {
     "A": {
-      "dlaKogo": "kierownik urzędu, którego stanowisko jest stanowiskiem pracy w służbie cywilnej (§ 3 ust. 2)",
-      "kryteriaObowiazkowe": [
+      "forWhom": "kierownik urzędu, którego stanowisko jest stanowiskiem pracy w służbie cywilnej (§ 3 ust. 2)",
+      "mandatoryCriteria": [
         "zarzadzanie-ludzmi",
         "podejmowanie-decyzji",
         "organizacja-pracy",
@@ -21,8 +21,8 @@
       ]
     },
     "B": {
-      "dlaKogo": "stanowisko, na którym praca polega na bezpośrednim kierowaniu pracownikami, inne niż kierownik urzędu (§ 3 ust. 3)",
-      "kryteriaObowiazkowe": [
+      "forWhom": "stanowisko, na którym praca polega na bezpośrednim kierowaniu pracownikami, inne niż kierownik urzędu (§ 3 ust. 3)",
+      "mandatoryCriteria": [
         "zarzadzanie-ludzmi",
         "podejmowanie-decyzji",
         "organizacja-pracy",
@@ -31,8 +31,8 @@
       ]
     },
     "C": {
-      "dlaKogo": "pozostałe stanowiska (§ 3 ust. 4)",
-      "kryteriaObowiazkowe": [
+      "forWhom": "pozostałe stanowiska (§ 3 ust. 4)",
+      "mandatoryCriteria": [
         "wykorzystywanie-wiedzy",
         "rzetelnosc",
         "organizacja-pracy",
@@ -41,108 +41,108 @@
       ]
     }
   },
-  "maksKryteriowDodatkowych": 3,
-  "skalaCzastkowa": [
+  "maxAdditionalCriteria": 3,
+  "partialScale": [
     {
-      "punkty": 1,
-      "nazwa": "znacznie poniżej oczekiwań"
+      "points": 1,
+      "name": "znacznie poniżej oczekiwań"
     },
     {
-      "punkty": 3,
-      "nazwa": "poniżej oczekiwań"
+      "points": 3,
+      "name": "poniżej oczekiwań"
     },
     {
-      "punkty": 5,
-      "nazwa": "na poziomie oczekiwań"
+      "points": 5,
+      "name": "na poziomie oczekiwań"
     },
     {
-      "punkty": 7,
-      "nazwa": "powyżej oczekiwań"
+      "points": 7,
+      "name": "powyżej oczekiwań"
     },
     {
-      "punkty": 9,
-      "nazwa": "znacznie powyżej oczekiwań"
+      "points": 9,
+      "name": "znacznie powyżej oczekiwań"
     }
   ],
-  "poziomOgolny": [
+  "overallLevels": [
     {
-      "nazwa": "znacznie poniżej oczekiwań",
-      "od": 1,
-      "odWlacznie": true,
-      "do": 2
+      "name": "znacznie poniżej oczekiwań",
+      "from": 1,
+      "fromInclusive": true,
+      "to": 2
     },
     {
-      "nazwa": "poniżej oczekiwań",
-      "od": 2,
-      "odWlacznie": false,
-      "do": 4
+      "name": "poniżej oczekiwań",
+      "from": 2,
+      "fromInclusive": false,
+      "to": 4
     },
     {
-      "nazwa": "na poziomie oczekiwań",
-      "od": 4,
-      "odWlacznie": false,
-      "do": 6
+      "name": "na poziomie oczekiwań",
+      "from": 4,
+      "fromInclusive": false,
+      "to": 6
     },
     {
-      "nazwa": "powyżej oczekiwań",
-      "od": 6,
-      "odWlacznie": false,
-      "do": 8
+      "name": "powyżej oczekiwań",
+      "from": 6,
+      "fromInclusive": false,
+      "to": 8
     },
     {
-      "nazwa": "znacznie powyżej oczekiwań",
-      "od": 8,
-      "odWlacznie": false,
-      "do": 9
+      "name": "znacznie powyżej oczekiwań",
+      "from": 8,
+      "fromInclusive": false,
+      "to": 9
     }
   ],
-  "terminy": {
-    "ocenaCoMiesiecy": {
-      "wartosc": 24,
-      "podstawa": "art. 81 ust. 4 ustawy"
+  "deadlines": {
+    "assessmentEveryMonths": {
+      "value": 24,
+      "basis": "art. 81 ust. 4 ustawy"
     },
-    "rozmowaOKryteriachDni": {
-      "wartosc": 30,
-      "podstawa": "§ 7 pkt 1",
-      "od": "dzień sporządzenia poprzedniej oceny albo zatrudnienia na czas nieokreślony"
+    "criteriaTalkDays": {
+      "value": 30,
+      "basis": "§ 7 pkt 1",
+      "from": "dzień sporządzenia poprzedniej oceny albo zatrudnienia na czas nieokreślony"
     },
-    "rozmowaOKryteriachPoNegatywnejDni": {
-      "wartosc": 7,
-      "podstawa": "§ 7 pkt 2",
-      "od": "dzień sporządzenia negatywnej oceny"
+    "criteriaTalkAfterNegativeDays": {
+      "value": 7,
+      "basis": "§ 7 pkt 2",
+      "from": "dzień sporządzenia negatywnej oceny"
     },
-    "ponownaOcenaPoNegatywnejMiesiecy": {
-      "wartosc": 6,
-      "podstawa": "art. 81 ust. 9 ustawy",
-      "od": "dzień zapoznania się z oceną"
+    "reassessmentAfterNegativeMonths": {
+      "value": 6,
+      "basis": "art. 81 ust. 9 ustawy",
+      "from": "dzień zapoznania się z oceną"
     },
-    "sprzeciwDni": {
-      "wartosc": 7,
-      "podstawa": "art. 83 ust. 1 ustawy",
-      "od": "dzień zapoznania się z oceną",
-      "do": "dyrektor generalny urzędu"
+    "objectionDays": {
+      "value": 7,
+      "basis": "art. 83 ust. 1 ustawy",
+      "from": "dzień zapoznania się z oceną",
+      "to": "dyrektor generalny urzędu"
     },
-    "rozpatrzenieSprzeciwuDni": {
-      "wartosc": 14,
-      "podstawa": "art. 83 ust. 3 ustawy",
-      "od": "dzień wniesienia sprzeciwu"
+    "objectionReviewDays": {
+      "value": 14,
+      "basis": "art. 83 ust. 3 ustawy",
+      "from": "dzień wniesienia sprzeciwu"
     },
-    "odwolanieDoSaduPracyDni": {
-      "wartosc": 14,
-      "podstawa": "art. 83 ust. 5 ustawy",
-      "od": "doręczenie decyzji albo upływ terminu na rozpatrzenie sprzeciwu"
+    "courtAppealDays": {
+      "value": 14,
+      "basis": "art. 83 ust. 5 ustawy",
+      "from": "doręczenie decyzji albo upływ terminu na rozpatrzenie sprzeciwu"
     },
-    "zmianaStanowiskaMinMiesiecy": {
-      "wartosc": 6,
-      "podstawa": "art. 81 ust. 6 ustawy"
+    "positionChangeMinMonths": {
+      "value": 6,
+      "basis": "art. 81 ust. 6 ustawy"
     }
   },
-  "kryteria": [
+  "criteria": [
     {
       "id": "komunikacja",
-      "nr": 1,
-      "nazwa": "Komunikacja",
-      "opis": [
+      "number": 1,
+      "name": "Komunikacja",
+      "description": [
         "Koncentrowanie się na wypowiedzi rozmówcy i dbanie o wzajemne zrozumienie.",
         "Wypowiadanie się w sposób jasny i precyzyjny, dostosowany do sytuacji i rozmówcy (dobieranie stylu, języka i treści).",
         "Formułowanie jasnych i precyzyjnych wypowiedzi pisemnych dostosowanych do sytuacji i odbiorcy (dobieranie stylu, języka i treści).",
@@ -151,18 +151,18 @@
     },
     {
       "id": "kreatywnosc",
-      "nr": 2,
-      "nazwa": "Kreatywność",
-      "opis": [
+      "number": 2,
+      "name": "Kreatywność",
+      "description": [
         "Proponowanie lub tworzenie nowych rozwiązań.",
         "Nieschematyczne podejście do zadań."
       ]
     },
     {
       "id": "negocjowanie",
-      "nr": 3,
-      "nazwa": "Negocjowanie",
-      "opis": [
+      "number": 3,
+      "name": "Negocjowanie",
+      "description": [
         "Przygotowywanie się do negocjacji, w szczególności opracowanie projektu stanowiska, zakresu możliwych ustępstw i argumentacji.",
         "Stosowanie technik i strategii negocjacyjnych.",
         "Osiągnięcie efektu negocjacji akceptowanego przez przełożonych."
@@ -170,9 +170,9 @@
     },
     {
       "id": "organizacja-pracy",
-      "nr": 4,
-      "nazwa": "Organizacja pracy i orientacja na osiąganie celów",
-      "opis": [
+      "number": 4,
+      "name": "Organizacja pracy i orientacja na osiąganie celów",
+      "description": [
         "Określanie sposobu realizacji zadań/celów.",
         "Realizowanie zadań/celów w kolejności uwzględniającej ich wagę i pilność (ustalanie priorytetów działania).",
         "Dobieranie niezbędnych zasobów umożliwiających realizację zadań/celów.",
@@ -182,18 +182,18 @@
     },
     {
       "id": "orientacja-na-klienta",
-      "nr": 5,
-      "nazwa": "Orientacja na klienta/interesanta",
-      "opis": [
+      "number": 5,
+      "name": "Orientacja na klienta/interesanta",
+      "description": [
         "Taktowne zachowanie, wyrażające szacunek i zrozumienie dla drugiej osoby.",
         "Reagowanie na potrzeby klienta/interesanta, w szczególności rozpoznawanie jego potrzeb i proponowanie rozwiązań."
       ]
     },
     {
       "id": "podejmowanie-decyzji",
-      "nr": 6,
-      "nazwa": "Podejmowanie decyzji i odpowiedzialność",
-      "opis": [
+      "number": 6,
+      "name": "Podejmowanie decyzji i odpowiedzialność",
+      "description": [
         "Wypracowywanie alternatywnych rozwiązań na podstawie analizy informacji, w szczególności potencjalnego ryzyka.",
         "Podejmowanie decyzji (decyzyjność).",
         "Przyjmowanie odpowiedzialności za efekty podjętych decyzji."
@@ -201,9 +201,9 @@
     },
     {
       "id": "sytuacje-kryzysowe",
-      "nr": 7,
-      "nazwa": "Radzenie sobie w sytuacjach kryzysowych",
-      "opis": [
+      "number": 7,
+      "name": "Radzenie sobie w sytuacjach kryzysowych",
+      "description": [
         "Rozpoznawanie sytuacji kryzysowych i informowanie o nich zainteresowanych.",
         "Podejmowanie działań mających na celu rozwiązanie kryzysu.",
         "Wyciąganie wniosków z sytuacji kryzysowych."
@@ -211,18 +211,18 @@
     },
     {
       "id": "rzetelnosc",
-      "nr": 8,
-      "nazwa": "Rzetelność",
-      "opis": [
+      "number": 8,
+      "name": "Rzetelność",
+      "description": [
         "Wykonywanie zadań zgodnie z obowiązującymi standardami (przepisami, zasadami, procedurami) oraz dbałość o jakość rezultatów.",
         "Dotrzymywanie zobowiązań (realizacja zadań) w wyznaczonym czasie."
       ]
     },
     {
       "id": "myslenie-analityczne",
-      "nr": 9,
-      "nazwa": "Myślenie analityczne",
-      "opis": [
+      "number": 9,
+      "name": "Myślenie analityczne",
+      "description": [
         "Rozróżnianie informacji istotnych i nieistotnych.",
         "Dostrzeganie zależności między informacjami.",
         "Formułowanie wniosków."
@@ -230,9 +230,9 @@
     },
     {
       "id": "wykorzystywanie-wiedzy",
-      "nr": 10,
-      "nazwa": "Wykorzystywanie wiedzy i doskonalenie zawodowe",
-      "opis": [
+      "number": 10,
+      "name": "Wykorzystywanie wiedzy i doskonalenie zawodowe",
+      "description": [
         "Wykorzystywanie wiedzy przy realizacji zadań na zajmowanym stanowisku pracy.",
         "Doskonalenie wiedzy i umiejętności niezbędnych do wykonywania zadań na zajmowanym stanowisku pracy, w szczególności wyszukiwanie i pozyskiwanie wiedzy, korzystanie z dobrych praktyk i doświadczeń innych.",
         "Korzystanie z dostępnych źródeł informacji, rozwiązań i technologii."
@@ -240,9 +240,9 @@
     },
     {
       "id": "wspolpraca",
-      "nr": 11,
-      "nazwa": "Współpraca",
-      "opis": [
+      "number": 11,
+      "name": "Współpraca",
+      "description": [
         "Włączanie się w działania realizowane razem z innymi osobami, jeśli istnieje taka możliwość.",
         "Dbanie o przepływ informacji.",
         "Dbanie o dobrą atmosferę i otwartość we współpracy.",
@@ -253,9 +253,9 @@
     },
     {
       "id": "wystapienia-publiczne",
-      "nr": 12,
-      "nazwa": "Wystąpienia publiczne",
-      "opis": [
+      "number": 12,
+      "name": "Wystąpienia publiczne",
+      "description": [
         "Wykorzystywanie różnych środków przekazu (np. narzędzi multimedialnych) i dbałość o sposób prezentacji (w tym autoprezentacji).",
         "Nawiązywanie i utrzymywanie kontaktu z audytorium.",
         "Zarządzanie czasem wystąpienia, w szczególności przestrzeganie ram czasowych, elastyczne reagowanie na potrzeby audytorium.",
@@ -264,9 +264,9 @@
     },
     {
       "id": "zarzadzanie-ludzmi",
-      "nr": 13,
-      "nazwa": "Zarządzanie ludźmi",
-      "opis": [
+      "number": 13,
+      "name": "Zarządzanie ludźmi",
+      "description": [
         "Przydzielanie zakresu odpowiedzialności, zadań i uprawnień pracownikom (delegowanie zadań).",
         "Monitorowanie realizacji zadań oraz w razie potrzeby podejmowanie działań korygujących lub zapobiegawczych.",
         "Motywowanie pracowników.",
@@ -277,27 +277,27 @@
     },
     {
       "id": "zarzadzanie-strategiczne",
-      "nr": 14,
-      "nazwa": "Zarządzanie strategiczne",
-      "opis": [
+      "number": 14,
+      "name": "Zarządzanie strategiczne",
+      "description": [
         "Tworzenie wizji oraz wyznaczanie celów strategicznych w oparciu o całościowe i perspektywiczne widzenie organizacji, otoczenia oraz strategie rozwoju.",
         "Formułowanie celów operacyjnych na podstawie celów strategicznych.",
         "Analiza ryzyka planowanych działań o charakterze strategicznym."
       ]
     }
   ],
-  "rozmowaOKryteriach": {
-    "podstawa": "§ 5 ust. 1",
-    "tematy": [
+  "criteriaConversation": {
+    "basis": "§ 5 ust. 1",
+    "topics": [
       "główne obowiązki wynikające z opisu stanowiska pracy zajmowanego przez ocenianego",
       "kryteria obowiązkowe i kryteria dodatkowe, jeżeli są wybierane przez oceniającego",
       "oczekiwania oceniającego co do sposobu spełniania kryteriów oceny przez ocenianego",
       "cele do osiągnięcia w okresie, w którym oceniany podlega ocenie, jeżeli ich określenie jest uzasadnione ze względu na charakter obowiązków, a także sposób realizacji wyznaczonych celów"
     ]
   },
-  "rozmowaOceniajaca": {
-    "podstawa": "§ 10",
-    "tematy": [
+  "assessmentConversation": {
+    "basis": "§ 10",
+    "topics": [
       "główne obowiązki wykonywane przez ocenianego w okresie, w którym podlegał ocenie, oraz sposób ich realizacji, z uwzględnieniem spełniania ustalonych kryteriów oceny",
       "sposób realizowania celów do osiągnięcia w okresie, w którym oceniany podlegał ocenie, jeżeli cele te zostały wyznaczone",
       "kierunki dalszego rozwoju zawodowego i potrzeby ocenianego w zakresie podnoszenia kwalifikacji i doskonalenia umiejętności"
