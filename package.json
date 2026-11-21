@@ -1,7 +1,9 @@
 {
   "name": "mocena",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.tsx",
+    "seed": "bun run src/seed.ts",
+    "test": "bun test"
   },
   "dependencies": {
     "hono": "^4.13.16"
