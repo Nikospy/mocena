@@ -47,11 +47,11 @@ Trasy sprawdzaj w testach przez `app.request()`, bez uruchamiania serwera.
 
 - **Kod:** jest starter Hono (`src/index.ts`, `GET /`) i silnik z nazwami po polsku: `reguly/rozporzadzenie-2016-470.json`, `src/silnik/ocena.ts`, `src/silnik/terminy.ts`, `src/silnik/ocena.test.ts` (19 testów przechodzi). Ekranów, bazy i danych pokazowych jeszcze nie ma.
 - **Plany:** wszystkie siedem zmian ma gotowy `plan.md` po czterech recenzjach krzyżowych. Wspólne nazwy są w rozdziale „Kontrakt wspólny dla wszystkich plastrów” planu F-01.
-- **Wygląd:** design system autora nie jest jeszcze w repo (`public/` jest puste). Do czasu, gdy autor poda ścieżkę, ekrany powstają na samym HTML z klasami.
+- **Wygląd:** autor przyjął design system („wygląd A”, rodzina mObywatel) 22.11 ok. 00:05. Leży poza repo; ścieżka jest w lokalnym `CLAUDE.local.md` i w przekazaniu pracy. W repo jeszcze go nie ma (`public/` jest puste): pliki trafiają do `public/` w pierwszym kroku budowy.
 
 ## Start budowy po poleceniu autora
 
-1. Zapytaj autora o ścieżkę do design systemu, jeśli nie podał jej razem z poleceniem. Brak odpowiedzi nie wstrzymuje kodu: budujesz na samym HTML z klasami.
+1. Skopiuj przyjęty design system do `public/`: `rodzina.css`, katalog `fonts/` (z licencją OFL) i `styl.css` z wariantu kart. Trzy pliki HTML makiet są wzorcem układu i zachowania, do repo ich nie kopiujesz. Zmiana przyjętego wyglądu wymaga pytania do autora.
 2. Buduj w tej kolejności: F-01 `rules-engine-and-demo-data`, S-01 `cycle-start-criteria`, S-02 `assessment-and-confirmation`, S-04 `notes-and-justification`, S-05 `hr-partner-question`, S-06 `hr-overview-and-print`, S-03 `timeline-and-absences`. Jedna zmiana to `/10x-implement <change-id>`.
 3. W każdym plastrze najpierw „Wersja minimalna”, potem pozycje z „Kolejności cięcia” od góry. Pozycje oznaczone „potrzebne do wersji 5-minutowej pokazu” idą zaraz po wersji minimalnej.
 4. Pierwszy krok F-01: przenieść silnik na nazwy angielskie (`rules/`, `src/engine/`) i poprawić datę obowiązywania reguł na `2016-04-23` (w pliku jest błędnie `2016-04-22`).
