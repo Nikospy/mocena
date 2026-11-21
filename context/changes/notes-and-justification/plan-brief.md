@@ -20,16 +20,16 @@ Marek zapisuje notatkę na 360 px; pole „Zmiana zadań pracownika” zaznacza 
 |---|---|---|---|
 | Gdzie żyją notatki | Tabela `notes` z kontraktu, jedna granica `date <= today()` | Własne pola i odczyt przy każdym kryterium; ta sama granica co zdarzenia | Kontrakt, decyzja 10i |
 | Data faktu i data zapisu | `date` (fakt, decyduje o widoczności) osobno od `created_at` (kliknięcie) | Recenzja, ustalenie 11 | Plan |
-| Dostęp | Zapis: `cycles.appraiser_id` w cyklu, `people.supervisor_id` bez cyklu; odczyt tylko autor | Zmiana oceniającego nie może zostawić starego dostępu | Recenzja, ustalenie 17 |
-| Adapter | `src/suggestions/`: osobne wejścia dla notatki i reguł kryteriów; w prototypie tylko reguły | Jedno wymienne miejsce; konfiguracja nie włączy usługi | Decyzje 9, 10l; ustalenie 18 |
+| Dostęp | Zapis: `cycles.appraiser_id` cyklu z `openCycle`, `people.supervisor_id` bez otwartego cyklu; odczyt tylko autor | Zmiana oceniającego nie może zostawić starego dostępu | Recenzja, ustalenie 17 |
+| Adapter | `src/suggestions/index.ts`: `suggestCriteria` (S-01), `suggestForNote` i `suggestionMode` (S-04), `suggestDevelopmentForm` (S-05); w prototypie tylko reguły | Jedno wymienne miejsce; konfiguracja nie włączy usługi | Decyzje 9, 10l; ustalenie 18 |
 | Co się zapisuje | `task_change` = klik człowieka; wynik adaptera obok, do wglądu | Nic bez kliknięcia; S-05 widzi źródło | Plan |
 | „Wstaw” | W przeglądarce do `slots` S-02; test DOM | Nie rusza zapisu S-02, nic nie wstawia się samo | Decyzja 10f |
-| Dane pokazowe | `src/seed/notes.ts`, opcja `--live-step-2` pomija notatkę z 11.03.2026 | Krok 2 pisze ją na żywo | Kontrakt |
+| Dane pokazowe | `src/seed/notes.ts` wołany z `runSeed` po `part1`, opcja `liveStep2` pomija notatkę z 11.03.2026 | Krok 2 pisze ją na żywo | Kontrakt |
 | Gałąź modelu | Faza 4, tylko podstawiona funkcja w kodzie, sprawdzana atrapą | Pierwsza rzecz, jeśli zostanie czas | Decyzja 10l |
 
 ## Scope
 
-**In scope:** tabele i 16 notatek pokazowych; formularz notatki; „Moje notatki”; adapter z regułami; notatki i ostrzeżenie „z ostatniego miesiąca” przy kryteriach; „Wstaw do uzasadnienia”; karta rozmowy oceniającej z odnośnikami; potem „Przekaż pracownikowi”, ekran „Informacja zwrotna”, drugie „Wstaw”, data notatki, ostrzeżenie o ocenie skrajnej.
+**In scope:** tabele i 16 notatek pokazowych; formularz notatki; „Moje notatki”; adapter z regułami; notatki i ostrzeżenie „z ostatniego miesiąca” przy kryteriach; „Wstaw do uzasadnienia”; karta rozmowy oceniającej z odnośnikami; potem (faza 3, trasy `/notes/:id/feedback` i `/feedback`) „Przekaż pracownikowi”, ekran „Informacja zwrotna”, drugie „Wstaw”, data notatki, ostrzeżenie o ocenie skrajnej.
 
 **Out of scope:** pytanie HR partnera, „Przed rozmową”, przypomnienie o docenianiu, ekran „Skąd biorą się podpowiedzi” (S-05); edycja i usuwanie notatek; style (design system autora); model językowy.
 
@@ -48,10 +48,9 @@ Marek zapisuje notatkę na 360 px; pole „Zmiana zadań pracownika” zaznacza 
 ## Open Risks & Assumptions
 
 - Kolejność cięcia jest na górze planu; wersji minimalnej się nie tnie.
-- Gdy `src/seed/base.ts` nie ustawi Marka jako oceniającego Ewy przed S-03, Marek nie dopisze notatki o Ewie (pokaz tego nie używa).
 
 ## Success Criteria (Summary)
 
-- Kroki 2 (2026-03-11, `--live-step-2`) i 4 (2026-11-21) pokazu działają na danych wgranych seedem.
-- `bun test` przechodzi, w tym R1–R12 dla wersji minimalnej.
+- Kroki 2 (2026-03-11) i 4 (2026-11-21) pokazu działają na danych z `bun run seed -- --after-step-1 --live-step-2`; testy od kroku 2 biorą `seedOptions: { afterStep1: true }`.
+- `bun test` przechodzi, w tym R1–R12 i R16 dla wersji minimalnej.
 - Nigdzie przy nazwisku nie ma liczby ani etykiety; nic nie zapisuje się bez kliknięcia.

@@ -21,7 +21,7 @@ Co jest pewne już dziś:
 Przy dacie systemowej 22.11.2026 (krok 5 pokazu) Joanna otwiera `/hr` i widzi:
 
 1. Kartę „Obowiązek urzędu: stopień służbowy z mocy prawa”. Osobne pole „Urzędnik: Tomasz Kamiński”. Treść o obowiązku urzędu: „Urząd ma obowiązek przyznać kolejny stopień służbowy, bo od ostatniego stopnia są dwie kolejne oceny pozytywne na jednym z dwóch najwyższych poziomów: 12.11.2024 i 12.11.2026”. Termin: „do 14.12.2026 (30 dni od zapoznania z oceną 12.11.2026, koniec w sobotę 12.12.2026, więc poniedziałek; art. 89 ust. 2 ustawy)”. „Stopień V → VI”. Zdanie „To obowiązek, nie wniosek”.
-2. Tabelę cykli: osoba, oceniający, arkusz, stan procesu, termin z podstawą, odnośniki do cyklu („Część I”), arkusza i historii ocen. Wśród stanów: „sprzeciw wniesiony 20.11.2026, rozpatrzenie do 04.12.2026” (Maria), „wniosek ocenianej o zmianę terminu czeka na rozpatrzenie” z podstawą i zdaniem o zawiadomieniu na piśmie (Anna, decyzja 11d), „zapoznanie potwierdzone 22.11.2026, sprzeciw do 30.11.2026” (Piotr po kroku 5).
+2. Tabelę cykli: osoba, oceniający, arkusz, stan procesu, termin z podstawą i odnośniki z `cycleLinks(cycle, viewer)` (z tego plastra „Arkusz” i „Historia ocen”; resztę dopisują inne plastry, w tym „Wpisz nieobecność” z S-03). Wśród stanów: „sprzeciw wniesiony 20.11.2026, rozpatrzenie do 04.12.2026” (Katarzyna Lewandowska), „wniosek ocenianej o zmianę terminu czeka na rozpatrzenie” z podstawą i zdaniem o zawiadomieniu na piśmie (Anna, decyzja 11d), „zapoznanie potwierdzone 22.11.2026, sprzeciw do 30.11.2026” (Piotr po kroku 5).
 3. (Faza 2) Blok „Statystyki terminowości (widok dyrektora generalnego, bez nazwisk)” i przyciski rozstrzygnięcia sprzeciwu.
 
 Przy dacie 11.11.2026 karty Tomasza nie ma, przy 12.11.2026 jest (decyzja 10i). Strona `/cycles/:id/sheet` pokazuje arkusz ze wszystkimi polami w kolejności wzoru; przycisk „Drukuj / pobierz PDF” otwiera druk przeglądarki; na wydruku nie ma nawigacji ani przycisków, jest pouczenie o sprzeciwie (7 dni od zapoznania, art. 83 ust. 1 ustawy), słowo „potwierdzenie”, nigdzie „podpis”. Oceniany otwiera i drukuje własny egzemplarz części I i całego arkusza. `bun test` przechodzi.
@@ -39,7 +39,7 @@ Przy dacie 11.11.2026 karty Tomasza nie ma, przy 12.11.2026 jest (decyzja 10i). 
 - Generatora PDF. „Pobranie” to zapis do PDF w oknie druku przeglądarki (decyzja 7).
 - Wierności 1:1 ze wzorem (PRD, Non-Goals). Jest komplet pól w kolejności wzoru.
 - Notatek i informacji zwrotnej na arkuszu i wydruku: notatek ocenianemu nie pokazujemy (S-04, decyzja 11c), na arkusz trafia tylko tekst uzasadnienia, który przełożony sam wstawił (decyzja 10f).
-- Osi czasu, nieobecności i zmiany oceniającego (S-03). Termin w tabeli i na arkuszu czyta `effectiveDeadline(cycleId)`; S-03 dokłada w niej nieobecności i ekran kadr pokaże nowy termin bez zmian w tym plastrze.
+- Osi czasu, nieobecności i zmiany oceniającego (S-03). Termin bierzemy według tabeli kontraktu „Skąd ekran bierze termin oceny”: termin przekazany w części I z `part1_submitted.payload.dueDate`, termin cyklu otwartego z `effectiveDeadline(cycleId)`, termin oceny zatwierdzonej (arkusz, wydruk, statystyka terminowości) z `AssessmentSnapshot.deadline`. S-03 dokłada nieobecności w `effectiveDeadline` i ekran kadr pokaże nowy termin bez zmian w tym plastrze.
 - Wyszukiwania, filtrów i sortowania po wyniku (decyzja 4: lista bez wyszukiwania). Sortujemy tylko po terminie.
 - Przypomnienia o stopniu na ekranie oceniającej (Anny). FR-027 dotyczy kadr; reguła jest gotowa do użycia później.
 - Stylów ekranu. Wygląd i komponenty pochodzą z design systemu autora (decyzja 10b); plan wymienia tylko ekrany i komponenty. Styl druku jest częścią tego planu.
@@ -48,7 +48,7 @@ Przy dacie 11.11.2026 karty Tomasza nie ma, przy 12.11.2026 jest (decyzja 10i). 
 
 Trzy warstwy, jak w poprzednich plastrach:
 
-1. **Reguła w silniku** (czysta funkcja, test bez bazy): `src/engine/grades.ts` liczy, czy urzędnikowi mianowanemu należy się stopień z mocy prawa i do kiedy. Liczby (30 dni, dwa najwyższe poziomy, najwyższy stopień) są w pliku reguł, z podstawą.
+1. **Reguła w silniku** (czysta funkcja, test bez bazy): `src/engine/grades.ts` liczy, czy urzędnikowi mianowanemu należy się stopień z mocy prawa i do kiedy. Liczby są w pliku reguł: 30 dni w `deadlines.mandatoryGradeDays` (dopisuje S-06), najwyższy stopień w `approval.gradeRequest.maxGrade` (klucz S-02), dwa najwyższe poziomy to dwa ostatnie z listy poziomów ogólnych, która już jest w pliku.
 2. **Odczyt stanu z widocznych zdarzeń** (`src/hr/`): stan procesu cyklu, historia ocen, bieżący stopień, dane arkusza i statystyki. Każdy odczyt idzie przez `visibleEvents(cycleId)` (granica `date <= today()`, porządek `(date, id)`); cykl istnieje dla ekranu od swojego widocznego `cycle_started`, część I pochodzi z migawki `part1_submitted`, ocena z migawki `assessment_approved` (decyzja 10i, uwaga 11).
 3. **Trasy i widoki** w Hono JSX na wspólnym układzie `src/views/layout.tsx`, testowane przez `app.request()` na `createTestApp({ today })`.
 
@@ -56,17 +56,17 @@ Stan cyklu to opis kroku procesu („część I czeka na potwierdzenie ocenianeg
 
 ### Wersja minimalna (faza 1, ok. 50 minut)
 
-Karta stopnia Tomasza, tabela stanów cykli (z sprzeciwem Marii i wnioskiem Anny), podgląd arkusza ze stylem druku i pouczeniem, druk własnego egzemplarza przez ocenianego (część I i cały arkusz), historia ocen, odnośniki (`registerCycleLinks`, wiersze `/hr`, link na ekranie startowym Joanny) oraz dane pokazowe `src/seed/assessments.ts`. To jest krok 5 pokazu w każdej wersji. Historia i odnośniki są w minimum, bo bez nich arkusze i historia są osiągalne tylko przez wpisanie adresu (uwaga 4).
+Karta stopnia Tomasza, tabela stanów cykli (ze sprzeciwem Katarzyny Lewandowskiej i wnioskiem Anny), podgląd arkusza ze stylem druku i pouczeniem, druk własnego egzemplarza przez ocenianego (część I i cały arkusz), historia ocen, odnośniki (`registerCycleLinks`, wiersze `/hr`, link na ekranie startowym Joanny) oraz dane pokazowe `src/seed/assessments.ts`. To jest krok 5 pokazu w każdej wersji. Historia i odnośniki są w minimum, bo bez nich arkusze i historia są osiągalne tylko przez wpisanie adresu (uwaga 4).
 
 ### Kolejność cięcia
 
-Faza 2 powstaje po wersji minimalnej, w kolejności budowy odwrotnej do kolejności cięcia. Gdy brakuje czasu, tniemy od góry:
+Faza 2 powstaje po wersji minimalnej w kolejności tej listy. Gdy brakuje czasu, tniemy od dołu, więc pierwsza pozycja wypada jako ostatnia:
 
-1. Przyciski rozstrzygnięcia sprzeciwu (faza 2, zmiana 4).
-2. Blok statystyk bez nazwisk (faza 2, zmiana 3); zostaje zdanie „Statystyki: poza prototypem”.
-3. Część III na arkuszu (faza 2, zmiana 2); zostaje pole „Czy dołączono wniosek o kolejny stopień”.
-4. Wgrane poprzednie oceny Piotra i Ewy (faza 2, zmiana 2); historia działa na Tomaszu.
-5. Przycisk „Odnotuj przyznanie stopnia” (faza 2, zmiana 1); bez niego wersja 5-minutowa traci kliknięcie stopnia obowiązkowego.
+1. Przycisk „Odnotuj przyznanie stopnia” (faza 2, zmiana 1): **potrzebne do wersji 5-minutowej pokazu**. Powstaje zaraz po wersji minimalnej.
+2. Wgrane poprzednie oceny Piotra i Ewy (faza 2, zmiana 2); bez nich historia działa na Tomaszu.
+3. Część III na arkuszu (faza 2, zmiana 2); bez niej zostaje pole „Czy dołączono wniosek o kolejny stopień”.
+4. Blok statystyk bez nazwisk (faza 2, zmiana 3); bez niego zostaje zdanie „Statystyki: poza prototypem”.
+5. Przyciski rozstrzygnięcia sprzeciwu (faza 2, zmiana 4).
 
 Nie wolno ciąć niczego z wersji minimalnej.
 
@@ -76,21 +76,23 @@ Same nazwy z kontraktu wspólnego.
 
 **F-01**
 
-- Tabele: `people(id, name, role, position_title, unit, supervisor_id, has_account, appointed, civil_service_grade)` z `role = 'hr'` dla Joanny; `cycles(id, person_id, appraiser_id, period_start, sheet)`; `cycle_criteria(cycle_id, criterion_id, kind, expectation)`; `events(id, type, cycle_id, actor_id, date, payload)`; `settings` z kluczami `demo_date`, `office_city`, `office_name`.
-- Funkcje: `today()`, `currentPerson(c)`, `recordEvent(type, cycleId, actorId, payload)`, `seedEvent(...)` (tylko w danych pokazowych), `visibleEvents(cycleId)`, `effectiveDeadline(cycleId): { date, basis: string[] }` z `src/cycles.ts`, `homeTasks(person)` i `registerHomeTasks(fn)` z `src/home-tasks.ts`, `cycleLinks(cycle, person)` i `registerCycleLinks(fn)` z `src/cycle-links.ts`, `rulesVersion()`, `createTestApp({ today })` z `src/test-helpers.ts`.
+- Tabele: `people(id, name, role, position_title, unit, supervisor_id, has_account, appointed, civil_service_grade, grade_awarded_on)` z `role = 'hr'` dla Joanny (`grade_awarded_on` należy do schematu F-01 i może być puste); `cycles(id, person_id, appraiser_id, period_start, sheet)`; `cycle_criteria(cycle_id, criterion_id, kind, expectation)`; `events(id, type, cycle_id, actor_id, date, payload)`; `settings` z kluczami `demo_date`, `office_city`, `office_name`.
+- Funkcje: `today()`, `currentPerson(c)`, `recordEvent(type, cycleId, actorId, payload)`, `seedEvent(...)` (tylko w danych pokazowych), `visibleEvents(cycleId, { asOf })` i `effectiveDeadline(cycleId, { asOf })` z `src/cycles.ts` (`asOf` tylko w danych pokazowych i testach; `effectiveDeadline` zwraca `{ date, basis: string[] }`), `visibleEventsOfType(type)`, `openCycle(personId)`, `currentGrade(personId)` z `src/people.ts` (zwraca `{ grade, awardedOn }`; jedyne źródło bieżącego stopnia), `homeTasks(person)` i `registerHomeTasks(fn)` z `src/home-tasks.ts`, `cycleLinks(cycle, person)` i `registerCycleLinks(fn)` z `src/cycle-links.ts`, `rulesVersion()`, `setting(key)`, `createTestApp({ today, seedOptions })` z `src/test-helpers.ts`, `runSeed(db, options)` z `src/seed.ts`.
 - Silnik: `src/engine/deadlines.ts` (`addDays`, `toWorkingDay`, `isDayOff`, `nextAssessmentDeadline`, `criteriaTalkDeadline(from, afterNegative)`, `objectionDeadline`, `objectionReviewDeadline`); `src/engine/scoring.ts` (`computeAssessment(scores)` → `{ mean, overallLevel, outcome, reasons, justificationRequired }`, `mandatoryCriteria(sheet)`, `criterion(id)`); `src/engine/rules.ts` czyta `rules/regulation-2016-470.json`.
 - Trasy: `GET /`, `GET/POST /account`, `POST /demo/date`. Pliki z `public/` serwuje `serveStatic`.
-- Dane: `src/seed.ts` woła moduły z `src/seed/`. `src/seed/base.ts` wgrywa osoby (w tym dyrektora generalnego urzędu bez konta), datę `2024-12-09`, cykle Piotra, Ewy i Tomasza (bieżący, `period_start = 2024-11-12`) ze zdarzeniami `cycle_started` o payloadzie `{ reason, periodStart, previousAssessmentOn, previousOutcome }`. Tomasz ma w `base.ts` `appointed = 1` i `civil_service_grade = 5` (zob. pytanie otwarte 3).
+- Dane: `runSeed(db, options)` woła moduły z `src/seed/` w kolejności `base`, `part1`, `notes`, `assessments`, `absences`. `src/seed/base.ts` wgrywa osoby (w tym dyrektora generalnego urzędu i Katarzynę Lewandowską, podwładną Anny, obie bez konta), datę `2024-12-09`, cykle Piotra, Ewy i Tomasza (bieżący, `period_start = 2024-11-12`) ze zdarzeniami `cycle_started` o pięciu polach `{ reason, periodStart, previousAssessmentOn, previousAcknowledgedOn, previousOutcome }`. Tomasz jest urzędnikiem mianowanym ze stopniem V (`appointed = 1`, `civil_service_grade = 5`). Maria nie ma żadnego cyklu.
 
 **S-01**
 
 - Zdarzenia: `part1_submitted { sheet, criteria, dueDate, dueDateBasis, criteriaBasis, rulesVersion, place, appraiserName }` (data zdarzenia = data rozmowy o kryteriach) i `part1_confirmed { place, appraiseeName }`.
-- Trasa `GET /cycles/:id/part1` jako ekran wejściowy cyklu, który pokazuje `cycleLinks`. Widok do odczytu dla kadr jest w planie S-01 drugą pozycją do cięcia; jeśli go wycięto (kadry dostają 403), wiersz `/hr` nie pokazuje odnośnika „Część I”, a arkusz (`/cycles/:id/sheet`) zastępuje go jako wejście do cyklu, bo zawiera całą część I.
+- `savePart1(cycleId, actorId, input, date)`: zapis części I z jawnym aktorem i datą, bez sprawdzania aktora. Moduł danych S-06 zapisuje nim część I wgrywanych cykli historycznych.
+- Trasa `GET /cycles/:id/part1` jako ekran wejściowy cyklu, który pokazuje `cycleLinks`. Odnośnik do części I w wierszu `/hr` rejestruje S-01 przez `registerCycleLinks`, o ile jego trasa wpuszcza kadry; S-06 nie wpisuje go na sztywno i działa tak samo z widokiem kadr części I i bez niego. Arkusz (`/cycles/:id/sheet`) zawiera całą część I.
+- `src/views/components.tsx`: `ConfirmationBlock` (wariant wpisu o fikcji dopisuje S-02). S-06 tylko go używa i niczego w nim nie zmienia.
 - `src/seed/part1.ts`: pełna część I bieżącego cyklu Tomasza (przekazana 02.12.2024, potwierdzona 03.12.2024) i cyklu Ewy.
 
 **S-02**
 
-- Zdarzenia: `assessment_approved` z migawką `AssessmentSnapshot` z planu S-02. Ten plaster czyta z niej: `criteria: { id, name, kind, score }[]` w kolejności arkusza, `result` (`mean`, `overallLevel`, `outcome`), `justification`, `developmentConclusions`, `interviewDate`, `gradeRequest: { attached, motivation, targetGrade }`, `periodFrom` (= `cycles.period_start`), `periodTo`, `rulesVersion`, `confirmation: { place, date, name }`. `assessment_acknowledged { place, date, name, objectionDeadline }`; `acknowledgement_fiction { reason, deliveryMethod, deliveredOn, objectionDeadline }` (`reason` ∈ `could_not` | `would_not`, `deliveryMethod` ∈ `in_person` | `post` | `email`).
+- Zdarzenia: `assessment_approved` z migawką `AssessmentSnapshot` z planu S-02. Ten plaster czyta z niej: `sheet`, `criteria: { id, name, kind, score }[]` w kolejności arkusza, `result` (`mean`, `overallLevel`, `outcome`), `justification`, `developmentConclusions`, `interviewDate`, `gradeRequest: { attached, motivation, targetGrade }`, `periodFrom` (= `cycles.period_start`), `periodTo`, `deadline: { date, basis }` (`effectiveDeadline` z dnia zatwierdzenia), `grade` i `gradeAwardedOn` (stopień z dnia zatwierdzenia), `rulesVersion`, `confirmation: { place, date, name }`. `assessment_acknowledged { place, date, name, objectionDeadline }`; `acknowledgement_fiction { reason, deliveryMethod, deliveredOn, objectionDeadline }` (`reason` ∈ `could_not` | `would_not`, `deliveryMethod` ∈ `in_person` | `post` | `email`).
 - `assessmentState(cycleId)` z `src/assessment/state.ts`: `{ stage, draft, snapshot, acknowledgement, fiction, objectionDeadline }`, `stage` ∈ `no_part1` | `draft` | `approved` | `acknowledged` | `fiction`.
 - Termin sprzeciwu czytamy z payloadu zdarzenia zapoznania albo fikcji (`objectionDeadline`), nie liczymy go drugi raz (uwaga 15).
 
@@ -100,20 +102,23 @@ Same nazwy z kontraktu wspólnego.
 
 Zgodnie z kontraktem (trasy „Kadry i wydruk”, zdarzenia S-06, rozszerzenia `people`, moduł `src/seed/assessments.ts`):
 
-- Rozszerzenia tabeli: `people.appointed_year`, `people.grade_awarded_on` (stan początkowy stopnia).
-- Trasy: `GET /hr`, `GET /cycles/:id/sheet` (z parametrem `?part=1` dla samej części I), `GET /people/:id/history`, `POST /hr/grades/:personId`, `POST /cycles/:id/objection-outcome`.
+- Rozszerzenie tabeli: tylko `people.appointed_year`.
+- Klucz pliku reguł: tylko `deadlines.mandatoryGradeDays`. Granicę stopnia czyta z `approval.gradeRequest.maxGrade` (S-02).
+- Trasy: `GET /hr`, `GET /cycles/:id/sheet` (z parametrem `?part=1` dla samej części I), `GET /people/:id/history`, `POST /hr/grades/:personId`, `POST /cycles/:id/objection-outcome`. Zasady wspólne tras: po udanym `POST` przekierowanie 303; błąd walidacji 422, brak uprawnień 403, powtórzenie zamkniętego kroku 409.
 - Zdarzenia (payloady):
   - `objection_filed { to }` (adresat sprzeciwu, np. „dyrektor generalny urzędu”);
   - `objection_resolved { outcome }`, `outcome` ∈ `changed` | `redone` | `rejected`;
   - `due_change_requested { requestedDate, reason }`, `reason` to jeden z czterech powodów z art. 81 ust. 8 ustawy (lista zamknięta, decyzja 11d);
-  - `mandatory_grade_awarded { fromGrade, toGrade, basis }`, `cycle_id` = cykl drugiej oceny z pary, aktor = osoba z kadr.
-- Dane pokazowe: `src/seed/assessments.ts` (obie oceny Tomasza jako pełne łańcuchy zdarzeń, przykłady stanów uproszczonych; kształt migawki z S-02).
-- Funkcje (nowe nazwy, których kontrakt jeszcze nie wymienia; zob. „Luki kontraktu” w raporcie z dopasowania):
+  - `mandatory_grade_awarded { personId, fromGrade, toGrade, basis }`, `cycle_id` = cykl drugiej oceny z pary, aktor = osoba z kadr.
+- Dane pokazowe: `src/seed/assessments.ts` (obie oceny Tomasza jako pełne łańcuchy zdarzeń, przykłady stanów uproszczonych, w tym zamknięty cykl Katarzyny Lewandowskiej ze sprzeciwem; kształt migawki z S-02). `runSeed(db, options)` woła go jednym dopisanym wywołaniem po `notes`.
+- Funkcje:
   - `mandatoryGradeDeadline(ackOn): string` w `src/engine/deadlines.ts`;
   - `mandatoryGrade(input, today)` w `src/engine/grades.ts`;
-  - `currentGrade(personId): { grade: number | null, awardedOn: string | null }` z `src/people.ts` (kontrakt wspólny, F-01): jedno źródło bieżącego stopnia dla S-02 i S-06; S-06 jej nie tworzy, tylko używa;
-  - `cycleState(cycleId)` w `src/hr/cycle-state.ts`, `assessmentHistory(personId)` w `src/hr/history.ts`, `sheetData(cycleId)` i `canViewSheet(viewer, cycle)` w `src/hr/sheet-data.ts`, `officeStats()` w `src/hr/stats.ts`.
-- Odnośniki przez `registerCycleLinks`: „Arkusz” (`/cycles/:id/sheet`) i „Historia ocen” (`/people/:personId/history`) dla każdego, kto przechodzi `canViewSheet`. Pozycja „Stan cykli” (`/hr`) przez `registerHomeTasks` dla roli `hr`.
+  - `cycleState(cycleId)` w `src/hr/cycle-state.ts`, `assessmentHistory(personId)` w `src/hr/history.ts`, `sheetData(cycleId, options?)` i `canViewSheet(viewer, cycle)` w `src/hr/sheet-data.ts`;
+  - wewnętrznie `officeStats()` w `src/hr/stats.ts`.
+- `currentGrade(personId)` pochodzi z `src/people.ts` (F-01). S-06 tylko go używa.
+- Odnośniki przez `registerCycleLinks`, tylko dla ról, które wpuszcza trasa `GET`: „Arkusz” (`/cycles/:id/sheet`), gdy widz przechodzi `canViewSheet` (oceniany, oceniający cyklu, kadry); „Historia ocen” (`/people/:personId/history`), gdy widz przechodzi to samo sprawdzenie uprawnień co trasa historii (sama osoba, oceniający któregokolwiek jej cyklu, kadry). Pozycja „Stan cykli” (`/hr`) przez `registerHomeTasks` dla roli `hr`.
+- Pliki wspólne, do których S-06 tylko dopisuje: `src/index.tsx` (import i montowanie tras `sheet`, `history`, `/hr` i obu tras `POST`), `src/db.ts` (kolumna `people.appointed_year`), `src/seed.ts` (wywołanie `assessments` po `notes`), `rules/regulation-2016-470.json` (`deadlines.mandatoryGradeDays`), `src/engine/deadlines.ts` (`mandatoryGradeDeadline`), `src/views/layout.tsx` (jedna linia z odnośnikiem do stylu druku, bez zmiany istniejących właściwości).
 - Plik `public/print.css` (styl druku dla każdego ekranu; S-03 może z niego korzystać przy osi czasu).
 
 ## Phase 1: Wersja minimalna
@@ -122,22 +127,22 @@ Zgodnie z kontraktem (trasy „Kadry i wydruk”, zdarzenia S-06, rozszerzenia `
 
 #### 1. Reguła stopnia z mocy prawa i bieżący stopień
 
-**File**: `rules/regulation-2016-470.json`, `src/engine/deadlines.ts`, `src/engine/grades.ts`, `src/engine/grades.test.ts`, `src/people.ts` (`currentGrade` z F-01, tylko użycie), miejsce w S-02, które czyta stopień do wniosku (`approvalBlockers`, `gradeRequestOptions`, `gradeRequest.targetGrade`)
+**File**: `rules/regulation-2016-470.json`, `src/engine/deadlines.ts`, `src/engine/grades.ts`, `src/engine/grades.test.ts`; `src/people.ts` (`currentGrade` z F-01) tylko do odczytu
 
-**Intent**: Dopisać do pliku reguł w `deadlines`: `mandatoryGradeDays` (`value: 30`, `basis: "art. 89 ust. 2 ustawy"`, `from: "dzień zapoznania się z oceną"`), a w nowym kluczu `serviceGrade`: `topLevels` (lista dwóch najwyższych poziomów ogólnych: „powyżej oczekiwań”, „znacznie powyżej oczekiwań”) i `max: 9`. Wersja pliku reguł zostaje (dodanie stałej nie zmienia liczenia ocen). `mandatoryGradeDeadline` liczy `toWorkingDay(addDays(ackOn, 30))`.
+**Intent**: Dopisać do pliku reguł w `deadlines` jeden klucz: `mandatoryGradeDays` (`value: 30`, `basis: "art. 89 ust. 2 ustawy"`, `from: "dzień zapoznania się z oceną"`). Najwyższy stopień czytamy z `approval.gradeRequest.maxGrade` (klucz S-02, wartość 9). Dwa najwyższe poziomy ogólne („powyżej oczekiwań”, „znacznie powyżej oczekiwań”) to dwa ostatnie z listy poziomów, która już jest w pliku reguł. Wersja pliku reguł zostaje (dodanie stałej nie zmienia liczenia ocen). `mandatoryGradeDeadline` liczy `toWorkingDay(addDays(ackOn, 30))`.
 
 Reguła (uwaga 9):
 
-1. Bieżący stopień i jego data pochodzą z `currentGrade(personId)`: ostatnie widoczne `mandatory_grade_awarded` w cyklach osoby (`toGrade`, data zdarzenia), a gdy go nie ma, `people.civil_service_grade` i `people.grade_awarded_on`.
+1. Bieżący stopień i jego data pochodzą z `currentGrade(personId)` (F-01): ostatnie widoczne `mandatory_grade_awarded` tej osoby (`toGrade`, data zdarzenia, szukane po `payload.personId`), a gdy go nie ma, `people.civil_service_grade` i `people.grade_awarded_on`.
 2. Bierzemy **wszystkie** zatwierdzone i widoczne oceny osoby z datą `assessment_approved` późniejszą niż data bieżącego stopnia, w pełnej chronologii (`(date, id)`), także negatywne i bez zapoznania. Niczego nie odfiltrowujemy przed sprawdzeniem kolejności, żeby nie skleić dwóch ocen rozdzielonych trzecią.
-3. Idziemy po kolejnych parach (n, n+1). Para kwalifikuje się, gdy obie oceny mają `outcome = "positive"` i `overallLevel` z `serviceGrade.topLevels`. Wysoki poziom przy ocenie negatywnej się nie liczy.
+3. Idziemy po kolejnych parach (n, n+1). Para kwalifikuje się, gdy obie oceny mają `outcome = "positive"` i `overallLevel` wśród dwóch najwyższych poziomów. Wysoki poziom przy ocenie negatywnej się nie liczy.
 4. Obowiązek powstaje z pierwszej kwalifikującej się pary, w której druga ocena ma zapoznanie albo fikcję; `dueOn = mandatoryGradeDeadline(data zapoznania albo fikcji drugiej oceny)`. Para bez zapoznania z drugą oceną jeszcze nie daje obowiązku.
 5. Późniejsza ocena (także negatywna) nie kasuje obowiązku, który już powstał. Obowiązek wygasa tylko przez `mandatory_grade_awarded` (zmienia się data bieżącego stopnia).
-6. Przy bieżącym stopniu równym `max` wynik ma `toGrade: null` i `atMaxGrade: true`; ekran pisze „ma najwyższy stopień, kolejnego nie można przyznać”, bez przycisku.
+6. Przy bieżącym stopniu równym `approval.gradeRequest.maxGrade` wynik ma `toGrade: null` i `atMaxGrade: true`; ekran pisze „ma najwyższy stopień, kolejnego nie można przyznać”, bez przycisku.
 
-Jedno źródło stopnia: `currentGrade(personId)` z `src/people.ts` (F-01) zwraca ostatnie widoczne `mandatory_grade_awarded.toGrade` tej osoby z datą zdarzenia, a gdy go nie ma, `people.civil_service_grade`. Ten krok nie pisze drugiej kopii. Zdarzenie `mandatory_grade_awarded` ma w payloadzie `personId` i jest zapisane przy cyklu drugiej oceny z pary.
+Ten krok nie pisze drugiej kopii odczytu stopnia. Zdarzenie `mandatory_grade_awarded { personId, fromGrade, toGrade, basis }` jest zapisane przy cyklu drugiej oceny z pary.
 
-**Contract**: `mandatoryGradeDeadline(ackOn: string): string`. `mandatoryGrade({ isAppointed, currentGrade, currentGradeOn, assessments: { cycleId, approvedOn, outcome, overallLevel, acknowledgedOn: string | null }[] }, today): null | { dueOn, basis: "art. 89 ust. 2 ustawy", fromGrade, toGrade: number | null, assessmentDates: [string, string], acknowledgedOn, cycleId, overdue: boolean, atMaxGrade: boolean }`. Osoba z `appointed = 0` → `null`. `currentGrade(personId): { grade, awardedOn }`.
+**Contract**: `mandatoryGradeDeadline(ackOn: string): string`. `mandatoryGrade({ isAppointed, currentGrade, currentGradeOn, assessments: { cycleId, approvedOn, outcome, overallLevel, acknowledgedOn: string | null }[] }, today): null | { dueOn, basis: "art. 89 ust. 2 ustawy", fromGrade, toGrade: number | null, assessmentDates: [string, string], acknowledgedOn, cycleId, overdue: boolean, atMaxGrade: boolean }`. Osoba z `appointed = 0` → `null`. Wejście `currentGrade` i `currentGradeOn` pochodzi z `currentGrade(personId)`.
 
 #### 2. Stan cyklu i historia
 
@@ -163,19 +168,27 @@ Termin po upływie dostaje dopisek „termin minął DD.MM.RRRR”, bez kolorów
 
 #### 3. Dane pokazowe
 
-**File**: `src/seed/assessments.ts`, `src/db.ts` (kolumny `people.appointed_year`, `people.grade_awarded_on`), `src/seed.ts` (wywołanie modułu po `part1.ts`)
+**File**: `src/seed/assessments.ts`, `src/db.ts` (kolumna `people.appointed_year`), `src/seed.ts` (jedno wywołanie modułu w `runSeed(db, options)` po `notes`)
 
-**Intent**: Każda ocena w danych jest pełnym łańcuchem zdarzeń z datami: `cycle_started`, `part1_submitted` (z kryteriami w `cycle_criteria`), `part1_confirmed`, `assessment_approved` z kompletną migawką S-02, `assessment_acknowledged` (uwaga 10). Żadna osoba nie ma `assessment_approved` bez części I: moduł przerywa seed z komunikatem, jeśli cykl nie ma widocznego w łańcuchu `part1_confirmed` przed datą zatwierdzenia. Zdarzenia zapisuje `seedEvent(...)` z jawną datą, więc odsłaniają się przy przesuwaniu daty (decyzja 10i). Migawkę składa jedna funkcja pomocnicza w module z `computeAssessment(scores)`, `mandatoryCriteria(sheet)` i `criterion(id)`; `periodFrom = cycles.period_start`, `periodTo` = data zatwierdzenia, `rulesVersion` z `rulesVersion()`, `confirmation` z `settings.office_city`, datą i nazwiskiem oceniającego, `objectionDeadline` = `objectionDeadline(data zapoznania)`. Treść uzasadnień i wniosków pisze agent przy budowie (decyzja 10e).
+**Intent**: Każda ocena w danych jest pełnym łańcuchem zdarzeń z datami: `cycle_started`, `part1_submitted` (z kryteriami w `cycle_criteria`), `part1_confirmed`, `assessment_approved` z kompletną migawką złożoną przez `buildAssessmentSnapshot(cycleId, draft, { asOf })` z S-02 (moduł danych nie składa migawki własnym kodem), `assessment_acknowledged` (uwaga 10). Część I wgrywanych cykli historycznych zapisuje `savePart1(cycleId, actorId, input, date)` z S-01 z jawnym aktorem (oceniającym cyklu) i historyczną datą; `part1_confirmed` i pozostałe zdarzenia zapisuje `seedEvent(...)` z jawną datą, więc odsłaniają się przy przesuwaniu daty (decyzja 10i). Każde wgrywane `cycle_started` ma wszystkie pięć pól `{ reason, periodStart, previousAssessmentOn, previousAcknowledgedOn, previousOutcome }`.
+
+Moduł buduje łańcuchy historyczne przy dacie systemowej `2024-12-09`, czyli zanim data dojdzie do ich zdarzeń. Dlatego sprawdzanie i składanie migawek używa jawnej daty:
+
+- Żadna osoba nie ma `assessment_approved` bez części I: moduł przerywa seed z komunikatem, jeśli `visibleEvents(cycleId, { asOf: data zatwierdzenia })` nie zawiera `part1_confirmed`.
+- Migawkę składa jedna funkcja pomocnicza w module z `computeAssessment(scores)`, `mandatoryCriteria(sheet)` i `criterion(id)`: `sheet` z `cycles.sheet`, `periodFrom = cycles.period_start`, `periodTo` = data zatwierdzenia, `deadline = effectiveDeadline(cycleId, { asOf: data zatwierdzenia })`, `grade` i `gradeAwardedOn` = `people.civil_service_grade` i `people.grade_awarded_on` (w danych nie ma wcześniejszego `mandatory_grade_awarded`; dla osoby bez stopnia oba `null`), `rulesVersion` z `rulesVersion()`, `confirmation` z `setting("office_city")`, datą zatwierdzenia i nazwiskiem oceniającego.
+- `objectionDeadline` w `assessment_acknowledged` = `objectionDeadline(data zapoznania)`.
+
+Treść uzasadnień i wniosków pisze agent przy budowie (decyzja 10e).
 
 | Osoba | Co wgrać | Daty |
 |---|---|---|
-| Tomasz (arkusz B, oceniająca Anna) | `appointed_year = 2016`, `grade_awarded_on = 2022-12-01` (`appointed = 1` i `civil_service_grade = 5` z `base.ts`) | — |
-| Tomasz, poprzedni cykl | nowy wiersz `cycles` (`period_start = 2022-11-14`, arkusz B, oceniająca Anna) i łańcuch: `cycle_started` 2022-11-14 (`reason` jak w `base.ts` dla cyklu po poprzedniej ocenie, `previousAssessmentOn = 2022-11-14`, `previousOutcome = "positive"`), `part1_submitted` 2022-12-05, `part1_confirmed` 2022-12-06, `assessment_approved` 2024-11-12 (oceny 7, 7, 9, 7, 7; średnia 7,4; „powyżej oczekiwań”; pozytywna; `gradeRequest.attached: false`), `assessment_acknowledged` 2024-11-12 | widoczne od startu pokazu |
-| Tomasz, bieżący cykl | do łańcucha z `base.ts` i `part1.ts` (cykl od 2024-11-12, część I 02.12.2024 / 03.12.2024): `assessment_approved` 2026-11-12 (oceny 7, 9, 7, 7, 7; średnia 7,4; „powyżej oczekiwań”; pozytywna; `gradeRequest.attached: false`; wnioski rozwojowe wpisane), `assessment_acknowledged` 2026-11-12 | odsłania się 12.11.2026; termin stopnia 14.12.2026 |
-| Maria (arkusz C, oceniający Marek) | nowy wiersz `cycles` (`period_start = 2024-11-18`) i łańcuch: `cycle_started` 2024-11-18, `part1_submitted` 2024-11-25, `part1_confirmed` 2024-11-26, `assessment_approved` 2026-11-16 (pozytywna, „na poziomie oczekiwań”), `assessment_acknowledged` 2026-11-17 (sprzeciw do 24.11.2026), `objection_filed` 2026-11-20 (`to: "dyrektor generalny urzędu"`) | cykl widoczny od 18.11.2024; sprzeciw od 20.11.2026, rozpatrzenie do 04.12.2026 |
-| Anna (arkusz B, oceniający dyrektor generalny) | nowy wiersz `cycles` (`period_start = 2024-12-16`) i łańcuch: `cycle_started` 2024-12-16, `part1_submitted` 2025-01-14, `part1_confirmed` 2025-01-15, `due_change_requested` 2026-10-05 (`requestedDate`, `reason` z listy art. 81 ust. 8, bez danych o zdrowiu) | cykl widoczny od 16.12.2024; wniosek od 05.10.2026 |
+| Tomasz (arkusz B, oceniająca Anna) | `appointed_year = 2016` w jego wierszu `people` (stopień V, `grade_awarded_on = 2022-12-01` i `appointed = 1` są z `base.ts`) | — |
+| Tomasz, poprzedni cykl | nowy wiersz `cycles` (`period_start = 2022-11-14`, arkusz B, oceniająca Anna) i łańcuch: `cycle_started` 2022-11-14 (`reason: "previous_assessment"`, `periodStart: "2022-11-14"`, `previousAssessmentOn: "2022-11-14"`, `previousAcknowledgedOn: "2022-11-14"`, `previousOutcome: "positive"`), część I przez `savePart1` z datą 2022-12-05, `part1_confirmed` 2022-12-06, `assessment_approved` 2024-11-12 (oceny 7, 7, 9, 7, 7; średnia 7,4; „powyżej oczekiwań”; pozytywna; `grade: 5`, `gradeAwardedOn: "2022-12-01"`; `gradeRequest.attached: false`), `assessment_acknowledged` 2024-11-12 | widoczne od startu pokazu |
+| Tomasz, bieżący cykl | do łańcucha z `base.ts` i `part1.ts` (cykl od 2024-11-12, część I 02.12.2024 / 03.12.2024): `assessment_approved` 2026-11-12 (oceny 7, 9, 7, 7, 7; średnia 7,4; „powyżej oczekiwań”; pozytywna; `grade: 5`, `gradeAwardedOn: "2022-12-01"`; `gradeRequest.attached: false`; wnioski rozwojowe wpisane), `assessment_acknowledged` 2026-11-12 | odsłania się 12.11.2026; termin stopnia 14.12.2026 |
+| Katarzyna Lewandowska (osoba bez konta z `base.ts`, podwładna Anny; arkusz C, oceniająca Anna) | nowy wiersz `cycles` (`period_start = 2024-11-18`) i łańcuch: `cycle_started` 2024-11-18 (`reason: "previous_assessment"`, `periodStart: "2024-11-18"`, `previousAssessmentOn: "2024-11-18"`, `previousAcknowledgedOn: "2024-11-18"`, `previousOutcome: "positive"`), część I przez `savePart1` z datą 2024-11-25, `part1_confirmed` 2024-11-26, `assessment_approved` 2026-11-16 (pozytywna, „na poziomie oczekiwań”, `grade: null`, `gradeAwardedOn: null`), `assessment_acknowledged` 2026-11-17 (sprzeciw do 24.11.2026), `objection_filed` 2026-11-20 (`to: "dyrektor generalny urzędu"`) | cykl widoczny od 18.11.2024; sprzeciw od 20.11.2026, rozpatrzenie do 04.12.2026 |
+| Anna (arkusz B, oceniający dyrektor generalny) | nowy wiersz `cycles` (`period_start = 2024-12-16`) i łańcuch: `cycle_started` 2024-12-16 (`reason: "previous_assessment"`, `periodStart: "2024-12-16"`, `previousAssessmentOn: "2024-12-16"`, `previousAcknowledgedOn: "2024-12-16"`, `previousOutcome: "positive"`), część I przez `savePart1` z aktorem dyrektor generalny i datą 2025-01-14, `part1_confirmed` 2025-01-15, `due_change_requested` 2026-10-05 (`requestedDate`, `reason` z listy art. 81 ust. 8, bez danych o zdrowiu) | cykl widoczny od 16.12.2024; wniosek od 05.10.2026 |
 
-Daty Marii są dobrane tak, żeby jej część I była potwierdzona przed krokiem 1 (09.12.2024), a ocena zatwierdzona przed terminem 18.11.2026; w kroku 4 (21.11.2026) Maria nie ma otwartego cyklu, więc zdanie S-05 o Marii i formularz notatki S-04 bez cyklu działają jak w ich planach.
+Daty Katarzyny są dobrane tak, żeby jej część I była potwierdzona przed krokiem 1 (09.12.2024), a ocena zatwierdzona przed terminem z `effectiveDeadline` (18.11.2026). Maria nie dostaje żadnego cyklu.
 
 Stan „fikcja zapoznania” nie jest wgrywany: powstaje na żywo w osobnym przebiegu wersji 5-minutowej (S-02, `demo.md`). Stan „część I czeka” daje cykl Piotra w kroku 1 między przekazaniem a potwierdzeniem. Testy obu stanów dopisują zdarzenia przez `seedEvent` w teście.
 
@@ -183,15 +196,15 @@ Stan „fikcja zapoznania” nie jest wgrywany: powstaje na żywo w osobnym prze
 
 #### 4. Ekran kadr: karta stopnia i tabela stanów
 
-**File**: `src/routes/hr.tsx`, `src/views/hr-overview.tsx`, `src/index.tsx` (podpięcie trasy), `src/hr/links.ts` (rejestracja w `registerHomeTasks` i `registerCycleLinks`)
+**File**: `src/routes/hr.tsx`, `src/views/hr-overview.tsx`, `src/index.tsx` (dopisany import i montowanie tras `/hr`, `sheet`, `history` i tras `POST` tego plastra), `src/hr/links.ts` (rejestracja w `registerHomeTasks` i `registerCycleLinks`)
 
 **Intent**: Ekran Joanny na wspólnym układzie. Od góry: karta obowiązku stopnia (jedna na osobę, której się należy), tabela cykli (najnowszy widoczny cykl każdej osoby, sortowana po terminie rosnąco, bez sortowania po wyniku), w fazie 2 blok statystyk.
 
 Karta stopnia (uwaga 18): nagłówek „Obowiązek urzędu: stopień służbowy z mocy prawa”; osobne pole „Urzędnik” z imieniem i nazwiskiem; treść „Urząd ma obowiązek przyznać kolejny stopień służbowy, bo od ostatniego stopnia są dwie kolejne oceny pozytywne na jednym z dwóch najwyższych poziomów: 12.11.2024 i 12.11.2026” (bez nazw poziomów); „Przyznać do 14.12.2026: 30 dni od zapoznania z oceną 12.11.2026, koniec w sobotę 12.12.2026, więc poniedziałek (art. 89 ust. 2 ustawy)”; „Stopień V → VI”; „To obowiązek, nie wniosek”. Nic nie stoi „przy nazwisku”: nazwisko jest wartością pola, a obowiązek dotyczy urzędu.
 
-Wiersz tabeli: imię i nazwisko, oceniający, arkusz, tekst stanu, termin z podstawą, odnośnik „Część I” (`/cycles/:id/part1`, ekran wejściowy cyklu) i odnośniki z `cycleLinks(cycle, joanna)` (arkusz i historia z tego plastra; S-03 dopisze tam swoje przez `registerCycleLinks`, bez zmian w tym widoku).
+Wiersz tabeli: imię i nazwisko, oceniający, arkusz, tekst stanu, termin z podstawą (dla cyklu otwartego z `effectiveDeadline(cycleId)`) i odnośniki z `cycleLinks(cycle, viewer)`. Widok nie wpisuje na sztywno żadnego odnośnika do trasy innego plastra: część I (S-01), ocena (S-02) i „Wpisz nieobecność” (S-03) pojawiają się w wierszu tylko wtedy, gdy ich plastry zarejestrują je dla kadr.
 
-Odnośniki (uwaga 4): `registerCycleLinks` dodaje „Arkusz” i „Historia ocen” na ekranie wejściowym cyklu `GET /cycles/:id/part1` dla ocenianego, oceniającego i kadr; `registerHomeTasks` dodaje Joannie pozycję „Stan cykli” prowadzącą do `/hr`.
+Odnośniki (uwaga 4): `registerCycleLinks` dodaje „Arkusz” i „Historia ocen” według uprawnień ich tras `GET` (opis w „Co ten plaster udostępnia”); te same odnośniki widać na ekranie wejściowym cyklu `GET /cycles/:id/part1` i w wierszach `/hr`. `registerHomeTasks` dodaje Joannie pozycję „Stan cykli” prowadzącą do `/hr`.
 
 Nowe komponenty UI (wygląd z design systemu autora, decyzja 10b): `ReminderCard` (karta przypomnienia z polami, terminem i podstawą), `CycleStateTable` (tabela stanów). Jeśli design system ma odpowiedniki (karta, tabela), używasz ich zamiast nowych.
 
@@ -203,7 +216,7 @@ Nowe komponenty UI (wygląd z design systemu autora, decyzja 10b): `ReminderCard
 
 **Intent**: Podgląd arkusza w dowolnym kroku cyklu: pola jeszcze niewypełnione pokazują „—”. Dane tylko z widocznych zdarzeń: część I z migawki `part1_submitted` i `part1_confirmed`, ocena z migawki `assessment_approved`, zapoznanie albo fikcja z ich payloadów. Kolejność pól według wzoru z zał. 2–4 do rozporządzenia (nagłówki części i nazwy pól po polsku):
 
-1. **Część I.** Nazwa urzędu (`settings.office_name`). Oceniany: imię i nazwisko, stanowisko (`people.position_title`), komórka organizacyjna (`people.unit`; B i C). Oceniający: imię i nazwisko (`part1_submitted.payload.appraiserName`), stanowisko, komórka organizacyjna (B i C). Kryteria obowiązkowe (lista arkusza). Kryteria dodatkowe (0–3, nazwy, oczekiwanie). Termin sporządzenia oceny: `part1_submitted.payload.dueDate` z `dueDateBasis` (termin przekazany w części I); gdy ocena nie jest jeszcze zatwierdzona, a `effectiveDeadline(cycleId).date` jest inna, pod spodem „Termin bieżący: DD.MM.RRRR (podstawa)”. Oświadczenie o rozmowie z § 5 ust. 1 i zapoznaniu z kryteriami i terminem. Potwierdzenie oceniającego (`place`, data `part1_submitted`, `appraiserName`), potwierdzenie ocenianego (`place`, data `part1_confirmed`, `appraiseeName`).
+1. **Część I.** Nazwa urzędu (`settings.office_name`). Oceniany: imię i nazwisko, stanowisko (`people.position_title`), komórka organizacyjna (`people.unit`; B i C). Oceniający: imię i nazwisko (`part1_submitted.payload.appraiserName`), stanowisko, komórka organizacyjna (B i C). Kryteria obowiązkowe (lista arkusza). Kryteria dodatkowe (0–3, nazwy, oczekiwanie). Termin sporządzenia oceny: `part1_submitted.payload.dueDate` z `dueDateBasis` (termin przekazany w części I). Pod spodem, gdy data jest inna niż przekazana: w cyklu otwartym „Termin bieżący: DD.MM.RRRR (podstawa)” z `effectiveDeadline(cycleId)`, a po zatwierdzeniu „Termin w dniu zatwierdzenia: DD.MM.RRRR (podstawa)” z `AssessmentSnapshot.deadline`. Oświadczenie o rozmowie z § 5 ust. 1 i zapoznaniu z kryteriami i terminem. Potwierdzenie oceniającego (`place`, data `part1_submitted`, `appraiserName`), potwierdzenie ocenianego (`place`, data `part1_confirmed`, `appraiseeName`).
 2. **Część II.** Data rozmowy oceniającej (`interviewDate`). Okres podlegania ocenie od `periodFrom` (= `cycles.period_start`; przed zatwierdzeniem wprost z `cycles.period_start`) do `periodTo`. Macierz ocen cząstkowych: wiersz na kryterium obowiązkowe, potem dodatkowe; kolumny 1, 3, 5, 7, 9 z nazwami skali; „X” w wybranej. Średnia (bez zaokrąglania w obliczeniu, wyświetlana z dwoma miejscami). Ogólny poziom: pięć przedziałów, „X” przy wyliczonym. Ocena okresowa: POZYTYWNA albo NEGATYWNA, „X”.
 3. **Dalsza część.** Uzasadnienie przyznanej oceny. Wnioski do indywidualnego programu rozwoju zawodowego. Dane poprzedniej oceny (tylko urzędnik mianowany; z `assessmentHistory`: wynik, poziom, data, albo „brak w systemie”). Czy dołączono wniosek o kolejny stopień: TAK / NIE / NIE DOTYCZY (NIE DOTYCZY dla `appointed = 0`). Dane oceniającego. Potwierdzenie oceniającego (`confirmation`). Potwierdzenie ocenianego (rozmowa oceniająca, zapoznanie z oceną i wnioskami; z `assessment_acknowledged`) albo wpis o fikcji zapoznania: „Stwierdzono fikcję zapoznania DD.MM.RRRR: oceniany nie mógł / nie chciał potwierdzić. Kopię arkusza doręczono osobiście / pocztą / pocztą elektroniczną DD.MM.RRRR. Wpis oceniającego: imię i nazwisko” (decyzja 11a). **Pouczenie**: „Od oceny przysługuje sprzeciw do dyrektora generalnego urzędu w terminie 7 dni od dnia zapoznania się z oceną (art. 83 ust. 1 ustawy)”; dla arkusza A adresatem jest kierownik urzędu. Pouczenie jest zawsze w HTML i na wydruku (nie ma klasy `no-print`).
 4. **Część III** (faza 2, zmiana 2).
@@ -212,13 +225,13 @@ Blok potwierdzenia ma postać „Potwierdzenie w systemie: <miejscowość>, <DD.
 
 Uprawnienia: `canViewSheet` przepuszcza ocenianego (`cycles.person_id`), oceniającego cyklu (`cycles.appraiser_id`) i rolę `hr` (Access Control); pozostali 403. Oceniany drukuje własny egzemplarz części I i całego arkusza tymi samymi przyciskami. Na arkusz nie trafia nic z tabel `notes` ani `feedback_messages`.
 
-Nowe komponenty UI: `SheetField` (etykieta i wartość, „—” gdy puste), `ScoreMatrix` (macierz z „X”), `PrintButton`. Blok potwierdzenia to `ConfirmationBlock` z `src/views/components.tsx` (tworzy go S-01), rozszerzony tu o wpis o fikcji.
+Nowe komponenty UI: `SheetField` (etykieta i wartość, „—” gdy puste), `ScoreMatrix` (macierz z „X”), `PrintButton`. Blok potwierdzenia i wpis o fikcji to `ConfirmationBlock` z `src/views/components.tsx` (tworzy go S-01, wariant fikcji dopisuje S-02); S-06 tylko go używa i niczego w nim nie zmienia.
 
-**Contract**: `sheetData(cycleId, { part?: 1 }): SheetData` (wszystkie pola powyżej w tej kolejności, puste jako `null`); `canViewSheet(viewer, cycle): boolean`; `GET /cycles/:id/sheet` i `GET /cycles/:id/sheet?part=1` → 200 / 403 / 404 (cykl bez widocznego `cycle_started` → 404).
+**Contract**: `sheetData(cycleId, options?: { part: 1 }): SheetData` (drugi argument opcjonalny; wszystkie pola powyżej w tej kolejności, puste jako `null`; termin według tabeli kontraktu „Skąd ekran bierze termin oceny”); `canViewSheet(viewer, cycle): boolean`; `GET /cycles/:id/sheet` i `GET /cycles/:id/sheet?part=1` → 200 / 403 / 404 (cykl bez widocznego `cycle_started` → 404).
 
 #### 6. Styl druku
 
-**File**: `public/print.css`, `src/views/layout.tsx` (jedna linia `<link rel="stylesheet" href="/print.css" media="print">`)
+**File**: `public/print.css` (nowy), `src/views/layout.tsx` (dopisana jedna linia `<link rel="stylesheet" href="/print.css" media="print">`, bez zmiany istniejących właściwości układu)
 
 **Intent**: Wydruk arkusza czytelny na A4, bez elementów aplikacji. Reguły:
 
@@ -255,47 +268,49 @@ Nowy komponent UI: `HistoryList`.
 
 #### Manual Verification:
 
-- Pełny przebieg pokazu do kroku 5 (data 2026-11-22): `/hr` pokazuje kartę Tomasza z terminem 14.12.2026, sprzeciw Marii z rozpatrzeniem do 04.12.2026, wniosek Anny z podstawą i zdaniem o zawiadomieniu oraz zapoznanie Piotra z sprzeciwem do 30.11.2026
+- Pełny przebieg pokazu do kroku 5 (data 2026-11-22): `/hr` pokazuje kartę Tomasza z terminem 14.12.2026, sprzeciw Katarzyny Lewandowskiej z rozpatrzeniem do 04.12.2026, wniosek Anny z podstawą i zdaniem o zawiadomieniu oraz zapoznanie Piotra z sprzeciwem do 30.11.2026
 - Podgląd wydruku w przeglądarce (Chrome, A4) arkusza Piotra po potwierdzeniu zapoznania, z konta Piotra: bez nawigacji i przycisków, części od nowej strony, macierz nie łamie się między stronami, pouczenie o sprzeciwie jest, nigdzie słowo „podpis”
 - Podgląd wydruku arkusza Tomasza z 12.11.2026: pole „Dane poprzedniej oceny” pokazuje ocenę z 12.11.2024
 
 ## Phase 2: Po wersji minimalnej
 
-Budowane w tej kolejności; tniemy w odwrotnej (zob. „Kolejność cięcia”).
+Budowane w kolejności listy „Kolejność cięcia”; tniemy od dołu tej listy.
 
 ### Changes Required:
 
-#### 1. Odnotowanie przyznania stopnia (cięcie 5)
+#### 1. Odnotowanie przyznania stopnia (pozycja 1 listy cięcia, potrzebne do wersji 5-minutowej pokazu)
 
 **File**: `src/routes/hr.tsx`
 
-**Intent**: Przycisk „Odnotuj przyznanie stopnia” na karcie (nie przy stopniu IX). Zapis tylko po kliknięciu człowieka (zasada 7). Zdarzenie dostaje datę `today()`, `cycle_id` drugiej oceny z pary i aktora z kadr. Po zapisie karta znika, bo `currentGrade` zwraca nowy stopień z datą dzisiejszą, a reguła liczy oceny od niej; S-02 widzi ten sam nowy stopień. Ponowne kliknięcie (druga wysyłka formularza) nie tworzy drugiego zdarzenia: serwer sprawdza `mandatoryGrade` przed zapisem.
+**Intent**: Przycisk „Odnotuj przyznanie stopnia” na karcie (nie przy stopniu równym `approval.gradeRequest.maxGrade`). Zapis tylko po kliknięciu człowieka (zasada 7). Zdarzenie dostaje datę `today()`, `cycle_id` drugiej oceny z pary i aktora z kadr. Po zapisie karta znika, bo `currentGrade` zwraca nowy stopień z datą dzisiejszą, a reguła liczy oceny od niej; S-02 widzi ten sam nowy stopień. Ponowne kliknięcie (druga wysyłka formularza) nie tworzy drugiego zdarzenia: serwer sprawdza `mandatoryGrade` przed zapisem.
 
-**Contract**: `POST /hr/grades/:personId` → `recordEvent("mandatory_grade_awarded", cycleId, actorId, { fromGrade, toGrade, basis: "art. 89 ust. 2 ustawy" })`, przekierowanie 303 na `/hr`. Tylko `role = 'hr'` (inni 403). Brak obowiązku albo stopień IX → 409 bez zapisu.
+**Contract**: `POST /hr/grades/:personId` → `recordEvent("mandatory_grade_awarded", cycleId, actorId, { personId, fromGrade, toGrade, basis: "art. 89 ust. 2 ustawy" })`, przekierowanie 303 na `/hr`. Tylko `role = 'hr'` (inni 403). Brak obowiązku albo stopień najwyższy → 409 bez zapisu.
 
-#### 2. Część III arkusza i poprzednie oceny Piotra i Ewy (cięcia 3 i 4)
+#### 2. Poprzednie oceny Piotra i Ewy oraz część III arkusza (pozycje 2 i 3 listy cięcia)
 
 **File**: `src/hr/sheet-data.ts`, `src/views/sheet.tsx`, `src/seed/assessments.ts`
 
-**Intent**: Część III (tylko `appointed = 1` i `gradeRequest.attached`): imię i nazwisko, rok mianowania (`people.appointed_year`), posiadany stopień i data przyznania (z `currentGrade` na dzień zatwierdzenia), zdanie wniosku z art. 89 ust. 1 ustawy, umotywowanie, potwierdzenie oceniającego. Poprzednie oceny Piotra (zatwierdzona i potwierdzona 27.11.2024) i Ewy (20.11.2024) jako pełne łańcuchy w zamkniętych cyklach (nowe wiersze `cycles` z `period_start` 24 miesiące wcześniej, część I w pierwszych 30 dniach, pozytywne, „na poziomie oczekiwań”), widoczne od startu pokazu; daty zgodne z `previousAssessmentOn` w `cycle_started` z `base.ts`.
+**Intent**: Poprzednie oceny Piotra (zatwierdzona i potwierdzona 27.11.2024) i Ewy (20.11.2024) jako pełne łańcuchy w zamkniętych cyklach (nowe wiersze `cycles` z `period_start` 24 miesiące wcześniej, część I przez `savePart1` w pierwszych 30 dniach, pozytywne, „na poziomie oczekiwań”, `grade` i `gradeAwardedOn` w migawce `null`), widoczne od startu pokazu; daty zgodne z `previousAssessmentOn` i `previousAcknowledgedOn` w `cycle_started` z `base.ts`. Każde z tych `cycle_started` ma pięć pól (`reason: "previous_assessment"`, `periodStart` = `period_start`, `previousAssessmentOn` i `previousAcknowledgedOn` = `period_start`, `previousOutcome: "positive"`); sprawdzanie i migawki jak w fazie 1, zmiana 3 (`asOf`).
+
+Część III (tylko `appointed = 1` i `gradeRequest.attached`): imię i nazwisko, rok mianowania (`people.appointed_year`), posiadany stopień i data jego przyznania z migawki (`grade`, `gradeAwardedOn`, czyli stan z dnia zatwierdzenia, nie dzisiejszy `currentGrade`), zdanie wniosku z art. 89 ust. 1 ustawy, umotywowanie, potwierdzenie oceniającego.
 
 **Contract**: część III w HTML tylko przy `gradeRequest.attached`; `assessmentHistory` Piotra przy 2024-12-09 zwraca jedną ocenę z 27.11.2024.
 
-#### 3. Statystyki bez nazwisk (cięcie 2)
+#### 3. Statystyki bez nazwisk (pozycja 4 listy cięcia)
 
 **File**: `src/hr/stats.ts`, `src/views/hr-overview.tsx`
 
-**Intent**: Blok z nagłówkiem „Statystyki terminowości (widok dyrektora generalnego, bez nazwisk)”: liczba cykli w każdym kroku, oceny zatwierdzone w terminie i po terminie (data `assessment_approved` względem `effectiveDeadline(cycleId).date`), cykle po terminie bez oceny. Dla całego urzędu, bez podziału na komórki i bez nazwisk; tylko widoczne zdarzenia. Nowy komponent UI `StatsBlock` (albo odpowiednik z design systemu).
+**Intent**: Blok z nagłówkiem „Statystyki terminowości (widok dyrektora generalnego, bez nazwisk)”: liczba cykli w każdym kroku, oceny zatwierdzone w terminie i po terminie (data `assessment_approved` względem `AssessmentSnapshot.deadline.date`), cykle otwarte po terminie bez oceny (`today()` względem `effectiveDeadline(cycleId).date`). Dla całego urzędu, bez podziału na komórki i bez nazwisk; tylko widoczne zdarzenia. Nowy komponent UI `StatsBlock` (albo odpowiednik z design systemu).
 
 **Contract**: `officeStats(): { byStep: Record<step, number>, onTime: number, late: number, overdueOpen: number }`.
 
-#### 4. Odnotowanie rozstrzygnięcia sprzeciwu (cięcie 1)
+#### 4. Odnotowanie rozstrzygnięcia sprzeciwu (pozycja 5 listy cięcia)
 
 **File**: `src/routes/hr.tsx`
 
 **Intent**: Przy stanie `objection_filed` trzy przyciski: „Uwzględniony: zmiana oceny”, „Uwzględniony: ponowne sporządzenie oceny”, „Nieuwzględniony”. To stan uproszczony z decyzji 4 (FR-028); system nie prowadzi dalszego obiegu.
 
-**Contract**: `POST /cycles/:id/objection-outcome` z polem `outcome` ∈ `changed` | `redone` | `rejected` → `recordEvent("objection_resolved", cycleId, actorId, { outcome })`, 303 na `/hr`. Tylko `role = 'hr'`; inna wartość `outcome` → 400; cykl bez widocznego `objection_filed` → 409.
+**Contract**: `POST /cycles/:id/objection-outcome` z polem `outcome` ∈ `changed` | `redone` | `rejected` → `recordEvent("objection_resolved", cycleId, actorId, { outcome })`, 303 na `/hr`. Tylko `role = 'hr'` (inni 403); inna wartość `outcome` → 422 bez zapisu; cykl bez widocznego `objection_filed` albo z już widocznym `objection_resolved` → 409.
 
 ### Success Criteria:
 
@@ -310,20 +325,20 @@ Budowane w tej kolejności; tniemy w odwrotnej (zob. „Kolejność cięcia”).
 
 ## Testing Strategy
 
-Testy obok kodu, trasy przez `app.request()` na `createTestApp({ today })` (baza w pamięci z wgranymi danymi i datą systemową).
+Testy obok kodu, trasy przez `app.request()` na `createTestApp({ today, seedOptions })` (baza w pamięci z wgranymi przez `runSeed` danymi i datą systemową).
 
 **Faza 1**
 
 - `src/engine/grades.test.ts`: przypadek Tomasza (zapoznanie 2026-11-12 → `dueOn` 2026-12-14, przeniesienie z soboty 12.12.2026); wysoka ocena negatywna (poziom „powyżej oczekiwań”, `outcome: "negative"`) nie tworzy pary; ocena pośrodku (wysoka, „na poziomie”, wysoka) → `null`; brak zapoznania z drugą oceną → `null`, po dopisaniu zapoznania → obowiązek; fikcja zapoznania liczy się jak zapoznanie (data wpisu); późniejsza ocena „na poziomie” po powstałym obowiązku go nie kasuje; pracownik niemianowany → `null`; ocena sprzed bieżącego stopnia się nie liczy; stopień IX → `atMaxGrade: true`, `toGrade: null`; po `mandatory_grade_awarded` → `null` (przez `currentGrade`).
-- `src/hr/cycle-state.test.ts`: każdy `step` z tabeli; `criteria_due` przy poprzedniej ocenie pozytywnej daje 30 dni, przy negatywnej 7 dni (wartość z `criteriaTalkDeadline`, różne daty sporządzenia i zapoznania); `in_period` pokazuje datę i podstawę z `effectiveDeadline`; „część I czeka od X dni” liczy dni od `part1_submitted`; stan fikcji ma sposób i datę doręczenia; widoczność (uwaga 11) dzień przed, w dniu i po zdarzeniu: cykl Anny przy 2024-12-15 / 2024-12-16 / 2024-12-17, sprzeciw Marii przy 2026-11-19 / 2026-11-20 / 2026-11-21, historia Tomasza (1 / 2 / 2 oceny) i karta stopnia (brak / jest / jest) przy 2026-11-11 / 2026-11-12 / 2026-11-13.
-- `src/routes/hr.test.ts`: Joanna przy 2026-11-22 widzi pole „Urzędnik” z „Tomasz Kamiński”, nagłówek „Obowiązek urzędu”, „14.12.2026” i „art. 89 ust. 2”; widzi stan sprzeciwu Marii z „04.12.2026” i wniosek Anny z „art. 81 ust. 8” i zdaniem „zawiadamia pracownika pisemnie”; ekran startowy Joanny ma odnośnik do `/hr`; każdy wiersz ma odnośnik do `/cycles/:id/part1`, arkusza i historii; ekran `/cycles/:id/part1` cyklu Tomasza ma odnośniki „Arkusz” i „Historia ocen”; Piotr dostaje 403; HTML `/hr` nie zawiera nazw poziomów („powyżej oczekiwań” itd.) ani słów „pozytywna”/„negatywna”.
-- `src/routes/sheet.test.ts`: Piotr otwiera własny arkusz i `?part=1` (200; w `?part=1` jest „Część I” i nie ma „Część II”); Ewa dostaje 403 na arkusz Piotra, Joanna 200, Marek 200; kolejność w HTML: „Część I” < „Część II” < „Uzasadnienie” < „Wnioski do indywidualnego programu” < „Pouczenie”; pouczenie zawiera „7 dni” i „art. 83 ust. 1” i nie jest w elemencie `no-print`; HTML nie zawiera „podpis” (bez względu na wielkość liter) ani tekstu żadnej wgranej notatki; przy fikcji zapoznania jest wpis „nie mógł” albo „nie chciał” ze sposobem i datą doręczenia; okres od = `cycles.period_start` (Piotr: 27.11.2024, nie 09.12.2024).
+- `src/hr/cycle-state.test.ts`: każdy `step` z tabeli; `criteria_due` przy poprzedniej ocenie pozytywnej daje 30 dni, przy negatywnej 7 dni (wartość z `criteriaTalkDeadline`, różne daty sporządzenia i zapoznania); `in_period` pokazuje datę i podstawę z `effectiveDeadline`; „część I czeka od X dni” liczy dni od `part1_submitted`; stan fikcji ma sposób i datę doręczenia; widoczność (uwaga 11) dzień przed, w dniu i po zdarzeniu: cykl Anny przy 2024-12-15 / 2024-12-16 / 2024-12-17, sprzeciw Katarzyny Lewandowskiej przy 2026-11-19 / 2026-11-20 / 2026-11-21, historia Tomasza (1 / 2 / 2 oceny) i karta stopnia (brak / jest / jest) przy 2026-11-11 / 2026-11-12 / 2026-11-13.
+- `src/routes/hr.test.ts`: Joanna przy 2026-11-22 widzi pole „Urzędnik” z „Tomasz Kamiński”, nagłówek „Obowiązek urzędu”, „14.12.2026” i „art. 89 ust. 2”; widzi stan sprzeciwu Katarzyny Lewandowskiej z „04.12.2026” i wniosek Anny z „art. 81 ust. 8” i zdaniem „zawiadamia pracownika pisemnie”; ekran startowy Joanny ma odnośnik do `/hr`; każdy wiersz ma odnośniki tego plastra „Arkusz” (`/cycles/:id/sheet`) i „Historia ocen” (`/people/:id/history`); test nie sprawdza odnośników innych plastrów, więc przechodzi z widokiem kadr części I z S-01 i bez niego; ekran `/cycles/:id/part1` cyklu Tomasza otwarty z konta Tomasza ma odnośniki „Arkusz” i „Historia ocen”; Piotr dostaje 403 na `/hr`; HTML `/hr` nie zawiera nazw poziomów („powyżej oczekiwań” itd.) ani słów „pozytywna”/„negatywna”.
+- `src/routes/sheet.test.ts`: Piotr otwiera własny arkusz i `?part=1` (200; w `?part=1` jest „Część I” i nie ma „Część II”); Ewa dostaje 403 na arkusz Piotra, Joanna 200, Marek 200; kolejność w HTML: „Część I” < „Część II” < „Uzasadnienie” < „Wnioski do indywidualnego programu” < „Pouczenie”; pouczenie zawiera „7 dni” i „art. 83 ust. 1” i nie jest w elemencie `no-print`; HTML nie zawiera „podpis” (bez względu na wielkość liter); zatwierdzony tekst uzasadnienia z migawki jest na arkuszu (po „Wstaw” może być równy tekstowi notatki i to jest dozwolone), a test zabrania tylko tekstu notatki, którego nie ma w migawce; termin oceny zatwierdzonej na arkuszu pochodzi z `AssessmentSnapshot.deadline`; przy fikcji zapoznania jest wpis „nie mógł” albo „nie chciał” ze sposobem i datą doręczenia; okres od = `cycles.period_start` (Piotr: 27.11.2024, nie 09.12.2024).
 - `src/routes/history.test.ts`: Tomasz przy 2026-11-22 widzi 2 oceny, przy 2026-01-01 jedną; Anna widzi historię Tomasza; Ewa dostaje 403 na historię Piotra.
-- `src/routes/hr-sheets.test.ts` (uwaga 10): przy 2026-11-22 Joanna otwiera `/hr`, z HTML bierze odnośniki „Arkusz” Tomasza, Marii i Anny oraz z historii Tomasza odnośnik do arkusza z 12.11.2024, otwiera każdy (200) i sprawdza: potwierdzenia części I oceniającego i ocenianego (nazwiska z `appraiserName` i `appraiseeName`); u Tomasza (obie oceny) i Marii potwierdzenie oceniającego w części II i potwierdzenie zapoznania; u Tomasza z 12.11.2026 „Dane poprzedniej oceny” z datą 12.11.2024; u Tomasza z 12.11.2024 „brak w systemie”; u Anny część II pusta („—”). Osobno: w danych nie ma cyklu z `assessment_approved` bez `part1_confirmed`.
+- `src/routes/hr-sheets.test.ts` (uwaga 10): przy 2026-11-22 Joanna otwiera `/hr`, z HTML bierze odnośniki „Arkusz” Tomasza, Katarzyny Lewandowskiej i Anny oraz z historii Tomasza odnośnik do arkusza z 12.11.2024, otwiera każdy (200) i sprawdza: potwierdzenia części I oceniającego i ocenianego (nazwiska z `appraiserName` i `appraiseeName`); u Tomasza (obie oceny) i Katarzyny Lewandowskiej potwierdzenie oceniającego w części II i potwierdzenie zapoznania; u Tomasza z 12.11.2026 „Dane poprzedniej oceny” z datą 12.11.2024; u Tomasza z 12.11.2024 „brak w systemie”; u Anny część II pusta („—”). Osobno: w danych nie ma cyklu z `assessment_approved` bez `part1_confirmed`; każde wgrane `cycle_started` ma pięć pól; każda wgrana migawka ma `deadline`, `grade` i `gradeAwardedOn`; Maria nie ma żadnego cyklu.
 
 **Faza 2**
 
-- `src/routes/hr-actions.test.ts`: `POST /hr/grades/:id` przez Joannę tworzy jedno `mandatory_grade_awarded` i usuwa kartę; drugie kliknięcie → 409 i nadal jedno zdarzenie; po przyznaniu `currentGrade` Tomasza to 6 (to samo widzi S-02); Piotr → 403; `POST /cycles/:id/objection-outcome` z nieznaną wartością → 400, z `rejected` → stan „sprzeciw nieuwzględniony”; blok statystyk nie zawiera żadnego nazwiska z danych; część III tylko przy `gradeRequest.attached`; historia Piotra przy 2024-12-09 ma ocenę z 27.11.2024.
+- `src/routes/hr-actions.test.ts`: `POST /hr/grades/:id` przez Joannę → 303 na `/hr`, jedno `mandatory_grade_awarded` z payloadem `{ personId, fromGrade: 5, toGrade: 6, basis: "art. 89 ust. 2 ustawy" }` i karta znika; drugie kliknięcie → 409 i nadal jedno zdarzenie; po przyznaniu `currentGrade` Tomasza to 6 (to samo widzi S-02); Piotr → 403; `POST /cycles/:id/objection-outcome` z nieznaną wartością → 422 bez zapisu, z `rejected` → 303 i stan „sprzeciw nieuwzględniony”, powtórzenie → 409; blok statystyk nie zawiera żadnego nazwiska z danych i liczy terminowość z `AssessmentSnapshot.deadline`; część III tylko przy `gradeRequest.attached` i ze stopniem i datą z migawki; historia Piotra przy 2024-12-09 ma ocenę z 27.11.2024.
 
 ## Open questions
 
@@ -331,11 +346,9 @@ Każde ma domyślne rozstrzygnięcie, z którym implementacja idzie dalej.
 
 1. **„Na jednym z dwóch najwyższych poziomów”** (art. 89 ust. 2): obie oceny na tym samym poziomie czy każda na którymkolwiek z dwóch? Domyślnie: każda na którymkolwiek z dwóch najwyższych. Tomasz ma dwa razy „powyżej oczekiwań”, więc pokaz działa przy obu odczytaniach.
 2. **Termin 30 dni w sobotę lub dzień wolny.** Domyślnie przechodzi na następny dzień roboczy, jak pozostałe terminy w silniku (14.12.2026 zamiast 12.12.2026). Karta podaje oba fakty.
-3. **Stopień Tomasza i data ostatniego stopnia** nie są w `demo.md` ani w kontrakcie. Domyślnie: stopień V z `base.ts` (`civil_service_grade = 5`), przyznany 01.12.2022, mianowany w 2016 roku (dane pokazowe, decyzja 10e). Jeśli `base.ts` ustawi inny stopień, testy biorą go z bazy, a nie z tekstu.
-4. **Gdzie widać stany uproszczone.** Domyślnie: sprzeciw na zamkniętym cyklu Marii (osoba bez konta z zespołu Marka), wniosek o zmianę terminu w cyklu Anny (ocenia ją dyrektor generalny). Nie dotykamy ocen Piotra, Ewy i bieżącej Tomasza poza danymi z tej tabeli. Między 18.11.2024 a 16.11.2026 Maria ma otwarty cykl, więc notatka o niej zapisana w tym czasie (np. krok 2) dostanie jego `cycle_id`; oceniającym jest ten sam Marek.
-5. **Poprzednie oceny Piotra i Ewy** (27.11.2024 i 20.11.2024): `demo.md` podaje tylko daty. Domyślnie: pozytywne, „na poziomie oczekiwań”.
-6. **Podstawa prawna najwyższego stopnia IX** nie jest w pliku reguł. Domyślnie: wartość `max: 9` z polem `basis` uzupełnionym przy budowie po sprawdzeniu w ustawie; dopóki nie jest sprawdzona, ekran nie pokazuje tej podstawy.
-7. **Powód wniosku Anny o zmianę terminu.** Domyślnie jeden z czterech powodów z art. 81 ust. 8 ustawy, wybrany przy budowie po sprawdzeniu brzmienia przepisu w bazie wiedzy; bez danych o zdrowiu.
+3. **Data ostatniego stopnia i rok mianowania Tomasza** nie są w `demo.md`. Domyślnie: stopień V przyznany 01.12.2022, mianowany w 2016 roku (dane pokazowe, decyzja 10e). Stopień V pochodzi z `base.ts` (F-01).
+4. **Poprzednie oceny Piotra i Ewy** (27.11.2024 i 20.11.2024): `demo.md` podaje tylko daty. Domyślnie: pozytywne, „na poziomie oczekiwań”.
+5. **Powód wniosku Anny o zmianę terminu.** Domyślnie jeden z czterech powodów z art. 81 ust. 8 ustawy, wybrany przy budowie po sprawdzeniu brzmienia przepisu w bazie wiedzy; bez danych o zdrowiu.
 
 ## References
 
@@ -363,7 +376,7 @@ Każde ma domyślne rozstrzygnięcie, z którym implementacja idzie dalej.
 
 #### Manual
 
-- [ ] 1.6 Pełny przebieg do kroku 5 (2026-11-22): `/hr` pokazuje kartę Tomasza (14.12.2026), sprzeciw Marii (04.12.2026), wniosek Anny i zapoznanie Piotra (sprzeciw do 30.11.2026)
+- [ ] 1.6 Pełny przebieg do kroku 5 (2026-11-22): `/hr` pokazuje kartę Tomasza (14.12.2026), sprzeciw Katarzyny Lewandowskiej (04.12.2026), wniosek Anny i zapoznanie Piotra (sprzeciw do 30.11.2026)
 - [ ] 1.7 Podgląd wydruku arkusza Piotra z jego konta: bez nawigacji i przycisków, części od nowej strony, macierz w całości, pouczenie o sprzeciwie, bez słowa „podpis”
 - [ ] 1.8 Podgląd wydruku arkusza Tomasza z 12.11.2026: pole „Dane poprzedniej oceny” pokazuje ocenę z 12.11.2024
 

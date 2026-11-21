@@ -1,0 +1,2704 @@
+{
+  "title": "Event Storming: cykl oceny okresowej (mOcena)",
+  "purpose": "software-design",
+  "phase": "closure",
+  "origin": {
+    "x": 0,
+    "y": 0
+  },
+  "phases": [
+    {
+      "label": "Start",
+      "from": 0
+    },
+    {
+      "label": "Część I",
+      "from": 1
+    },
+    {
+      "label": "Okres",
+      "from": 4
+    },
+    {
+      "label": "Zmiany",
+      "from": 7
+    },
+    {
+      "label": "Ocena",
+      "from": 10
+    },
+    {
+      "label": "Zapoznanie",
+      "from": 13
+    },
+    {
+      "label": "Sprzeciw",
+      "from": 15
+    },
+    {
+      "label": "Skutki",
+      "from": 17
+    }
+  ],
+  "items": [
+    {
+      "role": "event",
+      "text": "Cykl oceny pracownika rozpoczął się",
+      "col": 0,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Kadry",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia",
+      "code": "cycle_started",
+      "slice": "F-01"
+    },
+    {
+      "role": "policy",
+      "text": "Gdy cykl widoczny, wylicz termin rozmowy o kryteriach",
+      "col": 0,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Kadry",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md, Phase 1 pkt 6; reguly/rozporzadzenie-2016-470.json, terminy.rozmowaOKryteriachDni",
+      "code": "criteriaTalkDeadline",
+      "slice": "S-01"
+    },
+    {
+      "role": "external",
+      "text": "Dane pokazowe zapisują start cyklu",
+      "col": 0,
+      "status": "confirmed",
+      "by": [
+        "Architekt",
+        "Kadry"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Dane pokazowe",
+      "code": "src/seed/base.ts",
+      "slice": "F-01"
+    },
+    {
+      "role": "external",
+      "text": "Prowadzący przesuwa datę systemową do przodu",
+      "col": 0,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy; context/foundation/decisions.md, 10i",
+      "code": "POST /demo/date",
+      "slice": "F-01"
+    },
+    {
+      "role": "readmodel",
+      "text": "Sprawa: wyznacz kryteria z terminem",
+      "col": 0,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md, Phase 1 pkt 6",
+      "code": "homeTasks",
+      "slice": "S-01"
+    },
+    {
+      "role": "hotspot",
+      "text": "Data reguł 2016-04-22 zamiast 2016-04-23",
+      "col": 0,
+      "status": "confirmed",
+      "by": [
+        "Prawnik"
+      ],
+      "source": "AGENTS.md, Stan kodu",
+      "slice": "F-01",
+      "priority": 1,
+      "owner": "F-01",
+      "next": "Poprawić obowiązywanie na 2016-04-23 przy przenosinach silnika"
+    },
+    {
+      "role": "hotspot",
+      "text": "Kolejność zdarzeń z tą samą datą rozstrzyga id",
+      "col": 0,
+      "status": "confirmed",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Pliki dotykane przez więcej niż jeden plaster",
+      "slice": "F-01",
+      "priority": 3,
+      "owner": "F-01",
+      "next": "Rozstrzygnięte (kontrakt zaktualizowany w trakcie warsztatu): kolejność base, part1, notes, assessments, absences"
+    },
+    {
+      "role": "hotspot",
+      "text": "Rejestry spraw przez import: kolejność i konflikty",
+      "col": 0,
+      "status": "suggested",
+      "by": [
+        "Architekt"
+      ],
+      "slice": "F-01",
+      "priority": 3,
+      "owner": "F-01",
+      "next": "Częściowo rozstrzygnięte (kontrakt zaktualizowany w trakcie warsztatu): każdy plaster dopisuje import; kolejność spraw na liście nadal nieustalona"
+    },
+    {
+      "role": "hotspot",
+      "text": "Brak trasy zapisującej start cyklu na żywo",
+      "col": 0,
+      "status": "confirmed",
+      "by": [
+        "Architekt",
+        "Kadry"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "slice": "F-01",
+      "priority": 3,
+      "owner": "autor",
+      "next": "Zapisać w kontrakcie, że start cyklu istnieje tylko w danych"
+    },
+    {
+      "role": "hotspot",
+      "text": "Start cyklu: czyn człowieka czy polityka i czas?",
+      "col": 0,
+      "status": "confirmed",
+      "by": [
+        "Prawnik"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, terminy.rozmowaOKryteriachDni.od",
+      "priority": 3,
+      "owner": "autor",
+      "next": "Zostawić jako politykę; bez aktora na tablicy"
+    },
+    {
+      "role": "event",
+      "text": "System dobrał arkusz do stanowiska",
+      "col": 1,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md, Phase 1 pkt 3 (sheetForPosition)",
+      "slice": "S-01"
+    },
+    {
+      "role": "event",
+      "text": "System podpowiedział kryteria dodatkowe z uzasadnieniem",
+      "col": 1,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md, Phase 1 pkt 3; context/foundation/decisions.md, 6b",
+      "code": "suggestCriteria",
+      "slice": "S-01"
+    },
+    {
+      "role": "event",
+      "text": "Oceniający zapisał kryteria i oczekiwania",
+      "col": 1,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md, Trasy; context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Tabele",
+      "code": "cycle_criteria",
+      "slice": "S-01"
+    },
+    {
+      "role": "command",
+      "text": "Zapisz kryteria i oczekiwania",
+      "col": 1,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "POST /cycles/:id/part1/criteria",
+      "slice": "S-01"
+    },
+    {
+      "role": "actor",
+      "text": "Oceniający",
+      "col": 1,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/foundation/prd.md, Access Control"
+    },
+    {
+      "role": "readmodel",
+      "text": "Arkusz, kryteria obowiązkowe, podpowiedzi z „dlaczego”",
+      "col": 1,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md, Phase 1 pkt 3",
+      "code": "GET /cycles/:id/part1",
+      "slice": "S-01"
+    },
+    {
+      "role": "policy",
+      "text": "Gdy otwarto część I, dobierz arkusz do stanowiska",
+      "col": 1,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, arkusze (§ 3 ust. 2–4); context/changes/cycle-start-criteria/plan.md (sheetForPosition)",
+      "slice": "S-01"
+    },
+    {
+      "role": "policy",
+      "text": "Podpowiedź kryteriów z tabeli obowiązków urzędu",
+      "col": 1,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik"
+      ],
+      "source": "context/foundation/decisions.md, 6b",
+      "code": "suggestCriteria",
+      "slice": "S-01"
+    },
+    {
+      "role": "hotspot",
+      "text": "Szkic kryteriów bez zdarzenia, a stan „draft”",
+      "col": 1,
+      "status": "confirmed",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md, Logika części I",
+      "slice": "S-01",
+      "priority": 3,
+      "owner": "S-01",
+      "next": "Zostawić odczyt z tabeli i wpisać wyjątek w plan S-01"
+    },
+    {
+      "role": "event",
+      "text": "Odbyła się rozmowa o kryteriach",
+      "col": 2,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Prawnik"
+      ],
+      "source": "context/foundation/prd.md, US-01; reguly/rozporzadzenie-2016-470.json, rozmowaOKryteriach",
+      "slice": "S-01"
+    },
+    {
+      "role": "event",
+      "text": "Minął termin rozmowy o kryteriach (§ 7)",
+      "col": 2,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, terminy.rozmowaOKryteriachDni",
+      "slice": "S-01",
+      "aliases": [
+        "Minęło 30 dni na rozmowę o kryteriach"
+      ]
+    },
+    {
+      "role": "event",
+      "text": "Oceniający przekazał część I ocenianemu",
+      "col": 2,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia",
+      "code": "part1_submitted",
+      "slice": "S-01"
+    },
+    {
+      "role": "command",
+      "text": "Potwierdź rozmowę i przekaż część I",
+      "col": 2,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy; context/changes/cycle-start-criteria/plan.md (submitPart1)",
+      "code": "POST /cycles/:id/part1/submit",
+      "slice": "S-01"
+    },
+    {
+      "role": "actor",
+      "text": "Oceniający",
+      "col": 2,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ]
+    },
+    {
+      "role": "readmodel",
+      "text": "Cztery tematy rozmowy z § 5 ust. 1",
+      "col": 2,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, rozmowaOKryteriach.tematy; context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "GET /cycles/:id/cards/opening",
+      "slice": "S-01"
+    },
+    {
+      "role": "policy",
+      "text": "Gdy przekazano część I, zablokuj kryteria",
+      "col": 2,
+      "status": "confirmed",
+      "by": [
+        "Architekt",
+        "Oceniany"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md, Co ten plaster udostępnia (isPart1Locked)",
+      "slice": "S-01"
+    },
+    {
+      "role": "aggregate",
+      "text": "Część I cyklu (Part1)",
+      "col": 2,
+      "status": "suggested",
+      "by": [
+        "Architekt",
+        "Prawnik"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Co plastry udostępniają; context/foundation/prd.md, Business Logic",
+      "code": "part1Status",
+      "slice": "S-01"
+    },
+    {
+      "role": "hotspot",
+      "text": "Rozmowa o kryteriach: brak typu, data = przekazanie",
+      "col": 2,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Oceniający",
+        "Oceniany",
+        "Architekt"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md, Pytania otwarte pkt 4",
+      "slice": "S-01",
+      "priority": 2,
+      "owner": "autor",
+      "next": "Nazwać uproszczenie na ekranie albo dodać pole daty rozmowy"
+    },
+    {
+      "role": "hotspot",
+      "text": "Dwa plastry piszą cycle_criteria w danych",
+      "col": 2,
+      "status": "confirmed",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Dane pokazowe",
+      "slice": "S-01",
+      "priority": 3,
+      "owner": "F-01",
+      "next": "Rozstrzygnięte (kontrakt zaktualizowany w trakcie warsztatu): wspólne savePart1; sprawdzić, czy S-06 go używa"
+    },
+    {
+      "role": "event",
+      "text": "Oceniany potwierdził część I",
+      "col": 3,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Kadry",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia; context/foundation/decisions.md, 5a",
+      "code": "part1_confirmed",
+      "slice": "S-01"
+    },
+    {
+      "role": "event",
+      "text": "Kryteria i termin zablokowały się",
+      "col": 3,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany"
+      ],
+      "source": "context/foundation/prd.md, US-02, Business Logic",
+      "slice": "S-01"
+    },
+    {
+      "role": "command",
+      "text": "Potwierdź część I",
+      "col": 3,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "POST /cycles/:id/part1/confirm",
+      "slice": "S-01"
+    },
+    {
+      "role": "actor",
+      "text": "Oceniany",
+      "col": 3,
+      "status": "confirmed",
+      "by": [
+        "Oceniany"
+      ]
+    },
+    {
+      "role": "readmodel",
+      "text": "Kryteria, termin z podstawą, potwierdzenie oceniającego",
+      "col": 3,
+      "status": "confirmed",
+      "by": [
+        "Oceniany"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md, UI",
+      "code": "effectiveDeadline",
+      "slice": "S-01"
+    },
+    {
+      "role": "readmodel",
+      "text": "Część I czeka na potwierdzenie od X dni",
+      "col": 3,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/foundation/decisions.md, 10d",
+      "code": "part1Status",
+      "slice": "S-01"
+    },
+    {
+      "role": "policy",
+      "text": "Miejscowość, datę i nazwisko wpisuje system",
+      "col": 3,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Prawnik"
+      ],
+      "source": "context/foundation/decisions.md, 5a; context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Pliki wspólne",
+      "code": "setting",
+      "slice": "S-01"
+    },
+    {
+      "role": "hotspot",
+      "text": "Blokada: od przekazania czy od potwierdzenia?",
+      "col": 3,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Architekt"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md (isPart1Locked) kontra context/foundation/prd.md, US-02",
+      "slice": "S-01",
+      "priority": 3,
+      "owner": "S-01",
+      "next": "Rozstrzygnięte (kontrakt zaktualizowany w trakcie warsztatu, Zasady wspólne tras): blokada od przekazania jako uproszczenie"
+    },
+    {
+      "role": "hotspot",
+      "text": "Oceniany nie potwierdza części I: brak wyjścia",
+      "col": 3,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Kadry",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/foundation/decisions.md, 5 Znana luka, 10d",
+      "priority": 2,
+      "owner": "prawnik urzędu",
+      "next": "Zostawić lukę; zdanie dla jury z decyzji 10d"
+    },
+    {
+      "role": "hotspot",
+      "text": "Oceniany nie może zgłosić uwag do części I",
+      "col": 3,
+      "status": "confirmed",
+      "by": [
+        "Oceniany"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md, UI",
+      "slice": "S-01",
+      "priority": 3,
+      "owner": "autor",
+      "next": "Odnotować jako ograniczenie prototypu"
+    },
+    {
+      "role": "event",
+      "text": "System wstępnie zaznaczył „Zmiana zadań pracownika”",
+      "col": 4,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/notes-and-justification/plan.md, Phase 2 pkt 2",
+      "code": "suggestForNote",
+      "slice": "S-04"
+    },
+    {
+      "role": "event",
+      "text": "Oceniający zapisał notatkę o fakcie",
+      "col": 4,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Tabele; context/foundation/prd.md, FR-008",
+      "code": "notes",
+      "slice": "S-04"
+    },
+    {
+      "role": "event",
+      "text": "Oceniający odznaczył podpowiedź i zapisał notatkę",
+      "col": 4,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/changes/notes-and-justification/plan.md, R6",
+      "code": "notes",
+      "slice": "S-04"
+    },
+    {
+      "role": "command",
+      "text": "Zapisz notatkę o fakcie",
+      "col": 4,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "POST /people/:personId/notes",
+      "slice": "S-04"
+    },
+    {
+      "role": "actor",
+      "text": "Oceniający",
+      "col": 4,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ]
+    },
+    {
+      "role": "readmodel",
+      "text": "Kryteria cyklu i źródło podpowiedzi",
+      "col": 4,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/changes/notes-and-justification/plan.md, NoteForm",
+      "code": "suggestionMode",
+      "slice": "S-04"
+    },
+    {
+      "role": "policy",
+      "text": "Lista słów wstępnie zaznacza pole zmiany zadań",
+      "col": 4,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik"
+      ],
+      "source": "context/foundation/decisions.md, 9, 10l",
+      "code": "suggestForNote",
+      "slice": "S-04"
+    },
+    {
+      "role": "external",
+      "text": "Model lokalny urzędu, domyślnie wyłączony",
+      "col": 4,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/foundation/decisions.md, 9, 10l; AGENTS.md, zasada 5",
+      "code": "src/suggestions/index.ts",
+      "slice": "S-04"
+    },
+    {
+      "role": "aggregate",
+      "text": "Notatka z odpowiedzią o zmianę zadań",
+      "col": 4,
+      "status": "suggested",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Tabele, Zdarzenia",
+      "code": "notes",
+      "slice": "S-04"
+    },
+    {
+      "role": "hotspot",
+      "text": "Notatka i informacja zwrotna bez typu zdarzenia",
+      "col": 4,
+      "status": "confirmed",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/notes-and-justification/plan.md, Implementation Approach",
+      "slice": "S-04",
+      "priority": 3,
+      "owner": "S-04",
+      "next": "Zostawić tabele; oś czasu czyta notes.date i sent_on"
+    },
+    {
+      "role": "hotspot",
+      "text": "Notatki nie da się poprawić ani usunąć",
+      "col": 4,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/changes/notes-and-justification/plan.md, What We're NOT Doing",
+      "slice": "S-04",
+      "priority": 3,
+      "owner": "autor",
+      "next": "Odnotować jako ograniczenie prototypu"
+    },
+    {
+      "role": "event",
+      "text": "Oceniający odpowiedział na pytanie o zmianę zadań",
+      "col": 5,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia; context/changes/hr-partner-question/plan.md",
+      "code": "task_change_answered",
+      "slice": "S-05",
+      "aliases": [
+        "Oceniający potwierdził stałą zmianę zadań",
+        "Oceniający odpowiedział na pytanie HR partnera"
+      ]
+    },
+    {
+      "role": "event",
+      "text": "System pokazał kartę i jedną formę rozwoju",
+      "col": 5,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/changes/hr-partner-question/plan.md, Phase 1",
+      "code": "card",
+      "slice": "S-05"
+    },
+    {
+      "role": "command",
+      "text": "Odpowiedz tak albo nie na pytanie",
+      "col": 5,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "POST /notes/:noteId/task-change",
+      "slice": "S-05"
+    },
+    {
+      "role": "actor",
+      "text": "Oceniający",
+      "col": 5,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ]
+    },
+    {
+      "role": "readmodel",
+      "text": "Karta po zmianie zadań z podstawą prawną",
+      "col": 5,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik"
+      ],
+      "source": "context/foundation/decisions.md, 11e",
+      "code": "card",
+      "slice": "S-05"
+    },
+    {
+      "role": "policy",
+      "text": "Gdy notatka ma zmianę zadań, zadaj pytanie",
+      "col": 5,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/hr-partner-question/plan.md, Phase 1 pkt 3",
+      "code": "afterNoteSaved",
+      "slice": "S-05"
+    },
+    {
+      "role": "hotspot",
+      "text": "„Potwierdził” czy „odpowiedział” przy zmianie zadań?",
+      "col": 5,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/hr-partner-question/plan.md; AGENTS.md, zasada 6",
+      "slice": "S-05",
+      "aliases": [
+        "Oceniający potwierdził stałą zmianę zadań"
+      ],
+      "priority": 3,
+      "owner": "S-05",
+      "next": "Używać „odpowiedział”; słowo „potwierdzenie” zostaje dla części I i II"
+    },
+    {
+      "role": "hotspot",
+      "text": "Skąd kadry wiedzą o istotnej zmianie zadań?",
+      "col": 5,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Prawnik"
+      ],
+      "source": "context/foundation/decisions.md, 11e; context/changes/hr-overview-and-print/plan.md, Założenia",
+      "priority": 3,
+      "owner": "autor",
+      "next": "Zostawić odesłanie do kadr na karcie; bez sygnału na /hr"
+    },
+    {
+      "role": "event",
+      "text": "Oceniający przekazał pracownikowi informację zwrotną",
+      "col": 6,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Tabele; context/foundation/decisions.md, 10j",
+      "code": "feedback_messages",
+      "slice": "S-04"
+    },
+    {
+      "role": "event",
+      "text": "Oceniany przeczytał informację zwrotną",
+      "col": 6,
+      "status": "suggested",
+      "by": [
+        "Oceniany"
+      ],
+      "source": "context/changes/notes-and-justification/plan.md, Phase 3 pkt 4",
+      "code": "GET /feedback",
+      "slice": "S-04"
+    },
+    {
+      "role": "event",
+      "text": "Przypomnienie o docenianiu zniknęło po wysłaniu",
+      "col": 6,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/foundation/decisions.md, 10j; context/changes/hr-partner-question/plan.md, Phase 3",
+      "slice": "S-05"
+    },
+    {
+      "role": "command",
+      "text": "Przekaż pracownikowi poprawiony tekst notatki",
+      "col": 6,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "POST /notes/:id/feedback",
+      "slice": "S-04"
+    },
+    {
+      "role": "actor",
+      "text": "Oceniający",
+      "col": 6,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ]
+    },
+    {
+      "role": "readmodel",
+      "text": "Moje notatki i data ostatniej informacji zwrotnej",
+      "col": 6,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Co plastry udostępniają",
+      "code": "lastFeedbackDate",
+      "slice": "S-04"
+    },
+    {
+      "role": "readmodel",
+      "text": "Informacja zwrotna od najnowszej, bez licznika",
+      "col": 6,
+      "status": "confirmed",
+      "by": [
+        "Oceniany"
+      ],
+      "source": "context/changes/notes-and-justification/plan.md, Phase 3 pkt 4",
+      "code": "GET /feedback",
+      "slice": "S-04"
+    },
+    {
+      "role": "policy",
+      "text": "Gdy długo bez informacji, przypomnij o docenianiu",
+      "col": 6,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/hr-partner-question/plan.md, Phase 3",
+      "code": "GET /cycles/:id/appreciation",
+      "slice": "S-05"
+    },
+    {
+      "role": "hotspot",
+      "text": "Informacja zwrotna łagodniejsza niż notatka w ocenie?",
+      "col": 6,
+      "status": "suggested",
+      "by": [
+        "Oceniany"
+      ],
+      "priority": 3,
+      "owner": "autor",
+      "next": "Odnotować; pracownik może wnioskować o wydanie notatek"
+    },
+    {
+      "role": "event",
+      "text": "Kadry wpisały nieobecność ocenianego",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Kadry",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia",
+      "code": "absence_recorded",
+      "slice": "S-03"
+    },
+    {
+      "role": "event",
+      "text": "Termin oceny przedłużył się o nieobecność",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Kadry",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/foundation/prd.md, US-03; src/silnik/terminy.ts (terminKolejnejOceny)",
+      "code": "effectiveDeadline",
+      "slice": "S-03",
+      "aliases": [
+        "Termin oceny przesunął się o nieobecność"
+      ]
+    },
+    {
+      "role": "event",
+      "text": "Krótka albo nieusprawiedliwiona nieobecność nie przedłużyła terminu",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Prawnik"
+      ],
+      "source": "context/changes/timeline-and-absences/plan.md, Phase 1 pkt 2, 6",
+      "slice": "S-03"
+    },
+    {
+      "role": "command",
+      "text": "Wpisz nieobecność: daty i usprawiedliwienie",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy; context/foundation/decisions.md, 10m",
+      "code": "POST /cycles/:id/absences",
+      "slice": "S-03"
+    },
+    {
+      "role": "actor",
+      "text": "Kadry",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ]
+    },
+    {
+      "role": "readmodel",
+      "text": "Połączona nieobecność, próg i nowy termin",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ],
+      "source": "context/changes/timeline-and-absences/plan.md, Phase 1 pkt 6 (buildTimeline, wewnętrzne)",
+      "slice": "S-03"
+    },
+    {
+      "role": "policy",
+      "text": "Gdy ciągła usprawiedliwiona nieobecność ponad miesiąc, termin dłuższy",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/changes/timeline-and-absences/plan.md, Phase 1 pkt 2; art. 81 ust. 7 wg context/foundation/decisions.md, 11 (mergeAbsences)",
+      "slice": "S-03"
+    },
+    {
+      "role": "policy",
+      "text": "Po ocenie negatywnej nieobecność nie przedłuża terminu",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ],
+      "source": "context/changes/timeline-and-absences/plan.md, Key Discoveries",
+      "code": "effectiveDeadline",
+      "slice": "S-03"
+    },
+    {
+      "role": "aggregate",
+      "text": "Cykl: oceniający i termin",
+      "col": 7,
+      "status": "suggested",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Tabele, Funkcje F-01",
+      "code": "cycles",
+      "slice": "F-01"
+    },
+    {
+      "role": "hotspot",
+      "text": "Termin zamrożony w migawkach a wyliczany na żywo",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Architekt",
+        "Prawnik"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia; context/changes/assessment-and-confirmation/plan.md, Success Criteria",
+      "slice": "F-01",
+      "priority": 3,
+      "owner": "F-01",
+      "next": "Rozstrzygnięte (kontrakt zaktualizowany w trakcie warsztatu, Skąd ekran bierze termin oceny); sprawdzić test S-02 z nieobecnością Piotra"
+    },
+    {
+      "role": "hotspot",
+      "text": "Przedłużenie terminu: zdarzenie czy wyliczenie?",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt",
+        "Prawnik"
+      ],
+      "source": "context/changes/timeline-and-absences/plan.md, Implementation Approach",
+      "slice": "S-03",
+      "priority": 3,
+      "owner": "S-03",
+      "next": "Zostawić wyliczenie; na tablicy jako model odczytu"
+    },
+    {
+      "role": "hotspot",
+      "text": "Błędnego wpisu nieobecności nie da się cofnąć",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ],
+      "source": "context/changes/timeline-and-absences/plan.md, What We're NOT Doing",
+      "slice": "S-03",
+      "priority": 2,
+      "owner": "S-03",
+      "next": "Poprawka tylko w danych pokazowych; uważać na kolejność kroku 3"
+    },
+    {
+      "role": "hotspot",
+      "text": "Różne kolumny granicy widoczności w tabelach",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Funkcje F-01; context/changes/timeline-and-absences/plan.md; context/changes/notes-and-justification/plan.md",
+      "slice": "F-01",
+      "priority": 2,
+      "owner": "F-01",
+      "next": "Wpisać do kontraktu, którą datę czyta każda tabela"
+    },
+    {
+      "role": "hotspot",
+      "text": "Payloady S-03 w snake_case, reszta w camelCase",
+      "col": 7,
+      "status": "confirmed",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia",
+      "slice": "S-03",
+      "priority": 3,
+      "owner": "F-01",
+      "next": "Zdecydować przed pierwszym zapisem absence_recorded"
+    },
+    {
+      "role": "event",
+      "text": "Kadry zmieniły oceniającego",
+      "col": 8,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia; context/foundation/prd.md, FR-011",
+      "code": "appraiser_changed",
+      "slice": "S-03",
+      "aliases": [
+        "Oceniający przejął wydział z cyklem"
+      ]
+    },
+    {
+      "role": "event",
+      "text": "Kryteria zostały bez zmian po zmianie oceniającego",
+      "col": 8,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Oceniany"
+      ],
+      "source": "context/changes/timeline-and-absences/plan.md, Phase 2 pkt 3 (§ 9 ust. 3)",
+      "code": "cycle_criteria",
+      "slice": "S-03"
+    },
+    {
+      "role": "event",
+      "text": "Dostęp do osi przeszedł na nowego oceniającego",
+      "col": 8,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ],
+      "source": "context/changes/timeline-and-absences/plan.md, Phase 2 Success Criteria",
+      "slice": "S-03"
+    },
+    {
+      "role": "command",
+      "text": "Zmień oceniającego",
+      "col": 8,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "POST /cycles/:id/appraiser",
+      "slice": "S-03"
+    },
+    {
+      "role": "actor",
+      "text": "Kadry",
+      "col": 8,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ]
+    },
+    {
+      "role": "readmodel",
+      "text": "Kryteria cyklu i zdanie o § 9 ust. 3",
+      "col": 8,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ],
+      "source": "context/changes/timeline-and-absences/plan.md, Phase 2 pkt 3",
+      "code": "cycleCriteria",
+      "slice": "S-03"
+    },
+    {
+      "role": "hotspot",
+      "text": "Kto przekazał część I Ewy w danych?",
+      "col": 8,
+      "status": "confirmed",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/cycle-start-criteria/plan.md, Phase 1 pkt 4–5; context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Dane pokazowe",
+      "slice": "F-01",
+      "priority": 3,
+      "owner": "F-01 z S-01",
+      "next": "Rozstrzygnięte (kontrakt zaktualizowany w trakcie warsztatu): savePart1 z jawnym aktorem i datą"
+    },
+    {
+      "role": "hotspot",
+      "text": "Nadpisanie appraiser_id łamie granicę daty pokazu",
+      "col": 8,
+      "status": "confirmed",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/timeline-and-absences/plan.md, Formularz kadr; context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Funkcje F-01",
+      "slice": "S-03",
+      "priority": 2,
+      "owner": "S-03",
+      "next": "Czytać oceniającego z appraiser_changed według today()"
+    },
+    {
+      "role": "hotspot",
+      "text": "Nowy oceniający nie widzi notatek poprzednika",
+      "col": 8,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Kadry"
+      ],
+      "source": "context/changes/notes-and-justification/plan.md, Implementation Approach, R7",
+      "slice": "S-04",
+      "priority": 2,
+      "owner": "autor",
+      "next": "Zdecydować, czy pokaz Ewy to mówi wprost"
+    },
+    {
+      "role": "hotspot",
+      "text": "Kadry zmieniły czy oceniający przejął wydział?",
+      "col": 8,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Kadry"
+      ],
+      "source": "context/changes/timeline-and-absences/plan.md, Phase 2 pkt 1",
+      "priority": 3,
+      "owner": "S-03",
+      "next": "Na żywo aktorem są kadry; przejęcie zostaje w danych"
+    },
+    {
+      "role": "event",
+      "text": "Oceniany złożył wniosek o zmianę terminu",
+      "col": 9,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia; context/foundation/prd.md, FR-013",
+      "code": "due_change_requested",
+      "slice": "S-06"
+    },
+    {
+      "role": "event",
+      "text": "Oceniający zmienił termin i zawiadomił pisemnie",
+      "col": 9,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Prawnik"
+      ],
+      "source": "context/foundation/decisions.md, 11d",
+      "slice": "S-06"
+    },
+    {
+      "role": "event",
+      "text": "Termin oceny minął bez zatwierdzonej oceny",
+      "col": 9,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Prawnik"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, Phase 1 pkt 2",
+      "slice": "S-06",
+      "aliases": [
+        "Nadszedł termin oceny po 24 miesiącach"
+      ]
+    },
+    {
+      "role": "policy",
+      "text": "Gdy blisko terminu, przypomnij o ocenie",
+      "col": 9,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/timeline-and-absences/plan.md, Phase 3",
+      "slice": "S-03"
+    },
+    {
+      "role": "readmodel",
+      "text": "Termin cyklu z podstawą, ten sam wszędzie",
+      "col": 9,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Funkcje F-01",
+      "code": "effectiveDeadline",
+      "slice": "F-01"
+    },
+    {
+      "role": "hotspot",
+      "text": "Upływ terminów nie zostawia zdarzeń, tylko odczyt",
+      "col": 9,
+      "status": "confirmed",
+      "by": [
+        "Architekt",
+        "Kadry",
+        "Oceniający"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, Phase 1 pkt 2; context/changes/assessment-and-confirmation/plan.md",
+      "slice": "F-01",
+      "priority": 3,
+      "owner": "F-01",
+      "next": "Zaakceptować; stany liczą się z today() przy odczycie"
+    },
+    {
+      "role": "hotspot",
+      "text": "Zmiana terminu tylko w danych, bez trasy",
+      "col": 9,
+      "status": "confirmed",
+      "by": [
+        "Architekt",
+        "Oceniany",
+        "Kadry"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, Co ten plaster udostępnia; context/foundation/decisions.md, 11d",
+      "slice": "S-06",
+      "priority": 3,
+      "owner": "S-06",
+      "next": "Pokazać stan uproszczony z podstawą art. 81 ust. 8"
+    },
+    {
+      "role": "hotspot",
+      "text": "Kto buduje przypomnienie o terminie oceny?",
+      "col": 9,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/foundation/decisions.md, 4; context/changes/timeline-and-absences/plan.md, Phase 3",
+      "priority": 2,
+      "owner": "S-03",
+      "next": "Sprawdzić, czy przypomnienie przetrwa cięcie S-03"
+    },
+    {
+      "role": "event",
+      "text": "Odbyła się rozmowa oceniająca",
+      "col": 10,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, rozmowaOceniajaca; context/changes/assessment-and-confirmation/plan.md (interviewDate)",
+      "slice": "S-02"
+    },
+    {
+      "role": "event",
+      "text": "Oceniający zapisał szkic oceny",
+      "col": 10,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia",
+      "code": "assessment_draft_saved",
+      "slice": "S-02"
+    },
+    {
+      "role": "command",
+      "text": "Zapisz szkic oceny",
+      "col": 10,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "POST /cycles/:id/assessment",
+      "slice": "S-02"
+    },
+    {
+      "role": "actor",
+      "text": "Oceniający",
+      "col": 10,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ]
+    },
+    {
+      "role": "readmodel",
+      "text": "Przed rozmową: notatki przed i po zmianie",
+      "col": 10,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/changes/hr-partner-question/plan.md, Phase 2; context/foundation/demo.md, krok 4",
+      "code": "GET /cycles/:id/before-meeting",
+      "slice": "S-05"
+    },
+    {
+      "role": "readmodel",
+      "text": "Trzy tematy rozmowy oceniającej z § 10",
+      "col": 10,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, rozmowaOceniajaca.tematy; context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "GET /cycles/:id/cards/assessment-conversation",
+      "slice": "S-04"
+    },
+    {
+      "role": "hotspot",
+      "text": "Rozmowa oceniająca bez zdarzenia; data może wypaść",
+      "col": 10,
+      "status": "confirmed",
+      "by": [
+        "Architekt",
+        "Oceniający",
+        "Prawnik"
+      ],
+      "source": "context/changes/assessment-and-confirmation/plan.md, Kolejność cięcia pkt 5",
+      "slice": "S-02",
+      "priority": 2,
+      "owner": "S-02",
+      "next": "Zostawić interviewDate albo nazwać datę zatwierdzenia na ekranie"
+    },
+    {
+      "role": "event",
+      "text": "Pokazało się ostrzeżenie: fakty z ostatniego miesiąca",
+      "col": 11,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/changes/notes-and-justification/plan.md, Phase 2 pkt 3; context/foundation/decisions.md, 10c",
+      "code": "criterionAside",
+      "slice": "S-04"
+    },
+    {
+      "role": "event",
+      "text": "Oceniający wstawił notatki do uzasadnienia",
+      "col": 11,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/foundation/decisions.md, 10f; context/changes/notes-and-justification/plan.md, Phase 2 pkt 4–5",
+      "code": "justificationTools",
+      "slice": "S-04"
+    },
+    {
+      "role": "event",
+      "text": "System wyliczył wynik negatywny mimo wysokiej średniej",
+      "col": 11,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik"
+      ],
+      "source": "src/silnik/ocena.ts (wyliczOcene); context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Nazwy silnika",
+      "code": "computeAssessment",
+      "slice": "S-02"
+    },
+    {
+      "role": "event",
+      "text": "Uzasadnienie oceny negatywnej stało się obowiązkowe",
+      "col": 11,
+      "status": "confirmed",
+      "by": [
+        "Prawnik"
+      ],
+      "source": "src/silnik/ocena.ts (uzasadnienieObowiazkowe)",
+      "code": "computeAssessment",
+      "slice": "S-02"
+    },
+    {
+      "role": "command",
+      "text": "Wstaw zaznaczone notatki do uzasadnienia",
+      "col": 11,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/foundation/decisions.md, 10f",
+      "code": "justificationTools",
+      "slice": "S-04"
+    },
+    {
+      "role": "actor",
+      "text": "Oceniający",
+      "col": 11,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ]
+    },
+    {
+      "role": "readmodel",
+      "text": "Notatki przy kryterium i ostrzeżenie",
+      "col": 11,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Co plastry udostępniają",
+      "code": "notesForCycle",
+      "slice": "S-04"
+    },
+    {
+      "role": "readmodel",
+      "text": "Średnia, poziom, wynik i powody z przepisem",
+      "col": 11,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik"
+      ],
+      "source": "context/changes/assessment-and-confirmation/plan.md (ResultPanel); context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Nazwy silnika",
+      "code": "computeAssessment",
+      "slice": "S-02"
+    },
+    {
+      "role": "policy",
+      "text": "Ocena cząstkowa 1 daje wynik negatywny",
+      "col": 11,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik"
+      ],
+      "source": "src/silnik/ocena.ts (wyliczOcene, § 11 ust. 1)",
+      "code": "computeAssessment",
+      "slice": "S-02"
+    },
+    {
+      "role": "hotspot",
+      "text": "Wstawienie i wynik to odczyt, nie zdarzenie",
+      "col": 11,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/notes-and-justification/plan.md, R12; context/changes/assessment-and-confirmation/plan.md",
+      "priority": 3,
+      "owner": "S-02",
+      "next": "Na tablicy jako model odczytu; nic nie zapisuje się bez kliknięcia"
+    },
+    {
+      "role": "hotspot",
+      "text": "Szorstka notatka trafi dosłownie do uzasadnienia",
+      "col": 11,
+      "status": "suggested",
+      "by": [
+        "Oceniający"
+      ],
+      "slice": "S-04",
+      "priority": 3,
+      "owner": "autor",
+      "next": "Zostawić zdanie „Ten tekst przeczyta pracownik” nad polem"
+    },
+    {
+      "role": "event",
+      "text": "Szkic zapisany przy próbie zatwierdzenia",
+      "col": 12,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/assessment-and-confirmation/plan.md, Phase 1 pkt 4",
+      "code": "assessment_draft_saved",
+      "slice": "S-02"
+    },
+    {
+      "role": "event",
+      "text": "Oceniający dołączył wniosek o kolejny stopień",
+      "col": 12,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/foundation/prd.md, FR-023; context/changes/assessment-and-confirmation/plan.md, Phase 1 pkt 2",
+      "code": "assessment_draft_saved",
+      "slice": "S-02"
+    },
+    {
+      "role": "event",
+      "text": "System odrzucił zatwierdzenie bez wniosków rozwojowych",
+      "col": 12,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ],
+      "source": "context/changes/assessment-and-confirmation/plan.md, Phase 1 pkt 4",
+      "code": "approvalBlockers",
+      "slice": "S-02"
+    },
+    {
+      "role": "event",
+      "text": "Oceniający zatwierdził ocenę",
+      "col": 12,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Kadry",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia",
+      "code": "assessment_approved",
+      "slice": "S-02"
+    },
+    {
+      "role": "event",
+      "text": "Ocena stała się widoczna dla ocenianego",
+      "col": 12,
+      "status": "confirmed",
+      "by": [
+        "Oceniany"
+      ],
+      "source": "context/changes/assessment-and-confirmation/plan.md, Wpisy do wspólnych list",
+      "code": "GET /cycles/:id/assessment",
+      "slice": "S-02"
+    },
+    {
+      "role": "command",
+      "text": "Zatwierdź ocenę",
+      "col": 12,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "POST /cycles/:id/assessment/approve",
+      "slice": "S-02"
+    },
+    {
+      "role": "actor",
+      "text": "Oceniający",
+      "col": 12,
+      "status": "confirmed",
+      "by": [
+        "Oceniający"
+      ]
+    },
+    {
+      "role": "readmodel",
+      "text": "Lista blokad zatwierdzenia z przepisem",
+      "col": 12,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Co plastry udostępniają",
+      "code": "approvalBlockers",
+      "slice": "S-02"
+    },
+    {
+      "role": "policy",
+      "text": "Bez wniosków rozwojowych lub uzasadnienia: odmowa",
+      "col": 12,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik"
+      ],
+      "source": "context/foundation/prd.md, FR-022; src/silnik/ocena.ts",
+      "code": "approvalBlockers",
+      "slice": "S-02"
+    },
+    {
+      "role": "aggregate",
+      "text": "Ocena okresowa (Assessment)",
+      "col": 12,
+      "status": "suggested",
+      "by": [
+        "Architekt",
+        "Prawnik"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia, Co plastry udostępniają",
+      "code": "assessmentState",
+      "slice": "S-02"
+    },
+    {
+      "role": "hotspot",
+      "text": "Kto buduje migawkę oceny: S-02 czy S-06?",
+      "col": 12,
+      "status": "confirmed",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Dane pokazowe; context/changes/hr-overview-and-print/plan.md, Phase 1 pkt 3",
+      "slice": "S-02",
+      "priority": 3,
+      "owner": "S-02",
+      "next": "Rozstrzygnięte w kontrakcie po warsztacie: S-02 eksportuje buildAssessmentSnapshot, S-06 używa go w danych."
+    },
+    {
+      "role": "event",
+      "text": "Oceniany potwierdził zapoznanie z oceną",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Kadry",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia; context/foundation/decisions.md, 5a",
+      "code": "assessment_acknowledged",
+      "slice": "S-02"
+    },
+    {
+      "role": "event",
+      "text": "Oceniający stwierdził fikcję zapoznania",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Kadry",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia; context/foundation/decisions.md, 5b, 10n, 11a",
+      "code": "acknowledgement_fiction",
+      "slice": "S-02"
+    },
+    {
+      "role": "event",
+      "text": "Oceniający doręczył ocenianemu kopię arkusza",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Oceniany",
+        "Kadry"
+      ],
+      "source": "context/foundation/decisions.md, 11a (§ 12 ust. 2)",
+      "slice": "S-02"
+    },
+    {
+      "role": "event",
+      "text": "Przycisk potwierdzenia ocenianego zniknął",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Oceniany"
+      ],
+      "source": "context/changes/assessment-and-confirmation/plan.md, Phase 2 pkt 1",
+      "slice": "S-02",
+      "aliases": [
+        "Zapoznanie ustalone"
+      ]
+    },
+    {
+      "role": "command",
+      "text": "Potwierdź zapoznanie z oceną",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "POST /cycles/:id/assessment/acknowledge",
+      "slice": "S-02"
+    },
+    {
+      "role": "command",
+      "text": "Stwierdź fikcję zapoznania: powód i doręczenie",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy; context/foundation/decisions.md, 11a",
+      "code": "POST /cycles/:id/assessment/fiction",
+      "slice": "S-02"
+    },
+    {
+      "role": "actor",
+      "text": "Oceniany",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Oceniany"
+      ]
+    },
+    {
+      "role": "actor",
+      "text": "Oceniający",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik"
+      ]
+    },
+    {
+      "role": "readmodel",
+      "text": "Ocena, uzasadnienie i oświadczenie nad przyciskiem",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Oceniany"
+      ],
+      "source": "context/changes/assessment-and-confirmation/plan.md, Phase 1 pkt 5",
+      "code": "GET /cycles/:id/assessment",
+      "slice": "S-02"
+    },
+    {
+      "role": "readmodel",
+      "text": "Ekran skutku: urząd przyjmuje dzisiejszy dzień",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Prawnik"
+      ],
+      "source": "context/foundation/decisions.md, 10n, 11a",
+      "code": "GET /cycles/:id/assessment/fiction",
+      "slice": "S-02"
+    },
+    {
+      "role": "policy",
+      "text": "Zapoznanie albo fikcja, nigdy oba",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Architekt",
+        "Oceniający"
+      ],
+      "source": "context/changes/assessment-and-confirmation/plan.md, Phase 2; context/foundation/decisions.md, 10n",
+      "code": "assessmentState",
+      "slice": "S-02"
+    },
+    {
+      "role": "hotspot",
+      "text": "Czy oceniany dowie się o fikcji?",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Oceniany"
+      ],
+      "source": "context/foundation/prd.md, Access Control kontra context/changes/assessment-and-confirmation/plan.md, Open Questions pkt 2",
+      "slice": "S-02",
+      "priority": 2,
+      "owner": "S-02",
+      "next": "Ustalić widoczność wpisu fikcji na koncie ocenianego"
+    },
+    {
+      "role": "hotspot",
+      "text": "Doręczenie kopii zapisane tylko przy fikcji",
+      "col": 13,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Oceniany",
+        "Oceniający"
+      ],
+      "source": "context/foundation/decisions.md, 11a; context/changes/hr-overview-and-print/plan.md, Key Discoveries",
+      "priority": 3,
+      "owner": "prawnik urzędu",
+      "next": "Odnotować; oceniany drukuje kopię sam"
+    },
+    {
+      "role": "hotspot",
+      "text": "Przycisk zniknął: zdarzenie interfejsu, nie domeny",
+      "col": 13,
+      "status": "suggested",
+      "by": [
+        "Prawnik",
+        "Architekt"
+      ],
+      "priority": 3,
+      "owner": "S-02",
+      "next": "Na tablicy jako skutek polityki"
+    },
+    {
+      "role": "event",
+      "text": "System zaczął liczyć 7 dni na sprzeciw",
+      "col": 14,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/foundation/decisions.md, 11a; context/changes/assessment-and-confirmation/plan.md, Phase 2",
+      "code": "objectionDeadline",
+      "slice": "S-02",
+      "aliases": [
+        "Zaczął biec termin 7 dni na sprzeciw"
+      ]
+    },
+    {
+      "role": "event",
+      "text": "Minął termin na sprzeciw",
+      "col": 14,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Kadry",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, terminy.sprzeciwDni (art. 83 ust. 1)",
+      "slice": "S-02"
+    },
+    {
+      "role": "event",
+      "text": "Powstał obowiązek przyznania stopnia służbowego",
+      "col": 14,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, Phase 1 pkt 1, reguła 4",
+      "code": "mandatoryGrade",
+      "slice": "S-06"
+    },
+    {
+      "role": "policy",
+      "text": "Gdy zapoznanie lub fikcja, zapisz termin sprzeciwu",
+      "col": 14,
+      "status": "confirmed",
+      "by": [
+        "Oceniający",
+        "Oceniany",
+        "Architekt"
+      ],
+      "source": "context/changes/assessment-and-confirmation/plan.md, Implementation Approach; context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Nazwy silnika",
+      "code": "objectionDeadline",
+      "slice": "S-02"
+    },
+    {
+      "role": "policy",
+      "text": "Gdy dwie najwyższe oceny i zapoznanie: obowiązek stopnia",
+      "col": 14,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt",
+        "Prawnik"
+      ],
+      "source": "context/foundation/prd.md, FR-027; context/changes/hr-overview-and-print/plan.md, Phase 1 pkt 1",
+      "code": "mandatoryGrade",
+      "slice": "S-06"
+    },
+    {
+      "role": "readmodel",
+      "text": "Zegar sprzeciwu: data końca i liczba dni",
+      "col": 14,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Oceniający"
+      ],
+      "source": "context/changes/assessment-and-confirmation/plan.md, Phase 1 pkt 5 (ObjectionClock)",
+      "slice": "S-02"
+    },
+    {
+      "role": "hotspot",
+      "text": "„Biegnie termin” zakazane, ma być „system liczy”",
+      "col": 14,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Oceniający",
+        "Architekt",
+        "Oceniany"
+      ],
+      "source": "context/foundation/decisions.md, 11a",
+      "slice": "S-02",
+      "aliases": [
+        "Zaczął biec termin 7 dni na sprzeciw"
+      ],
+      "priority": 2,
+      "owner": "S-02",
+      "next": "Test na brak słowa „biegnie” w tekstach ekranów"
+    },
+    {
+      "role": "hotspot",
+      "text": "Termin stopnia liczony od dnia fikcji?",
+      "col": 14,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Kadry"
+      ],
+      "source": "context/foundation/prd.md, FR-027; context/foundation/decisions.md, 11a",
+      "priority": 2,
+      "owner": "prawnik urzędu",
+      "next": "Zapytać mentorów; do tego czasu liczyć jak przy zapoznaniu"
+    },
+    {
+      "role": "hotspot",
+      "text": "Obowiązek stopnia przy zapoznaniu, nie po sprzeciwie",
+      "col": 14,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, Phase 1 pkt 1",
+      "priority": 3,
+      "owner": "S-06",
+      "next": "Przyjęte na tablicy; sprawdzić kartę Tomasza od 12.11.2026"
+    },
+    {
+      "role": "event",
+      "text": "Oceniany wniósł sprzeciw do dyrektora generalnego",
+      "col": 15,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Kadry",
+        "Prawnik",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia",
+      "code": "objection_filed",
+      "slice": "S-06"
+    },
+    {
+      "role": "event",
+      "text": "Minęło 14 dni na rozpatrzenie sprzeciwu",
+      "col": 15,
+      "status": "confirmed",
+      "by": [
+        "Prawnik"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, terminy.rozpatrzenieSprzeciwuDni",
+      "code": "objectionReviewDeadline",
+      "slice": "S-06"
+    },
+    {
+      "role": "command",
+      "text": "Wnieś sprzeciw do dyrektora generalnego",
+      "col": 15,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Prawnik"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, terminy.sprzeciwDni",
+      "slice": "S-06"
+    },
+    {
+      "role": "actor",
+      "text": "Oceniany",
+      "col": 15,
+      "status": "confirmed",
+      "by": [
+        "Oceniany"
+      ]
+    },
+    {
+      "role": "external",
+      "text": "Dyrektor generalny, bez konta w systemie",
+      "col": 15,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Prawnik"
+      ],
+      "source": "context/foundation/demo.md, Kto jest w danych pokazowych",
+      "slice": "S-06"
+    },
+    {
+      "role": "readmodel",
+      "text": "Stan sprzeciwu i termin rozpatrzenia",
+      "col": 15,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Co plastry udostępniają",
+      "code": "cycleState",
+      "slice": "S-06"
+    },
+    {
+      "role": "hotspot",
+      "text": "Sprzeciw nie ma trasy: tylko dane pokazowe",
+      "col": 15,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Architekt",
+        "Kadry"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, What We're NOT Doing",
+      "slice": "S-06",
+      "priority": 2,
+      "owner": "S-06",
+      "next": "Zdanie na pokazie: sprzeciw składa się pismem"
+    },
+    {
+      "role": "hotspot",
+      "text": "Adresat sprzeciwu przy arkuszu A: kierownik urzędu",
+      "col": 15,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, Pouczenie",
+      "slice": "S-06",
+      "priority": 3,
+      "owner": "S-06",
+      "next": "Pouczenie na wydruku zależne od arkusza"
+    },
+    {
+      "role": "event",
+      "text": "Kadry odnotowały rozstrzygnięcie sprzeciwu",
+      "col": 16,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt",
+        "Oceniany"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia; context/foundation/prd.md, FR-028",
+      "code": "objection_resolved",
+      "slice": "S-06",
+      "aliases": [
+        "Sprzeciw rozpatrzono",
+        "Dyrektor generalny rozpatrzył sprzeciw"
+      ]
+    },
+    {
+      "role": "event",
+      "text": "Sprzeciw nieuwzględniony",
+      "col": 16,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Prawnik"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, Phase 2 pkt 4",
+      "code": "objection_resolved",
+      "slice": "S-06"
+    },
+    {
+      "role": "event",
+      "text": "Ocena ponownie sporządzona po sprzeciwie",
+      "col": 16,
+      "status": "suggested",
+      "by": [
+        "Architekt"
+      ],
+      "slice": "S-06"
+    },
+    {
+      "role": "event",
+      "text": "Minęło 14 dni na odwołanie do sądu",
+      "col": 16,
+      "status": "confirmed",
+      "by": [
+        "Prawnik"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, terminy.odwolanieDoSaduPracyDni",
+      "code": "courtAppealDeadline",
+      "slice": "S-06"
+    },
+    {
+      "role": "command",
+      "text": "Odnotuj rozstrzygnięcie sprzeciwu",
+      "col": 16,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "POST /cycles/:id/objection-outcome",
+      "slice": "S-06"
+    },
+    {
+      "role": "actor",
+      "text": "Kadry",
+      "col": 16,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ]
+    },
+    {
+      "role": "external",
+      "text": "Sąd pracy",
+      "col": 16,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Oceniany"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, terminy.odwolanieDoSaduPracyDni"
+    },
+    {
+      "role": "aggregate",
+      "text": "Sprzeciw i zmiana terminu (Objection)",
+      "col": 16,
+      "status": "suggested",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia",
+      "slice": "S-06"
+    },
+    {
+      "role": "hotspot",
+      "text": "Po „redone” i „changed” ścieżka się urywa",
+      "col": 16,
+      "status": "confirmed",
+      "by": [
+        "Architekt",
+        "Kadry",
+        "Oceniany"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, What We're NOT Doing",
+      "slice": "S-06",
+      "priority": 2,
+      "owner": "S-06",
+      "next": "Pokazać stan uproszczony; nie budować ponownej oceny"
+    },
+    {
+      "role": "hotspot",
+      "text": "Drugie kliknięcie zapisze drugie rozstrzygnięcie?",
+      "col": 16,
+      "status": "suggested",
+      "by": [
+        "Kadry"
+      ],
+      "slice": "S-06",
+      "priority": 2,
+      "owner": "S-06",
+      "next": "Odmowa 409, gdy objection_resolved już widoczne"
+    },
+    {
+      "role": "hotspot",
+      "text": "Kto rozstrzyga: dyrektor generalny czy kadry?",
+      "col": 16,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Kadry",
+        "Oceniany"
+      ],
+      "source": "context/foundation/prd.md, FR-028",
+      "priority": 3,
+      "owner": "S-06",
+      "next": "Kadry tylko odnotowują; tekst ekranu ma to mówić"
+    },
+    {
+      "role": "hotspot",
+      "text": "Brak daty doręczenia rozstrzygnięcia dla terminu sądu",
+      "col": 16,
+      "status": "confirmed",
+      "by": [
+        "Prawnik"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, terminy.odwolanieDoSaduPracyDni.od",
+      "priority": 3,
+      "owner": "prawnik urzędu",
+      "next": "Poza prototypem; odnotować"
+    },
+    {
+      "role": "event",
+      "text": "Kadry odnotowały przyznanie stopnia służbowego",
+      "col": 17,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt",
+        "Oceniany"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia",
+      "code": "mandatory_grade_awarded",
+      "slice": "S-06",
+      "aliases": [
+        "Urząd przyznał stopień z mocy prawa"
+      ]
+    },
+    {
+      "role": "event",
+      "text": "Minął termin przyznania stopnia",
+      "col": 17,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, Phase 1 pkt 1 (overdue)",
+      "code": "mandatoryGrade",
+      "slice": "S-06"
+    },
+    {
+      "role": "event",
+      "text": "Urzędnik ma już najwyższy stopień",
+      "col": 17,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, Phase 1 pkt 1 (atMaxGrade)",
+      "code": "mandatoryGrade",
+      "slice": "S-06"
+    },
+    {
+      "role": "command",
+      "text": "Odnotuj przyznanie stopnia",
+      "col": 17,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "POST /hr/grades/:personId",
+      "slice": "S-06"
+    },
+    {
+      "role": "actor",
+      "text": "Kadry",
+      "col": 17,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ]
+    },
+    {
+      "role": "readmodel",
+      "text": "Obowiązek urzędu, termin, stopień „z → na”",
+      "col": 17,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, Phase 1 pkt 1, 4",
+      "code": "currentGrade",
+      "slice": "S-06"
+    },
+    {
+      "role": "aggregate",
+      "text": "Stopień służbowy osoby (ServiceGrade)",
+      "col": 17,
+      "status": "suggested",
+      "by": [
+        "Architekt"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Funkcje F-01 (currentGrade)",
+      "code": "currentGrade",
+      "slice": "S-06"
+    },
+    {
+      "role": "hotspot",
+      "text": "Payload stopnia z personId czy bez?",
+      "col": 17,
+      "status": "confirmed",
+      "by": [
+        "Architekt",
+        "Kadry"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Zdarzenia kontra context/changes/hr-overview-and-print/plan.md, Phase 2 pkt 1 (Contract)",
+      "slice": "S-06",
+      "priority": 3,
+      "owner": "S-06",
+      "next": "Rozstrzygnięte w kontrakcie po warsztacie: payload ma personId we wszystkich planach."
+    },
+    {
+      "role": "hotspot",
+      "text": "Reguła stopnia bez podstawy w pliku reguł",
+      "col": 17,
+      "status": "confirmed",
+      "by": [
+        "Prawnik"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json",
+      "priority": 2,
+      "owner": "prawnik urzędu",
+      "next": "Dopisać klucz z podstawą do pliku reguł"
+    },
+    {
+      "role": "hotspot",
+      "text": "Uwzględniony sprzeciw a obowiązek stopnia?",
+      "col": 17,
+      "status": "suggested",
+      "by": [
+        "Kadry"
+      ],
+      "priority": 3,
+      "owner": "prawnik urzędu",
+      "next": "Odnotować; obowiązek zostaje w prototypie"
+    },
+    {
+      "role": "hotspot",
+      "text": "„Przyznał” czy „odnotowały”: kto przyznaje stopień?",
+      "col": 17,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Architekt",
+        "Kadry"
+      ],
+      "source": "context/foundation/prd.md, Non-Goals",
+      "priority": 3,
+      "owner": "S-06",
+      "next": "System odnotowuje; akt przyznania jest poza systemem"
+    },
+    {
+      "role": "event",
+      "text": "Arkusz wydrukowano albo zapisano do PDF",
+      "col": 18,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Kadry"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy; context/foundation/decisions.md, 7 Druk",
+      "code": "GET /cycles/:id/sheet",
+      "slice": "S-06"
+    },
+    {
+      "role": "event",
+      "text": "Oceniany wydrukował własny egzemplarz części I",
+      "col": 18,
+      "status": "confirmed",
+      "by": [
+        "Oceniany"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md, Desired End State",
+      "code": "GET /cycles/:id/sheet",
+      "slice": "S-06"
+    },
+    {
+      "role": "event",
+      "text": "Minęło 6 miesięcy po ocenie negatywnej",
+      "col": 18,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Kadry"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, terminy.ponownaOcenaPoNegatywnejMiesiecy",
+      "code": "periodEndAfterNegative",
+      "slice": "F-01"
+    },
+    {
+      "role": "event",
+      "text": "Rozpoczął się nowy cykl po ocenie",
+      "col": 18,
+      "status": "suggested",
+      "by": [
+        "Kadry",
+        "Architekt"
+      ],
+      "code": "cycle_started",
+      "slice": "F-01"
+    },
+    {
+      "role": "command",
+      "text": "Drukuj albo pobierz PDF",
+      "col": 18,
+      "status": "confirmed",
+      "by": [
+        "Oceniany",
+        "Kadry"
+      ],
+      "source": "context/foundation/decisions.md, 7 Druk",
+      "code": "GET /cycles/:id/sheet",
+      "slice": "S-06"
+    },
+    {
+      "role": "actor",
+      "text": "Oceniany, oceniający albo kadry",
+      "col": 18,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Oceniany"
+      ],
+      "source": "context/changes/hr-overview-and-print/plan.md (canViewSheet)"
+    },
+    {
+      "role": "readmodel",
+      "text": "Przegląd urzędu: stan i termin cykli",
+      "col": 18,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy; context/foundation/prd.md, FR-030",
+      "code": "GET /hr",
+      "slice": "S-06"
+    },
+    {
+      "role": "readmodel",
+      "text": "Historia ocen osoby",
+      "col": 18,
+      "status": "confirmed",
+      "by": [
+        "Kadry",
+        "Oceniany"
+      ],
+      "source": "context/changes/rules-engine-and-demo-data/plan.md, Kontrakt wspólny dla wszystkich plastrów, Trasy",
+      "code": "GET /people/:id/history",
+      "slice": "S-06"
+    },
+    {
+      "role": "hotspot",
+      "text": "Nowy cykl od sporządzenia czy od zapoznania?",
+      "col": 18,
+      "status": "confirmed",
+      "by": [
+        "Prawnik",
+        "Kadry",
+        "Architekt"
+      ],
+      "source": "reguly/rozporzadzenie-2016-470.json, terminy.*.od; src/silnik/terminy.ts",
+      "priority": 2,
+      "owner": "prawnik urzędu",
+      "next": "Zapisać założenie w kontrakcie; nowy cykl tylko w danych"
+    },
+    {
+      "role": "hotspot",
+      "text": "Wydruk z potwierdzeniem w systemie: czy trafi do akt?",
+      "col": 18,
+      "status": "confirmed",
+      "by": [
+        "Kadry"
+      ],
+      "source": "context/foundation/decisions.md, 11b; context/foundation/prd.md, Open Questions 1",
+      "priority": 3,
+      "owner": "prawnik urzędu",
+      "next": "Pytanie do mentorów organizatora"
+    }
+  ],
+  "notes": {
+    "scope": "Jeden cykl oceny jednego pracownika: start cyklu, rozmowa o kryteriach i część I, potwierdzenie części I, notatki i informacja zwrotna w okresie, nieobecności, zmiana oceniającego i termin, formularz oceny, zatwierdzenie, zapoznanie albo fikcja zapoznania, sprzeciw, stopień obowiązkowy oraz przegląd kadr. Poza zakresem: logowanie, design system, wdrożenie.",
+    "participants": [
+      "Oceniający (Marek): demo.md, prd.md, plany S-01, S-02, S-04, S-05",
+      "Oceniany (Piotr): prd.md, decisions.md 5, 10–11, plany S-01, S-02, S-04, S-06",
+      "Kadry (Joanna) z perspektywą dyrektora generalnego: prd.md, decisions.md, plany S-03, S-05, S-06",
+      "Prawnik: plik reguł, silnik terminów i wyniku, decisions.md 11a–11e, AGENTS.md",
+      "Architekt: kontrakt wspólny w planie F-01, roadmap.md, wszystkie plany",
+      "Prowadzący: składa oś czasu, nie dodaje wiedzy domenowej"
+    ],
+    "decisions": [
+      "Fikcję zapoznania stwierdza tylko oceniający kliknięciem; nie ma automatu po czasie (decisions.md 5b, 10n, 11a).",
+      "Potwierdzenie części I bez wyjścia zostaje jako znana luka (decisions.md 5, 10d).",
+      "Nieobecność zapisuje tylko daty i usprawiedliwienie, bez rodzaju (decisions.md 10m).",
+      "Termin oceny nie leży w tabeli cycles; każdy ekran czyta effectiveDeadline (kontrakt, Tabele).",
+      "Prowadzący: zachowano nazwy uczestników; różne nazwy tego samego faktu są w polu aliases i w hotspotach o nazewnictwie.",
+      "Prowadzący: obowiązek stopnia przesunięty do kolumny zapoznania (Kadry, Architekt); spór o start nowego cyklu zostawiony jako hotspot.",
+      "Prowadzący: w trakcie warsztatu inny agent zaktualizował kontrakt i plany; hotspoty rozstrzygnięte tą zmianą mają priorytet 3 i dopisek w polu next.",
+      "Prowadzący: pole code zawiera tylko nazwy z rozdziału kontraktu; trasy zapisane z nawiasem klamrowym rozwinięto do pojedynczych tras; nazwy z planów plastrów są w polu source."
+    ],
+    "invariants": [
+      "Kryteria i termin części I są zablokowane od przekazania (kontrakt, Zasady wspólne tras).",
+      "Kryteria: wszystkie obowiązkowe z arkusza, 0–3 dodatkowe bez powtórzeń (reguły, maksKryteriowDodatkowych; ocena.ts).",
+      "Nie ma oceny bez widocznego part1_confirmed.",
+      "Zbiór ocen cząstkowych równa się zbiorowi cycle_criteria; wynik zawsze z computeAssessment.",
+      "Na cykl najwyżej jedno assessment_approved i najwyżej jedno z pary assessment_acknowledged albo acknowledgement_fiction.",
+      "Jedna data zapoznania zasila termin sprzeciwu, 6 miesięcy po ocenie negatywnej i 30 dni na stopień; objectionDeadline liczony raz i czytany z payloadu.",
+      "Termin oceny ma jedno źródło: effectiveDeadline; migawki terminu w zdarzeniach muszą być oznaczone jako historyczne.",
+      "Jedna granica widoczności date <= today() dla zdarzeń, notatek, informacji zwrotnych i nieobecności.",
+      "Bieżący stopień ma jedno źródło: currentGrade; przyznanie wymaga niepustego mandatoryGrade.",
+      "Nic nie zapisuje się bez kliknięcia człowieka; przy nazwisku nie ma etykiet ani wskaźników (AGENTS.md, zasady 5 i 7)."
+    ],
+    "assumptions": [
+      "Warsztat przeprowadzili agenci AI symulujący role na podstawie dokumentów repozytorium. Żaden człowiek nie potwierdził tej tablicy.",
+      "Status confirmed oznacza tylko, że kartkę wspiera dokument repozytorium, a nie potwierdzenie przez eksperta.",
+      "Kandydaci na agregaty pochodzą od Architekta i Prawnika i mają status suggested.",
+      "Brzmienie przepisów nie było sprawdzane u źródła; paragrafy podano za plikami repozytorium.",
+      "Kodu plastrów jeszcze nie ma; nazwy pochodzą z planów i kontraktu."
+    ],
+    "open": [
+      {
+        "q": "[P1] Data reguł 2016-04-22 zamiast 2016-04-23",
+        "owner": "F-01",
+        "next": "Poprawić obowiązywanie na 2016-04-23 przy przenosinach silnika"
+      },
+      {
+        "q": "[P1] Kto buduje migawkę oceny: S-02 czy S-06?",
+        "owner": "S-02",
+        "next": "S-02 eksportuje budowniczego AssessmentSnapshot; S-06 używa go w danych"
+      },
+      {
+        "q": "[P1] Payload stopnia z personId czy bez?",
+        "owner": "S-06",
+        "next": "Dopisać personId w Contract trasy POST /hr/grades/:personId w planie S-06"
+      },
+      {
+        "q": "[P2] Rozmowa o kryteriach: brak typu, data = przekazanie",
+        "owner": "autor",
+        "next": "Nazwać uproszczenie na ekranie albo dodać pole daty rozmowy"
+      },
+      {
+        "q": "[P2] Oceniany nie potwierdza części I: brak wyjścia",
+        "owner": "prawnik urzędu",
+        "next": "Zostawić lukę; zdanie dla jury z decyzji 10d"
+      },
+      {
+        "q": "[P2] Błędnego wpisu nieobecności nie da się cofnąć",
+        "owner": "S-03",
+        "next": "Poprawka tylko w danych pokazowych; uważać na kolejność kroku 3"
+      },
+      {
+        "q": "[P2] Różne kolumny granicy widoczności w tabelach",
+        "owner": "F-01",
+        "next": "Wpisać do kontraktu, którą datę czyta każda tabela"
+      },
+      {
+        "q": "[P2] Nadpisanie appraiser_id łamie granicę daty pokazu",
+        "owner": "S-03",
+        "next": "Czytać oceniającego z appraiser_changed według today()"
+      },
+      {
+        "q": "[P2] Nowy oceniający nie widzi notatek poprzednika",
+        "owner": "autor",
+        "next": "Zdecydować, czy pokaz Ewy to mówi wprost"
+      },
+      {
+        "q": "[P2] Kto buduje przypomnienie o terminie oceny?",
+        "owner": "S-03",
+        "next": "Sprawdzić, czy przypomnienie przetrwa cięcie S-03"
+      },
+      {
+        "q": "[P2] Rozmowa oceniająca bez zdarzenia; data może wypaść",
+        "owner": "S-02",
+        "next": "Zostawić interviewDate albo nazwać datę zatwierdzenia na ekranie"
+      },
+      {
+        "q": "[P2] Czy oceniany dowie się o fikcji?",
+        "owner": "S-02",
+        "next": "Ustalić widoczność wpisu fikcji na koncie ocenianego"
+      },
+      {
+        "q": "[P2] „Biegnie termin” zakazane, ma być „system liczy”",
+        "owner": "S-02",
+        "next": "Test na brak słowa „biegnie” w tekstach ekranów"
+      },
+      {
+        "q": "[P2] Termin stopnia liczony od dnia fikcji?",
+        "owner": "prawnik urzędu",
+        "next": "Zapytać mentorów; do tego czasu liczyć jak przy zapoznaniu"
+      },
+      {
+        "q": "[P2] Sprzeciw nie ma trasy: tylko dane pokazowe",
+        "owner": "S-06",
+        "next": "Zdanie na pokazie: sprzeciw składa się pismem"
+      },
+      {
+        "q": "[P2] Po „redone” i „changed” ścieżka się urywa",
+        "owner": "S-06",
+        "next": "Pokazać stan uproszczony; nie budować ponownej oceny"
+      },
+      {
+        "q": "[P2] Drugie kliknięcie zapisze drugie rozstrzygnięcie?",
+        "owner": "S-06",
+        "next": "Odmowa 409, gdy objection_resolved już widoczne"
+      },
+      {
+        "q": "[P2] Reguła stopnia bez podstawy w pliku reguł",
+        "owner": "prawnik urzędu",
+        "next": "Dopisać klucz z podstawą do pliku reguł"
+      },
+      {
+        "q": "[P2] Nowy cykl od sporządzenia czy od zapoznania?",
+        "owner": "prawnik urzędu",
+        "next": "Zapisać założenie w kontrakcie; nowy cykl tylko w danych"
+      }
+    ]
+  },
+  "ids": {}
+}

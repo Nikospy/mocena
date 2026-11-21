@@ -12,8 +12,12 @@ Czytaj w tej kolejności. Przy sprzeczności wygrywa dokument wyżej na liście.
 4. `context/foundation/demo.md`: scenariusz pokazu, osoby i dane pokazowe do wgrania.
 5. `context/changes/<change-id>/plan.md`: plan bieżącej zmiany; stan jest w sekcji `## Progress`.
 6. `context/foundation/tech-stack.md`: stos i powody wyboru.
+7. `context/domain/glossary.md`: słownik (słowo na ekranie, znaczenie, nazwa w kodzie, czego nie pisać). Czytasz go przed pierwszą linią kodu plastra.
+8. `context/domain/event-storming.md`: przebieg cyklu oceny (aktor, polecenie, zdarzenie, reguła, widok) i reguły biznesowe z testami. Pełna tablica warsztatu: `context/domain/event-storming.board.json`.
 
 `context/foundation/shape-notes.md` to notatki wejściowe do PRD. Nie są źródłem decyzji.
+
+Nazwy tabel, zdarzeń, tras i funkcji wspólnych dla plastrów są w rozdziale „Kontrakt wspólny dla wszystkich plastrów” w `context/changes/rules-engine-and-demo-data/plan.md`. Żaden plaster nie tworzy drugiej nazwy na to samo.
 
 ## Zasady, których nie wolno złamać
 

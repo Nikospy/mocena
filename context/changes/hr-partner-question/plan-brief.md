@@ -20,9 +20,11 @@ Po notatce ze zmianą zadań Marek odpowiada na „To stała zmiana zadań?” i
 | --- | --- | --- |
 | Granica „przed / po” | data najwcześniejszej notatki z polem zmiany zadań, bez odpowiedzi „Nie”; „Tak” nie jest warunkiem | Wersja 90 sekund pomija krok 2, a krok 4 musi mieć podział. |
 | Duplikat notatki z 11.03.2026 | opcja seeda `--live-step-2` w pełnym pokazie; w wersji 90 s granicę daje wgrana notatka | Ustalenie kontraktu i `demo.md`; obie drogi dają granicę 11.03.2026. |
-| Odpowiedź przy notatce bez cyklu | `task_change_answered` z pustym `cycle_id`, odczyt po `payload.noteId` | Maria nie ma cyklu, a kontrakt pozwala na puste `cycle_id`. |
+| Odpowiedź przy notatce bez cyklu | `task_change_answered` z pustym `cycle_id`, odczyt przez `visibleEvents(null)` po `payload.noteId` | Maria nie ma cyklu (`openCycle` zwraca `null`); kontrakt tak to definiuje. |
+| Część I Piotra w testach i próbach | `createTestApp({ today, seedOptions: { afterStep1: true } })`, w pełnym pokazie z `liveStep2: true`; ręcznie `bun run seed -- --after-step-1 --live-step-2` | Domyślne dane zostawiają Piotra bez części I; żaden test nie przepisuje wgranych danych. |
 | Data zmiany | data notatki (11.03.2026), nie 9.03 z tekstu | System nie czyta treści notatek. |
-| Forma rozwoju | pierwsza z katalogu pasująca do kryterium notatki, inaczej domyślna | Reguła w miejscu 5 z decyzji 9. |
+| Forma rozwoju | `suggestDevelopmentForm(note)` w `src/suggestions/index.ts`: pierwsza z katalogu pasująca do kryterium notatki, inaczej jedyna forma z `default: true` | Miejsce 5 z decyzji 9 w jednym wymiennym miejscu podpowiedzi (zasada 5). |
+| „Przekaż pracownikowi” w karcie docenienia | tylko gdy istnieją trasy `GET/POST /notes/:id/feedback` (S-04, faza 3) | Bez nich karta nie ma tego działania. |
 | Zapis | tylko zdarzenie `task_change_answered` przez `recordEvent` po kliknięciu | „Nic nie zapisuje się bez kliknięcia”. |
 | Odnośniki | `registerCycleLinks` na `GET /cycles/:id/part1`, `registerHomeTasks` na `GET /` | Wspólne miejsca z kontraktu, bez ręcznego wpisywania adresów. |
 | Odmiana imion | `content/name-forms.json` z zdaniem zastępczym | Zdania z decyzji 10k wymagają przypadków. |
@@ -53,7 +55,7 @@ Czysta logika w `src/hr-partner/partner.ts` na danych z `data.ts`, każda funkcj
 
 ## Open Risks & Assumptions
 
-- Kontrakt nie mówi, czy `visibleEvents(null)` zwraca zdarzenia bez cyklu, ani czy `createTestApp` przyjmuje opcję `--live-step-2`; domyślne rozstrzygnięcia są w planie.
+- Plaster dopisuje trasy w `src/index.tsx`, klucze w `content/cards.json` i `rules/office-settings.json` oraz wejście w `src/suggestions/index.ts`, bez zmiany cudzych kluczy.
 - Nazwy z kontraktu i z planów S-01 i S-04 są w planie w sekcji „Założenia wobec wcześniejszych plastrów”.
 
 ## Success Criteria (Summary)

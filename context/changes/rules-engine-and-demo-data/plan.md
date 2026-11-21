@@ -30,13 +30,14 @@ Ten rozdział jest źródłem nazw dla planów S-01 do S-06. Przy rozjeździe wy
 
 - `package.json`: `dev` wskazuje `src/index.tsx`; `seed` to `bun run src/seed.ts`; `test` to `bun test`.
 - Pliki z `public/` (style, style druku, małe skrypty) są serwowane lokalnie przez `serveStatic`; bez CDN i bez sieci.
-- `createTestApp({ today })` w `src/test-helpers.ts`: aplikacja na bazie w pamięci, z wgranymi danymi i ustawioną datą systemową.
+- `createTestApp({ today, seedOptions })` w `src/test-helpers.ts`: aplikacja na bazie w pamięci, z wgranymi danymi i ustawioną datą systemową. Oba pola są opcjonalne.
+- `runSeed(db, options)` w `src/seed.ts`: jedno wspólne wgranie danych. Wołają je `bun run seed` i `createTestApp`. Opcje: `liveStep2` (z wiersza poleceń `--live-step-2`) i `afterStep1` (`--after-step-1`); opis w części o danych pokazowych.
 
 ### Tabele
 
 | Tabela | Kolumny | Właściciel |
 |---|---|---|
-| `people` | `id, name, role, position_title, unit, supervisor_id, has_account, appointed, civil_service_grade` | F-01 |
+| `people` | `id, name, role, position_title, unit, supervisor_id, has_account, appointed, civil_service_grade, grade_awarded_on` (`grade_awarded_on` może być puste) | F-01 |
 | `cycles` | `id, person_id, appraiser_id, period_start, sheet` | F-01 |
 | `cycle_criteria` | `cycle_id, criterion_id, kind, expectation` (`kind`: `mandatory` albo `additional`) | F-01 tworzy, S-01 wypełnia |
 | `events` | `id, type, cycle_id, actor_id, date, payload` (`payload` to JSON, `cycle_id` może być puste) | F-01 |
@@ -45,7 +46,7 @@ Ten rozdział jest źródłem nazw dla planów S-01 do S-06. Przy rozjeździe wy
 | `feedback_messages` | `id, note_id, author_id, recipient_id, sent_on, text` | S-04 |
 | `absences` | `id, person_id, date_from, date_to, excused, recorded_on, recorded_by` | S-03 |
 
-Rozszerzenia: S-01 dodaje `people.position_kind` i `people.duty_types` (JSON); S-06 dodaje `people.appointed_year` i `people.grade_awarded_on`. Role w `people.role`: `appraiser`, `employee`, `hr`, `admin`. Identyfikatory kryteriów zostają takie jak w pliku reguł (na przykład `orientacja-na-klienta`): to dane, nie nazwy w kodzie.
+Rozszerzenia: S-01 dodaje `people.position_kind` i `people.duty_types` (JSON); S-06 dodaje `people.appointed_year`. Role w `people.role`: `appraiser`, `employee`, `hr`, `admin`. Identyfikatory kryteriów zostają takie jak w pliku reguł (na przykład `orientacja-na-klienta`): to dane, nie nazwy w kodzie.
 
 Terminu oceny nie zapisuje się w `cycles`. Każdy ekran czyta go z `effectiveDeadline(cycleId)`.
 
@@ -54,15 +55,15 @@ Terminu oceny nie zapisuje się w `cycles`. Każdy ekran czyta go z `effectiveDe
 - `today()`: data systemowa z `settings.demo_date`.
 - `currentPerson(c)`: osoba z ciasteczka albo `null`.
 - `recordEvent(type, cycleId, actorId, payload)`: zapis z datą `today()`; `seedEvent(...)` z jawną datą tylko w skryptach danych.
-- `visibleEvents(cycleId)`: zdarzenia z `date <= today()`, w porządku `(date, id)`. Ta sama granica obowiązuje notatki, nieobecności i cykle: cykl jest widoczny od swojego zdarzenia `cycle_started`.
-- `effectiveDeadline(cycleId)` w `src/cycles.ts`: zwraca `{ date, basis: string[] }`. W F-01: dla zwykłego cyklu `nextAssessmentDeadline(period_start, 0)`, dla ponownej oceny po negatywnej `periodEndAfterNegative(previousAcknowledgedOn)`. S-03 dokłada nieobecności w tym samym miejscu, tylko dla zwykłego cyklu.
+- `visibleEvents(cycleId, { asOf })`: zdarzenia z `date <= today()`, w porządku `(date, id)`. Opcjonalne `asOf` zastępuje `today()` jawną datą; używają go tylko moduły danych pokazowych (składanie historycznych łańcuchów i migawek), `savePart1` (liczy termin na dzień zapisu) oraz testy. Ta sama granica obowiązuje pozostałe tabele, każda ma jedną kolumnę granicy: `notes.date` (nie `created_at`), `feedback_messages.sent_on`, `absences.recorded_on`; cykl jest widoczny od daty swojego zdarzenia `cycle_started`. Data systemowa przesuwa się tylko do przodu, więc zapis zrobiony na żywo nigdy nie znika.
+- `effectiveDeadline(cycleId, { asOf })` w `src/cycles.ts`: zwraca `{ date, basis: string[] }`; `asOf` jak wyżej. W F-01: dla zwykłego cyklu `nextAssessmentDeadline(period_start, 0)`, dla ponownej oceny po negatywnej `periodEndAfterNegative(previousAcknowledgedOn)`. S-03 dokłada nieobecności w tym samym miejscu, tylko dla zwykłego cyklu.
+- `openCycle(personId)` w `src/cycles.ts`: bieżący otwarty cykl osoby albo `null`. Otwarty to widoczny cykl bez widocznego `assessment_acknowledged` i bez `acknowledgement_fiction`; gdy jest ich kilka, ten z najpóźniejszym `period_start`. Notatki, uprawnienia i ekrany biorą cykl osoby tylko stąd, nigdy z „pierwszego widocznego”.
 - `homeTasks(person)` w `src/home-tasks.ts`: lista spraw na `GET /`; każdy plaster dopisuje swoje pozycje przez `registerHomeTasks(fn)`.
-- `cycleLinks(cycle, person)` w `src/cycle-links.ts`: odnośniki na ekranie cyklu; każdy plaster dopisuje swoje przez `registerCycleLinks(fn)`.
+- `cycleLinks(cycle, person)` w `src/cycle-links.ts`: odnośniki na ekranie cyklu i w wierszu cyklu na `/hr`; każdy plaster dopisuje swoje przez `registerCycleLinks(fn)`. Dwie zasady: plaster rejestruje odnośnik tylko dla ról, które jego trasa `GET` naprawdę wpuszcza, i żaden plaster nie wpisuje na sztywno odnośnika do trasy innego plastra.
 - `rulesVersion()`: `{ version, effectiveFrom, act }`.
 - `setting(key)`: odczyt wartości z `settings` (na przykład `office_city`).
 - `visibleEvents(null)` zwraca zdarzenia bez cyklu; `visibleEventsOfType(type)` zwraca widoczne zdarzenia danego typu ze wszystkich cykli.
-- `currentGrade(personId)` w `src/people.ts`: zwraca `{ grade, awardedOn }` z ostatniego widocznego `mandatory_grade_awarded` tej osoby, a gdy go nie ma, z `people.civil_service_grade`. To jedyne źródło bieżącego stopnia dla S-02 i S-06.
-- `createTestApp({ today, seedOptions })`: `seedOptions.liveStep2` odpowiada opcji `--live-step-2`.
+- `currentGrade(personId)` w `src/people.ts`: zwraca `{ grade, awardedOn }` z ostatniego widocznego `mandatory_grade_awarded` tej osoby (`toGrade` i data zdarzenia, szukane po `payload.personId`), a gdy go nie ma, z `people.civil_service_grade` i `people.grade_awarded_on`. Powstaje w fazie 1 F-01. To jedyne źródło bieżącego stopnia dla S-02 i S-06.
 
 ### Nazwy silnika po przeniesieniu
 
@@ -73,11 +74,11 @@ Terminu oceny nie zapisuje się w `cycles`. Każdy ekran czyta go z `effectiveDe
 
 | Typ | Payload | Właściciel |
 |---|---|---|
-| `cycle_started` | `{ reason, periodStart, previousAssessmentOn, previousAcknowledgedOn, previousOutcome }`; `reason`: `hired`, `appointed` albo `previous_assessment`; `previousOutcome`: `positive`, `negative` albo `null`; `previousAssessmentOn` to dzień sporządzenia poprzedniej oceny | F-01 (dane), S-01 |
+| `cycle_started` | `{ reason, periodStart, previousAssessmentOn, previousAcknowledgedOn, previousOutcome }`; `reason`: `hired`, `appointed` albo `previous_assessment`; `previousOutcome`: `positive`, `negative` albo `null`; `previousAssessmentOn` to dzień sporządzenia poprzedniej oceny, `previousAcknowledgedOn` dzień zapoznania z nią (od niego liczy się ponowna ocena po negatywnej). Każdy plaster, który zapisuje albo wgrywa to zdarzenie, podaje wszystkie pięć pól | F-01 (dane), S-01 |
 | `part1_submitted` | `{ sheet, criteria, dueDate, dueDateBasis, criteriaBasis, rulesVersion, place, appraiserName }` | S-01 |
-| `part1_confirmed` | `{ place, appraiseeName }` | S-01 |
+| `part1_confirmed` | `{ place, appraiseeName }`; w danych pokazowych zapisuje je `seedEvent` z jawną datą | S-01 |
 | `assessment_draft_saved` | szkic oceny | S-02 |
-| `assessment_approved` | migawka oceny; `periodFrom` to `cycles.period_start` | S-02 |
+| `assessment_approved` | migawka oceny `AssessmentSnapshot`; `periodFrom` to `cycles.period_start`, `deadline` to `effectiveDeadline` z dnia zatwierdzenia, `grade` i `gradeAwardedOn` to stopień z dnia zatwierdzenia | S-02 |
 | `assessment_acknowledged` | `{ place, date, name, objectionDeadline }` | S-02 |
 | `acknowledgement_fiction` | `{ reason, deliveryMethod, deliveredOn, objectionDeadline }` | S-02 |
 | `task_change_answered` | `{ noteId, answer, developmentFormId }` | S-05 |
@@ -97,25 +98,32 @@ Terminu oceny nie zapisuje się w `cycles`. Każdy ekran czyta go z `effectiveDe
 | Kadry i wydruk | `GET /hr`, `GET /cycles/:id/sheet`, `GET /people/:id/history`, `POST /hr/grades/:personId`, `POST /cycles/:id/objection-outcome` | S-06 |
 | Oś czasu | `GET/POST /cycles/:id/absences`, `GET/POST /cycles/:id/appraiser`, `GET /cycles/:id/timeline` | S-03 |
 
+### Zasady wspólne tras
+
+- Po udanym `POST` trasa odpowiada przekierowaniem 303. `GET /cycles/:id` przekierowuje kodem 302.
+- Błąd walidacji to 422 z formularzem, brak uprawnień to 403, próba powtórzenia zamkniętego kroku albo zapisu do cyklu, który nie jest już otwarty, to 409.
+- `GET /cycles/:id/sheet` obsługuje oba stany: przy otwartym cyklu pokazuje część I z bieżącym terminem, po zatwierdzeniu cały arkusz z terminem z migawki.
+- Kryteria i termin części I są zablokowane już od przekazania części I, czyli wcześniej, niż wymaga PRD (blokada po potwierdzeniu). To uproszczenie prototypu: nie budujemy wycofania przekazanej części I.
+
 ### Pliki wspólne
 
 - `rules/office-settings.json` z `officeSettings()`: ustawienia urzędu; tworzy S-01, kolejne plastry dopisują klucze.
 - `content/cards.json` z `card(id)`: treści kart; tworzy S-01. Klucze: `opening` (S-01), `assessment` (S-04), `taskChange`, `appreciation`, `beforeMeeting` (S-05).
 - Miejscowość potwierdzeń pochodzi z `settings.office_city`. W `rules/office-settings.json` są tylko ustawienia wymyślone przez nas (tabela obowiązków, lista słów, progi, katalog form rozwoju).
-- `src/suggestions/index.ts`: jedno wymienne miejsce podpowiedzi. Tworzy S-01 z wejściem `suggestCriteria(sheet, dutyTypeIds)`; S-04 dopisuje `suggestForNote(text)` i `suggestionMode()`, które zwraca `rules`, `local-model` albo `none` (te same wartości co `notes.suggestion_source`).
-- `src/views/components.tsx`: `LegalBasis` i `ConfirmationBlock`; tworzy S-01, używają S-02 i S-06.
-- Plik reguł po przeniesieniu ma klucze `criteriaConversation` i `assessmentConversation` (każdy z `basis` i `topics`); S-02 dopisuje `approval`, S-03 podstawy nieobecności i zmiany oceniającego.
+- `src/suggestions/index.ts`: jedno wymienne miejsce podpowiedzi. Tworzy S-01 z wejściem `suggestCriteria(sheet, dutyTypeIds)`; S-04 dopisuje `suggestForNote(text)` i `suggestionMode()`, które zwraca `rules`, `local-model` albo `none` (te same wartości co `notes.suggestion_source`); S-05 dopisuje `suggestDevelopmentForm(note)`. W katalogu `developmentForms` dokładnie jedna forma ma `default: true`.
+- `src/views/components.tsx`: `LegalBasis` i `ConfirmationBlock`; tworzy S-01. S-02 używa `ConfirmationBlock` i razem z fikcją dopisuje do niego wariant wpisu o fikcji. S-06 tylko go używa; własnego bloku nie tworzy nikt.
+- Plik reguł po przeniesieniu ma klucze `criteriaConversation` i `assessmentConversation` (każdy z `basis` i `topics`); S-02 dopisuje `approval`, w tym jedyny klucz granicy stopnia `approval.gradeRequest.maxGrade` (9); S-06 dopisuje `deadlines.mandatoryGradeDays` i czyta granicę stopnia z klucza S-02; S-03 dopisuje podstawy nieobecności i zmiany oceniającego.
 
 ### Co plastry udostępniają sobie nawzajem
 
 | Plaster | Funkcje i kształty |
 |---|---|
-| S-01 | `part1Status(cycleId)`, `cycleCriteria(cycleId)`, `submitPart1(cycleId, actorId, input)` |
-| S-02 | `assessmentState(cycleId)`, `approvalBlockers(input)`, migawka `AssessmentSnapshot` opisana w planie S-02, `slots` formularza: `criterionAside(criterionId)`, `justificationTools`, `conclusionsTools`, `beforeForm`; pola `justification` i `developmentConclusions` |
+| S-01 | `part1Status(cycleId)`, `cycleCriteria(cycleId)`, `submitPart1(cycleId, actorId, input)` (sprawdza, że aktor jest bieżącym oceniającym), `savePart1(cycleId, actorId, input, date)` (sam zapis, bez sprawdzania aktora; woła go `submitPart1` i moduły danych pokazowych) |
+| S-02 | `assessmentState(cycleId)`, `approvalBlockers(input)`, `buildAssessmentSnapshot(cycleId, draft, { asOf })` (jedyne miejsce, które składa migawkę; woła je zatwierdzenie i moduł danych S-06), migawka `AssessmentSnapshot` opisana w planie S-02, typ `Slots` i prop `slots` formularza: `criterionAside(criterionId)`, `justificationTools`, `conclusionsTools`, `beforeForm`; pola `justification` i `developmentConclusions`; zapisane oceny cząstkowe w `assessmentState(cycleId).draft.scores` |
 | S-04 | `notesAbout`, `notesByAuthor`, `notesForCycle`, `lastFeedbackDate`, `afterNoteSaved(note)`, `suggestForNote`, `suggestionMode` |
 | S-05 | zdarzenie `task_change_answered` |
-| S-06 | `cycleState(cycleId)`, `mandatoryGrade`, `sheetData`, `canViewSheet`, `assessmentHistory` |
-| S-03 | `mergeAbsences`, `buildTimeline(cycleId)` |
+| S-06 | `cycleState(cycleId)`, `mandatoryGrade`, `sheetData(cycleId, options?)`, `canViewSheet`, `assessmentHistory` |
+| S-03 | tylko zdarzenia, trasy i rozszerzony `effectiveDeadline`; funkcje osi czasu są wewnętrzne |
 
 ### Dane pokazowe: jeden skrypt, jeden właściciel na zestaw
 
@@ -123,11 +131,13 @@ Terminu oceny nie zapisuje się w `cycles`. Każdy ekran czyta go z `effectiveDe
 
 | Moduł | Co wgrywa | Właściciel |
 |---|---|---|
-| `src/seed/base.ts` | osoby i podległość, ustawienia, data systemowa `2024-12-09`, cykle Piotra, Ewy i Tomasza ze zdarzeniami `cycle_started`; Piotr bez części I; oceniającym Ewy jest od początku Marek (wcześniejszą zmianę oceniającego dopisuje S-03 jako zdarzenie historyczne); Tomasz jest urzędnikiem mianowanym ze stopniem V | F-01 |
-| `src/seed/part1.ts` | pełna część I Ewy i bieżącego cyklu Tomasza; `position_kind` i `duty_types` osób | S-01 |
+| `src/seed/base.ts` | osoby i podległość, ustawienia, data systemowa `2024-12-09`, cykle Piotra, Ewy i Tomasza ze zdarzeniami `cycle_started`; Piotr bez części I; oceniającym Ewy jest od początku Marek (wcześniejszą zmianę oceniającego dopisuje S-03 jako zdarzenie historyczne); Tomasz jest urzędnikiem mianowanym ze stopniem V przyznanym 2022-12-01 (`grade_awarded_on`); wśród osób bez konta jest Katarzyna Lewandowska, podwładna Anny na stanowisku z arkuszem C, na której dane S-06 pokazują sprzeciw (Maria nie ma żadnego cyklu) | F-01 |
+| `src/seed/part1.ts` | pełna część I Ewy i bieżącego cyklu Tomasza; `position_kind` i `duty_types` osób. Część I Ewy zapisuje `savePart1` z jawnym aktorem (poprzedni naczelnik) i historyczną datą. Z opcją `afterStep1` dochodzi część I Piotra tak, jak po kroku 1 pokazu: przekazana i potwierdzona 2024-12-09, kryteria dodatkowe `orientacja-na-klienta` i `myslenie-analityczne` | S-01 |
 | `src/seed/notes.ts` | 16 notatek z `demo.md` | S-04 |
-| `src/seed/assessments.ts` | obie oceny Tomasza jako pełne łańcuchy zdarzeń, przykłady stanów uproszczonych (w tym zamknięty cykl Marii ze sprzeciwem) | S-06 (kształt migawki z S-02) |
+| `src/seed/assessments.ts` | obie oceny Tomasza jako pełne łańcuchy zdarzeń, przykłady stanów uproszczonych (w tym zamknięty cykl Katarzyny Lewandowskiej ze sprzeciwem) | S-06 (kształt migawki z S-02) |
 | `src/seed/absences.ts` | nieobecność Ewy i zmiana jej oceniającego | S-03 |
+
+Opcja `afterStep1` służy testom i próbom plastrów budowanych po S-01: test S-02, S-04 albo S-05, który zaczyna od późniejszej daty, bierze `createTestApp({ today, seedOptions: { afterStep1: true } })` zamiast dopisywać część I Piotra własnym kodem. Próba ręczna od kroku 2 w górę używa `bun run seed -- --after-step-1` albo odtwarza krok 1 klikaniem.
 
 Wgrana notatka z 11.03.2026 o przejęciu kolejki dubluje notatkę pisaną na żywo w kroku 2 pokazu. `bun run seed -- --live-step-2` pomija tę jedną notatkę; pełny pokaz i wersja 5-minutowa używają tej opcji, wersja 90-sekundowa używa danych domyślnych.
 
@@ -141,7 +151,42 @@ Wgrana notatka z 11.03.2026 o przejęciu kolejki dubluje notatkę pisaną na ży
 | 4 | 2026-11-21 |
 | 5 | 2026-11-22 (termin sprzeciwu: 2026-11-30) |
 
-Kliknięcie fikcji zapoznania w wersji 5-minutowej pokazuje się w osobnym przebiegu od czystych danych, zamiast potwierdzenia Piotra.
+Kliknięcie fikcji zapoznania w wersji 5-minutowej pokazuje się w osobnym przebiegu od czystych danych, zamiast potwierdzenia Piotra. Ten przebieg odtwarza kroki 1 i 2 (albo wgrywa dane z `--after-step-1` bez `--live-step-2`), żeby notatka z 11.03.2026 istniała i krok 4 miał podział na notatki sprzed zmiany zadań i po niej.
+
+### Co jest potrzebne do wersji 5-minutowej pokazu
+
+Wersja minimalna każdego plastra utrzymuje wersję 90-sekundową i pełne kroki 1 do 5. Wersja 5-minutowa wymaga dodatkowo trzech rzeczy. W planach stoją one na początku listy „Kolejność cięcia”, czyli powstają zaraz po wersji minimalnej i wypadają jako ostatnie:
+
+| Rzecz | Plaster |
+|---|---|
+| Fikcja zapoznania z ekranem skutku i wgląd kadr w ocenę | S-02 |
+| Przycisk „Odnotuj przyznanie stopnia” | S-06 |
+| Zmiana oceniającego Ewy widoczna na osi czasu (dane i jej wyświetlenie) | S-03 |
+
+### Skąd ekran bierze termin oceny
+
+| Sytuacja | Źródło |
+|---|---|
+| Termin przekazany ocenianemu w części I | `part1_submitted.payload.dueDate` |
+| Cykl otwarty (ekrany, `/hr`, oś czasu) | `effectiveDeadline(cycleId)` |
+| Ocena zatwierdzona (arkusz, wydruk, statystyka terminowości) | `AssessmentSnapshot.deadline` |
+
+### Pliki dotykane przez więcej niż jeden plaster
+
+Plaster dopisuje swoją część i niczego cudzego nie zmienia ani nie przestawia.
+
+| Plik | Zasada dopisywania |
+|---|---|
+| `src/seed.ts` | F-01 tworzy `runSeed` z listą wywołań i przekazywaniem opcji. Każdy plaster dopisuje jedno wywołanie swojego modułu, w kolejności: `base`, `part1`, `notes`, `assessments`, `absences`. |
+| `src/index.tsx` | Każdy plaster dopisuje import i montowanie własnych tras. |
+| `src/db.ts` | Każdy plaster dopisuje własną tabelę albo własne kolumny. Kolumna potrzebna wcześniejszemu plastrowi należy do F-01. |
+| `rules/office-settings.json`, `content/cards.json` | S-01 zakłada pliki; kolejne plastry dopisują własne klucze. Czytelnik klucza działa także wtedy, gdy klucza jeszcze nie ma. |
+| `rules/regulation-2016-470.json`, `src/engine/rules.ts` | F-01 ustala kształt po przeniesieniu; S-02, S-06 i S-03 dopisują klucze wymienione w części „Pliki wspólne”. |
+| `src/suggestions/index.ts` | S-01 tworzy z `suggestCriteria`; S-04 i S-05 dopisują osobne wejścia. |
+| `src/views/components.tsx`, `src/views/layout.tsx` | S-01 tworzy wspólne bloki; S-02 dopisuje wariant fikcji; S-06 dopisuje odnośnik do stylu druku, bez zmiany istniejących właściwości. |
+| `src/routes/assessment.tsx`, `src/routes/notes.tsx` | S-04 przekazuje `slots` do formularza S-02; S-05 dopina pytanie przez `afterNoteSaved(note)`. |
+| `src/cycles.ts`, `src/engine/deadlines.ts`, `package.json` | S-03 rozszerza `effectiveDeadline`; S-06 dopisuje `mandatoryGradeDeadline`; S-04 dopisuje zależność testową `happy-dom`. |
+| `public/` | Każdy plaster dodaje własne pliki: F-01 `style.css`, S-02 `assessment.js`, S-04 `note-form.js` i `insert-notes.js`, S-06 `print.css`. |
 
 ## Phase 1: Fundament
 
@@ -157,7 +202,7 @@ Kliknięcie fikcji zapoznania w wersji 5-minutowej pokazuje się w osobnym przeb
 
 #### 2. Baza i dane pokazowe
 
-**File**: `src/db.ts`, `src/seed.ts`
+**File**: `src/db.ts`, `src/seed.ts`, `src/seed/base.ts`, `src/people.ts`
 
 **Intent**: Schemat tabel F-01 z rozdziału „Kontrakt wspólny” i skrypt `src/seed.ts` z modułem `src/seed/base.ts`, który wgrywa osoby z listy „Kto jest w danych pokazowych” w `context/foundation/demo.md` (jeden urząd). Notatek, ocen i nieobecności F-01 nie wgrywa: robią to moduły kolejnych plastrów. Osoby i daty bierze z `context/foundation/demo.md`; daty i szczegóły scenariusza są w sekcji „Ustalenia do scenariusza” tego pliku. Nieobecność ma tylko daty i pole „usprawiedliwiona”, bez rodzaju (decyzja 10m). Zespół Marka to Ewa, Piotr i Maria (bez konta i bez notatek).
 
@@ -185,7 +230,7 @@ Kliknięcie fikcji zapoznania w wersji 5-minutowej pokazuje się w osobnym przeb
 
 ## Testing Strategy
 
-Reguły sprawdza `src/engine/scoring.test.ts` (przykłady organizatora, granice przedziałów). Wejście bez konta, wybór konta i ekran startowy sprawdza `src/app.test.ts` przez `app.request`. Osobny test: wgrana notatka z 2025 roku nie jest widoczna przy dacie systemowej 2024-12-09 i jest widoczna po przesunięciu daty na 2026-03-11.
+Reguły sprawdza `src/engine/scoring.test.ts` (przykłady organizatora, granice przedziałów). Wejście bez konta, wybór konta i ekran startowy sprawdza `src/app.test.ts` przez `app.request`. Osobny test granicy widoczności na własnej tabeli `events`: zdarzenie wgrane przez `seedEvent` z datą 2025-06-02 nie jest zwracane przez `visibleEvents` przy dacie systemowej 2024-12-09 ani 2025-06-01, a jest zwracane 2025-06-02 i po przesunięciu daty na 2026-03-11; `visibleEvents(cycleId, { asOf })` zwraca je bez przesuwania daty. Test `currentGrade`: bez zdarzenia zwraca stopień i datę z `people`, po `mandatory_grade_awarded` zwraca `toGrade` i datę zdarzenia. Test `openCycle`: cykl z widocznym `assessment_acknowledged` nie jest otwarty.
 
 ## References
 

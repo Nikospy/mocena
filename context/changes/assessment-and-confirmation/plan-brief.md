@@ -19,14 +19,14 @@ Na koncie Marka „1” przy Rzetelności daje ocenę negatywną mimo średniej 
 | Decision | Choice | Why (1 sentence) | Source |
 | --- | --- | --- | --- |
 | Zapis stanu oceny | tylko zdarzenia w `events` (szkic, zatwierdzenie, potwierdzenie, fikcja), bez nowej tabeli | konwencja projektu i filtr dat z decyzji 10i działają bez wyjątków | Plan |
-| Zatwierdzenie | migawka z `periodFrom` = `cycles.period_start`, terminem z `effectiveDeadline` na dzień zatwierdzenia i wersją reguł | historia i wydruk (S-06) bez przeliczania, FR-033 | Recenzja, ustalenie 8 |
+| Zatwierdzenie | migawka `AssessmentSnapshot` z `periodFrom` = `cycles.period_start`, `deadline` z `effectiveDeadline` na dzień zatwierdzenia, `grade` i `gradeAwardedOn` z `currentGrade` na dzień zatwierdzenia i wersją reguł | historia i wydruk (S-06) bez przeliczania, FR-033 | Recenzja, ustalenie 8 |
 | Termin sprzeciwu | liczony raz przy potwierdzeniu albo fikcji, czytany z payloadu | zegar nie zmienia terminu przy przesuwaniu daty | Recenzja, ustalenie 15 |
 | Kontrole serwera | aktor, potwierdzona część I, dokładny zestaw ocen, IPRZ, uzasadnienie, wniosek o stopień; zdarzenie końcowe w transakcji | żądanie może ominąć formularz; najwyżej jedno zdarzenie końcowe | Recenzja, ustalenie 13 |
 | Blokady | jedna czysta funkcja `approvalBlockers` dla ekranu i serwera | te same komunikaty i przepisy w obu miejscach | Plan |
 | Uzasadnienie | zwykłe pole `justification` w `slots` dla S-04 | decyzja 10f | decisions.md |
 | Fikcja | przycisk od zatwierdzenia, ekran skutku, wymagany wybór i pola doręczenia kopii arkusza, kadry tylko widzą; w pokazie osobny przebieg | decyzje 5b, 10n i 11a | decisions.md, demo.md |
 | Potwierdzenia | miejscowość z `settings.office_city`, data, nazwisko wpisywane same, słowo „potwierdzenie” | decyzja 5a | decisions.md |
-| Wniosek o stopień | tylko urzędnik mianowany z wynikiem pozytywnym, stopień z ostatniego `mandatory_grade_awarded` albo `people.civil_service_grade`, sprawdzony testem | Piotr nie jest mianowany, pokaz tego nie klika | Recenzja, ustalenie 9 |
+| Wniosek o stopień | tylko urzędnik mianowany z wynikiem pozytywnym, stopień z `currentGrade(personId)` (F-01), granica w `approval.gradeRequest.maxGrade` (9), sprawdzony testem | Piotr nie jest mianowany, pokaz tego nie klika | Recenzja, ustalenie 9 |
 | Dane pokazowe ocen | S-02 nic nie wgrywa; oceny Tomasza wgrywa S-06 w kształcie migawki S-02 | jeden właściciel na zestaw danych | Recenzja, ustalenie 3 |
 
 ## Scope
@@ -44,7 +44,7 @@ Na koncie Marka „1” przy Rzetelności daje ocenę negatywną mimo średniej 
 | Phase | What it delivers | Key risk |
 | --- | --- | --- |
 | 1. Wersja minimalna (ok. 50 min) | kroki 4 i 5 pokazu, wynik po „Zapisz”, pełne kontrole serwera | nazwy w kodzie F-01/S-01 różne od kontraktu |
-| 2. Fikcja i wgląd kadr | wariant 5-minutowy | rozjazd z ekranem kadr S-06 |
+| 2. Fikcja i wgląd kadr | wersja 5-minutowa pokazu; odnośnik „Ocena” dla kadr dopiero tu | rozjazd z ekranem kadr S-06 |
 | 3. Dodatki | pole wniosku o stopień, podgląd na żywo, data rozmowy | pierwsze do wycięcia |
 
 **Prerequisites:** F-01 i S-01 gotowe (tabele, `today()`, `part1_confirmed`, cykl Piotra).
@@ -52,8 +52,8 @@ Na koncie Marka „1” przy Rzetelności daje ocenę negatywną mimo średniej 
 
 ## Open Risks & Assumptions
 
-- Kontrakt nie nazywa wspólnej funkcji bieżącego stopnia ani cyklu, przy którym leży `mandatory_grade_awarded`; plan opisuje regułę i trzyma ją w jednym miejscu.
-- Kolejność cięcia (od końca): data rozmowy oceniającej, podgląd na żywo, pole wniosku o stopień, wgląd kadr, fikcja.
+- Oba potwierdzenia i wpis o fikcji rysuje `ConfirmationBlock` z S-01; S-02 dopisuje wariant fikcji przez `kind`.
+- Kolejność cięcia (od końca): data rozmowy oceniającej, podgląd na żywo, pole wniosku o stopień. Fikcja z ekranem skutku i wgląd kadr są potrzebne do wersji 5-minutowej pokazu: powstają zaraz po wersji minimalnej i wypadają ostatnie.
 
 ## Success Criteria (Summary)
 

@@ -45,7 +45,7 @@ Trzy konta: Marek (oceniający), Piotr (oceniany), Joanna (kadry). Dwa telefony 
 Założenie: w prototypie jest jeden urząd. Opisy osób niżej umieszczają Annę i Tomasza w ministerstwie; w danych pokazowych pracują w tym samym urzędzie co pozostali, żeby ekran kadr Joanny pokazywał obowiązkowy stopień Tomasza.
 
 - **Konta do wyboru:** Marek Zieliński (oceniający), Piotr Wójcik (oceniany), Ewa Nowak (oceniana), Joanna Mazur (kadry), Anna Kwiatkowska (oceniająca), Tomasz Kamiński (oceniany), administrator (ekran „Skąd biorą się podpowiedzi”, data systemowa).
-- **Osoby bez konta:** Maria (współpracownica z notatek), poprzedni naczelnik wydziału (potrzebny na osi czasu Ewy; nazwisko nadaje autor danych), dyrektor generalny urzędu (adresat sprzeciwu).
+- **Osoby bez konta:** Maria (współpracownica z notatek), poprzedni naczelnik wydziału (potrzebny na osi czasu Ewy; nazwisko nadaje autor danych), dyrektor generalny urzędu (adresat sprzeciwu), Katarzyna Lewandowska (podwładna Anny; na jej zamkniętym cyklu ekran kadr pokazuje sprzeciw).
 
 ## Czego jeszcze nie ma (powstaje przy budowie)
 
