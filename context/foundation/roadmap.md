@@ -43,12 +43,12 @@ Ocena okresowa w służbie cywilnej powstaje raz na 24 miesiące, na papierze i 
 | ID   | Change ID                    | Outcome (user can …)                                                                 | Prerequisites | PRD refs                                   | Status   |
 | ---- | ---------------------------- | ------------------------------------------------------------------------------------ | ------------- | ------------------------------------------ | -------- |
 | F-01 | rules-engine-and-demo-data   | (foundation) silnik reguł z testami, dane pokazowe i wybór konta są na miejscu       | —             | FR-033, Business Logic, Access Control     | in-progress |
-| S-01 | cycle-start-criteria         | oceniający zaczyna cykl i ustala kryteria, oceniany potwierdza część I               | F-01          | US-01, US-02, FR-001–FR-007                | proposed |
-| S-02 | assessment-and-confirmation  | oceniający wystawia ocenę z blokadami, oceniany potwierdza zapoznanie                | S-01          | US-05, FR-018, FR-019, FR-022–FR-025       | proposed |
-| S-04 | notes-and-justification      | oceniający notuje fakty z telefonu i składa z nich uzasadnienie                      | S-02          | FR-008, FR-009, FR-017, FR-020, FR-021     | proposed |
-| S-05 | hr-partner-question          | oceniający dostaje pytanie HR partnera po notatce, zestawienie przed rozmową i przypomnienie o docenianiu | S-04 | US-04, FR-015, FR-016, FR-035, FR-036 | proposed |
-| S-03 | timeline-and-absences        | kadry wpisują nieobecność i zmianę oceniającego, a wszyscy widzą oś czasu z regułami | S-01          | US-03, FR-010, FR-011, FR-014, FR-033, FR-034 | proposed |
-| S-06 | hr-overview-and-print        | kadry widzą stan cykli i stopnie obowiązkowe, a arkusz da się pobrać i wydrukować    | S-02          | FR-026, FR-027, FR-029, FR-031             | proposed |
+| S-01 | cycle-start-criteria         | oceniający zaczyna cykl i ustala kryteria, oceniany potwierdza część I               | F-01          | US-01, US-02, FR-001–FR-007                | planning |
+| S-02 | assessment-and-confirmation  | oceniający wystawia ocenę z blokadami, oceniany potwierdza zapoznanie                | S-01          | US-05, FR-018, FR-019, FR-022–FR-025       | planning |
+| S-04 | notes-and-justification      | oceniający notuje fakty z telefonu i składa z nich uzasadnienie                      | S-02          | FR-008, FR-009, FR-017, FR-020, FR-021     | planning |
+| S-05 | hr-partner-question          | oceniający dostaje pytanie HR partnera po notatce, zestawienie przed rozmową i przypomnienie o docenianiu | S-04 | US-04, FR-015, FR-016, FR-035, FR-036 | planning |
+| S-03 | timeline-and-absences        | kadry wpisują nieobecność i zmianę oceniającego, a wszyscy widzą oś czasu z regułami | S-01          | US-03, FR-010, FR-011, FR-014, FR-033, FR-034 | planning |
+| S-06 | hr-overview-and-print        | kadry widzą stan cykli i stopnie obowiązkowe, a arkusz da się pobrać i wydrukować    | S-02          | FR-026, FR-027, FR-029, FR-031             | planning |
 
 ## Streams
 
@@ -100,7 +100,7 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Unknowns:**
   - Czy podpowiedź kryteriów z opisu stanowiska da się oprzeć na prostych regułach? — Owner: team. Rozstrzygnięte 2026-11-21: tabela „rodzaj obowiązku → kryterium” w pliku reguł (`decisions.md`, decyzja 6b).
 - **Risk:** Pierwszy ekran ustala wygląd całego produktu, więc tu zapada kierunek wizualny. Pokazuje dwie pierwsze trudności wymienione przez organizatora.
-- **Status:** proposed
+- **Status:** planning
 
 ### S-02: Ocena z blokadami i potwierdzenie zapoznania
 
@@ -113,7 +113,7 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Unknowns:**
   - Czy potwierdzenie w systemie wystarcza organizatorowi jako odpowiednik podpisu? — Owner: user. Block: no (przyjęte: tak).
 - **Risk:** Najwięcej reguł formalnych w jednym miejscu; mapa pól organizatora jest tu specyfikacją blokad.
-- **Status:** proposed
+- **Status:** planning
 
 ### S-03: Oś czasu, nieobecności i zmiana oceniającego
 
@@ -125,7 +125,7 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Sklejanie nieobecności przez dni wolne to nowy kod w silniku terminów; sprawdzian to przykład organizatora (05.10–06.11.2026).
-- **Status:** proposed
+- **Status:** planning
 
 ### S-04: Notatki o faktach i uzasadnienie z notatek
 
@@ -138,7 +138,7 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Unknowns:**
   - Czy składanie uzasadnienia z notatek organizator uzna za wsparcie w formułowaniu treści oceny? — Owner: user. Block: no.
 - **Risk:** To jest teza produktu („24 miesiące ciszy”); bez danych z dwóch lat w bazie pokazowej ekran wygląda pusto.
-- **Status:** proposed
+- **Status:** planning
 
 ### S-05: Pytanie HR partnera i przypomnienie o docenianiu
 
@@ -151,7 +151,7 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Unknowns:**
   - Co organizator chce zobaczyć w module HR partnera? — Owner: user. Block: no (przyjęte przez autora: wariant bez modelu, z zestawieniem przed rozmową).
 - **Risk:** Moduł oceniany osobno i nazwany przez organizatora innowacyjnym; stoi po notatkach, bo bez nich nie ma na co reagować.
-- **Status:** proposed
+- **Status:** planning
 
 ### S-06: Stan cykli dla kadr, stopień obowiązkowy i wydruk arkusza
 
@@ -163,14 +163,14 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Zamyka „kompletność”: to ekran, na którym widać podprocesy, których pokaz nie klika.
-- **Status:** proposed
+- **Status:** planning
 
 ## Backlog Handoff
 
 | Roadmap ID | Change ID                   | Suggested issue title                                         | Ready for `/10x-plan` | Notes |
 | ---------- | --------------------------- | ------------------------------------------------------------- | --------------------- | ----- |
 | F-01       | rules-engine-and-demo-data  | Silnik reguł, dane pokazowe i wybór konta                     | yes                   | Run `/10x-plan rules-engine-and-demo-data` |
-| S-01       | cycle-start-criteria        | Początek cyklu: arkusz, kryteria, potwierdzenie części I      | no                    | po F-01 |
+| S-01       | cycle-start-criteria        | Początek cyklu: arkusz, kryteria, potwierdzenie części I      | planned               | plan gotowy; budowa po F-01 |
 | S-02       | assessment-and-confirmation | Ocena z blokadami i potwierdzenie zapoznania                  | no                    | po S-01 |
 | S-03       | timeline-and-absences       | Oś czasu, nieobecności i zmiana oceniającego                  | no                    | po S-01 |
 | S-04       | notes-and-justification     | Notatki o faktach i uzasadnienie z notatek                    | no                    | po S-02 |
