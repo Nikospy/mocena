@@ -42,7 +42,8 @@ describe("trasy F-01", () => {
     expect(home.status).toBe(200);
     const text = await home.text();
     expect(text).toContain(rows[0].name);
-    expect(text).toContain("09.12.2024");
+    expect(text).toContain("9 grudnia 2024");
+    expect(text).toContain('action="/demo/date"');
   });
 
   test("POST /account z nieznaną osobą daje 422", async () => {
