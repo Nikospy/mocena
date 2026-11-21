@@ -1,6 +1,6 @@
 ---
 project: "mOcena"
-version: 1
+version: 2
 status: draft
 created: 2026-11-21
 context_type: greenfield
@@ -87,11 +87,12 @@ Ocena nie psuje się przy formularzu, tylko przez 24 miesiące ciszy przed nim. 
 ### US-04: HR partner pyta przełożonego o zmianę zadań
 
 - **Given** oceniający zapisuje z telefonu notatkę o pracowniku
-- **When** notatka wskazuje, że pracownik przejął nowe zadania
+- **When** przy notatce jest zaznaczona zmiana zadań pracownika
 - **Then** asystent zadaje jedno pytanie zamknięte, a po odpowiedzi „tak” pokazuje kartę rozmowy i jedną formę rozwoju z katalogu
 
 #### Acceptance Criteria
-- Notatka bez takiego sygnału nie wywołuje żadnego pytania
+- Notatka bez zaznaczenia nie wywołuje żadnego pytania
+- Zaznaczenie podpowiada system, a przełożony zmienia je jednym dotknięciem
 - Nic nie zapisuje się bez kliknięcia przełożonego
 - Przy nazwisku pracownika nie pojawia się żadna etykieta ani liczba
 
@@ -107,32 +108,33 @@ Ocena nie psuje się przy formularzu, tylko przez 24 miesiące ciszy przed nim. 
 - Ocena negatywna wymaga uzasadnienia; każda ocena wymaga wniosków do indywidualnego programu rozwoju zawodowego
 - Ostrzeżenie pojawia się, gdy wszystkie fakty do kryterium pochodzą z ostatniego miesiąca
 - Po potwierdzeniu ocenianego widać zegar 7 dni na sprzeciw
-- Gdy oceniany nie potwierdza, oceniający może stwierdzić fikcję zapoznania, a kadry ją potwierdzają
+- Gdy oceniany nie potwierdza, oceniający może stwierdzić fikcję zapoznania, a kadry widzą ten wpis
 
 ## Functional Requirements
 
 ### Początek cyklu
 - FR-001: System może rozpocząć cykl oceny po zatrudnieniu na czas nieokreślony, mianowaniu albo poprzedniej ocenie i przypomnieć oceniającemu o wyznaczeniu kryteriów w terminie 30 dni (7 dni po ocenie negatywnej). Priority: must-have
 - FR-002: Oceniający może zobaczyć arkusz A, B albo C dobrany do rodzaju stanowiska wraz z jego kryteriami obowiązkowymi. Priority: must-have
-- FR-003: Oceniający może wybrać do 3 kryteriów dodatkowych z wykazu, widząc podpowiedź wynikającą z opisu stanowiska z jednozdaniowym uzasadnieniem. Priority: must-have
+- FR-003: Oceniający może wybrać do 3 kryteriów dodatkowych z wykazu, widząc podpowiedź wynikającą z rodzajów obowiązków przypisanych do stanowiska, z jednozdaniowym uzasadnieniem. Priority: must-have
 - FR-004: Oceniający może zapisać oczekiwania co do sposobu spełniania kryteriów. Priority: must-have
 - FR-005: Oceniający może otworzyć kartę przygotowania do rozmowy rozpoczynającej: cel, wymagane tematy, pytania, trudne sytuacje. Priority: must-have
 - FR-006: Oceniający może potwierdzić rozmowę i kryteria oraz przekazać część I ocenianemu. Priority: must-have
 - FR-007: Oceniany może na własnym koncie potwierdzić rozmowę oraz zapoznanie się z kryteriami i terminem. Priority: must-have
 
 ### Okres oceny
-- FR-008: Oceniający może z telefonu zapisać notatkę o fakcie, z datą i kryterium, widoczną tylko dla niego. Priority: must-have
+- FR-008: Oceniający może z telefonu zapisać notatkę o fakcie, z datą i kryterium, widoczną tylko dla niego, oznaczyć ją jako „dobrze” albo „do poprawy” i zaznaczyć, że dotyczy zmiany zadań pracownika. Priority: must-have
 - FR-009: Oceniający może wysłać ocenianemu informację zwrotną, a oceniany może ją przeczytać. Priority: must-have
 - FR-010: Kadry mogą wpisać nieobecność ocenianego, po której system łączy nieobecności rozdzielone dniami wolnymi i przedłuża termin oceny o czas nieobecności dłuższej niż miesiąc. Priority: must-have
 - FR-011: Kadry mogą zarejestrować zmianę oceniającego w trakcie cyklu z zachowaniem kryteriów. Priority: must-have
-- FR-012: Oceniający może zmienić termin oceny w przypadkach dopuszczonych ustawą, a oceniany dostaje informację o nowym terminie. Priority: must-have
+- FR-012: Oceniający może zmienić termin oceny w przypadkach dopuszczonych ustawą, a oceniany dostaje informację o nowym terminie. Priority: nice-to-have
 - FR-013: Oceniany może złożyć wniosek o zmianę terminu po 6 miesiącach, a oceniający może go rozpatrzyć. Priority: nice-to-have
 - FR-014: Uczestnik cyklu może zobaczyć oś czasu cyklu z regułą i wersją reguł, z której wynika każdy termin. Priority: must-have
 
 ### Wirtualny HR partner
-- FR-015: Oceniający może odpowiedzieć na jedno pytanie zamknięte zadane po notatce wskazującej zmianę zadań pracownika i dostać kartę rozmowy oraz formę rozwoju z katalogu. Priority: must-have
+- FR-015: Oceniający może odpowiedzieć na jedno pytanie zamknięte zadane po notatce, przy której zaznaczono zmianę zadań pracownika, i dostać kartę rozmowy oraz formę rozwoju z katalogu; zaznaczenie podpowiada system, a oceniający może je zmienić. Priority: must-have
 - FR-016: Oceniający może zobaczyć przypomnienie, że od ostatniej rozmowy nie przekazał pracownikowi informacji zwrotnej, wraz z kartą docenienia. Priority: must-have
 - FR-017: Oceniający może otworzyć kartę przygotowania do rozmowy oceniającej z tematami wymaganymi przepisami. Priority: must-have
+- FR-035: Oceniający może przed rozmową z pracownikiem zobaczyć zestawienie własnych wpisów: notatki sprzed zmiany zadań i po niej, kryteria bez żadnej notatki, czas od ostatniej informacji zwrotnej oraz liczbę notatek o każdym podwładnym, każde z pytaniem albo propozycją działania. Priority: must-have
 
 ### Ocena
 - FR-018: Oceniający może przyznać ocenę cząstkową 1, 3, 5, 7 albo 9 każdemu kryterium, widząc przy nim notatki z całego okresu. Priority: must-have
@@ -142,7 +144,7 @@ Ocena nie psuje się przy formularzu, tylko przez 24 miesiące ciszy przed nim. 
 - FR-022: Oceniający może zatwierdzić ocenę dopiero wtedy, gdy są wnioski rozwojowe, uzasadnienie przy ocenie negatywnej i umotywowanie dołączonego wniosku o stopień. Priority: must-have
 - FR-023: Oceniający może dołączyć wniosek o kolejny stopień służbowy dla urzędnika mianowanego z oceną pozytywną. Priority: must-have
 - FR-024: Oceniany może na własnym koncie potwierdzić zapoznanie się z oceną, od którego liczy się 7 dni na sprzeciw. Priority: must-have
-- FR-025: Oceniający może stwierdzić fikcję zapoznania z oceną przez adnotację, a kadry mogą ją potwierdzić. Priority: must-have
+- FR-025: Oceniający może stwierdzić fikcję zapoznania z oceną, wskazując, czy oceniany nie mógł, czy nie chciał jej potwierdzić, a kadry widzą ten wpis. Priority: must-have
 - FR-026: Uprawniona osoba może obejrzeć, pobrać i wydrukować arkusz ze wszystkimi polami w układzie wzoru z rozporządzenia. Priority: must-have
 
 ### Po ocenie i widoki kadr
@@ -195,7 +197,7 @@ Rodzaj nieobecności nie jest widoczny poza kadrami. Pola zablokowane zmienia wy
 ## Non-Goals
 
 - Asystent nie wystawia ocen i nie układa zdań o pracowniku. Uzasadnienie składa się z notatek przełożonego.
-- Prototyp nie używa modelu językowego. Pytanie HR partnera wynika z listy słów spisanej z góry.
+- Prototyp nie używa modelu językowego. Zmianę zadań pracownika zaznacza oceniający przy notatce; lista słów tylko podpowiada to zaznaczenie.
 - Brak wysyłki e-maili i integracji z elektronicznym systemem zarządzania dokumentacją; powiadomienia są widoczne w produkcie.
 - Brak podpisu kwalifikowanego, zaufanego i osobistego; potwierdzenie w systemie nazywamy potwierdzeniem, nie podpisem.
 - Brak importu danych z systemu kadrowego; dane pokazowe są wgrane z góry.
@@ -207,7 +209,7 @@ Rodzaj nieobecności nie jest widoczny poza kadrami. Pola zablokowane zmienia wy
 ## Open Questions
 
 1. **Czy potwierdzenie w systemie wystarcza w prototypie jako odpowiednik podpisu, czy organizator chce zobaczyć podpis zaufany albo obieg w systemie dokumentacji?** — Owner: user (pytanie do mentorów DSC). By: 2026-11-21 wieczór. Block: no (przyjęte: potwierdzenie w systemie).
-2. **Co organizator chce zobaczyć w module HR partnera, żeby uznać go za innowacyjny?** — Owner: user (pytanie do mentorów DSC). By: 2026-11-21 wieczór. Block: no (przyjęte: wariant A+ bez modelu).
+2. **Co organizator chce zobaczyć w module HR partnera, żeby uznać go za innowacyjny?** — Owner: user (pytanie do mentorów DSC). By: 2026-11-21 wieczór. Block: no (przyjęte przez autora 2026-11-21: wariant bez modelu, z zestawieniem przed rozmową).
 3. **Czy składanie uzasadnienia z notatek przełożonego organizator uzna za wsparcie w formułowaniu treści oceny?** — Owner: user (pytanie do mentorów DSC). By: 2026-11-21 wieczór. Block: no.
-4. **Kto w praktyce stwierdza fikcję zapoznania i co musi być zapisane?** — Owner: user (pytanie do mentorów DSC). Block: no (przyjęte: adnotacja oceniającego i potwierdzenie kadr).
+4. **Kto w praktyce stwierdza fikcję zapoznania i co musi być zapisane?** — Owner: user (pytanie do mentorów DSC). Block: no (przyjęte przez autora 2026-11-21: wpis oceniającego, kadry go widzą).
 5. **Długość slotu pokazu** — znana 2026-11-22 o 14:45. Przyjęte 3 minuty, z wersją 90 sekund i 5 minut.

@@ -1,0 +1,306 @@
+{
+  "wersja": "2016-470/1",
+  "obowiazujeOd": "2016-04-22",
+  "zrodlo": {
+    "akt": "Rozporządzenie Prezesa Rady Ministrów z dnia 4 kwietnia 2016 r. w sprawie warunków i sposobu przeprowadzania ocen okresowych urzędników służby cywilnej i pracowników służby cywilnej",
+    "publikator": "Dz.U. 2016 poz. 470",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2016/470/text.html",
+    "status": "obowiązujący (sprawdzone w API Sejmu 2026-11-19)",
+    "podstawa": "art. 82 ustawy z dnia 21 listopada 2008 r. o służbie cywilnej (t.j. Dz.U. 2026 poz. 590)"
+  },
+  "arkusze": {
+    "A": {
+      "dlaKogo": "kierownik urzędu, którego stanowisko jest stanowiskiem pracy w służbie cywilnej (§ 3 ust. 2)",
+      "kryteriaObowiazkowe": [
+        "zarzadzanie-ludzmi",
+        "podejmowanie-decyzji",
+        "organizacja-pracy",
+        "wspolpraca",
+        "komunikacja",
+        "zarzadzanie-strategiczne"
+      ]
+    },
+    "B": {
+      "dlaKogo": "stanowisko, na którym praca polega na bezpośrednim kierowaniu pracownikami, inne niż kierownik urzędu (§ 3 ust. 3)",
+      "kryteriaObowiazkowe": [
+        "zarzadzanie-ludzmi",
+        "podejmowanie-decyzji",
+        "organizacja-pracy",
+        "wspolpraca",
+        "komunikacja"
+      ]
+    },
+    "C": {
+      "dlaKogo": "pozostałe stanowiska (§ 3 ust. 4)",
+      "kryteriaObowiazkowe": [
+        "wykorzystywanie-wiedzy",
+        "rzetelnosc",
+        "organizacja-pracy",
+        "wspolpraca",
+        "komunikacja"
+      ]
+    }
+  },
+  "maksKryteriowDodatkowych": 3,
+  "skalaCzastkowa": [
+    {
+      "punkty": 1,
+      "nazwa": "znacznie poniżej oczekiwań"
+    },
+    {
+      "punkty": 3,
+      "nazwa": "poniżej oczekiwań"
+    },
+    {
+      "punkty": 5,
+      "nazwa": "na poziomie oczekiwań"
+    },
+    {
+      "punkty": 7,
+      "nazwa": "powyżej oczekiwań"
+    },
+    {
+      "punkty": 9,
+      "nazwa": "znacznie powyżej oczekiwań"
+    }
+  ],
+  "poziomOgolny": [
+    {
+      "nazwa": "znacznie poniżej oczekiwań",
+      "od": 1,
+      "odWlacznie": true,
+      "do": 2
+    },
+    {
+      "nazwa": "poniżej oczekiwań",
+      "od": 2,
+      "odWlacznie": false,
+      "do": 4
+    },
+    {
+      "nazwa": "na poziomie oczekiwań",
+      "od": 4,
+      "odWlacznie": false,
+      "do": 6
+    },
+    {
+      "nazwa": "powyżej oczekiwań",
+      "od": 6,
+      "odWlacznie": false,
+      "do": 8
+    },
+    {
+      "nazwa": "znacznie powyżej oczekiwań",
+      "od": 8,
+      "odWlacznie": false,
+      "do": 9
+    }
+  ],
+  "terminy": {
+    "ocenaCoMiesiecy": {
+      "wartosc": 24,
+      "podstawa": "art. 81 ust. 4 ustawy"
+    },
+    "rozmowaOKryteriachDni": {
+      "wartosc": 30,
+      "podstawa": "§ 7 pkt 1",
+      "od": "dzień sporządzenia poprzedniej oceny albo zatrudnienia na czas nieokreślony"
+    },
+    "rozmowaOKryteriachPoNegatywnejDni": {
+      "wartosc": 7,
+      "podstawa": "§ 7 pkt 2",
+      "od": "dzień sporządzenia negatywnej oceny"
+    },
+    "ponownaOcenaPoNegatywnejMiesiecy": {
+      "wartosc": 6,
+      "podstawa": "art. 81 ust. 9 ustawy",
+      "od": "dzień zapoznania się z oceną"
+    },
+    "sprzeciwDni": {
+      "wartosc": 7,
+      "podstawa": "art. 83 ust. 1 ustawy",
+      "od": "dzień zapoznania się z oceną",
+      "do": "dyrektor generalny urzędu"
+    },
+    "rozpatrzenieSprzeciwuDni": {
+      "wartosc": 14,
+      "podstawa": "art. 83 ust. 3 ustawy",
+      "od": "dzień wniesienia sprzeciwu"
+    },
+    "odwolanieDoSaduPracyDni": {
+      "wartosc": 14,
+      "podstawa": "art. 83 ust. 5 ustawy",
+      "od": "doręczenie decyzji albo upływ terminu na rozpatrzenie sprzeciwu"
+    },
+    "zmianaStanowiskaMinMiesiecy": {
+      "wartosc": 6,
+      "podstawa": "art. 81 ust. 6 ustawy"
+    }
+  },
+  "kryteria": [
+    {
+      "id": "komunikacja",
+      "nr": 1,
+      "nazwa": "Komunikacja",
+      "opis": [
+        "Koncentrowanie się na wypowiedzi rozmówcy i dbanie o wzajemne zrozumienie.",
+        "Wypowiadanie się w sposób jasny i precyzyjny, dostosowany do sytuacji i rozmówcy (dobieranie stylu, języka i treści).",
+        "Formułowanie jasnych i precyzyjnych wypowiedzi pisemnych dostosowanych do sytuacji i odbiorcy (dobieranie stylu, języka i treści).",
+        "Przedstawianie przekonujących argumentów odpowiednio do sytuacji."
+      ]
+    },
+    {
+      "id": "kreatywnosc",
+      "nr": 2,
+      "nazwa": "Kreatywność",
+      "opis": [
+        "Proponowanie lub tworzenie nowych rozwiązań.",
+        "Nieschematyczne podejście do zadań."
+      ]
+    },
+    {
+      "id": "negocjowanie",
+      "nr": 3,
+      "nazwa": "Negocjowanie",
+      "opis": [
+        "Przygotowywanie się do negocjacji, w szczególności opracowanie projektu stanowiska, zakresu możliwych ustępstw i argumentacji.",
+        "Stosowanie technik i strategii negocjacyjnych.",
+        "Osiągnięcie efektu negocjacji akceptowanego przez przełożonych."
+      ]
+    },
+    {
+      "id": "organizacja-pracy",
+      "nr": 4,
+      "nazwa": "Organizacja pracy i orientacja na osiąganie celów",
+      "opis": [
+        "Określanie sposobu realizacji zadań/celów.",
+        "Realizowanie zadań/celów w kolejności uwzględniającej ich wagę i pilność (ustalanie priorytetów działania).",
+        "Dobieranie niezbędnych zasobów umożliwiających realizację zadań/celów.",
+        "Dostosowywanie się do zmieniających się okoliczności.",
+        "Wytrwałość i zaangażowanie w realizację zadań/celów."
+      ]
+    },
+    {
+      "id": "orientacja-na-klienta",
+      "nr": 5,
+      "nazwa": "Orientacja na klienta/interesanta",
+      "opis": [
+        "Taktowne zachowanie, wyrażające szacunek i zrozumienie dla drugiej osoby.",
+        "Reagowanie na potrzeby klienta/interesanta, w szczególności rozpoznawanie jego potrzeb i proponowanie rozwiązań."
+      ]
+    },
+    {
+      "id": "podejmowanie-decyzji",
+      "nr": 6,
+      "nazwa": "Podejmowanie decyzji i odpowiedzialność",
+      "opis": [
+        "Wypracowywanie alternatywnych rozwiązań na podstawie analizy informacji, w szczególności potencjalnego ryzyka.",
+        "Podejmowanie decyzji (decyzyjność).",
+        "Przyjmowanie odpowiedzialności za efekty podjętych decyzji."
+      ]
+    },
+    {
+      "id": "sytuacje-kryzysowe",
+      "nr": 7,
+      "nazwa": "Radzenie sobie w sytuacjach kryzysowych",
+      "opis": [
+        "Rozpoznawanie sytuacji kryzysowych i informowanie o nich zainteresowanych.",
+        "Podejmowanie działań mających na celu rozwiązanie kryzysu.",
+        "Wyciąganie wniosków z sytuacji kryzysowych."
+      ]
+    },
+    {
+      "id": "rzetelnosc",
+      "nr": 8,
+      "nazwa": "Rzetelność",
+      "opis": [
+        "Wykonywanie zadań zgodnie z obowiązującymi standardami (przepisami, zasadami, procedurami) oraz dbałość o jakość rezultatów.",
+        "Dotrzymywanie zobowiązań (realizacja zadań) w wyznaczonym czasie."
+      ]
+    },
+    {
+      "id": "myslenie-analityczne",
+      "nr": 9,
+      "nazwa": "Myślenie analityczne",
+      "opis": [
+        "Rozróżnianie informacji istotnych i nieistotnych.",
+        "Dostrzeganie zależności między informacjami.",
+        "Formułowanie wniosków."
+      ]
+    },
+    {
+      "id": "wykorzystywanie-wiedzy",
+      "nr": 10,
+      "nazwa": "Wykorzystywanie wiedzy i doskonalenie zawodowe",
+      "opis": [
+        "Wykorzystywanie wiedzy przy realizacji zadań na zajmowanym stanowisku pracy.",
+        "Doskonalenie wiedzy i umiejętności niezbędnych do wykonywania zadań na zajmowanym stanowisku pracy, w szczególności wyszukiwanie i pozyskiwanie wiedzy, korzystanie z dobrych praktyk i doświadczeń innych.",
+        "Korzystanie z dostępnych źródeł informacji, rozwiązań i technologii."
+      ]
+    },
+    {
+      "id": "wspolpraca",
+      "nr": 11,
+      "nazwa": "Współpraca",
+      "opis": [
+        "Włączanie się w działania realizowane razem z innymi osobami, jeśli istnieje taka możliwość.",
+        "Dbanie o przepływ informacji.",
+        "Dbanie o dobrą atmosferę i otwartość we współpracy.",
+        "Dostrzeganie wkładu pracy innych osób.",
+        "Branie pod uwagę zdania innych osób.",
+        "Dzielenie się wiedzą i doświadczeniem."
+      ]
+    },
+    {
+      "id": "wystapienia-publiczne",
+      "nr": 12,
+      "nazwa": "Wystąpienia publiczne",
+      "opis": [
+        "Wykorzystywanie różnych środków przekazu (np. narzędzi multimedialnych) i dbałość o sposób prezentacji (w tym autoprezentacji).",
+        "Nawiązywanie i utrzymywanie kontaktu z audytorium.",
+        "Zarządzanie czasem wystąpienia, w szczególności przestrzeganie ram czasowych, elastyczne reagowanie na potrzeby audytorium.",
+        "Radzenie sobie ze stresem i emocjami, w szczególności wywołanymi krytyką i trudnymi pytaniami."
+      ]
+    },
+    {
+      "id": "zarzadzanie-ludzmi",
+      "nr": 13,
+      "nazwa": "Zarządzanie ludźmi",
+      "opis": [
+        "Przydzielanie zakresu odpowiedzialności, zadań i uprawnień pracownikom (delegowanie zadań).",
+        "Monitorowanie realizacji zadań oraz w razie potrzeby podejmowanie działań korygujących lub zapobiegawczych.",
+        "Motywowanie pracowników.",
+        "Udzielanie pracownikom informacji zwrotnej opartej na ocenie ich zaangażowania i sposobu realizacji zadań.",
+        "Rozwiązywanie konfliktów.",
+        "Wspieranie pracowników w rozwoju zawodowym, w szczególności identyfikowanie potrzeb rozwojowych, proponowanie działań rozwojowych oraz monitorowanie ich realizacji."
+      ]
+    },
+    {
+      "id": "zarzadzanie-strategiczne",
+      "nr": 14,
+      "nazwa": "Zarządzanie strategiczne",
+      "opis": [
+        "Tworzenie wizji oraz wyznaczanie celów strategicznych w oparciu o całościowe i perspektywiczne widzenie organizacji, otoczenia oraz strategie rozwoju.",
+        "Formułowanie celów operacyjnych na podstawie celów strategicznych.",
+        "Analiza ryzyka planowanych działań o charakterze strategicznym."
+      ]
+    }
+  ],
+  "rozmowaOKryteriach": {
+    "podstawa": "§ 5 ust. 1",
+    "tematy": [
+      "główne obowiązki wynikające z opisu stanowiska pracy zajmowanego przez ocenianego",
+      "kryteria obowiązkowe i kryteria dodatkowe, jeżeli są wybierane przez oceniającego",
+      "oczekiwania oceniającego co do sposobu spełniania kryteriów oceny przez ocenianego",
+      "cele do osiągnięcia w okresie, w którym oceniany podlega ocenie, jeżeli ich określenie jest uzasadnione ze względu na charakter obowiązków, a także sposób realizacji wyznaczonych celów"
+    ]
+  },
+  "rozmowaOceniajaca": {
+    "podstawa": "§ 10",
+    "tematy": [
+      "główne obowiązki wykonywane przez ocenianego w okresie, w którym podlegał ocenie, oraz sposób ich realizacji, z uwzględnieniem spełniania ustalonych kryteriów oceny",
+      "sposób realizowania celów do osiągnięcia w okresie, w którym oceniany podlegał ocenie, jeżeli cele te zostały wyznaczone",
+      "kierunki dalszego rozwoju zawodowego i potrzeby ocenianego w zakresie podnoszenia kwalifikacji i doskonalenia umiejętności"
+    ]
+  }
+}
