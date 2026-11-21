@@ -27,7 +27,7 @@ Decyzje podjęte przez autora 21.11.2026 (17:57–19:00) po przejściu całego p
 1. Zmianę zadań pracownika zaznacza przełożony polem „Zmiana zadań pracownika” przy notatce. Lista słów tylko wstępnie zaznacza to pole, przełożony może je odznaczyć.
 2. Po notatce z zaznaczonym polem partner pyta „To stała zmiana zadań?”. Po „tak” pokazuje kartę rozmowy i jedną formę rozwoju z katalogu.
 3. Notatka ma pole „dobrze / do poprawy”, wypełniane wyłącznie przez przełożonego.
-4. Jest ekran „Przed rozmową z pracownikiem”. Pokazuje: notatki sprzed zmiany zadań i po niej, kryteria bez żadnej notatki, czas od ostatniej informacji zwrotnej, liczbę notatek o każdym podwładnym. Każda pozycja ma pytanie albo proponowane działanie.
+4. Jest ekran „Przed rozmową z pracownikiem”. Pokazuje: notatki sprzed zmiany zadań i po niej, kryteria bez żadnej notatki, czas od ostatniej informacji zwrotnej, podwładnych, o których przełożony od dawna nie ma żadnej notatki (zdaniem, bez liczb przy nazwisku; decyzja 10k). Każda pozycja ma pytanie albo proponowane działanie.
 5. Są karty przygotowania do rozmowy rozpoczynającej i oceniającej z tematami wymaganymi przez rozporządzenie oraz przypomnienie o docenianiu.
 
 **Dlaczego.** Samo wykrywanie zmiany zadań po słowach w tekście nie działa wystarczająco dobrze, żeby na nim polegać. Pole wypełnione przez człowieka jest pewne, a lista słów oszczędza jedno kliknięcie. Ekran „Przed rozmową” daje to, czego organizator oczekuje od HR partnera (analiza sytuacji, ryzyka, sugestie działań), bez rozumienia tekstu: z dat, liczb i pól.
@@ -82,7 +82,7 @@ Pracownik potwierdza w cyklu dokładnie dwie rzeczy: część I (rozmowa o kryte
 
 ## 8. Praca nad kodem
 
-- **8a.** Kolejność budowy: F-01, S-01, S-02, S-04, S-05, S-03, S-06 (HR partner przed osią czasu).
+- **8a.** Kolejność budowy: F-01, S-01, S-02, S-04, S-05, S-06, S-03 (HR partner przed kadrami i osią czasu; oś czasu na końcu, zmienione decyzją 10h).
 - **8b.** Kod i nazwy plików po angielsku, interfejs po polsku.
 - **8c.** Push tylko na polecenie autora.
 
@@ -113,7 +113,7 @@ Adapter powstaje w plastrze notatek (S-04), ekran w plastrze HR partnera (S-05).
 
 **Odrzucono.** Uruchomienie modelu w prototypie. Działające ostrzeżenie o danych o zdrowiu jako dodatkowa funkcja.
 
-## 10. Decyzje z dialogu przed budową (21.11.2026, 21:30–22:00)
+## 10. Decyzje z dialogu przed budową (21.11.2026, 21:30–22:50)
 
 Przyjęte przez autora, po jednej naraz.
 
@@ -124,9 +124,14 @@ Przyjęte przez autora, po jednej naraz.
 - **10e. Treści pisane przy budowie** (tabela „rodzaj obowiązku → kryterium”, lista słów, katalog form rozwoju, karty rozmów, pytania „Przed rozmową”). Autor ich osobno nie przegląda.
 - **10f. Uzasadnienie z notatek.** Przełożony zaznacza notatki przy kryterium i klika „Wstaw”; trafiają z datą do zwykłego pola tekstowego, które może poprawić. Nic nie wstawia się samo. Nad polem zdanie „Ten tekst przeczyta pracownik”. Odrzucono: wstępne wypełnienie wszystkimi notatkami, same odsyłacze bez wklejania.
 
-**Czekają na odpowiedź autora** (do tego czasu obowiązuje rekomendacja jako założenie): koniec budowy o 07:00; oś czasu (S-03) budowana po S-06, czyli zmiana decyzji 8a; wgrane zdarzenia ukryte do swojej daty; informacja zwrotna jako poprawiana kopia notatki.
-
-**Jeszcze nie omówione:** kształt adaptera podpowiedzi; „liczba notatek o każdym podwładnym” (decyzja 3) wobec zasady „żadnych liczb przy nazwisku”; nieobecność bez rodzaju; kiedy dostępny jest przycisk fikcji zapoznania.
+- **10g. Koniec budowy.** Nowe funkcje powstają do 07:00 w niedzielę 22.11. Od 07:00 do 11:00: dwa pełne przebiegi pokazu, naprawa błędów z przebiegów, nagranie zapasowe, prezentacja PDF. Plaster, który o 07:00 nie działa, zostaje jako stan na ekranie albo wypada ze scenariusza. Odrzucono: 05:00, 09:00, brak sztywnej godziny.
+- **10h. Co wypada pierwsze.** Oś czasu (S-03) jest budowana na końcu, po ekranie kadr i wydruku (S-06). Dlaczego: S-06 to 5 z 15 czynności liczonych jako „działa” i ostatni krok każdej wersji pokazu; S-03 to 3 z 15 i krok, którego wersja 90-sekundowa nie ma. Zmienia decyzję 8a. Odrzucono: S-06 na końcu; S-06 zaraz po S-02 (cierpiałby HR partner).
+- **10i. Dane wgrane z przyszłości.** Każde wgrane zdarzenie ma datę, a ekrany pokazują tylko te, których data już minęła według daty systemowej. To, co kliknięte na żywo, zapisuje się z datą systemową i zostaje. Zdanie dla jury: „Dwa lata pracy są wgrane z góry, a przesunięcie daty je odsłania”. Wymóg: w kroku 1 Marek wybiera kryterium „Orientacja na klienta/interesanta”, bo wgrana notatka z 04.08.2025 jest do niego przypisana. Odrzucono: dwa stany bazy podmieniane przy zmianie daty; początek cyklu na innej osobie.
+- **10j. Informacja zwrotna.** Przy notatce jest przycisk „Przekaż pracownikowi”. Otwiera tekst notatki do poprawy; pracownik widzi wysłaną wersję, a notatka zostaje prywatna. Data wysłania zeruje przypomnienie o docenianiu. Odrzucono: osobny formularz; przełączenie notatki na widoczną.
+- **10k. Rozkład notatek w zespole.** Ekran „Przed rozmową” mówi zdaniem o przełożonym, na przykład „O Marii nie masz żadnej notatki od 6 miesięcy”, z przyciskiem „Dopisz notatkę”. Nazwiska bez liczb. Zmienia brzmienie decyzji 3 pkt 4. Odrzucono: liczby notatek przy nazwiskach (czyta się jak ranking); usunięcie pozycji.
+- **10l. Adapter podpowiedzi.** Jedno wejście (treść notatki bez nazwisk), wynik: źródło i podpowiedź pola. Działają reguły. Gałąź modelu z testem na atrapie lokalnej usługi (przełączenie i powrót do reguł po przekroczeniu czasu) powstaje jako pierwsza rzecz, jeśli zostanie czas. Odrzucono: atrapa od razu; sam opis bez gałęzi.
+- **10m. Nieobecność bez rodzaju.** System zapisuje tylko daty i to, czy nieobecność jest usprawiedliwiona. Zdanie dla jury: „System nie wie, czy to choroba, bo do terminu wystarcza mu data”. Odrzucono: rodzaj widoczny tylko dla kadr.
+- **10n. Fikcja zapoznania.** Przycisk jest dostępny od razu po zatwierdzeniu oceny. Przed zapisem ekran pokazuje skutek („Od dziś biegnie 7 dni na sprzeciw”) i wymaga wyboru „nie mógł” albo „nie chciał”. Odrzucono: próg dni z ustawień urzędu (liczba bez podstawy); zapis bez ekranu skutku.
 
 ## Pytania otwarte (do mentorów organizatora)
 

@@ -17,7 +17,7 @@ milestone_status: open
 > Derived from `context/foundation/prd.md` (v2) and `context/foundation/tech-stack.md` + codebase baseline.
 > Edit-in-place; the next milestone continues this file. Archive only when an independent roadmap replaces it.
 > Slices below are listed in dependency order. The "At a glance" table is the index.
-> Kolejność budowy przyjęta przez autora 2026-11-21: F-01, S-01, S-02, S-04, S-05, S-03, S-06.
+> Kolejność budowy przyjęta przez autora 2026-11-21: F-01, S-01, S-02, S-04, S-05, S-06, S-03 (`decisions.md`, decyzje 8a i 10h). Budowa nowych funkcji kończy się 22.11 o 07:00 (decyzja 10g).
 
 ## Milestone
 
@@ -58,7 +58,7 @@ Navigation aid — groups items that share a Prerequisites chain. Canonical orde
 | ------ | --------------------- | -------------------------------- | ----------------------------------------------------------------- |
 | A      | Rdzeń oceny           | `F-01` → `S-01` → `S-02`         | Ścisła ścieżka pokazu: bez niej nie ma „całego procesu”.          |
 | B      | Notatki i HR partner  | `S-04` → `S-05`                  | Budowany zaraz po rdzeniu: moduł oceniany osobno przez jury.      |
-| C      | Czas, kadry, wydruk   | `S-03` → `S-06`                  | Budowany na końcu; przy braku czasu upraszczany jako pierwszy.    |
+| C      | Kadry, wydruk, czas   | `S-06` → `S-03`                  | Budowany na końcu; przy braku czasu jako pierwsza wypada oś czasu (S-03). |
 
 ## Baseline
 
@@ -142,7 +142,7 @@ What's already in place in the codebase as of `2026-11-21`.
 
 ### S-05: Pytanie HR partnera i przypomnienie o docenianiu
 
-- **Outcome:** oceniający może odpowiedzieć na jedno pytanie zamknięte zadane po notatce z zaznaczoną zmianą zadań, dostać kartę rozmowy i formę rozwoju z katalogu, otworzyć zestawienie „Przed rozmową z pracownikiem” (notatki sprzed zmiany zadań i po niej, kryteria bez notatek, brak informacji zwrotnej, liczba notatek o podwładnych) oraz zobaczyć przypomnienie o docenianiu; administrator może zobaczyć ekran „Skąd biorą się podpowiedzi” z miejscami na model uruchomiony w urzędzie.
+- **Outcome:** oceniający może odpowiedzieć na jedno pytanie zamknięte zadane po notatce z zaznaczoną zmianą zadań, dostać kartę rozmowy i formę rozwoju z katalogu, otworzyć zestawienie „Przed rozmową z pracownikiem” (notatki sprzed zmiany zadań i po niej, kryteria bez notatek, brak informacji zwrotnej, podwładni bez notatek od dawna, zdaniem i bez liczb) oraz zobaczyć przypomnienie o docenianiu; administrator może zobaczyć ekran „Skąd biorą się podpowiedzi” z miejscami na model uruchomiony w urzędzie.
 - **Change ID:** hr-partner-question
 - **PRD refs:** US-04, FR-015, FR-016, FR-035, FR-036
 - **Prerequisites:** S-04

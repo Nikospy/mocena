@@ -134,7 +134,7 @@ Ocena nie psuje się przy formularzu, tylko przez 24 miesiące ciszy przed nim. 
 - FR-015: Oceniający może odpowiedzieć na jedno pytanie zamknięte zadane po notatce, przy której zaznaczono zmianę zadań pracownika, i dostać kartę rozmowy oraz formę rozwoju z katalogu; zaznaczenie podpowiada system, a oceniający może je zmienić. Priority: must-have
 - FR-016: Oceniający może zobaczyć przypomnienie, że od ostatniej rozmowy nie przekazał pracownikowi informacji zwrotnej, wraz z kartą docenienia. Priority: must-have
 - FR-017: Oceniający może otworzyć kartę przygotowania do rozmowy oceniającej z tematami wymaganymi przepisami. Priority: must-have
-- FR-035: Oceniający może przed rozmową z pracownikiem zobaczyć zestawienie własnych wpisów: notatki sprzed zmiany zadań i po niej, kryteria bez żadnej notatki, czas od ostatniej informacji zwrotnej oraz liczbę notatek o każdym podwładnym, każde z pytaniem albo propozycją działania. Priority: must-have
+- FR-035: Oceniający może przed rozmową z pracownikiem zobaczyć zestawienie własnych wpisów: notatki sprzed zmiany zadań i po niej, kryteria bez żadnej notatki, czas od ostatniej informacji zwrotnej oraz podwładnych, o których od dawna nie ma żadnej notatki (bez liczb przy nazwisku), każde z pytaniem albo propozycją działania. Priority: must-have
 
 ### Ocena
 - FR-018: Oceniający może przyznać ocenę cząstkową 1, 3, 5, 7 albo 9 każdemu kryterium, widząc przy nim notatki z całego okresu. Priority: must-have
@@ -193,7 +193,7 @@ Role: oceniający, oceniany, kadry (zarządzający), dyrektor generalny, adminis
 | Fikcja zapoznania | stwierdzenie („nie mógł” albo „nie chciał”) | brak | wgląd | brak |
 | Stan cykli i przypomnienia o stopniach | własny zespół | własny cykl | wszyscy | wszyscy, liczniki bez nazwisk |
 
-Rodzaj nieobecności nie jest widoczny poza kadrami. Pola zablokowane zmienia wyłącznie administrator w trybie korekty błędów. W prototypie logowanie odbywa się przez wybór jednego z kont demonstracyjnych; osoba niezalogowana widzi tylko ekran wyboru konta.
+System nie zapisuje rodzaju nieobecności, tylko daty i to, czy jest usprawiedliwiona. Pola zablokowane zmienia wyłącznie administrator w trybie korekty błędów. W prototypie logowanie odbywa się przez wybór jednego z kont demonstracyjnych; osoba niezalogowana widzi tylko ekran wyboru konta.
 
 ## Non-Goals
 

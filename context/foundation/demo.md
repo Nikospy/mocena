@@ -27,6 +27,15 @@ Trzy konta: Marek (oceniający), Piotr (oceniany), Joanna (kadry). Dwa telefony 
 - **Tomasz.** Oceny 12.11.2024 i 12.11.2026, obie „powyżej oczekiwań”; urzędnik mianowany.
 - **Data systemowa** na początku pokazu to dzień rozpoczęcia cyklu Piotra (grudzień 2024). Dzień pokazu to 21–22.11.2026.
 
+## Ustalenia do scenariusza (decyzje 10c i 10i; szczegóły ustalił agent, autor może je zmienić)
+
+- **Początek okresu i dzień rozmowy.** Okres 24 miesięcy Piotra liczy się od poprzedniej oceny, 27.11.2024, stąd termin 27.11.2026. Rozmowa o kryteriach i pierwszy dzień pokazu to poniedziałek 9.12.2024.
+- **Dane z przyszłości.** Wgrane notatki, nieobecności i oceny są widoczne dopiero, gdy data systemowa minie ich datę.
+- **Kryteria dodatkowe w kroku 1.** Marek wybiera „Orientacja na klienta/interesanta” (ma wgraną notatkę z 04.08.2025) i „Myślenie analityczne” (bez notatek, żeby ekran „Przed rozmową” miał kryterium bez żadnej notatki). Oba podpowiada tabela „rodzaj obowiązku → kryterium”.
+- **Ostrzeżenie „fakty tylko z ostatniego miesiąca”.** Wywołuje je notatka z 12.11.2026: jedyna przy kryterium „Wykorzystywanie wiedzy i doskonalenie zawodowe”.
+- **Ocena „1” w kroku 4.** Marek stawia ją przy „Rzetelności”, bo są do niej notatki sprzed zmiany zadań i po niej, a z nich składa się uzasadnienie.
+- **Zespół Marka w danych.** Ewa, Piotr i Maria. Maria nie ma konta ani notatek; na niej widać zdanie „O Marii nie masz żadnej notatki…”.
+
 ## Kto jest w danych pokazowych
 
 Założenie: w prototypie jest jeden urząd. Opisy osób niżej umieszczają Annę i Tomasza w ministerstwie; w danych pokazowych pracują w tym samym urzędzie co pozostali, żeby ekran kadr Joanny pokazywał obowiązkowy stopień Tomasza.
@@ -77,3 +86,4 @@ Pisane przez przełożonego, o faktach. Marek o Ewie i Piotrze, Anna o Tomaszu. 
 | 18.06.2026 | Piotr | Komunikacja | dobrze |  | Przepisał pismo do gminy: jedno zdanie, czego brakuje, i termin. Gmina odpowiedziała raz, bez dopytywania. Warto mu to powiedzieć, nie tylko odhaczyć. |
 | 26.08.2026 | Piotr | Rzetelność | do poprawy |  | Trzy odpowiedzi wyszły po terminie, który sam wpisał w marcu. Powiedział, że domyka kolejkę wieczorami i nie widzi, jak zdążyć bez odpuszczenia części spraw. |
 | 03.09.2026 | Ewa | Współpraca | dobrze |  | Po powrocie 31 sierpnia poprosiła Marię o pół godziny, żeby odtworzyć kolejkę. Nie udawała, że pamięta sprawy sprzed lutego; spisała, co ma przejąć. |
+| 12.11.2026 | Piotr | Wykorzystywanie wiedzy i doskonalenie zawodowe | dobrze |  | Po powrocie 9 listopada przeszedł zaległe szkolenie z nowego rejestru wniosków i tego samego dnia wprowadził do niego swoje otwarte sprawy. Nie czekał na przypomnienie. |
