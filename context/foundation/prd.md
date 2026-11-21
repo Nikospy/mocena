@@ -158,6 +158,7 @@ Ocena nie psuje się przy formularzu, tylko przez 24 miesiące ciszy przed nim. 
 ### Reguły
 - FR-033: Administrator może wymienić zestaw reguł (cykl, terminy, kryteria, przedziały) na nową wersję z datą obowiązywania, a każda ocena zachowuje wersję reguł, w której powstała. Priority: must-have
 - FR-034: Prowadzący pokaz może przesunąć datę systemową, żeby pokazać przypomnienia i terminy. Priority: must-have
+- FR-036: Administrator może zobaczyć, skąd biorą się podpowiedzi asystenta: miejsca, w których działają reguły i w których urząd może włączyć model uruchomiony u siebie, oraz czynności, których model nigdy nie wykonuje. Priority: must-have
 
 ## Non-Functional Requirements
 
@@ -197,7 +198,7 @@ Rodzaj nieobecności nie jest widoczny poza kadrami. Pola zablokowane zmienia wy
 ## Non-Goals
 
 - Asystent nie wystawia ocen i nie układa zdań o pracowniku. Uzasadnienie składa się z notatek przełożonego.
-- Prototyp nie używa modelu językowego. Zmianę zadań pracownika zaznacza oceniający przy notatce; lista słów tylko podpowiada to zaznaczenie.
+- Prototyp nie używa modelu językowego. Zmianę zadań pracownika zaznacza oceniający przy notatce; lista słów tylko podpowiada to zaznaczenie. Każda podpowiedź ma jedno wymienne źródło, które urząd może zastąpić modelem uruchomionym u siebie; model nie proponuje ocen, nie pisze o pracowniku i nie porównuje pracowników.
 - Brak wysyłki e-maili i integracji z elektronicznym systemem zarządzania dokumentacją; powiadomienia są widoczne w produkcie.
 - Brak podpisu kwalifikowanego, zaufanego i osobistego; potwierdzenie w systemie nazywamy potwierdzeniem, nie podpisem.
 - Brak importu danych z systemu kadrowego; dane pokazowe są wgrane z góry.

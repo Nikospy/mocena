@@ -46,7 +46,7 @@ Ocena okresowa w służbie cywilnej powstaje raz na 24 miesiące, na papierze i 
 | S-01 | cycle-start-criteria         | oceniający zaczyna cykl i ustala kryteria, oceniany potwierdza część I               | F-01          | US-01, US-02, FR-001–FR-007                | proposed |
 | S-02 | assessment-and-confirmation  | oceniający wystawia ocenę z blokadami, oceniany potwierdza zapoznanie                | S-01          | US-05, FR-018, FR-019, FR-022–FR-025       | proposed |
 | S-04 | notes-and-justification      | oceniający notuje fakty z telefonu i składa z nich uzasadnienie                      | S-02          | FR-008, FR-009, FR-017, FR-020, FR-021     | proposed |
-| S-05 | hr-partner-question          | oceniający dostaje pytanie HR partnera po notatce, zestawienie przed rozmową i przypomnienie o docenianiu | S-04 | US-04, FR-015, FR-016, FR-035 | proposed |
+| S-05 | hr-partner-question          | oceniający dostaje pytanie HR partnera po notatce, zestawienie przed rozmową i przypomnienie o docenianiu | S-04 | US-04, FR-015, FR-016, FR-035, FR-036 | proposed |
 | S-03 | timeline-and-absences        | kadry wpisują nieobecność i zmianę oceniającego, a wszyscy widzą oś czasu z regułami | S-01          | US-03, FR-010, FR-011, FR-014, FR-033, FR-034 | proposed |
 | S-06 | hr-overview-and-print        | kadry widzą stan cykli i stopnie obowiązkowe, a arkusz da się pobrać i wydrukować    | S-02          | FR-026, FR-027, FR-029, FR-031             | proposed |
 
@@ -142,9 +142,9 @@ What's already in place in the codebase as of `2026-11-21`.
 
 ### S-05: Pytanie HR partnera i przypomnienie o docenianiu
 
-- **Outcome:** oceniający może odpowiedzieć na jedno pytanie zamknięte zadane po notatce z zaznaczoną zmianą zadań, dostać kartę rozmowy i formę rozwoju z katalogu, otworzyć zestawienie „Przed rozmową z pracownikiem” (notatki sprzed zmiany zadań i po niej, kryteria bez notatek, brak informacji zwrotnej, liczba notatek o podwładnych) oraz zobaczyć przypomnienie o docenianiu.
+- **Outcome:** oceniający może odpowiedzieć na jedno pytanie zamknięte zadane po notatce z zaznaczoną zmianą zadań, dostać kartę rozmowy i formę rozwoju z katalogu, otworzyć zestawienie „Przed rozmową z pracownikiem” (notatki sprzed zmiany zadań i po niej, kryteria bez notatek, brak informacji zwrotnej, liczba notatek o podwładnych) oraz zobaczyć przypomnienie o docenianiu; administrator może zobaczyć ekran „Skąd biorą się podpowiedzi” z miejscami na model uruchomiony w urzędzie.
 - **Change ID:** hr-partner-question
-- **PRD refs:** US-04, FR-015, FR-016, FR-035
+- **PRD refs:** US-04, FR-015, FR-016, FR-035, FR-036
 - **Prerequisites:** S-04
 - **Parallel with:** S-06
 - **Blockers:** —
