@@ -11,7 +11,7 @@ Plaster jest budowany jako ostatni i wypada pierwszy, gdy zabraknie czasu (decyz
 Stan w chwili budowy S-03 (po F-01, S-01, S-02, S-04, S-05, S-06; decyzje 8a i 10h):
 
 - Silnik terminów jest w `src/engine/deadlines.ts` (przeniesiony przez F-01 z `src/silnik/terminy.ts`): `addDays`, `addMonths`, `isDayOff`, `toWorkingDay`, `nextAssessmentDeadline(start, longAbsenceDays)`, `periodEndAfterNegative` i pozostałe terminy. `nextAssessmentDeadline` liczy `toWorkingDay(addDays(addMonths(start, 24), longAbsenceDays))`: dni dodaje do surowego końca 24 miesięcy i dopiero potem przesuwa na dzień roboczy. Test `nextAssessmentDeadline("2024-03-16", 33) === "2026-04-20"` już istnieje.
-- `effectiveDeadline(cycleId, { asOf })` w `src/cycles.ts` istnieje od F-01 i zwraca `{ date, basis: string[] }`: dla zwykłego cyklu `nextAssessmentDeadline(period_start, 0)`, dla ponownej oceny po negatywnej `periodEndAfterNegative(previousAcknowledgedOn)`. Ekrany otwartego cyklu (`/hr`, ocena, oś czasu, wydruk otwartego cyklu) czytają termin tylko stąd. Termin przekazany w części I to `part1_submitted.payload.dueDate` (zamrożony w dniu przekazania), a termin zatwierdzonej oceny to `AssessmentSnapshot.deadline` (stan z dnia zatwierdzenia).
+- `effectiveDeadline(cycleId, { asOf })` w `src/cycles.ts` istnieje od F-01 i zwraca `{ date, basis: string[] }`: dla zwykłego cyklu `nextAssessmentDeadline(period_start, 0)`, dla ponownej oceny po negatywnej `periodEndAfterNegative(previousAcknowledgedOn)`. Ekrany cyklu przed zatwierdzeniem oceny (`/hr`, ocena, oś czasu, wydruk otwartego cyklu) czytają termin tylko stąd. Termin przekazany w części I to `part1_submitted.payload.dueDate` (zamrożony w dniu przekazania), a termin zatwierdzonej oceny to `AssessmentSnapshot.deadline` (stan z dnia zatwierdzenia). Cykl zostaje otwarty między `assessment_approved` a zapoznaniem, ale termin tej oceny jest już zamrożony w migawce (zasada wspólna kontraktu).
 - Nowego kodu wymaga: łączenie nieobecności przez dni wolne, próg „dłużej niż miesiąc”, wyliczenie dni przedłużenia z listy wpisów. Dziś nikt tego nie liczy.
 - Plik reguł `rules/regulation-2016-470.json` ma podstawę „art. 81 ust. 4 ustawy” dla 24 miesięcy. Nie ma progu nieobecności (art. 81 ust. 7 ustawy) ani § 9 ust. 3 rozporządzenia (zmiana oceniającego).
 - Tabeli `absences`, osi czasu i formularzy kadr nie ma.
@@ -29,7 +29,7 @@ Stan w chwili budowy S-03 (po F-01, S-01, S-02, S-04, S-05, S-06; decyzje 8a i 1
 
 ## Desired End State
 
-Kadry (Joanna) przy dacie systemowej 10.11.2026 otwierają `/hr`, w wierszu cyklu Piotra klikają „Wpisz nieobecność” (`/cycles/:id/absences`), zapisują pierwszy wpis, z osi czasu wracają do formularza i zapisują drugi. Ścieżka nie przechodzi przez `/cycles/:id/part1`. Oś pokazuje jedną ciągłą nieobecność 05.10.2026–06.11.2026 (33 dni), dopisek „dłużej niż miesiąc”, termin bazowy 27.11.2026 i nowy termin 30.12.2026, przy każdej dacie przepis, w stopce wersję reguł („Reguły 2016-470/1, obowiązują od 23.04.2016”). Ten sam termin 30.12.2026 pokazują `/hr` i wydruk otwartego cyklu Piotra, bo czytają `effectiveDeadline(cycleId)`. Wydruk zatwierdzonej oceny pokazuje `AssessmentSnapshot.deadline` i późniejszy wpis nieobecności go nie zmienia. Piotr na swojej osi widzi nowy termin i podstawę, bez dat nieobecności. Oś Ewy (konto Marka albo Joanny) pokazuje zmianę oceniającego 05.12.2024 („kryteria bez zmian, § 9 ust. 3 rozporządzenia”) i, od 28.08.2026, nieobecność 16.02–28.08.2026 z nowym terminem 02.06.2027. Gdy data systemowa wejdzie w okno przypomnienia, oceniający i oceniany widzą na ekranie startowym zdanie z terminem i przepisem. `bun test` przechodzi.
+Kadry (Joanna) przy dacie systemowej 10.11.2026 otwierają `/hr`, w wierszu cyklu Piotra klikają „Wpisz nieobecność” (`/cycles/:id/absences`), zapisują pierwszy wpis, z osi czasu wracają do formularza i zapisują drugi. Ścieżka nie przechodzi przez `/cycles/:id/part1`. Oś pokazuje jedną ciągłą nieobecność 05.10.2026–06.11.2026 (33 dni), dopisek „dłużej niż miesiąc”, termin bazowy 27.11.2026 i nowy termin 30.12.2026, przy każdej dacie przepis, w stopce wersję reguł („Reguły 2016-470/1, obowiązują od 23.04.2016”). Ten sam termin 30.12.2026 pokazują `/hr` i wydruk otwartego cyklu Piotra, bo czytają `effectiveDeadline(cycleId)`. Wydruk zatwierdzonej oceny pokazuje `AssessmentSnapshot.deadline` i późniejszy wpis nieobecności go nie zmienia. Od widocznego `assessment_approved` także oś pokazuje `AssessmentSnapshot.deadline`: nieobecność wpisana później zapisuje się i stoi na osi ze zdaniem, że ocena jest już zatwierdzona i jej termin się nie zmienia. Piotr na swojej osi widzi nowy termin i podstawę, bez dat nieobecności. Oś Ewy (konto Marka albo Joanny) pokazuje zmianę oceniającego 05.12.2024 („kryteria bez zmian, § 9 ust. 3 rozporządzenia”) i, od 28.08.2026, nieobecność 16.02–28.08.2026 z nowym terminem 02.06.2027. Gdy data systemowa wejdzie w okno przypomnienia, oceniający i oceniany widzą na ekranie startowym zdanie z terminem i przepisem. `bun test` przechodzi.
 
 ## What We're NOT Doing
 
@@ -49,12 +49,12 @@ Kadry (Joanna) przy dacie systemowej 10.11.2026 otwierają `/hr`, w wierszu cykl
 Wszystkie nazwy pochodzą z rozdziału „Kontrakt wspólny dla wszystkich plastrów” w `context/changes/rules-engine-and-demo-data/plan.md`. Gdy kod ma inną nazwę niż kontrakt, obowiązuje kod (zasada kontraktu), a rozjazd trzeba zgłosić; S-03 nie tworzy drugiej nazwy.
 
 - **Tabele (F-01):** `people(id, name, role, position_title, unit, supervisor_id, has_account, appointed, civil_service_grade, grade_awarded_on)`, role `appraiser`, `employee`, `hr`, `admin`; `cycles(id, person_id, appraiser_id, period_start, sheet)`; `cycle_criteria(cycle_id, criterion_id, kind, expectation)`; `events(id, type, cycle_id, actor_id, date, payload)`; `settings(key, value)` z `demo_date`.
-- **Funkcje (F-01):** `today()`, `currentPerson(c)`, `recordEvent(type, cycleId, actorId, payload)`, `seedEvent(...)` (tylko w danych), `visibleEvents(cycleId, { asOf })` (granica `date <= today()` albo `asOf`, porządek `(date, id)`), `effectiveDeadline(cycleId, { asOf })` i `openCycle(personId)` w `src/cycles.ts`, `registerHomeTasks(fn)` w `src/home-tasks.ts`, `registerCycleLinks(fn)` w `src/cycle-links.ts`, `rulesVersion()`, `createTestApp({ today, seedOptions })` w `src/test-helpers.ts`, `runSeed(db, options)` w `src/seed.ts`.
+- **Funkcje (F-01):** `today()`, `currentPerson(c)`, `recordEvent(type, cycleId, actorId, payload)`, `seedEvent(type, cycleId, actorId, payload, date)` (data jest piątym argumentem; tylko w danych i przygotowaniu testów), połączenie z bazą z `getDb()` w `src/db.ts` (funkcje nie biorą argumentu `db`), `visibleEvents(cycleId, { asOf })` (granica `date <= today()` albo `asOf`, porządek `(date, id)`), `effectiveDeadline(cycleId, { asOf })` i `openCycle(personId)` w `src/cycles.ts`, `registerHomeTasks(fn)` w `src/home-tasks.ts`, `registerCycleLinks(fn)` w `src/cycle-links.ts`, `rulesVersion()`, `createTestApp({ today, seedOptions })` w `src/test-helpers.ts`, `runSeed(db, options)` w `src/seed.ts`.
 - **Silnik (F-01):** `src/engine/deadlines.ts`: `addDays`, `addMonths`, `isDayOff`, `toWorkingDay`, `nextAssessmentDeadline(start, longAbsenceDays)`, `periodEndAfterNegative`, `criteriaTalkDeadline`, `objectionDeadline`; odczyt reguł w `src/engine/rules.ts`.
-- **Zdarzenia czytane przez oś:** `cycle_started { reason, periodStart, previousAssessmentOn, previousAcknowledgedOn, previousOutcome }` (`reason`: `hired`, `appointed`, `previous_assessment`; `previousOutcome`: `positive`, `negative`, `null`; F-01, S-01), `part1_submitted` (z `dueDate` i `rulesVersion`), `part1_confirmed` (S-01), `assessment_approved` (migawka `AssessmentSnapshot` z `deadline`), `assessment_acknowledged { place, date, name, objectionDeadline }`, `acknowledgement_fiction { reason, deliveryMethod, deliveredOn, objectionDeadline }` (S-02).
+- **Zdarzenia czytane przez oś:** `cycle_started { reason, periodStart, previousAssessmentOn, previousAcknowledgedOn, previousOutcome }` (`reason`: `hired`, `appointed`, `previous_assessment`; `previousOutcome`: `positive`, `negative`, `null`; F-01, S-01), `part1_submitted` (z `dueDate` i `rulesVersion`, który jest całym obiektem `{ version, effectiveFrom, act }`), `part1_confirmed` (S-01), `assessment_approved` (migawka `AssessmentSnapshot` z `deadline`), `assessment_acknowledged { place, date, name, objectionDeadline }`, `acknowledgement_fiction { reason, deliveryMethod, deliveredOn, objectionDeadline }` (S-02).
 - **Trasy:** `GET /hr` (S-06) renderuje w wierszu cyklu `cycleLinks(cycle, person)`; `GET /cycles/:id/part1` (S-01) też pokazuje `cycleLinks`, ale w wersji minimalnej odpowiada kadrom 403, więc ścieżka kadr do formularza idzie tylko przez `/hr`. `GET /cycles/:id/sheet` (S-06) to wydruk.
 - **Dane (F-01 `src/seed/base.ts`, S-01 `src/seed/part1.ts`):** osoby, w tym poprzedni naczelnik bez konta; cykle Piotra (od 27.11.2024), Ewy (od 20.11.2024) i Tomasza ze zdarzeniami `cycle_started`; oceniającym Ewy (`cycles.appraiser_id`) jest od początku Marek; część I Ewy przekazana przez poprzedniego naczelnika 02.12.2024 i potwierdzona 03.12.2024.
-- **Pliki wspólne:** `rules/office-settings.json` z `officeSettings()` (tworzy S-01, S-03 dopisuje klucz); plik reguł (S-03 dopisuje podstawy nieobecności i zmiany oceniającego).
+- **Pliki wspólne:** `rules/office-settings.json` z `officeSettings()` (tworzy S-01, S-03 dopisuje klucz); plik reguł (S-03 dopisuje `deadlines.longAbsenceOverMonths`, `deadlines.deadlineCounting` i `appraiserChange`, każdy z `basis`; czyta istniejące `deadlines.assessmentEveryMonths` i `deadlines.reassessmentAfterNegativeMonths`).
 
 ## Co ten plaster udostępnia
 
@@ -66,13 +66,13 @@ Zgodnie z kontraktem S-03 udostępnia innym plastrom tylko:
 
 Poza tym S-03 dopisuje do plików wspólnych według kontraktu: tabelę `absences(id, person_id, date_from, date_to, excused, recorded_on, recorded_by)` w `src/db.ts` (daty `RRRR-MM-DD` włącznie, `excused` 0/1, `recorded_on` = data zapisu i granica widoczności, `recorded_by` = osoba z kadr, bez kolumny rodzaju), moduł danych `src/seed/absences.ts` z jednym wywołaniem w `runSeed`, odnośniki przez `registerCycleLinks` i pozycje listy spraw przez `registerHomeTasks`.
 
-Wewnętrzne (nikt poza S-03 z nich nie korzysta): `src/engine/absences.ts` (`mergeAbsences`, `isLongerThanMonth`, `assessmentDeadline`), `cycleDeadlineDetails(cycleId, { asOf })` i `visibleAbsences` w `src/cycles.ts`, `buildTimeline(cycleId, viewer)` w `src/timeline.ts`, widok `src/views/timeline.tsx`, klucze w pliku reguł i `assessmentReminderDays` w `rules/office-settings.json`.
+Wewnętrzne (nikt poza S-03 z nich nie korzysta): `src/engine/absences.ts` (`mergeAbsences`, `isLongerThanMonth`, `assessmentDeadline`), `cycleDeadlineDetails(cycleId, { asOf })` i `visibleAbsences` w `src/cycles.ts`, `buildTimeline(cycleId, viewer)` w `src/timeline.ts`, widok `src/views/timeline.tsx`, klucze `deadlines.longAbsenceOverMonths`, `deadlines.deadlineCounting` i `appraiserChange` w pliku reguł i `assessmentReminderDays` w `rules/office-settings.json`.
 
 ## Implementation Approach
 
-Najpierw wersja minimalna, potem dodatki w kolejności budowy. Silnik jest czystą funkcją na datach `RRRR-MM-DD` z testami (bez bazy). Termin nigdy nie jest zapisywany: `effectiveDeadline` liczy go za każdym razem z `cycles.period_start`, payloadu `cycle_started` i widocznych nieobecności ocenianego, więc każdy ekran otwartego cyklu pokazuje ten sam termin bez zmian w cudzym kodzie. Szczegóły wyliczenia (połączone nieobecności, dni, termin bazowy) zwraca `cycleDeadlineDetails(cycleId, { asOf })`; `effectiveDeadline` jest jego skrótem, więc nie ma drugiego źródła. Oś czasu składa wpisy z widocznych zdarzeń, widocznych nieobecności (już połączonych) i terminów wyliczonych (te widać także w przyszłości, bo to terminy, nie fakty). Widok zależy od roli: kadry i oceniający widzą daty nieobecności i zmianę oceniającego, oceniany tylko termin i podstawę. Zmiana oceniającego z formularza zapisuje zdarzenie i w tej samej transakcji ustawia `cycles.appraiser_id`; kryteria (`cycle_criteria`) nie są dotykane (§ 9 ust. 3). Ekrany używają `src/views/layout.tsx`; dopóki design system nie ma komponentu osi czasu, oś to semantyczna lista `<ol>` z `<time>`.
+Najpierw wersja minimalna, potem dodatki w kolejności budowy. Silnik jest czystą funkcją na datach `RRRR-MM-DD` z testami (bez bazy). Termin nigdy nie jest zapisywany: `effectiveDeadline` liczy go za każdym razem z `cycles.period_start`, payloadu `cycle_started` i widocznych nieobecności ocenianego, więc każdy ekran otwartego cyklu pokazuje ten sam termin bez zmian w cudzym kodzie. Szczegóły wyliczenia (połączone nieobecności, dni, termin bazowy) zwraca `cycleDeadlineDetails(cycleId, { asOf })`; `effectiveDeadline` jest jego skrótem, więc nie ma drugiego źródła. Oś czasu składa wpisy z widocznych zdarzeń, widocznych nieobecności (już połączonych) i terminów wyliczonych (te widać także w przyszłości, bo to terminy, nie fakty). Od widocznego `assessment_approved` oś bierze termin z `AssessmentSnapshot.deadline` tego zdarzenia, a nie z `effectiveDeadline`. Widok zależy od roli: kadry i oceniający widzą daty nieobecności i zmianę oceniającego, oceniany tylko termin i podstawę. Zmiana oceniającego z formularza zapisuje zdarzenie i w tej samej transakcji ustawia `cycles.appraiser_id`; kryteria (`cycle_criteria`) nie są dotykane (§ 9 ust. 3). Ekrany używają `src/views/layout.tsx`; dopóki design system nie ma komponentu osi czasu, oś to semantyczna lista `<ol>` z `<time>`.
 
-Trasy stosują zasady wspólne kontraktu: po udanym `POST` przekierowanie 303, błąd walidacji 422 z formularzem, brak uprawnień 403, zapis do cyklu, który nie jest już otwarty (`openCycle(cycles.person_id)` nie zwraca tego cyklu), 409.
+Trasy stosują zasady wspólne kontraktu: po udanym `POST`, który coś zapisuje, przekierowanie 303; błąd walidacji zawsze 422 z formularzem (nigdy 400); brak uprawnień 403. Wpisanie nieobecności i zmiana oceniającego wymagają otwartego cyklu: gdy `openCycle(cycles.person_id)` nie zwraca tego cyklu, trasa odpowiada 409 bez zapisu. Cykl z widocznym `assessment_approved`, ale bez zapoznania i bez fikcji, jest nadal otwarty, więc nieobecność da się wpisać.
 
 **Wersja minimalna (ok. 45 min) = Phase 1.** Silnik z testami, rozszerzone `effectiveDeadline`, tabela `absences`, formularz kadr, oś czasu z połączoną nieobecnością, progiem, nowym terminem, przepisem i wersją reguł, odnośniki w wierszu cyklu na `/hr`. Krok 3 pokazu działa na samej fazie 1.
 
@@ -93,15 +93,19 @@ Nie tniemy: łączenia przez dni wolne, wspólnego terminu w `effectiveDeadline`
 
 **File**: `rules/regulation-2016-470.json`, `src/engine/rules.ts`
 
-**Intent**: Dopisać do sekcji terminów próg długiej nieobecności, podstawę zmiany oceniającego i sposób liczenia, żeby przepis przy dacie pochodził z pliku reguł (decyzja 7). Klucze w stylu nadanym przez F-01. Wersji pliku nie zmieniać: to uzupełnienie brakującej wartości tego samego aktu.
+**Intent**: Dopisać próg długiej nieobecności i sposób liczenia do sekcji `deadlines` oraz podstawę zmiany oceniającego jako klucz główny, żeby przepis przy dacie pochodził z pliku reguł (decyzja 7). Nazwy kluczy z kontraktu: `deadlines.longAbsenceOverMonths`, `deadlines.deadlineCounting`, `appraiserChange`, każdy z `basis`. Istniejące `deadlines.assessmentEveryMonths` i `deadlines.reassessmentAfterNegativeMonths` zostają bez zmian. Wersji pliku nie zmieniać: to uzupełnienie brakującej wartości tego samego aktu.
 
 **Contract**:
 
 ```json
-"longAbsenceOverMonths": { "value": 1, "basis": "art. 81 ust. 7 ustawy" },
-"appraiserChange": { "basis": "§ 9 ust. 3", "rule": "oceny dokonuje się na podstawie wcześniej wybranych kryteriów" },
-"deadlineCounting": { "basis": "art. 110–115 Kodeksu cywilnego; koniec w sobotę albo dzień wolny przechodzi na następny dzień roboczy" }
+"deadlines": {
+  "longAbsenceOverMonths": { "value": 1, "basis": "art. 81 ust. 7 ustawy" },
+  "deadlineCounting": { "basis": "art. 110–115 Kodeksu cywilnego; koniec w sobotę albo dzień wolny przechodzi na następny dzień roboczy" }
+},
+"appraiserChange": { "basis": "§ 9 ust. 3", "rule": "oceny dokonuje się na podstawie wcześniej wybranych kryteriów" }
 ```
+
+Fragment pokazuje tylko nowe klucze; pozostałe klucze `deadlines` zostają na miejscu.
 
 #### 2. Łączenie nieobecności i termin z przedłużeniem
 
@@ -132,9 +136,9 @@ Reguły (każda ma test):
 - `mergeAbsences` bierze tylko `excused: true`, sortuje po `from`, rzuca błąd przy `to < from` albo złej dacie.
 - Dwa sąsiednie wpisy łączą się, gdy nachodzą na siebie, stykają się (`next.from <= addDays(cur.to, 1)`) albo gdy każdy dzień ściśle między `cur.to` a `next.from` jest dniem wolnym (`isDayOff`). Połączony koniec to późniejszy z dwóch końców. Nieobecność nieusprawiedliwiona niczego nie łączy i niczego nie przedłuża (art. 81 ust. 7 mówi o usprawiedliwionej): dzień roboczy przykryty takim wpisem przerywa ciągłość.
 - `days` = dni kalendarzowe od `from` do `to` włącznie.
-- **Próg.** Nieobecność zajmuje przedział od `from` do `addDays(to, 1)` (bez końca). „Dłużej niż miesiąc” ⇔ `addDays(to, 1) > addMonths(from, value)`, porównanie ścisłe, `value` z `longAbsenceOverMonths`. Przykłady: od 05.10 miesiąc kończy się 05.11, więc 05.10–04.11 to dokładnie miesiąc (nie), 05.10–05.11 to dłużej (tak). Od 31.01.2026 miesiąc kończy się 28.02.2026, więc 31.01–27.02.2026 to dokładnie miesiąc (nie), 31.01–28.02.2026 to dłużej (tak).
-- **Ponowna ocena po negatywnej.** Dla `kind = "after_negative"`: `base = deadline = periodEndAfterNegative(previousAcknowledgedOn)` (sześć miesięcy od zapoznania z oceną negatywną), `extensionDays = 0`, nieobecności nie przedłużają terminu (FAQ pyt. 19), a `merged` służy tylko osi.
-- **Przedłużenie, kolejno (`"regular"`).** `rawEnd = addMonths(periodStart, 24)`; połączone nieobecności przetwarzane po kolei według `from`. Nieobecność kończącą się przed `periodStart` pomija. Nieobecność z `from > rawEnd` (bieżący surowy koniec) pomija i kończy pętlę. Dla nieobecności dłuższej niż miesiąc (próg na całej nieobecności, także z dniami sprzed okresu) dodaje dni liczone od `max(from, periodStart)` do `to` włącznie: `rawEnd = addDays(rawEnd, dni)`, `counted = true`. Dzięki temu druga długa nieobecność, która zaczyna się w już przedłużonym okresie, też przedłuża termin.
+- **Próg.** Nieobecność zajmuje przedział od `from` do `addDays(to, 1)` (bez końca). „Dłużej niż miesiąc” ⇔ `addDays(to, 1) > addMonths(from, value)`, porównanie ścisłe, `value` z `deadlines.longAbsenceOverMonths`. Przykłady: od 05.10 miesiąc kończy się 05.11, więc 05.10–04.11 to dokładnie miesiąc (nie), 05.10–05.11 to dłużej (tak). Od 31.01.2026 miesiąc kończy się 28.02.2026, więc 31.01–27.02.2026 to dokładnie miesiąc (nie), 31.01–28.02.2026 to dłużej (tak).
+- **Ponowna ocena po negatywnej.** Dla `kind = "after_negative"`: `base = deadline = periodEndAfterNegative(previousAcknowledgedOn)` (sześć miesięcy od zapoznania z oceną negatywną, `deadlines.reassessmentAfterNegativeMonths`), `extensionDays = 0`, nieobecności nie przedłużają terminu (FAQ pyt. 19), a `merged` służy tylko osi.
+- **Przedłużenie, kolejno (`"regular"`).** `rawEnd = addMonths(periodStart, 24)` (24 to `deadlines.assessmentEveryMonths`); połączone nieobecności przetwarzane po kolei według `from`. Nieobecność kończącą się przed `periodStart` pomija. Nieobecność z `from > rawEnd` (bieżący surowy koniec) pomija i kończy pętlę. Dla nieobecności dłuższej niż miesiąc (próg na całej nieobecności, także z dniami sprzed okresu) dodaje dni liczone od `max(from, periodStart)` do `to` włącznie: `rawEnd = addDays(rawEnd, dni)`, `counted = true`. Dzięki temu druga długa nieobecność, która zaczyna się w już przedłużonym okresie, też przedłuża termin.
 - **Dzień roboczy raz, na końcu.** `deadline = toWorkingDay(rawEnd)`, co jest równe `nextAssessmentDeadline(periodStart, extensionDays)`; przesunięcie na dzień roboczy nigdy nie wchodzi do `rawEnd` w trakcie pętli.
 
 #### 3. Wspólny termin cyklu: rozszerzenie `effectiveDeadline`
@@ -161,7 +165,7 @@ Reguły (każda ma test):
 
 **Intent**: Kadry wpisują nieobecność ocenianego z cyklu. Pola: „Od”, „Do”, „Nieobecność usprawiedliwiona” (zaznaczone domyślnie). Nad polami: „System zapisuje tylko daty. Rodzaju nieobecności nie podajesz”. Pod formularzem lista wpisanych nieobecności tej osoby (same daty i „usprawiedliwiona / nieusprawiedliwiona”). Zapis dopiero po kliknięciu „Zapisz nieobecność”: wiersz w `absences` (`recorded_on = today()`, `recorded_by` = konto), zdarzenie `absence_recorded { absence_id, notified: [appraiser_id, person_id] }` przez `recordEvent`, przekierowanie na oś czasu z komunikatem „Zapisano. Nowy termin oceny widzą: Marek Zieliński (oceniający), Piotr Wójcik (oceniany)”. Trasa czyta z żądania tylko `from`, `to` i `excused`; inne pola (na przykład rodzaj nieobecności) są pomijane i nigdzie nie trafiają. Tylko rola `hr`; inni 403. S-03 dopisuje import i montowanie swoich tras w `src/index.tsx`.
 
-**Contract**: `GET /cycles/:id/absences`; `POST /cycles/:id/absences` (pola `from`, `to`, `excused`) → 303 na `/cycles/:id/timeline`; brak daty, zła data albo „Do” przed „Od” → 422 z tym samym formularzem, komunikatem przy polu („Data końca nie może być wcześniejsza niż data początku”) i bez zapisu; brak roli `hr` → 403; cykl, który nie jest już otwarty → 409 bez zapisu.
+**Contract**: `GET /cycles/:id/absences`; `POST /cycles/:id/absences` (pola `from`, `to`, `excused`) → 303 na `/cycles/:id/timeline`; brak daty, zła data albo „Do” przed „Od” → 422 z tym samym formularzem, komunikatem przy polu („Data końca nie może być wcześniejsza niż data początku”) i bez zapisu; brak roli `hr` → 403; `openCycle(cycles.person_id)` nie zwraca tego cyklu → 409 bez zapisu. Cykl po `assessment_approved`, a przed zapoznaniem, jest otwarty: zapis przechodzi (303), a termin oceny się nie zmienia (pkt 6).
 
 #### 6. Oś czasu cyklu
 
@@ -176,9 +180,11 @@ Widok kadr i oceniającego:
 - termin bazowy, a przy przedłużeniu przekreślony obok nowego terminu, z podstawami z `basis`;
 - dla kadr pod listą odnośnik „Wpisz kolejną nieobecność” (`/cycles/:id/absences`): to drugi wpis w kroku 3.
 
-Widok ocenianego: początek okresu, termin (przy przedłużeniu: termin bazowy przekreślony i nowy) z `basis`. Bez dat i długości nieobecności i bez wpisu o zmianie oceniającego (tabela dostępu PRD).
+**Termin po zatwierdzeniu oceny.** Od widocznego `assessment_approved` (dla wszystkich ról) wpis terminu pokazuje `AssessmentSnapshot.deadline` z payloadu tego zdarzenia, a nie `effectiveDeadline`. Nieobecność wpisana później (`recorded_on` po dacie `assessment_approved`) jest zapisana i stoi na osi kadr i oceniającego ze swoimi datami, ale zamiast zdania o przedłużeniu ma zdanie „Ocena jest już zatwierdzona, jej termin się nie zmienia”. Nieobecność wpisana przed zatwierdzeniem jest już zawarta w terminie z migawki i dostaje zwykłe zdanie o progu.
 
-Stopka dla wszystkich: wersja reguł z `part1_submitted.payload.rulesVersion`, gdy część I jest przekazana, w przeciwnym razie z `rulesVersion()` („Reguły: 2016-470/1, obowiązują od 23.04.2016”). Przy nazwisku ocenianego w nagłówku i przy nazwiskach we wpisach nie ma etykiety ani liczby; liczba dni stoi tylko we wpisie nieobecności, przy jej datach.
+Widok ocenianego: początek okresu, termin (przy przedłużeniu: termin bazowy przekreślony i nowy; po zatwierdzeniu termin z migawki) z `basis`. Bez dat i długości nieobecności i bez wpisu o zmianie oceniającego (tabela dostępu PRD).
+
+Stopka dla wszystkich: wersja reguł z `part1_submitted.payload.rulesVersion`, gdy część I jest przekazana, w przeciwnym razie z `rulesVersion()`. Oba źródła mają ten sam kształt `{ version, effectiveFrom, act }`; stopka składa z niego tekst „Reguły: 2016-470/1, obowiązują od 23.04.2016” (`version` bez zmian, `effectiveFrom` w formacie `DD.MM.RRRR`). Przy nazwisku ocenianego w nagłówku i przy nazwiskach we wpisach nie ma etykiety ani liczby; liczba dni stoi tylko we wpisie nieobecności, przy jej datach.
 
 **Contract**: `GET /cycles/:id/timeline` → 200 dla uczestnika i kadr, 403 dla innych. Wewnętrznie `buildTimeline(cycleId, viewer): TimelineEntry[]`, `TimelineEntry = { date, title, detail?, basis, kind: "fact" | "deadline" }`. Fakty tylko z widocznych zdarzeń i nieobecności, terminy zawsze.
 
@@ -188,7 +194,7 @@ Stopka dla wszystkich: wersja reguł z `part1_submitted.payload.rulesVersion`, g
 
 **Intent**: Przez `registerCycleLinks(fn)` dodać odnośniki, które `cycleLinks(cycle, person)` zwraca na `/hr` i na ekranie wejściowym cyklu, każdy tylko dla ról wpuszczanych przez jego trasę `GET`: „Oś czasu” (oceniany, oceniający, kadry), „Wpisz nieobecność” (tylko `hr`) i „Zmień oceniającego” (tylko `hr`, dopiero gdy istnieje faza 2 pkt 4). Ścieżka kroku 3: `/hr` → w wierszu cyklu Piotra „Wpisz nieobecność” → `/cycles/:id/absences` → oś → „Wpisz kolejną nieobecność” → oś. Ścieżka nie przechodzi przez `/cycles/:id/part1`. Te odnośniki zostają w każdej wersji.
 
-**Contract**: `cycleLinks(cycle, joanna)` zawiera `/cycles/:id/timeline` i `/cycles/:id/absences`; `cycleLinks(cycle, piotr)` zawiera tylko `/cycles/:id/timeline`; `GET /hr` na koncie Joanny zawiera w wierszu cyklu Piotra odnośnik `/cycles/:id/absences` z tekstem „Wpisz nieobecność”.
+**Contract**: `cycleLinks(cycle, joanna)` zawiera `/cycles/:id/timeline` i `/cycles/:id/absences`; `cycleLinks(cycle, piotr)` zawiera `/cycles/:id/timeline` i nie zawiera `/cycles/:id/absences` ani `/cycles/:id/appraiser` (lista ma też odnośniki wcześniejszych plastrów, na przykład kartę otwarcia z S-01 oraz arkusz i historię z S-06, więc test nie sprawdza, że odnośnik osi jest jedyny); `GET /hr` na koncie Joanny zawiera w wierszu cyklu Piotra odnośnik `/cycles/:id/absences` z tekstem „Wpisz nieobecność”.
 
 ### Success Criteria:
 
@@ -200,6 +206,7 @@ Stopka dla wszystkich: wersja reguł z `part1_submitted.payload.rulesVersion`, g
 - Po dwóch wpisach kadr ten sam termin 30.12.2026 zwracają `effectiveDeadline`, `GET /hr` i oś czasu; oś zawiera „05.10.2026–06.11.2026”, „dłużej niż miesiąc”, „art. 81 ust. 7” i wersję reguł
 - Ścieżka `/hr` → „Wpisz nieobecność” → `/cycles/:id/absences` → oś → drugi wpis działa na koncie kadr bez wejścia na `/cycles/:id/part1`; `POST` odpowiada 303; oceniany widzi na osi 30.12.2026 i podstawę, bez „05.10.2026” i bez „33 dni”: `bun test`
 - Bez rodzaju nieobecności: tabela `absences` nie ma kolumny rodzaju, formularz nie ma takiego pola, a `POST` z dodatkowym polem rodzaju zapisuje wiersz bez tej wartości (decyzja 10m); oś i formularz nie mają liczby ani etykiety przy nazwisku osoby (zasada 7): `bun test`
+- Termin po zatwierdzeniu: w cyklu Piotra z widocznym `assessment_approved` i bez zapoznania dwa wpisy nieobecności 05.10–06.11.2026 odpowiadają 303 i zapisują się; oś pokazuje `AssessmentSnapshot.deadline` (27.11.2026, nie 30.12.2026), nieobecność ze zdaniem „Ocena jest już zatwierdzona, jej termin się nie zmienia”; w cyklu zamkniętym zapis daje 409, a błąd walidacji 422: `bun test src/routes/absences.test.ts`
 
 #### Manual Verification:
 
@@ -214,7 +221,7 @@ Stopka dla wszystkich: wersja reguł z `part1_submitted.payload.rulesVersion`, g
 **File**: `src/seed/absences.ts` (nowy), `src/seed.ts` (jedno wywołanie), `src/timeline.ts`
 
 **Intent**: Wersja 5-minutowa pokazuje oś Ewy ze zmianą oceniającego, więc powstają razem dane i ich wyświetlenie.
-- Dane: `src/seed/absences.ts` dopisuje `seedEvent("appraiser_changed", ewaCycle, joanna, { from_id: poprzedni naczelnik, to_id: Marek })` z datą 2024-12-05 (przejęcie wydziału, `demo.md`). Data jest po potwierdzeniu części I Ewy (03.12.2024) i przed pierwszym dniem pokazu (09.12.2024). Moduł nie zmienia `cycles.appraiser_id`: Marek jest oceniającym Ewy od początku w `src/seed/base.ts` (F-01). Moduł jest wołany z `runSeed(db, options)`; S-03 dopisuje w `src/seed.ts` jedno wywołanie, jako ostatnie (po `base`, `part1`, `notes`, `assessments`).
+- Dane: `src/seed/absences.ts` dopisuje `seedEvent("appraiser_changed", ewaCycle, joanna, { from_id: previousHead, to_id: marek }, "2024-12-05")` (data jako piąty argument; przejęcie wydziału, `demo.md`; `previousHead` to poprzedni naczelnik). Moduł korzysta z połączenia z `getDb()`. Data jest po potwierdzeniu części I Ewy (03.12.2024) i przed pierwszym dniem pokazu (09.12.2024). Moduł nie zmienia `cycles.appraiser_id`: Marek jest oceniającym Ewy od początku w `src/seed/base.ts` (F-01). Moduł jest wołany z `runSeed(db, options)`; S-03 dopisuje w `src/seed.ts` jedno wywołanie, jako ostatnie (po `base`, `part1`, `notes`, `assessments`).
 - Wyświetlenie: `buildTimeline` zamienia widoczne `appraiser_changed` na wpis „Zmiana oceniającego: <from> → <to>. Kryteria bez zmian” z przepisem § 9 ust. 3 rozporządzenia, tylko w widoku kadr i oceniającego.
 
 **Contract**: po `bun run seed` przy dacie 2024-12-09 oś Ewy na koncie Marka ma wpis 05.12.2024 z „§ 9 ust. 3”; na koncie Ewy go nie ma; `cycles.appraiser_id` Ewy wskazuje Marka przed wywołaniem modułu i po nim.
@@ -223,7 +230,7 @@ Stopka dla wszystkich: wersja reguł z `part1_submitted.payload.rulesVersion`, g
 
 **File**: `src/seed/absences.ts`
 
-**Intent**: Nieobecności Piotra nie są wgrywane: Joanna wpisuje je na żywo w kroku 3. Moduł wgrywa wiersz `absences` 2026-02-16–2026-08-28, `excused = 1`, `recorded_on = 2026-08-28`, `recorded_by` = Joanna, oraz `absence_recorded` z datą 2026-08-28. Wpis jest retrospektywny i odsłania się w dniu końca nieobecności, nie wcześniej (decyzja 10i).
+**Intent**: Nieobecności Piotra nie są wgrywane: Joanna wpisuje je na żywo w kroku 3. Moduł wgrywa przez `getDb()` wiersz `absences` 2026-02-16–2026-08-28, `excused = 1`, `recorded_on = 2026-08-28`, `recorded_by` = Joanna, oraz `seedEvent("absence_recorded", ewaCycle, joanna, { absence_id, notified: [marek, ewa] }, "2026-08-28")`. Wpis jest retrospektywny i odsłania się w dniu końca nieobecności, nie wcześniej (decyzja 10i).
 
 **Contract**: po `bun run seed`: przy dacie 2026-08-27 oś Ewy nie ma nieobecności, a termin to 20.11.2026; przy 2026-08-28 i 2026-08-29 jest nieobecność i termin 02.06.2027.
 
@@ -243,7 +250,7 @@ Stopka dla wszystkich: wersja reguł z `part1_submitted.payload.rulesVersion`, g
 
 **Uwaga dla S-04:** autoryzacja notatki w cyklu idzie za `cycles.appraiser_id`, a nie za `people.supervisor_id` (ten tylko dla osoby bez cyklu, jak Maria); odczyt notatki zostaje ograniczony do autora, więc dawny oceniający nadal czyta swoje notatki, a nowy ich nie widzi.
 
-**Contract**: `GET /cycles/:id/appraiser`; `POST /cycles/:id/appraiser` (pole `appraiser_id`) → 303 na `/cycles/:id/timeline`; ten sam oceniający albo osoba spoza listy → 422 bez zapisu; brak roli `hr` → 403; cykl, który nie jest już otwarty → 409 bez zapisu.
+**Contract**: `GET /cycles/:id/appraiser`; `POST /cycles/:id/appraiser` (pole `appraiser_id`) → 303 na `/cycles/:id/timeline`; ten sam oceniający albo osoba spoza listy → 422 bez zapisu; brak roli `hr` → 403; `openCycle(cycles.person_id)` nie zwraca tego cyklu → 409 bez zapisu.
 
 ### Success Criteria:
 
@@ -277,7 +284,7 @@ Stopka dla wszystkich: wersja reguł z `part1_submitted.payload.rulesVersion`, g
 **Intent**: Pozycje listy spraw liczone z `effectiveDeadline` przy bieżącej dacie systemowej (nic nie jest zapisywane), dla oceniającego i ocenianego otwartego cyklu (`openCycle`):
 - gdy `today()` jest w oknie `[date − assessmentReminderDays, date]`: „Termin oceny Piotra Wójcika: 30.12.2026 (art. 81 ust. 4 i 7 ustawy). Przypomnienie na 30 dni przed terminem: ustawienie urzędu”, z odnośnikiem do osi;
 - gdy termin jest przedłużony: „Termin oceny przesunięty z 27.11.2026 na 30.12.2026 z powodu nieobecności dłuższej niż miesiąc (art. 81 ust. 7 ustawy)”. Zdanie mówi o terminie, nie o pracowniku; bez dat i długości nieobecności.
-Dla kadr nic (mają `/hr`).
+Dla kadr nic (mają `/hr`). Po widocznym `assessment_approved` przypomnienia o terminie tej oceny nie ma: ocena jest sporządzona, a jej termin jest zamrożony w migawce.
 
 **Contract**: funkcja przekazana do `registerHomeTasks` zwraca `{ text, basis, href }[]`.
 
@@ -312,12 +319,13 @@ Dla kadr nic (mają `/hr`).
 - oceniający i oceniany: `POST /cycles/:id/absences` → 403, nic nie zapisane; zły zakres dat → 422, nic nie zapisane; cykl zamknięty → 409, nic nie zapisane;
 - decyzja 10m: `absences` nie ma kolumny rodzaju (`PRAGMA table_info`), formularz nie ma pola rodzaju, `POST` z dodatkowym polem `type=urlop` zapisuje wiersz, w którym tej wartości nie ma w żadnej kolumnie ani w payloadzie `absence_recorded`;
 - zasada 7: na formularzu nieobecności przy nazwisku osoby nie stoi liczba ani etykieta;
-- wydruk: `GET /cycles/:id/sheet` otwartego cyklu Piotra po dwóch wpisach pokazuje 30.12.2026; wydruk zatwierdzonej oceny pokazuje `AssessmentSnapshot.deadline` i nie zmienia się po wpisaniu nieobecności po dniu zatwierdzenia.
+- wydruk: `GET /cycles/:id/sheet` otwartego cyklu Piotra po dwóch wpisach pokazuje 30.12.2026; wydruk zatwierdzonej oceny pokazuje `AssessmentSnapshot.deadline` i nie zmienia się po wpisaniu nieobecności po dniu zatwierdzenia;
+- termin po zatwierdzeniu: `createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } })`, w przygotowaniu `seedEvent("assessment_approved", piotrCycle, marek, buildAssessmentSnapshot(piotrCycle, draft, { asOf: "2026-11-20" }), "2026-11-20")`; potem kadry wpisują 05.10–16.10.2026 i 19.10–06.11.2026 → oba `POST` 303 (cykl nadal otwarty), wiersze są w `absences`; oś kadr pokazuje termin 27.11.2026 z migawki, bez 30.12.2026, i nieobecność 05.10.2026–06.11.2026 ze zdaniem „Ocena jest już zatwierdzona, jej termin się nie zmienia”; oś Piotra pokazuje 27.11.2026.
 
 `src/routes/timeline.test.ts` przez `app.request()` na `createTestApp({ today })`:
 - oś: oceniany, oceniający i kadry → 200; osoba spoza cyklu (Tomasz) → 403; oceniany nie widzi dat nieobecności ani zmiany oceniającego, oceniający i kadry widzą;
 - zasada 7: w nagłówku osi i we wpisach przy nazwisku osoby nie stoi liczba ani etykieta; liczba dni występuje tylko we wpisie nieobecności;
-- `cycleLinks` dla kadr zawiera formularz i oś, dla ocenianego tylko oś; oś dla kadr zawiera „Wpisz kolejną nieobecność”;
+- `cycleLinks(cycle, joanna)` zawiera `/cycles/:id/timeline` i `/cycles/:id/absences`; `cycleLinks(cycle, piotr)` zawiera `/cycles/:id/timeline` i nie zawiera `/cycles/:id/absences` ani `/cycles/:id/appraiser` (odnośniki wcześniejszych plastrów mogą być na liście); oś dla kadr zawiera „Wpisz kolejną nieobecność”;
 - zmiana oceniającego Ewy z danych: wpis z „§ 9 ust. 3” na koncie Marka, brak na koncie Ewy;
 - widoczność (10i): nieobecność Ewy przy 2026-08-27, 2026-08-28, 2026-08-29.
 
@@ -358,10 +366,11 @@ Ręcznie: krok 3 pokazu i oś Ewy z wersji 5-minutowej, na komputerze i telefoni
 - [ ] 1.4 Ten sam termin 30.12.2026 w `effectiveDeadline`, na `/hr` i na osi po dwóch wpisach
 - [ ] 1.5 Ścieżka `/hr` → „Wpisz nieobecność” → oś → drugi wpis bez `/cycles/:id/part1`, odpowiedzi 303; oceniany widzi termin i podstawę bez dat nieobecności
 - [ ] 1.6 Brak rodzaju nieobecności w tabeli, formularzu i zapisie; brak liczb i etykiet przy nazwisku
+- [ ] 1.7 Po widocznym `assessment_approved` oś pokazuje termin z migawki, a później wpisana nieobecność zapisuje się (303) ze zdaniem o niezmienionym terminie; cykl zamknięty 409, walidacja 422
 
 #### Manual
 
-- [ ] 1.7 Krok 3 pokazu na koncie Joanny i ten sam termin w wierszu Piotra na `/hr`
+- [ ] 1.8 Krok 3 pokazu na koncie Joanny i ten sam termin w wierszu Piotra na `/hr`
 
 ### Phase 2: Dane Ewy, cudze zdarzenia na osi, zmiana oceniającego
 

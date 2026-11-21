@@ -12,7 +12,7 @@ F-01 daje silnik (`validateAdditionalCriteria`, `criteriaTalkDeadline`), tabele 
 
 ## Desired End State
 
-Przy 9.12.2024 Marek ma sprawę z terminem 27.12.2024 (§ 7 pkt 1), wypełnia i przekazuje część I z terminem oceny 27.11.2026 (z `effectiveDeadline`); Część I jest zablokowana od przekazania (uproszczenie z kontraktu). Piotr potwierdza, system wpisuje miejscowość, datę i nazwisko. Ewa i Tomasz mają po seedzie potwierdzoną część I; z opcją `afterStep1` także Piotr, jak po kroku 1.
+Przy 9.12.2024 Marek ma sprawę z terminem 27.12.2024 (§ 7 pkt 1), wypełnia i przekazuje część I z terminem oceny 27.11.2026 (przed przekazaniem z `effectiveDeadline`, po przekazaniu z `part1_submitted.payload.dueDate` jako „Termin przekazany w części I”); część I jest zablokowana od przekazania (uproszczenie z kontraktu). Piotr potwierdza, system wpisuje miejscowość, datę i nazwisko. Ewa i Tomasz mają po seedzie potwierdzoną część I; z opcją `afterStep1` także Piotr, jak po kroku 1.
 
 ## Key Decisions Made
 
@@ -21,7 +21,8 @@ Przy 9.12.2024 Marek ma sprawę z terminem 27.12.2024 (§ 7 pkt 1), wypełnia i 
 | Źródło podpowiedzi | tabela „rodzaj obowiązku → kryterium” w `rules/office-settings.json`, „ustawienie urzędu” | decyzja autora, bez rozumienia tekstu | decisions 6b |
 | Miejsce podpowiedzi | wejście `suggestCriteria` we wspólnym `src/suggestions/index.ts` | jedno wymienne miejsce | AGENTS.md zasada 5, przegląd 18 |
 | Podpowiedzi zaznaczone z góry | nie, tylko na górze listy ze zdaniem „dlaczego” | nic nie zapisuje się bez kliknięcia | Plan |
-| Termin oceny | nigdy w `cycles`; ekrany czytają `effectiveDeadline`, `part1_submitted.payload.dueDate` to migawka | jedno źródło terminu | kontrakt, przegląd 8 |
+| Termin oceny | nigdy w `cycles`; ekran części I przed przekazaniem czyta `effectiveDeadline`, po przekazaniu `part1_submitted.payload.dueDate` jako „Termin przekazany w części I” | jedno źródło na każdą sytuację (tabela „Skąd ekran bierze termin oceny”) | kontrakt, przegląd 8 |
+| Arkusz | `savePart1` dobiera go z `people.position_kind` przez `sheetForPosition`, bez argumentu; `src/seed/part1.ts` ustawia `position_kind` każdej osobie z `base.ts` | arkusz zawsze wynika ze stanowiska | kontrakt |
 | Termin rozmowy o kryteriach | `criteriaTalkDeadline` z danymi `cycle_started` (sporządzenie i wynik poprzedniej oceny) | 7 dni po negatywnej, bez stałej 30 | przegląd 16 |
 | Przekazanie | `submitPart1(cycleId, actorId, input)` sprawdza aktora, stan i dane, po czym w jednej transakcji woła `savePart1(cycleId, actorId, input, today())` | brak zapisu połowicznego; dane pokazowe zapisują część I Ewy przez `savePart1` z historycznym aktorem i datą | przegląd 13, kontrakt |
 | Kadry | w wersji minimalnej 403 i bez odnośnika; odnośnik „Część I” dla `hr` dopiero z widokiem do odczytu (faza 2) | odnośnik tylko dla ról, które trasa `GET` wpuszcza | kontrakt |
@@ -37,7 +38,7 @@ Przy 9.12.2024 Marek ma sprawę z terminem 27.12.2024 (§ 7 pkt 1), wypełnia i 
 
 ## Architecture / Approach
 
-Czyste funkcje w `src/engine/criteria.ts`, wejście podpowiedzi w `src/suggestions/index.ts`, logika w `src/cycles/part1.ts`, trasy w `src/routes/cycle-start.tsx`, jeden widok części I `src/views/part1.tsx` plus `LegalBasis` i `ConfirmationBlock` (z właściwością `kind` pod wariant fikcji z S-02) w `src/views/components.tsx`.
+Czyste funkcje w `src/engine/criteria.ts`, wejście podpowiedzi w `src/suggestions/index.ts`, logika w `src/cycles/part1.ts`, trasy w `src/routes/cycle-start.tsx`, jeden widok części I `src/views/part1.tsx` plus `LegalBasis` i `ConfirmationBlock` (od początku z oboma wariantami: `confirmation` i `fiction`; S-02 i S-06 tylko go używają) w `src/views/components.tsx`.
 
 ## Phases at a Glance
 
@@ -56,4 +57,4 @@ Czyste funkcje w `src/engine/criteria.ts`, wejście podpowiedzi w `src/suggestio
 ## Success Criteria (Summary)
 
 - Krok 1 pokazu przechodzi na dwóch kontach, przy 1440 px i 360 px.
-- `bun test` zielony, w tym test transakcji `submitPart1`, testy `savePart1` i opcji `afterStep1`, terminu po ocenie negatywnej i braku słowa „podpis”.
+- `bun test` zielony, w tym test transakcji `submitPart1`, testy `savePart1` i opcji `afterStep1`, terminu po ocenie negatywnej, renderowania obu wariantów `ConfirmationBlock` i braku słowa „podpis”.

@@ -19,7 +19,7 @@ Na koncie Marka „1” przy Rzetelności daje ocenę negatywną mimo średniej 
 | Decision | Choice | Why (1 sentence) | Source |
 | --- | --- | --- | --- |
 | Zapis stanu oceny | tylko zdarzenia w `events` (szkic, zatwierdzenie, potwierdzenie, fikcja), bez nowej tabeli | konwencja projektu i filtr dat z decyzji 10i działają bez wyjątków | Plan |
-| Zatwierdzenie | migawka `AssessmentSnapshot` z `periodFrom` = `cycles.period_start`, `deadline` z `effectiveDeadline` na dzień zatwierdzenia, `grade` i `gradeAwardedOn` z `currentGrade` na dzień zatwierdzenia i wersją reguł | historia i wydruk (S-06) bez przeliczania, FR-033 | Recenzja, ustalenie 8 |
+| Zatwierdzenie | migawka `AssessmentSnapshot` z `periodFrom` = `cycles.period_start`, `deadline` z `effectiveDeadline` na dzień zatwierdzenia, `grade` i `gradeAwardedOn` z `currentGrade` na dzień zatwierdzenia i wersją reguł `{ version, effectiveFrom, act }`; składa ją tylko `buildAssessmentSnapshot`; po zatwierdzeniu termin oceny jest zamrożony w migawce | historia i wydruk (S-06) bez przeliczania, FR-033 | Recenzja, ustalenie 8 |
 | Termin sprzeciwu | liczony raz przy potwierdzeniu albo fikcji, czytany z payloadu | zegar nie zmienia terminu przy przesuwaniu daty | Recenzja, ustalenie 15 |
 | Kontrole serwera | aktor, potwierdzona część I, dokładny zestaw ocen, IPRZ, uzasadnienie, wniosek o stopień; zdarzenie końcowe w transakcji | żądanie może ominąć formularz; najwyżej jedno zdarzenie końcowe | Recenzja, ustalenie 13 |
 | Blokady | jedna czysta funkcja `approvalBlockers` dla ekranu i serwera | te same komunikaty i przepisy w obu miejscach | Plan |
@@ -37,7 +37,7 @@ Na koncie Marka „1” przy Rzetelności daje ocenę negatywną mimo średniej 
 
 ## Architecture / Approach
 
-`src/engine/approval.ts` (czyste blokady) → `src/assessment/state.ts` (etap oceny z `visibleEvents`) → `src/routes/assessment.tsx` (ekran, zapis, zatwierdzenie, potwierdzenie, fikcja, podgląd) → `src/views/assessment.tsx` i `src/views/acknowledgement-fiction.tsx` we wspólnym układzie z `slots` dla S-04.
+`src/engine/approval.ts` (czyste blokady) → `src/assessment/state.ts` (etap oceny z `visibleEvents`) → `src/assessment/snapshot.ts` (`buildAssessmentSnapshot(cycleId, draft, { asOf })`, jedyne miejsce składania migawki; woła je zatwierdzenie i moduł danych S-06) → `src/routes/assessment.tsx` (ekran, zapis, zatwierdzenie, potwierdzenie, fikcja, podgląd) → `src/views/assessment.tsx` i `src/views/acknowledgement-fiction.tsx` we wspólnym układzie z `slots` dla S-04.
 
 ## Phases at a Glance
 
@@ -52,7 +52,7 @@ Na koncie Marka „1” przy Rzetelności daje ocenę negatywną mimo średniej 
 
 ## Open Risks & Assumptions
 
-- Oba potwierdzenia i wpis o fikcji rysuje `ConfirmationBlock` z S-01; S-02 dopisuje wariant fikcji przez `kind`.
+- Oba potwierdzenia i wpis o fikcji rysuje `ConfirmationBlock` z S-01, który ma od początku oba warianty (`kind: "confirmation"` i `kind: "fiction"`); S-02 tylko go używa.
 - Kolejność cięcia (od końca): data rozmowy oceniającej, podgląd na żywo, pole wniosku o stopień. Fikcja z ekranem skutku i wgląd kadr są potrzebne do wersji 5-minutowej pokazu: powstają zaraz po wersji minimalnej i wypadają ostatnie.
 
 ## Success Criteria (Summary)

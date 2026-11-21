@@ -29,7 +29,7 @@ Marek zapisuje notatkę na 360 px; pole „Zmiana zadań pracownika” zaznacza 
 
 ## Scope
 
-**In scope:** tabele i 16 notatek pokazowych; formularz notatki; „Moje notatki”; adapter z regułami; notatki i ostrzeżenie „z ostatniego miesiąca” przy kryteriach; „Wstaw do uzasadnienia”; karta rozmowy oceniającej z odnośnikami; potem (faza 3, trasy `/notes/:id/feedback` i `/feedback`) „Przekaż pracownikowi”, ekran „Informacja zwrotna”, drugie „Wstaw”, data notatki, ostrzeżenie o ocenie skrajnej.
+**In scope:** tabele i 16 notatek pokazowych; formularz notatki; „Moje notatki”; adapter z regułami; notatki i ostrzeżenie „z ostatniego miesiąca” przy kryteriach; „Wstaw do uzasadnienia”; karta rozmowy oceniającej z odnośnikami; potem (faza 3) „Przekaż pracownikowi” razem z ekranem „Informacja zwrotna” (trasy `GET/POST /notes/:id/feedback` i `GET /feedback` w jednym kroku, cięte razem), drugie „Wstaw”, data notatki, ostrzeżenie o ocenie skrajnej.
 
 **Out of scope:** pytanie HR partnera, „Przed rozmową”, przypomnienie o docenianiu, ekran „Skąd biorą się podpowiedzi” (S-05); edycja i usuwanie notatek; style (design system autora); model językowy.
 

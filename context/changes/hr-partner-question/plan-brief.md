@@ -24,11 +24,11 @@ Po notatce ze zmianą zadań Marek odpowiada na „To stała zmiana zadań?” i
 | Część I Piotra w testach i próbach | `createTestApp({ today, seedOptions: { afterStep1: true } })`, w pełnym pokazie z `liveStep2: true`; ręcznie `bun run seed -- --after-step-1 --live-step-2` | Domyślne dane zostawiają Piotra bez części I; żaden test nie przepisuje wgranych danych. |
 | Data zmiany | data notatki (11.03.2026), nie 9.03 z tekstu | System nie czyta treści notatek. |
 | Forma rozwoju | `suggestDevelopmentForm(note)` w `src/suggestions/index.ts`: pierwsza z katalogu pasująca do kryterium notatki, inaczej jedyna forma z `default: true` | Miejsce 5 z decyzji 9 w jednym wymiennym miejscu podpowiedzi (zasada 5). |
-| „Przekaż pracownikowi” w karcie docenienia | tylko gdy istnieją trasy `GET/POST /notes/:id/feedback` (S-04, faza 3) | Bez nich karta nie ma tego działania. |
+| „Przekaż pracownikowi” w karcie docenienia | tylko gdy istnieją wszystkie trzy trasy informacji zwrotnej S-04 (faza 3): `GET /notes/:id/feedback`, `POST /notes/:id/feedback`, `GET /feedback` | Bez nich karta nie ma tego działania. |
 | Zapis | tylko zdarzenie `task_change_answered` przez `recordEvent` po kliknięciu | „Nic nie zapisuje się bez kliknięcia”. |
 | Odnośniki | `registerCycleLinks` na `GET /cycles/:id/part1`, `registerHomeTasks` na `GET /` | Wspólne miejsca z kontraktu, bez ręcznego wpisywania adresów. |
 | Odmiana imion | `content/name-forms.json` z zdaniem zastępczym | Zdania z decyzji 10k wymagają przypadków. |
-| Odczyty cudzych danych | jeden plik `src/hr-partner/data.ts`, tylko przez `notesAbout`, `notesByAuthor`, `lastFeedbackDate`, `cycleCriteria`, `visibleEvents` | Rozbieżność z kodem poprawia się w jednym miejscu. |
+| Odczyty cudzych danych | jeden plik `src/hr-partner/data.ts`, tylko przez `notesAbout`, `noteById`, `lastFeedbackDate`, `cycleCriteria`, `visibleEvents` | Rozbieżność z kodem poprawia się w jednym miejscu. |
 | Progi | 90 dni docenianie, 6 miesięcy bez notatek, „ustawienie urzędu” | Brak progów w przepisach; 6 miesięcy z przykładu 10k. |
 
 ## Scope

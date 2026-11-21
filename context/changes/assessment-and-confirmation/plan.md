@@ -21,7 +21,7 @@ Na koncie Marka, przy cyklu Piotra z potwierdzoną częścią I, ekran oceny pok
 
 - `computeAssessment` rzuca wyjątek przy pustym zbiorze i punktach spoza skali (dziś `src/silnik/ocena.ts:73`); wynik liczy się więc tylko wtedy, gdy każde kryterium cyklu ma ocenę, a wcześniej ekran pokazuje „Wynik pojawi się, gdy każde kryterium będzie miało ocenę”.
 - `justificationRequired` już niesie regułę § 11 ust. 3 (dziś `src/silnik/ocena.ts:62`); blokada uzasadnienia korzysta z niej, nie liczy jej drugi raz.
-- `objectionDeadline` przesuwa koniec na dzień roboczy (dziś `src/silnik/terminy.ts:101`), więc data może wypaść później niż 7 dni kalendarzowych: potwierdzenie 21.11.2026 (sobota) albo 22.11.2026 (niedziela) daje 30.11.2026. Ekran pokazuje datę z silnika, a zdanie „7 dni” bierze wartość z pliku reguł.
+- `objectionDeadline` przesuwa koniec na dzień roboczy (dziś `src/silnik/terminy.ts:101`), więc data może wypaść później niż 7 dni kalendarzowych: potwierdzenie 21.11.2026 (sobota) albo 22.11.2026 (niedziela) daje 30.11.2026. Ekran pokazuje datę z silnika, a zdanie „7 dni” bierze wartość z klucza `deadlines.objectionDays` pliku reguł (`value`, podstawa z `basis`).
 - Średnia jest porównywana na liczbach całkowitych, bez zaokrągleń; ekran tylko wyświetla ją z dwoma miejscami po przecinku.
 
 ## What We're NOT Doing
@@ -38,7 +38,9 @@ Na koncie Marka, przy cyklu Piotra z potwierdzoną częścią I, ekran oceny pok
 
 ## Implementation Approach
 
-Stan oceny to wyłącznie wiersze w `events` (bez nowej tabeli), zgodnie z decyzją 10i: szkic to ostatnie widoczne `assessment_draft_saved`, a zatwierdzenie, potwierdzenie i fikcja to osobne zdarzenia zapisane przez `recordEvent` z datą `today()`. Odczyt idzie wyłącznie przez `visibleEvents(cycleId)`. Zatwierdzenie zapisuje pełną migawkę oceny (punkty, wynik, teksty, okres, termin na dzień zatwierdzenia, stopień z datą jego przyznania, wersja reguł), żeby historia i wydruk (S-06) niczego nie przeliczały, a ocena pamiętała swoją wersję reguł (FR-033). Termin sprzeciwu liczy się raz, przy zapisie potwierdzenia albo fikcji, i jest odtąd czytany z payloadu tego zdarzenia.
+Stan oceny to wyłącznie wiersze w `events` (bez nowej tabeli), zgodnie z decyzją 10i: szkic to ostatnie widoczne `assessment_draft_saved`, a zatwierdzenie, potwierdzenie i fikcja to osobne zdarzenia zapisane przez `recordEvent` z datą `today()`. Odczyt idzie wyłącznie przez `visibleEvents(cycleId)`. Zatwierdzenie zapisuje pełną migawkę oceny (punkty, wynik, teksty, okres, termin na dzień zatwierdzenia, stopień z datą jego przyznania, wersja reguł), żeby historia i wydruk (S-06) niczego nie przeliczały, a ocena pamiętała swoją wersję reguł (FR-033). Migawkę składa wyłącznie `buildAssessmentSnapshot(cycleId, draft, { asOf })`. Od widocznego `assessment_approved` termin tej oceny jest zamrożony w `AssessmentSnapshot.deadline` i ekrany tego plastra pokazują odtąd tę wartość, nie `effectiveDeadline`. Termin sprzeciwu liczy się raz, przy zapisie potwierdzenia albo fikcji, i jest odtąd czytany z payloadu tego zdarzenia.
+
+Zapis do oceny wymaga otwartego cyklu: po widocznym `assessment_acknowledged` albo `acknowledgement_fiction` każda trasa zapisu tego plastra odpowiada 409. Rozstrzygnięcie sprzeciwu i odnotowanie przyznania stopnia następują po zamknięciu cyklu, należą do S-06 i ten plaster ich nie blokuje.
 
 Wynik liczy wyłącznie silnik na serwerze. Zapis następuje tylko po kliknięciu „Zapisz”, „Zatwierdź ocenę”, „Potwierdzam zapoznanie z oceną” albo „Zapisz wpis” (zasada „nic bez kliknięcia człowieka”). Każda trasa zapisu sprawdza na serwerze aktora, etap i dane, niezależnie od tego, co pokazał formularz. Sprawdzenie etapu i zapis zdarzenia końcowego dzieją się w jednej transakcji SQLite, więc powtórzone albo konkurencyjne żądania zostawiają najwyżej jedno `assessment_approved` i najwyżej jedno z pary `assessment_acknowledged` / `acknowledgement_fiction`.
 
@@ -47,7 +49,7 @@ Ekrany (wygląd z design systemu autora, wspólny układ z F-01):
 - ekran „Ocena” w trybie edycji (oceniający przed zatwierdzeniem), podglądu (po zatwierdzeniu: oceniający, oceniany, kadry) albo ze zdaniem zamiast formularza (brak potwierdzonej części I; oceniany przed zatwierdzeniem);
 - ekran skutku fikcji zapoznania;
 - komponenty w `src/views/assessment.tsx`: wiersz kryterium z wyborem punktów, ramka wyniku, lista blokad, zegar sprzeciwu;
-- oba potwierdzenia (oceniającego i ocenianego) i wpis o fikcji rysuje `ConfirmationBlock` z `src/views/components.tsx` (tworzy S-01). Ten plaster nie definiuje własnego bloku potwierdzenia; w fazie 2 dopisuje do `ConfirmationBlock` wariant fikcji przez jego właściwość `kind`, bez zmiany istniejących właściwości. S-06 tylko używa tego wariantu.
+- oba potwierdzenia (oceniającego i ocenianego) i wpis o fikcji rysuje `ConfirmationBlock` z `src/views/components.tsx` (tworzy S-01). `ConfirmationBlock` ma od S-01 oba warianty: `kind: "confirmation"` (`name, place, date`) i `kind: "fiction"` (`name, reason, deliveryMethod, deliveredOn, date`). Ten plaster tylko go używa: nie definiuje własnego bloku i niczego w komponencie nie zmienia.
 
 ### Wersja minimalna (ok. 50 minut)
 
@@ -55,6 +57,7 @@ Kroki 4 i 5 pokazu działają od początku do końca; wynik pokazuje się po „
 
 - podstawy prawne blokad w pliku reguł; `approvalBlockers` ze wszystkimi blokadami, także regułą wniosku o stopień (czysta logika z testem);
 - `assessmentState` z etapem i terminem sprzeciwu czytanym z payloadu;
+- `buildAssessmentSnapshot(cycleId, draft, { asOf })` z testem: jedyne miejsce składania migawki;
 - `GET/POST /cycles/:id/assessment`, `POST /cycles/:id/assessment/approve`, `POST /cycles/:id/assessment/acknowledge` z pełnymi kontrolami serwera i transakcją;
 - widok edycji i podglądu z ramką wyniku po „Zapisz”, potwierdzeniami w `ConfirmationBlock`, zegarem sprzeciwu i pustymi `slots` dla S-04;
 - pozycje listy spraw (`registerHomeTasks`) i odnośnik „Ocena” na ekranie części I (`registerCycleLinks`) dla oceniającego i ocenianego, bo bez nich Piotr nie trafi do oceny z telefonu; kadry w wersji minimalnej dostają 403 i nie mają odnośnika;
@@ -79,7 +82,7 @@ Same nazwy z kontraktu wspólnego.
 **F-01:**
 
 - Tabele: `people(id, name, role, position_title, unit, supervisor_id, has_account, appointed, civil_service_grade, grade_awarded_on)`, role `appraiser`, `employee`, `hr`, `admin`; `cycles(id, person_id, appraiser_id, period_start, sheet)`; `events(id, type, cycle_id, actor_id, date, payload)`; `settings(key, value)` z kluczem `office_city`.
-- Funkcje: `today()`, `currentPerson(c)`, `recordEvent(type, cycleId, actorId, payload)`, `seedEvent(...)` (tylko testy i dane), `visibleEvents(cycleId)` (zdarzenia z `date <= today()`, porządek `(date, id)`), `effectiveDeadline(cycleId)` z `src/cycles.ts` zwracające `{ date, basis: string[] }`, `openCycle(personId)` z `src/cycles.ts`, `currentGrade(personId)` z `src/people.ts` zwracające `{ grade, awardedOn }`, `registerHomeTasks(fn)` z `src/home-tasks.ts`, `registerCycleLinks(fn)` z `src/cycle-links.ts`, `rulesVersion()`.
+- Funkcje: `today()`, `currentPerson(c)`, `recordEvent(type, cycleId, actorId, payload)` (data `today()`), `seedEvent(type, cycleId, actorId, payload, date)` (data jest ostatnim argumentem; tylko dane pokazowe i przygotowanie testów, nigdy trasy), `visibleEvents(cycleId, { asOf })` (zdarzenia z `date <= today()` albo `<= asOf`, porządek `(date, id)`), `effectiveDeadline(cycleId, { asOf })` z `src/cycles.ts` zwracające `{ date, basis: string[] }`, `openCycle(personId)` z `src/cycles.ts`, `currentGrade(personId, { asOf })` z `src/people.ts` zwracające `{ grade, awardedOn }`, `registerHomeTasks(fn)` z `src/home-tasks.ts`, `registerCycleLinks(fn)` z `src/cycle-links.ts`, `rulesVersion()` zwracające `{ version, effectiveFrom, act }`. Wszystkie funkcje biorą połączenie z bazą z `getDb()` w `src/db.ts`; funkcje tego plastra nie przyjmują argumentu `db`.
 - Silnik: `computeAssessment(scores)`, `mandatoryCriteria(sheet)`, `criterion(id)` z `src/engine/scoring.ts`; `objectionDeadline` z `src/engine/deadlines.ts`; plik `rules/regulation-2016-470.json`.
 - Układ `src/views/layout.tsx`, statyczne pliki z `public/`, `createTestApp({ today, seedOptions })` z `src/test-helpers.ts`.
 - **Cykl osoby** pochodzi wyłącznie z `openCycle(personId)` (lista spraw, wejście ocenianego do oceny). Cykl przestaje być otwarty z chwilą widocznego `assessment_acknowledged` albo `acknowledgement_fiction`; od tej chwili `openCycle` go nie zwraca, a ekran oceny tego cyklu jest dostępny dalej pod `/cycles/:id/assessment` (trasa bierze cykl z adresu).
@@ -90,7 +93,7 @@ Same nazwy z kontraktu wspólnego.
 - `cycle_criteria(cycle_id, criterion_id, kind, expectation)` wypełnione dla cyklu; lista kryteriów oceny to te wiersze w kolejności: obowiązkowe (`kind = mandatory`, w kolejności `mandatoryCriteria(sheet)`), potem dodatkowe (`kind = additional`). Ta lista jest dokładnym zestawem, który musi mieć oceny.
 - Zdarzenie `part1_confirmed` `{ place, appraiseeName }`. Bez widocznego `part1_confirmed` ekran oceny pokazuje „Ocena nie może powstać bez potwierdzonej części I” i nie ma formularza, a trasy zapisu odmawiają (PRD, Business Logic).
 - `GET /cycles/:id/part1` to ekran wejściowy cyklu z `cycleLinks`; tam ten plaster dokłada odnośnik „Ocena”.
-- `src/views/components.tsx` z `ConfirmationBlock` (miejscowość, data, nazwisko); ten plaster go używa i dopisuje wariant fikcji (faza 2).
+- `src/views/components.tsx` z `ConfirmationBlock` w obu wariantach: `kind: "confirmation"` (`name, place, date`) i `kind: "fiction"` (`name, reason, deliveryMethod, deliveredOn, date`); ten plaster tylko go używa.
 - `src/seed/part1.ts`: pełna część I bieżącego cyklu Tomasza (potrzebna testowi wniosku o stopień); z opcją `afterStep1` także przekazana i potwierdzona 2024-12-09 część I Piotra z kryteriami dodatkowymi `orientacja-na-klienta` i `myslenie-analityczne`.
 
 **S-06 (później, nie warunek tego plastra):** `src/seed/assessments.ts` wgrywa oceny Tomasza jako pełne łańcuchy zdarzeń w kształcie migawki `AssessmentSnapshot` z sekcji niżej; zdarzenie `mandatory_grade_awarded` `{ personId, fromGrade, toGrade, basis }` zmienia bieżący stopień.
@@ -106,24 +109,24 @@ Same nazwy z kontraktu wspólnego.
   - `scores: Record<criterionId, number>`,
   - `justification: string`,
   - `developmentConclusions: string`,
-  - `interviewDate: string` (data ISO; bez pola na ekranie `today()` z dnia zatwierdzenia),
+  - `interviewDate: string` (data ISO; bez pola na ekranie data migawki),
   - `gradeRequest: { attached: boolean, motivation: string, targetGrade: number | null }` (`targetGrade` = stopień o jeden wyższy niż `grade`, gdy `attached`, inaczej `null`),
   - `sheet: string` (z `cycles.sheet`),
   - `criteria: { id: string, name: string, kind: "mandatory" | "additional", score: number }[]` w kolejności arkusza,
   - `result: { mean, overallLevel, outcome, reasons, justificationRequired }` (wynik `computeAssessment`),
   - `periodFrom: string` = `cycles.period_start` (dla Piotra 2024-11-27),
-  - `periodTo: string` = data zatwierdzenia,
-  - `deadline: { date: string, basis: string[] }` = `effectiveDeadline(cycleId)` w dniu zatwierdzenia,
-  - `grade: number | null` = `currentGrade(personId).grade` w dniu zatwierdzenia (`null` u osoby nie mianowanej),
-  - `gradeAwardedOn: string | null` = `currentGrade(personId).awardedOn` w dniu zatwierdzenia (`null` u osoby nie mianowanej albo gdy data nie jest znana),
-  - `rulesVersion: { version, effectiveFrom, act }` = `rulesVersion()`,
-  - `confirmation: { place: string, date: string, name: string }` oceniającego (`place` z `settings.office_city`, `date` = data zatwierdzenia, `name` = `people.name` oceniającego).
-  Actor: oceniający. S-06 wgrywa historyczne oceny w `src/seed/assessments.ts` dokładnie w tym kształcie.
+  - `periodTo: string` = data migawki,
+  - `deadline: { date: string, basis: string[] }` = `effectiveDeadline(cycleId, { asOf })` na datę migawki; od widocznego `assessment_approved` to jedyne źródło terminu tej oceny na ekranach,
+  - `grade: number | null` = `currentGrade(personId, { asOf }).grade` na datę migawki (`null` u osoby nie mianowanej),
+  - `gradeAwardedOn: string | null` = `currentGrade(personId, { asOf }).awardedOn` na datę migawki (`null` u osoby nie mianowanej albo gdy data nie jest znana),
+  - `rulesVersion: { version, effectiveFrom, act }` = `rulesVersion()`; ten sam obiekt co `part1_submitted.payload.rulesVersion`,
+  - `confirmation: { place: string, date: string, name: string }` oceniającego (`place` z `settings.office_city`, `date` = data migawki, `name` = `people.name` oceniającego).
+  Data migawki to `asOf`, a bez `asOf` `today()`, czyli dzień zatwierdzenia. Actor: oceniający. Migawkę składa wyłącznie `buildAssessmentSnapshot` (niżej); S-06 wgrywa historyczne oceny w `src/seed/assessments.ts`, wołając tę funkcję z historyczną datą.
 - Zdarzenie `assessment_acknowledged`, payload `{ place, date, name, objectionDeadline }` (`place` z `settings.office_city`, `date` = `today()`, `name` = `people.name` ocenianego, `objectionDeadline` = `objectionDeadline(today())`). Actor: oceniany.
 - Zdarzenie `acknowledgement_fiction`, payload `{ reason, deliveryMethod, deliveredOn, objectionDeadline }`: `reason` = `could_not` | `would_not` (etykiety „nie mógł” / „nie chciał”), `deliveryMethod` = `in_person` | `post` | `email` (osobiście, pocztą, pocztą elektroniczną), `deliveredOn` = data doręczenia kopii arkusza, `objectionDeadline` = `objectionDeadline(today())`. Actor: oceniający.
 - Trasy: `GET /cycles/:id/assessment`, `POST /cycles/:id/assessment` (zapis szkicu), `POST /cycles/:id/assessment/preview` (fragment wyniku i blokad, bez zapisu), `POST /cycles/:id/assessment/approve`, `POST /cycles/:id/assessment/acknowledge`, `GET /cycles/:id/assessment/fiction` (ekran skutku), `POST /cycles/:id/assessment/fiction`.
 - Wpisy do wspólnych list: `registerHomeTasks` (oceniający: „Wystaw ocenę: <imię i nazwisko>” w etapie `draft`, „Czeka na potwierdzenie zapoznania: <imię i nazwisko>” w etapie `approved`; oceniany: „Zapoznaj się z oceną” w etapie `approved`; bez wyniku i liczb przy nazwisku) oraz `registerCycleLinks` (odnośnik „Ocena” do `/cycles/:id/assessment` dla oceniającego i dla ocenianego od `approved`; dla roli `hr` od `approved` dopiero w fazie 2, w kroku wglądu kadr, bo wcześniej trasa `GET` odpowiada kadrom 403).
-- `buildAssessmentSnapshot(cycleId, draft, { asOf })`: jedyne miejsce, które składa migawkę `AssessmentSnapshot`; woła je zatwierdzenie (bez `asOf`) i moduł danych S-06 (z historyczną datą).
+- `buildAssessmentSnapshot(cycleId, draft, { asOf })` w `src/assessment/snapshot.ts`: jedyne miejsce, które składa migawkę `AssessmentSnapshot`; woła je zatwierdzenie (bez `asOf`) i moduł danych S-06 (z historyczną datą). Z `asOf` czyta `effectiveDeadline(cycleId, { asOf })` i `currentGrade(personId, { asOf })`. Funkcja niczego nie zapisuje.
 - `approvalBlockers(input): Blocker[]` w `src/engine/approval.ts` (czysta), `Blocker = { field, message, basis }`; tamże `gradeRequestOptions(...)`.
 - `assessmentState(cycleId)` w `src/assessment/state.ts`: `{ stage: "no_part1" | "draft" | "approved" | "acknowledged" | "fiction", draft, snapshot, acknowledgement, fiction, objectionDeadline }`. `draft` to payload ostatniego `assessment_draft_saved` albo `null`; zapisane oceny cząstkowe są w `assessmentState(cycleId).draft.scores` (S-04 czyta je do ostrzeżenia). S-06 bierze stąd etap do ekranu kadr i migawkę do wydruku.
 
@@ -170,7 +173,15 @@ Pomocniczo `gradeRequestOptions({ appointed, grade, outcome }): "not_applicable"
 
 **Contract**: `assessmentState(cycleId)` jak w „Co ten plaster udostępnia”. Etapy: bez widocznego `part1_confirmed` → `no_part1`; potem `draft` (także bez żadnego szkicu); `assessment_approved` → `approved`; pierwsze z `assessment_acknowledged` / `acknowledgement_fiction` → `acknowledged` albo `fiction`. Szkic to ostatnie `assessment_draft_saved` w porządku `(date, id)`. `objectionDeadline` to wartość z payloadu zdarzenia potwierdzenia albo fikcji, bez ponownego liczenia; przed tym zdarzeniem `null`.
 
-#### 4. Trasy oceny i potwierdzenia
+#### 4. Migawka oceny
+
+**File**: `src/assessment/snapshot.ts`, `src/assessment/snapshot.test.ts`
+
+**Intent**: Jedno miejsce, które ze szkicu i danych cyklu składa `AssessmentSnapshot`, żeby zatwierdzenie na żywo i historyczne oceny wgrywane przez S-06 miały ten sam kształt i te same reguły. Wersja minimalna: pełna lista pól z „Co ten plaster udostępnia”, bez niczego więcej.
+
+**Contract**: `buildAssessmentSnapshot(cycleId, draft: AssessmentDraft, { asOf }?: { asOf?: string }): AssessmentSnapshot`. Data migawki to `asOf`, a bez niego `today()`. Czyta `cycles` i `cycle_criteria`, `computeAssessment(draft.scores)`, `effectiveDeadline(cycleId, { asOf })`, `currentGrade(cycles.person_id, { asOf })`, `rulesVersion()`, `setting("office_city")` i `people.name` oceniającego. Niczego nie zapisuje i nie sprawdza blokad (to robi wołający). Zatwierdzenie woła ją bez `asOf`; moduł `src/seed/assessments.ts` (S-06) z historyczną datą.
+
+#### 5. Trasy oceny i potwierdzenia
 
 **File**: `src/routes/assessment.tsx`, rejestracja w `src/index.tsx`
 
@@ -179,20 +190,20 @@ Pomocniczo `gradeRequestOptions({ appointed, grade, outcome }): "not_applicable"
 **Contract**:
 
 - `GET /cycles/:id/assessment`: oceniający (`cycles.appraiser_id`) widzi formularz w etapie `draft`, podgląd w dalszych; oceniany (`cycles.person_id`) widzi podgląd od `approved`, wcześniej zdanie „Ocena nie jest jeszcze zatwierdzona”; inni, w tym rola `hr`, dostają 403 (wgląd kadr dochodzi w fazie 2). Przy `no_part1` zdanie z Business Logic i brak formularza.
-- Kontrole wspólne dla `POST /cycles/:id/assessment` i `POST /cycles/:id/assessment/approve`: aktor = `cycles.appraiser_id`, inaczej 403; widoczne `part1_confirmed`, inaczej 409; etap `draft`, inaczej 409; każda ocena przy kryterium z `cycle_criteria` i z wartością ze skali, inaczej 400.
+- Kontrole wspólne dla `POST /cycles/:id/assessment` i `POST /cycles/:id/assessment/approve`: aktor = `cycles.appraiser_id`, inaczej 403; widoczne `part1_confirmed`, inaczej 409; etap `draft`, inaczej 409 (także po potwierdzeniu albo fikcji, gdy cykl nie jest już otwarty); każda ocena przy kryterium z `cycle_criteria` i z wartością ze skali, inaczej 422 z formularzem.
 - `POST /cycles/:id/assessment`: zapisuje `assessment_draft_saved` i przekierowuje na ekran (303), gdzie ramka wyniku pokazuje wynik ze szkicu.
-- `POST /cycles/:id/assessment/approve`: zapisuje szkic z formularza (kliknął człowiek), potem w jednej transakcji sprawdza ponownie etap i `approvalBlockers` dla stopnia z `currentGrade(cycles.person_id)`; gdy lista jest pusta, zapisuje `assessment_approved` z migawką i przekierowuje (303); w przeciwnym razie 422 z formularzem i listą blokad. Wniosek o stopień przysłany, gdy `gradeRequestOptions` daje `not_applicable` albo `no_only`, to blokada (422), nie cicho pominięte pole.
+- `POST /cycles/:id/assessment/approve`: zapisuje szkic z formularza (kliknął człowiek), potem w jednej transakcji sprawdza ponownie etap i `approvalBlockers` dla stopnia z `currentGrade(cycles.person_id)`; gdy lista jest pusta, zapisuje `assessment_approved` z migawką z `buildAssessmentSnapshot(cycleId, draft)` (bez `asOf`) i przekierowuje (303); w przeciwnym razie 422 z formularzem i listą blokad. Wniosek o stopień przysłany, gdy `gradeRequestOptions` daje `not_applicable` albo `no_only`, to blokada (422), nie cicho pominięte pole.
 - `POST /cycles/:id/assessment/acknowledge`: aktor = `cycles.person_id`, inaczej 403; w jednej transakcji etap `approved`, inaczej 409; zapisuje `assessment_acknowledged` z `objectionDeadline(today())`.
 
-#### 5. Widok oceny i zegar sprzeciwu
+#### 6. Widok oceny i zegar sprzeciwu
 
 **File**: `src/views/assessment.tsx`
 
-**Intent**: Jeden widok w trybie edycji i podglądu. W edycji: kryteria w kolejności arkusza (obowiązkowe, potem dodatkowe) z wyborem punktów i nazwą poziomu przy każdej wartości; ramka wyniku pod kryteriami, liczona z ostatniego szkicu; uzasadnienie ze zdaniem „Ten tekst przeczyta pracownik” (decyzja 10f) i oznaczeniem „wymagane przy ocenie negatywnej, § 11 ust. 3”, które zmienia się na „wymagane” przy wyniku negatywnym; „Wnioski do indywidualnego programu rozwoju zawodowego” zawsze wymagane; lista blokad nad przyciskami; przyciski „Zapisz” i „Zatwierdź ocenę”. W podglądzie: te same dane z migawki bez pól, potwierdzenie oceniającego w `ConfirmationBlock` (miejscowość, data, nazwisko z `snapshot.confirmation`), a u ocenianego w etapie `approved` oświadczenie z arkusza („Potwierdzam odbycie rozmowy oceniającej oraz zapoznanie z oceną i wnioskami do indywidualnego programu rozwoju zawodowego.”) i przycisk „Potwierdzam zapoznanie z oceną”; po potwierdzeniu potwierdzenie ocenianego w `ConfirmationBlock` (z payloadu `assessment_acknowledged`) i zegar sprzeciwu.
+**Intent**: Jeden widok w trybie edycji i podglądu. W edycji: kryteria w kolejności arkusza (obowiązkowe, potem dodatkowe) z wyborem punktów i nazwą poziomu przy każdej wartości; ramka wyniku pod kryteriami, liczona z ostatniego szkicu; uzasadnienie ze zdaniem „Ten tekst przeczyta pracownik” (decyzja 10f) i oznaczeniem „wymagane przy ocenie negatywnej, § 11 ust. 3”, które zmienia się na „wymagane” przy wyniku negatywnym; „Wnioski do indywidualnego programu rozwoju zawodowego” zawsze wymagane; lista blokad nad przyciskami; przyciski „Zapisz” i „Zatwierdź ocenę”. W podglądzie: te same dane z migawki bez pól, w tym termin oceny z `snapshot.deadline` (od widocznego `assessment_approved` termin jest zamrożony w migawce i ekrany tego plastra nie czytają już `effectiveDeadline`, więc nieobecność wpisana później go nie zmienia), potwierdzenie oceniającego w `ConfirmationBlock` (miejscowość, data, nazwisko z `snapshot.confirmation`), a u ocenianego w etapie `approved` oświadczenie z arkusza („Potwierdzam odbycie rozmowy oceniającej oraz zapoznanie z oceną i wnioskami do indywidualnego programu rozwoju zawodowego.”) i przycisk „Potwierdzam zapoznanie z oceną”; po potwierdzeniu potwierdzenie ocenianego w `ConfirmationBlock` (z payloadu `assessment_acknowledged`) i zegar sprzeciwu.
 
-**Contract**: `AssessmentView({ mode: "edit" | "view", state, criteria, person, viewer, blockers, slots })`, `slots: Slots` jak w „Miejscach dla S-04”. Oba potwierdzenia rysuje `ConfirmationBlock` z `src/views/components.tsx` z istniejącymi właściwościami S-01; ten plik nie definiuje własnego bloku potwierdzenia. `ResultPanel({ result | missing })` w elemencie `id="assessment-result"`: średnia (dwa miejsca po przecinku), poziom ogólny, „Ocena pozytywna” albo „Ocena negatywna”, `reasons` z paragrafami, nazwa aktu i wersja reguł. `ObjectionClock({ deadline, today })` z terminem z `assessmentState`: przed terminem „Sprzeciw do dyrektora generalnego urzędu możesz złożyć do <DD.MM.RRRR>. Zostało <n> dni. Art. 83 ust. 1 ustawy o służbie cywilnej.”; w ostatnim dniu „Dziś jest ostatni dzień na sprzeciw (<DD.MM.RRRR>).”; po terminie „Termin na sprzeciw minął <DD.MM.RRRR>.”; przed zdarzeniem potwierdzenia albo fikcji zegara nie ma. Zegar widzą oceniany i oceniający, a od fazy 2 także kadry. Wynik jest tylko na tym ekranie; listy spraw i nagłówki z nazwiskiem nie pokazują wyniku ani liczb.
+**Contract**: `AssessmentView({ mode: "edit" | "view", state, criteria, person, viewer, blockers, slots })`, `slots: Slots` jak w „Miejscach dla S-04”. Oba potwierdzenia rysuje `ConfirmationBlock` z `src/views/components.tsx` w wariancie `kind: "confirmation"` (`name, place, date`); ten plik nie definiuje własnego bloku potwierdzenia. `ResultPanel({ result | missing })` w elemencie `id="assessment-result"`: średnia (dwa miejsca po przecinku), poziom ogólny, „Ocena pozytywna” albo „Ocena negatywna”, `reasons` z paragrafami, nazwa aktu i wersja reguł. `ObjectionClock({ deadline, today })` z terminem z `assessmentState`: przed terminem „Sprzeciw do dyrektora generalnego urzędu możesz złożyć do <DD.MM.RRRR>. Zostało <n> dni. Art. 83 ust. 1 ustawy o służbie cywilnej.”; w ostatnim dniu „Dziś jest ostatni dzień na sprzeciw (<DD.MM.RRRR>).”; po terminie „Termin na sprzeciw minął <DD.MM.RRRR>.”; przed zdarzeniem potwierdzenia albo fikcji zegara nie ma. Zegar widzą oceniany i oceniający, a od fazy 2 także kadry. Wynik jest tylko na tym ekranie; listy spraw i nagłówki z nazwiskiem nie pokazują wyniku ani liczb.
 
-#### 6. Lista spraw i odnośnik z części I
+#### 7. Lista spraw i odnośnik z części I
 
 **File**: `src/assessment/home.ts` (rejestracje przy starcie aplikacji)
 
@@ -206,10 +217,11 @@ Pomocniczo `gradeRequestOptions({ appointed, grade, outcome }): "not_applicable"
 
 - Testy reguł zatwierdzenia przechodzą: `bun test src/engine/approval.test.ts`
 - Testy stanu oceny przechodzą: `bun test src/assessment/state.test.ts`
-- Testy tras oceny przechodzą: `bun test src/routes/assessment.test.ts` (scenariusze kroku 4: „1” przy Rzetelności i „7” przy pozostałych po „Zapisz” daje na ekranie „Ocena negatywna” i „powyżej oczekiwań”; zatwierdzenie bez wniosków do IPRZ → 422 i brak `assessment_approved`; z wnioskami, bez uzasadnienia przy wyniku negatywnym → 422; komplet → 303 i migawka z kompletem pól `AssessmentSnapshot`, w tym `periodFrom` = 2024-11-27, `deadline` równym `effectiveDeadline(cycleId)` w dniu zatwierdzenia (bez nieobecności Piotra 2026-11-27), `grade` = `null`, `gradeAwardedOn` = `null` i `rulesVersion`). Testy zaczynające od daty 2026-11-21 biorą potwierdzoną część I Piotra z `createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } })`
+- Testy migawki przechodzą: `bun test src/assessment/snapshot.test.ts` (bez `asOf` migawka ma `periodTo`, `confirmation.date` i `deadline` z dnia `today()`; z historycznym `asOf` ma `deadline` = `effectiveDeadline(cycleId, { asOf })` oraz `grade` i `gradeAwardedOn` = `currentGrade(personId, { asOf })`, także gdy po dacie `asOf` jest zdarzenie `mandatory_grade_awarded` (migawka go nie uwzględnia); `rulesVersion` to obiekt `{ version, effectiveFrom, act }`; funkcja nie zmienia liczby zdarzeń)
+- Testy tras oceny przechodzą: `bun test src/routes/assessment.test.ts` (scenariusze kroku 4: „1” przy Rzetelności i „7” przy pozostałych po „Zapisz” daje na ekranie „Ocena negatywna” i „powyżej oczekiwań”; zatwierdzenie bez wniosków do IPRZ → 422 i brak `assessment_approved`; z wnioskami, bez uzasadnienia przy wyniku negatywnym → 422; komplet → 303 i migawka z kompletem pól `AssessmentSnapshot`, w tym `periodFrom` = 2024-11-27, `deadline` równym `effectiveDeadline(cycleId)` w dniu zatwierdzenia (bez nieobecności Piotra 2026-11-27), `grade` = `null`, `gradeAwardedOn` = `null` i `rulesVersion` = `{ version, effectiveFrom, act }`; po zatwierdzeniu podgląd pokazuje termin z `snapshot.deadline`). Testy zaczynające od daty 2026-11-21 biorą potwierdzoną część I Piotra z `createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } })`
 - Test etykiet przechodzi (ten sam plik): na ekranie oceny w trybie edycji i podglądu, na liście spraw i na ekranie części I element z imieniem i nazwiskiem ocenianego nie zawiera liczby, średniej, poziomu ani etykiety wyniku (zasada 7 z `AGENTS.md`); wynik stoi tylko w elemencie `id="assessment-result"`
-- Testy bezpośrednich żądań przechodzą (te same pliki): zapis i zatwierdzenie przez osobę inną niż oceniający → 403; bez widocznego `part1_confirmed` → 409 i brak formularza na ekranie; ocena przy kryterium spoza cyklu albo wartość 4 → 422; brak oceny przy jednym kryterium przy zatwierdzeniu → 422; w każdym z tych przypadków brak `assessment_approved`; wniosek o stopień u Piotra → 422; dwa kolejne `approve` z kompletem → drugie 409, jedno `assessment_approved`; zapis szkicu po zatwierdzeniu → 409
-- Test wniosku o stopień przechodzi: cykl Tomasza przy dacie 2026-11-10 (część I z `src/seed/part1.ts`, przed oceną z 12.11.2026); wynik pozytywny i wniosek bez umotywowania → 422, z umotywowaniem → zatwierdzone z `targetGrade` o jeden wyższym; ten sam wniosek przy wyniku negatywnym → 422; po wgranym w teście (`seedEvent`) zdarzeniu `mandatory_grade_awarded` z pełnym payloadem `{ personId: <Tomasz>, fromGrade: 8, toGrade: 9, basis }` → `currentGrade` zwraca 9 i wniosek → 422; migawka zatwierdzonej oceny Tomasza ma `grade` i `gradeAwardedOn` równe `currentGrade` z dnia zatwierdzenia
+- Testy bezpośrednich żądań przechodzą (te same pliki): zapis i zatwierdzenie przez osobę inną niż oceniający → 403; bez widocznego `part1_confirmed` → 409 i brak formularza na ekranie; ocena przy kryterium spoza cyklu albo wartość 4 → 422; brak oceny przy jednym kryterium przy zatwierdzeniu → 422; w każdym z tych przypadków brak `assessment_approved`; wniosek o stopień u Piotra → 422; dwa kolejne `approve` z kompletem → drugie 409, jedno `assessment_approved`; zapis szkicu po zatwierdzeniu → 409; zapis szkicu i `approve` po potwierdzeniu przez Piotra → 409. Żaden błąd walidacji nie odpowiada 400
+- Test wniosku o stopień przechodzi: cykl Tomasza przy dacie 2026-11-10 (część I z `src/seed/part1.ts`, przed oceną z 12.11.2026); wynik pozytywny i wniosek bez umotywowania → 422, z umotywowaniem → zatwierdzone z `targetGrade` o jeden wyższym; ten sam wniosek przy wyniku negatywnym → 422; po wgranym w teście zdarzeniu `seedEvent("mandatory_grade_awarded", <cykl Tomasza>, <aktor>, { personId: <Tomasz>, fromGrade: 5, toGrade: 9, basis }, "2026-11-10")` → `currentGrade` zwraca 9 i wniosek → 422; migawka zatwierdzonej oceny Tomasza ma `grade` i `gradeAwardedOn` równe `currentGrade` z dnia zatwierdzenia
 - Testy potwierdzenia i zegara przechodzą: potwierdzenie przez Piotra przy dacie 2026-11-22 zapisuje `objectionDeadline` = 2026-11-30 i ekran pokazuje 30.11.2026; potwierdzenie 2026-11-21 daje również 2026-11-30; po przesunięciu daty na 2026-11-30 ekran mówi „ostatni dzień”, na 2026-12-01 „Termin na sprzeciw minął 30.11.2026”, a payload się nie zmienia; w etapie `approved` zegara nie ma; potwierdzenie przez Marka → 403; przed zatwierdzeniem → 409; drugie potwierdzenie → 409 i jedno zdarzenie
 - Wszystkie testy przechodzą: `bun test`
 
@@ -224,11 +236,11 @@ Pomocniczo `gradeRequestOptions({ appointed, grade, outcome }): "not_applicable"
 
 #### 1. Fikcja zapoznania
 
-**File**: `src/routes/assessment.tsx`, `src/views/acknowledgement-fiction.tsx`, `src/views/components.tsx` (wariant fikcji w `ConfirmationBlock`)
+**File**: `src/routes/assessment.tsx`, `src/views/acknowledgement-fiction.tsx`
 
-**Intent**: Oceniający widzi przycisk „Stwierdź fikcję zapoznania” od razu po zatwierdzeniu, dopóki oceniany nie potwierdził (decyzja 10n). Przycisk prowadzi na ekran skutku: „Urząd przyjmuje dzisiejszy dzień jako dzień zapoznania. Od dziś system liczy 7 dni na sprzeciw” (liczba z pliku reguł; brzmienie z decyzji 11a, ekran nie mówi „termin biegnie”), data końca terminu z silnika, zdanie, że kadry zobaczą wpis, wymagany wybór „nie mógł potwierdzić” albo „nie chciał potwierdzić” oraz wymagane pola „Jak doręczono kopię arkusza” (osobiście, pocztą, pocztą elektroniczną) i „Kiedy” (§ 12 ust. 2 rozporządzenia, decyzja 11a). Zapis tylko po wyborze i kliknięciu „Zapisz wpis”; obok „Wróć bez zapisu”. Po zapisie przycisk ocenianego znika, a w podglądzie oceny jest wpis „Stwierdzono fikcję zapoznania <data>: oceniany nie mógł / nie chciał potwierdzić. Kopia arkusza doręczona <data> (<sposób>). Stwierdził: <oceniający>” i zegar sprzeciwu z terminem z payloadu, opisany jako liczony od dnia przyjętego przez urząd jako dzień zapoznania.
+**Intent**: Oceniający widzi przycisk „Stwierdź fikcję zapoznania” od razu po zatwierdzeniu, dopóki oceniany nie potwierdził (decyzja 10n). Przycisk prowadzi na ekran skutku: „Urząd przyjmuje dzisiejszy dzień jako dzień zapoznania. Od dziś system liczy 7 dni na sprzeciw” (liczba z `deadlines.objectionDays.value`; brzmienie z decyzji 11a, ekran nie mówi „termin biegnie”), data końca terminu z silnika, zdanie, że kadry zobaczą wpis, wymagany wybór „nie mógł potwierdzić” albo „nie chciał potwierdzić” oraz wymagane pola „Jak doręczono kopię arkusza” (osobiście, pocztą, pocztą elektroniczną) i „Kiedy” (§ 12 ust. 2 rozporządzenia, decyzja 11a). Zapis tylko po wyborze i kliknięciu „Zapisz wpis”; obok „Wróć bez zapisu”. Po zapisie przycisk ocenianego znika, a w podglądzie oceny jest wpis „Stwierdzono fikcję zapoznania <data>: oceniany nie mógł / nie chciał potwierdzić. Kopia arkusza doręczona <data> (<sposób>). Stwierdził: <oceniający>” i zegar sprzeciwu z terminem z payloadu, opisany jako liczony od dnia przyjętego przez urząd jako dzień zapoznania.
 
-**Contract**: `GET /cycles/:id/assessment/fiction` (ekran skutku; tylko oceniający, tylko etap `approved`, inaczej 403 albo 409). `POST /cycles/:id/assessment/fiction` z polami `reason` (`could_not` | `would_not`), `deliveryMethod` (`in_person` | `post` | `email`) i `deliveredOn` (data ISO nie wcześniejsza niż data zatwierdzenia i nie późniejsza niż `today()`): aktor inny niż oceniający → 403; brak albo inna wartość `reason` → 422 z tym samym ekranem i komunikatem „Wybierz, czy oceniany nie mógł, czy nie chciał potwierdzić”; brak albo zła wartość pól doręczenia → 422 z komunikatem „Wpisz, jak i kiedy doręczono kopię arkusza”; w jednej transakcji etap `approved`, inaczej 409; zapisuje `acknowledgement_fiction` `{ reason, deliveryMethod, deliveredOn, objectionDeadline: objectionDeadline(today()) }`. Wpis o fikcji w podglądzie rysuje `ConfirmationBlock` w wariancie fikcji: ten plaster dopisuje do komponentu nową wartość właściwości `kind` (wariant wpisu o fikcji z powodem, sposobem i datą doręczenia oraz nazwiskiem oceniającego), bez zmiany istniejących właściwości i istniejącego wyglądu. S-06 używa tego wariantu bez zmian.
+**Contract**: `GET /cycles/:id/assessment/fiction` (ekran skutku; tylko oceniający, tylko etap `approved`, inaczej 403 albo 409). `POST /cycles/:id/assessment/fiction` z polami `reason` (`could_not` | `would_not`), `deliveryMethod` (`in_person` | `post` | `email`) i `deliveredOn` (data ISO nie wcześniejsza niż data zatwierdzenia i nie późniejsza niż `today()`): aktor inny niż oceniający → 403; brak albo inna wartość `reason` → 422 z tym samym ekranem i komunikatem „Wybierz, czy oceniany nie mógł, czy nie chciał potwierdzić”; brak albo zła wartość pól doręczenia → 422 z komunikatem „Wpisz, jak i kiedy doręczono kopię arkusza”; w jednej transakcji etap `approved`, inaczej 409; zapisuje `acknowledgement_fiction` `{ reason, deliveryMethod, deliveredOn, objectionDeadline: objectionDeadline(today()) }` i przekierowuje (303). Wpis o fikcji w podglądzie rysuje istniejący wariant `ConfirmationBlock` z S-01: `kind: "fiction"` z `reason`, `deliveryMethod`, `deliveredOn` z payloadu i `date` = data zdarzenia `acknowledgement_fiction`; nazwisko oceniającego („Stwierdził: …”) pochodzi z `actor_id` zdarzenia. Ten plaster komponentu nie zmienia.
 
 #### 2. Wgląd kadr
 
@@ -267,7 +279,7 @@ Pomocniczo `gradeRequestOptions({ appointed, grade, outcome }): "not_applicable"
 
 **Intent**: Po każdej zmianie punktów albo pól tekstowych formularz wysyła się w tle na `POST /cycles/:id/assessment/preview` i podmienia ramkę wyniku i listę blokad. Bez skryptu ekran działa jak w wersji minimalnej. Skrypt to kilkanaście linii zwykłego JavaScriptu w `public/assessment.js`, serwowanego lokalnie (bez CDN i bez biblioteki).
 
-**Contract**: `POST /cycles/:id/assessment/preview`: tylko oceniający (inaczej 403), zwraca fragment `ResultPanel` + lista blokad, nic nie zapisuje. Skrypt podmienia element `id="assessment-result"` i niczego nie zapisuje.
+**Contract**: `POST /cycles/:id/assessment/preview`: tylko oceniający (inaczej 403); niczego nie zapisuje, więc odpowiada 200 z fragmentem HTML (`ResultPanel` + lista blokad), nigdy przekierowaniem 303. Oceny spoza kryteriów cyklu albo spoza skali pokazuje jako blokady w tym fragmencie. Skrypt podmienia element `id="assessment-result"` i niczego nie zapisuje.
 
 #### 3. Pole „Data rozmowy oceniającej”
 
@@ -275,13 +287,13 @@ Pomocniczo `gradeRequestOptions({ appointed, grade, outcome }): "not_applicable"
 
 **Intent**: Pole `interviewDate` domyślnie `today()`, nie późniejsze niż `today()`; trafia do szkicu i migawki.
 
-**Contract**: data spoza zakresu → 422 przy zapisie.
+**Contract**: data spoza zakresu → 422 z formularzem przy zapisie szkicu i przy zatwierdzeniu.
 
 ### Success Criteria:
 
 #### Automated Verification:
 
-- Testy dodatków przechodzą: `bun test src/routes/assessment.test.ts` (podgląd z „1” przy Rzetelności zwraca „Ocena negatywna” i nie zmienia liczby zdarzeń; podgląd przez Piotra → 403; formularz Tomasza ma pole wniosku o stopień, formularz Piotra go nie ma; `interviewDate` z przyszłości → 400)
+- Testy dodatków przechodzą: `bun test src/routes/assessment.test.ts` (podgląd z „1” przy Rzetelności odpowiada 200, zwraca „Ocena negatywna” i nie zmienia liczby zdarzeń; podgląd przez Piotra → 403; formularz Tomasza ma pole wniosku o stopień, formularz Piotra go nie ma; `interviewDate` z przyszłości → 422 i brak zdarzenia)
 - Wszystkie testy przechodzą: `bun test`
 
 #### Manual Verification:
@@ -292,7 +304,8 @@ Pomocniczo `gradeRequestOptions({ appointed, grade, outcome }): "not_applicable"
 
 - **Czysta logika** (`src/engine/approval.test.ts`): każda blokada osobno i komplet bez blokad; uzasadnienie wymagane tylko przy wyniku negatywnym (przypadek „1” przy średniej powyżej 4 i przypadek średniej równej dokładnie 4); teksty z samych spacji traktowane jako puste; zestaw ocen różny od zestawu kryteriów (brak jednego, jedno nadmiarowe); wniosek o stopień: pracownik, urzędnik z wynikiem negatywnym, urzędnik ze stopniem IX, urzędnik bez umotywowania, urzędnik z umotywowaniem; `approvalBlockers` dostaje stopień jako argument (z `currentGrade` liczy go wołający).
 - **Stan oceny** (`src/assessment/state.test.ts`): kolejność etapów; ostatni szkic wygrywa; zdarzenie z datą późniejszą niż `today()` jest niewidoczne (decyzja 10i); `objectionDeadline` czytany z payloadu, nie przeliczany (test z payloadem celowo różnym od wyniku silnika).
-- **Trasy** (`src/routes/assessment.test.ts`) przez `app.request()` na `createTestApp({ today })`, konto ustawiane ciasteczkiem, datę przesuwa `POST /demo/date`. Testy zaczynające od późniejszej daty biorą potwierdzoną część I Piotra z `createTestApp({ today, seedOptions: { afterStep1: true } })` i nie dopisują `cycle_criteria` ani zdarzeń części I własnym kodem; test `no_part1` używa danych domyślnych (Piotr bez części I). Jedyne zdarzenie wgrywane w teście to `mandatory_grade_awarded` z pełnym payloadem `{ personId, fromGrade, toGrade, basis }`. Każdy test zapisu sprawdza także zdarzenia w `events`, nie tylko kod odpowiedzi. Wniosek o stopień (FR-023) jest sprawdzany tylko testem, na bieżącym cyklu Tomasza przy dacie 2026-11-10.
+- **Migawka** (`src/assessment/snapshot.test.ts`): komplet pól bez `asOf` i z historycznym `asOf`; termin i stopień czytane na datę `asOf`; brak zapisu.
+- **Trasy** (`src/routes/assessment.test.ts`) przez `app.request()` na `createTestApp({ today })`, konto ustawiane ciasteczkiem, datę przesuwa `POST /demo/date`. Testy zaczynające od późniejszej daty biorą potwierdzoną część I Piotra z `createTestApp({ today, seedOptions: { afterStep1: true } })` i nie dopisują `cycle_criteria` ani zdarzeń części I własnym kodem; test `no_part1` używa danych domyślnych (Piotr bez części I). Jedyne zdarzenie wgrywane w teście to `mandatory_grade_awarded` przez `seedEvent(type, cycleId, actorId, payload, date)` z pełnym payloadem `{ personId, fromGrade, toGrade, basis }`. Każdy błąd walidacji ma jeden kod: 422. Każdy test zapisu sprawdza także zdarzenia w `events`, nie tylko kod odpowiedzi. Wniosek o stopień (FR-023) jest sprawdzany tylko testem, na bieżącym cyklu Tomasza przy dacie 2026-11-10.
 - **Ręcznie**: kroki 4 i 5 pokazu na prawdziwej aplikacji, telefon 360 px i komputer 1440 px; fikcja w osobnym przebiegu od czystych danych.
 
 ## Open Questions
@@ -301,7 +314,7 @@ Pomocniczo `gradeRequestOptions({ appointed, grade, outcome }): "not_applicable"
 
 1. **Czy po fikcji oceniany może jeszcze potwierdzić?** Domyślnie: nie; pierwsze z dwóch zdarzeń zamyka etap, a oceniany widzi wpis o fikcji i zegar.
 2. **Czy „Wstaw” z notatek działa także we wnioskach do IPRZ?** FR-021 i roadmapa S-04 mówią o uzasadnieniu i wnioskach, decyzja 10f tylko o uzasadnieniu. Domyślnie: ten plaster daje miejsce `conclusionsTools`, decyzję podejmuje S-04.
-3. **Liczba dni w zegarze, gdy termin przesunął się na dzień roboczy.** Domyślnie: ekran skutku fikcji mówi „7 dni” (zdanie z decyzji 11a), a datę końca podaje z silnika, więc może być późniejsza niż 7 dni kalendarzowych.
+3. **Liczba dni w zegarze, gdy termin przesunął się na dzień roboczy.** Domyślnie: ekran skutku fikcji mówi „7 dni” (zdanie z decyzji 11a, liczba z `deadlines.objectionDays.value`), a datę końca podaje z silnika, więc może być późniejsza niż 7 dni kalendarzowych.
 
 ## References
 
@@ -323,17 +336,18 @@ Pomocniczo `gradeRequestOptions({ appointed, grade, outcome }): "not_applicable"
 
 - [ ] 1.1 Testy reguł zatwierdzenia przechodzą: `bun test src/engine/approval.test.ts`
 - [ ] 1.2 Testy stanu oceny przechodzą: `bun test src/assessment/state.test.ts`
-- [ ] 1.3 Testy tras oceny przechodzą: `bun test src/routes/assessment.test.ts`
-- [ ] 1.4 Test etykiet przechodzi
-- [ ] 1.5 Testy bezpośrednich żądań przechodzą
-- [ ] 1.6 Test wniosku o stopień przechodzi
-- [ ] 1.7 Testy potwierdzenia i zegara przechodzą
-- [ ] 1.8 Wszystkie testy przechodzą: `bun test`
+- [ ] 1.3 Testy migawki przechodzą: `bun test src/assessment/snapshot.test.ts`
+- [ ] 1.4 Testy tras oceny przechodzą: `bun test src/routes/assessment.test.ts`
+- [ ] 1.5 Test etykiet przechodzi
+- [ ] 1.6 Testy bezpośrednich żądań przechodzą
+- [ ] 1.7 Test wniosku o stopień przechodzi
+- [ ] 1.8 Testy potwierdzenia i zegara przechodzą
+- [ ] 1.9 Wszystkie testy przechodzą: `bun test`
 
 #### Manual
 
-- [ ] 1.9 Kroki 4 i 5 pokazu: wynik negatywny po „Zapisz”, blokada bez wniosków do IPRZ, potwierdzenie Piotra z zegarem 30.11.2026, 360 px i 1440 px
-- [ ] 1.10 Na żadnym ekranie nie pada słowo „podpis”, a przy nazwisku ocenianego nie ma wyniku ani etykiety poza ekranem oceny
+- [ ] 1.10 Kroki 4 i 5 pokazu: wynik negatywny po „Zapisz”, blokada bez wniosków do IPRZ, potwierdzenie Piotra z zegarem 30.11.2026, 360 px i 1440 px
+- [ ] 1.11 Na żadnym ekranie nie pada słowo „podpis”, a przy nazwisku ocenianego nie ma wyniku ani etykiety poza ekranem oceny
 
 ### Phase 2: Fikcja zapoznania i wgląd kadr
 
