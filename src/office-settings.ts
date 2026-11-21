@@ -7,6 +7,8 @@ export type OfficeSettings = {
   note: string;
   dutyTypes: DutyType[];
   dutyToCriterion: Record<string, string>;
+  taskChangeWords: string[];
+  recentFactsWindowMonths: number;
 };
 
 let checked = false;

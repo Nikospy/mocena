@@ -1,0 +1,74 @@
+import { getDb } from "../db";
+import { openCycle } from "../cycles";
+import { today } from "../settings";
+import type { SuggestionSource } from "../suggestions/types";
+
+export type Rating = "good" | "needs_improvement";
+export type Note = {
+  id: number; author_id: string; subject_id: string; cycle_id: string | null; criterion_id: string;
+  date: string; text: string; rating: Rating | null; task_change: number; suggested_task_change: number | null;
+  suggestion_source: SuggestionSource; created_at: string;
+};
+export type FeedbackMessage = { id: number; note_id: number; author_id: string; recipient_id: string; sent_on: string; text: string };
+
+/** Zapis: oceniający otwartego cyklu osoby; bez cyklu — jej przełożony (`people.supervisor_id`). */
+export function canWriteNoteAbout(viewerId: string, subjectId: string): boolean {
+  const cycle = openCycle(subjectId);
+  if (cycle) return cycle.appraiser_id === viewerId;
+  const row = getDb().query("SELECT supervisor_id FROM people WHERE id = ?").get(subjectId) as { supervisor_id: string | null } | null;
+  return !!row && row.supervisor_id === viewerId;
+}
+
+export function noteById(id: number): Note | null {
+  return (getDb().query("SELECT * FROM notes WHERE id = ? AND date <= ?").get(id, today()) as Note | null) ?? null;
+}
+
+export function notesAbout(subjectId: string, opts: { authorId: string; from?: string }): Note[] {
+  return getDb()
+    .query("SELECT * FROM notes WHERE subject_id = ? AND author_id = ? AND date >= ? AND date <= ? ORDER BY date, id")
+    .all(subjectId, opts.authorId, opts.from ?? "", today()) as Note[];
+}
+
+export function notesByAuthor(authorId: string): Note[] {
+  return getDb().query("SELECT * FROM notes WHERE author_id = ? AND date <= ? ORDER BY date DESC, id DESC").all(authorId, today()) as Note[];
+}
+
+export function notesForCycle(cycleId: string, authorId: string): Note[] {
+  const c = getDb().query("SELECT person_id, period_start FROM cycles WHERE id = ?").get(cycleId) as
+    | { person_id: string; period_start: string }
+    | null;
+  if (!c) return [];
+  return notesAbout(c.person_id, { authorId, from: c.period_start });
+}
+
+export function lastFeedbackDate(authorId: string, recipientId: string): string | null {
+  const r = getDb()
+    .query("SELECT MAX(sent_on) AS d FROM feedback_messages WHERE author_id = ? AND recipient_id = ? AND sent_on <= ?")
+    .get(authorId, recipientId, today()) as { d: string | null };
+  return r.d;
+}
+
+export function addNote(n: {
+  authorId: string; subjectId: string; criterionId: string; date: string; text: string; rating: Rating | null;
+  taskChange: boolean; suggestion: { source: SuggestionSource; taskChange: boolean | null };
+}): Note {
+  const now = today();
+  const res = getDb()
+    .query(
+      `INSERT INTO notes (author_id, subject_id, cycle_id, criterion_id, date, text, rating, task_change, suggested_task_change, suggestion_source, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .run(
+      n.authorId, n.subjectId, openCycle(n.subjectId)?.id ?? null, n.criterionId, n.date, n.text, n.rating,
+      n.taskChange ? 1 : 0, n.suggestion.taskChange === null ? null : n.suggestion.taskChange ? 1 : 0, n.suggestion.source, now,
+    );
+  return getDb().query("SELECT * FROM notes WHERE id = ?").get(Number(res.lastInsertRowid)) as Note;
+}
+
+export function sendFeedback(f: { noteId: number; authorId: string; text: string }): void {
+  const note = getDb().query("SELECT subject_id FROM notes WHERE id = ?").get(f.noteId) as { subject_id: string } | null;
+  if (!note) throw new Error(`Brak notatki ${f.noteId}`);
+  getDb()
+    .query("INSERT INTO feedback_messages (note_id, author_id, recipient_id, sent_on, text) VALUES (?, ?, ?, ?, ?)")
+    .run(f.noteId, f.authorId, note.subject_id, today(), f.text);
+}

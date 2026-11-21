@@ -44,5 +44,20 @@
     "crisis-situations": "sytuacje-kryzysowe",
     "process-improvements": "kreatywnosc",
     "team-management": "zarzadzanie-ludzmi"
-  }
+  },
+  "taskChangeWords": [
+    "przejął",
+    "przejęła",
+    "przejmuje",
+    "przejęcie",
+    "po odejściu",
+    "kolejkę",
+    "nowy zakres",
+    "nowe zadania",
+    "zakres obowiązków",
+    "zastępuje",
+    "zastępstw"
+  ],
+  "recentFactsWindowMonths": 1,
+  "noteSettingsNote": "taskChangeWords i recentFactsWindowMonths: ustawienie urzędu, nie pochodzi z przepisów. Słowa to rdzenie szukane jako podciąg tekstu notatki (małe litery)."
 }
