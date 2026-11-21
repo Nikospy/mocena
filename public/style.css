@@ -526,3 +526,7 @@ h2, h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w
 .seg.fit { max-inline-size: none; }
 .seg.fit label { flex: 1 1 auto; }
 .seg.fit span { white-space: nowrap; padding-inline: var(--sp-150); }
+
+/* F-01 */
+.plain-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-150); }
+.date-switch { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
