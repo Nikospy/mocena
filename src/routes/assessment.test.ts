@@ -264,3 +264,79 @@ describe("lista spraw, odnośniki, etykiety", () => {
     for (const h of [edit, view, home, part1]) expect(h.toLowerCase()).not.toContain("podpis");
   });
 });
+
+describe("fikcja zapoznania i wgląd kadr", () => {
+  const good = { reason: "would_not", deliveryMethod: "post", deliveredOn: "2026-11-22" };
+  const closing = () => visibleEvents(piotr).filter((e) => e.type === "assessment_acknowledged" || e.type === "acknowledgement_fiction");
+
+  test("422 przy braku wyboru, sposobu albo daty, z datą po today() i przed zatwierdzeniem", async () => {
+    const app = fresh("2026-11-21");
+    await approvePiotr(app);
+    await setDate(app, "2026-11-22");
+    const post = (p: Record<string, string>) => call(app, "marek", `/cycles/${piotr}/assessment/fiction`, p);
+    const r = await post({ ...good, reason: "" });
+    expect(r.status).toBe(422);
+    expect(await r.text()).toContain("Wybierz, czy oceniany nie mógł, czy nie chciał potwierdzić");
+    for (const bad of [{ deliveryMethod: "" }, { deliveredOn: "" }, { deliveredOn: "2026-11-23" }, { deliveredOn: "2026-11-20" }]) {
+      const rr = await post({ ...good, ...bad });
+      expect(rr.status).toBe(422);
+      expect(await rr.text()).toContain("Wpisz, jak i kiedy doręczono kopię arkusza");
+    }
+    expect(closing()).toHaveLength(0);
+  });
+
+  test("403 dla Piotra i Joanny; would_not 22.11.2026 daje termin 30.11.2026, potem potwierdzenie Piotra 409", async () => {
+    const app = fresh("2026-11-21");
+    await approvePiotr(app);
+    await setDate(app, "2026-11-22");
+    for (const who of ["piotr", "joanna"]) {
+      expect((await call(app, who, `/cycles/${piotr}/assessment/fiction`, good)).status).toBe(403);
+      expect((await call(app, who, `/cycles/${piotr}/assessment/fiction`)).status).toBe(403);
+    }
+    const screen = await (await call(app, "marek", `/cycles/${piotr}/assessment/fiction`)).text();
+    expect(screen).toContain("Od dziś system liczy 7 dni na sprzeciw");
+    expect(screen).toContain("30.11.2026");
+    expect(screen).not.toMatch(/biegnie|podpis/i);
+    expect((await call(app, "marek", `/cycles/${piotr}/assessment/fiction`, good)).status).toBe(303);
+    expect(events("acknowledgement_fiction")[0].payload).toEqual({ ...good, objectionDeadline: "2026-11-30" });
+    expect((await call(app, "piotr", `/cycles/${piotr}/assessment/acknowledge`, {})).status).toBe(409);
+    expect(closing()).toHaveLength(1);
+    expect(openCycle("piotr")).toBeNull();
+  });
+
+  test("potwierdzenie, potem fikcja: 409; równoczesne żądania zostawiają jedno zdarzenie końcowe", async () => {
+    const app = fresh("2026-11-22");
+    await approvePiotr(app);
+    await call(app, "piotr", `/cycles/${piotr}/assessment/acknowledge`, {});
+    expect((await call(app, "marek", `/cycles/${piotr}/assessment/fiction`, good)).status).toBe(409);
+    expect(closing()).toHaveLength(1);
+
+    const app2 = fresh("2026-11-22");
+    await approvePiotr(app2);
+    await Promise.all([
+      call(app2, "piotr", `/cycles/${piotr}/assessment/acknowledge`, {}),
+      call(app2, "marek", `/cycles/${piotr}/assessment/fiction`, good),
+    ]);
+    expect(closing()).toHaveLength(1);
+  });
+
+  test("Joanna widzi wpis o fikcji bez przycisków; odnośnik „Ocena” dla kadr dopiero od zatwierdzenia", async () => {
+    const app = fresh("2026-11-21");
+    const joanna = personById("joanna")!;
+    const links = () => cycleLinks(cycleById(piotr)!, joanna).map((l) => l.label);
+    expect(links()).not.toContain("Ocena");
+    expect(await (await call(app, "joanna", `/cycles/${piotr}/assessment`)).text()).toContain("Ocena nie jest jeszcze zatwierdzona");
+    await approvePiotr(app);
+    expect(links()).toContain("Ocena");
+    await setDate(app, "2026-11-22");
+    await call(app, "marek", `/cycles/${piotr}/assessment/fiction`, good);
+    const html = await (await call(app, "joanna", `/cycles/${piotr}/assessment`)).text();
+    expect(html).toContain("Zapoznanie uznane za dokonane: Piotr Wójcik");
+    expect(html).toContain("nie chciał potwierdzić");
+    expect(html).toContain("pocztą");
+    expect(html).toContain("30.11.2026");
+    expect(html.slice(html.indexOf("<main"))).not.toContain("<button");
+    expect(html).not.toContain("Stwierdź fikcję");
+    expect(html).not.toContain("Potwierdzam zapoznanie");
+  });
+});

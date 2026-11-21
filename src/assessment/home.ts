@@ -30,5 +30,8 @@ registerCycleLinks((cycle, person) => {
   if (cycle.person_id === person.id && assessmentState(cycle.id).stage !== "draft" && assessmentState(cycle.id).stage !== "no_part1") {
     return [{ label: "Ocena", href }];
   }
+  if (person.role === "hr" && ["approved", "acknowledged", "fiction"].includes(assessmentState(cycle.id).stage)) {
+    return [{ label: "Ocena", href }];
+  }
   return [];
 });

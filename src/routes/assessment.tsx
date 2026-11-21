@@ -12,6 +12,7 @@ import { recordEvent } from "../events";
 import { currentPerson, personById, type Person } from "../people";
 import { setting, today } from "../settings";
 import { AssessmentMessage, AssessmentView } from "../views/assessment";
+import { FictionView } from "../views/acknowledgement-fiction";
 
 type Ctx = { cycle: Cycle; person: Person; appraisee: Person };
 
@@ -142,7 +143,7 @@ const app = new Hono();
 app.get("/cycles/:id/assessment", (c) => {
   const g = guard(c);
   if (!isCtx(g)) return g;
-  if (!isAppraiser(g) && !isAppraisee(g)) return c.text("Brak uprawnień do tej oceny.", 403);
+  if (!isAppraiser(g) && !isAppraisee(g) && g.person.role !== "hr") return c.text("Brak uprawnień do tej oceny.", 403);
   return render(c, g);
 });
 
@@ -214,6 +215,68 @@ app.post("/cycles/:id/assessment/acknowledge", (c) => {
     return true;
   })();
   if (!ok) return render(c, g, { status: 409, errors: ["Ocena nie czeka na potwierdzenie zapoznania."] });
+  return c.redirect(`/cycles/${g.cycle.id}/assessment`, 303);
+});
+
+const REASONS = ["could_not", "would_not"];
+const METHODS = ["in_person", "post", "email"];
+
+function fictionGuard(c: Context): Ctx | Response | Promise<Response> {
+  const g = guard(c);
+  if (!isCtx(g)) return g;
+  if (!isAppraiser(g)) return c.text("Tylko oceniający może stwierdzić fikcję zapoznania.", 403);
+  const stage = assessmentState(g.cycle.id).stage;
+  if (stage !== "approved") {
+    return render(c, g, { status: 409, errors: ["Fikcję zapoznania można stwierdzić tylko po zatwierdzeniu oceny, dopóki oceniany jej nie potwierdził."] });
+  }
+  return g;
+}
+
+function fictionScreen(c: Context, cx: Ctx, extra: { status?: 200 | 422; errors?: string[]; values?: Record<string, string> } = {}) {
+  const approvedOn = assessmentState(cx.cycle.id).approvedOn ?? today();
+  return c.html(
+    <FictionView
+      viewer={cx.person}
+      person={cx.appraisee}
+      cycleId={cx.cycle.id}
+      today={today()}
+      approvedOn={approvedOn}
+      deadline={objectionDeadline(today())}
+      errors={extra.errors}
+      values={extra.values ? { reason: extra.values.reason, deliveryMethod: extra.values.deliveryMethod, deliveredOn: extra.values.deliveredOn } : undefined}
+    />,
+    extra.status ?? 200,
+  );
+}
+
+app.get("/cycles/:id/assessment/fiction", (c) => {
+  const g = fictionGuard(c);
+  if (!isCtx(g)) return g;
+  return fictionScreen(c, g);
+});
+
+app.post("/cycles/:id/assessment/fiction", async (c) => {
+  const g = fictionGuard(c);
+  if (!isCtx(g)) return g;
+  const body = await c.req.parseBody();
+  const values = { reason: str(body.reason), deliveryMethod: str(body.deliveryMethod), deliveredOn: str(body.deliveredOn) };
+  const errors: string[] = [];
+  if (!REASONS.includes(values.reason)) errors.push("Wybierz, czy oceniany nie mógł, czy nie chciał potwierdzić");
+  const approvedOn = assessmentState(g.cycle.id).approvedOn ?? today();
+  const dateOk = isIsoDate(values.deliveredOn) && values.deliveredOn >= approvedOn && values.deliveredOn <= today();
+  if (!METHODS.includes(values.deliveryMethod) || !dateOk) errors.push("Wpisz, jak i kiedy doręczono kopię arkusza");
+  if (errors.length) return fictionScreen(c, g, { status: 422, errors, values });
+  const ok = getDb().transaction(() => {
+    if (assessmentState(g.cycle.id).stage !== "approved") return false;
+    recordEvent("acknowledgement_fiction", g.cycle.id, g.person.id, {
+      reason: values.reason,
+      deliveryMethod: values.deliveryMethod,
+      deliveredOn: values.deliveredOn,
+      objectionDeadline: objectionDeadline(today()),
+    });
+    return true;
+  })();
+  if (!ok) return render(c, g, { status: 409, errors: ["Ocena nie czeka już na potwierdzenie zapoznania."] });
   return c.redirect(`/cycles/${g.cycle.id}/assessment`, 303);
 });
 
