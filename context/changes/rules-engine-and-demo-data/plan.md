@@ -20,7 +20,7 @@ Repo ma starter Hono (`src/index.ts`, `GET /`). Silnik i plik reguł są już sk
 
 ## Implementation Approach
 
-Jedna faza. Reguły zostają danymi (`rules/*.json` z `version` i `effectiveFrom`), kod czyta je przez jeden moduł. Baza to jeden plik `bun:sqlite`, schemat tworzony przy starcie, dane pokazowe wgrywane skryptem. Konto to ciasteczko z identyfikatorem osoby. Data systemowa leży w bazie, żeby pokaz mógł ją przesuwać; cały kod pyta o „dziś” jedną funkcję.
+Jedna faza. Reguły zostają danymi (`rules/*.json` z `version` i `effectiveFrom`), kod czyta je przez jeden moduł. Baza to jeden plik `bun:sqlite`, schemat tworzony przy starcie, dane pokazowe wgrywane skryptem. Konto to ciasteczko z identyfikatorem osoby. Data systemowa leży w bazie, żeby pokaz mógł ją przesuwać; cały kod pyta o „dziś” jedną funkcję. Każde zdarzenie ma datę, a odczyty pokazują tylko zdarzenia z datą nie późniejszą niż „dziś” (decyzja 10i): wgrane dane z lat 2025–2026 odsłaniają się przy przesuwaniu daty, a zapis z ekranu dostaje datę systemową.
 
 ## Phase 1: Fundament
 
@@ -38,15 +38,15 @@ Jedna faza. Reguły zostają danymi (`rules/*.json` z `version` i `effectiveFrom
 
 **File**: `src/db.ts`, `src/seed.ts`
 
-**Intent**: Schemat (`people`, `cycles`, `cycle_criteria`, `events`, `settings`) i skrypt, który wgrywa osoby z listy „Kto jest w danych pokazowych” w `context/foundation/demo.md` (jeden urząd). Osoby, daty i notatki bierze z `context/foundation/demo.md`; brakujące daty (sekcja „Do ustalenia przy wgrywaniu danych”) ustala autor skryptu i dopisuje do tego pliku.
+**Intent**: Schemat (`people`, `cycles`, `cycle_criteria`, `events`, `settings`) i skrypt, który wgrywa osoby z listy „Kto jest w danych pokazowych” w `context/foundation/demo.md` (jeden urząd). Osoby, daty i notatki bierze z `context/foundation/demo.md`; daty i szczegóły scenariusza są w sekcji „Ustalenia do scenariusza” tego pliku. Nieobecność ma tylko daty i pole „usprawiedliwiona”, bez rodzaju (decyzja 10m). Zespół Marka to Ewa, Piotr i Maria (bez konta i bez notatek).
 
-**Contract**: `bun run seed` kasuje i odtwarza bazę; `today()` zwraca datę systemową z tabeli `settings`.
+**Contract**: `bun run seed` kasuje i odtwarza bazę; `today()` zwraca datę systemową z tabeli `settings`; data systemowa po wgraniu to 2024-12-09; `POST /demo/date` przyjmuje tylko datę późniejszą niż bieżąca.
 
 #### 3. Konto i szkielet ekranu
 
 **File**: `src/index.tsx` (przemianowany z `src/index.ts`), `src/views/layout.tsx`, `public/style.css`
 
-**Intent**: Wybór konta pokazowego, wspólny układ (nagłówek z kontem i datą systemową, nawigacja), ekran startowy z listą spraw zależną od roli, tokeny wyglądu w jednym pliku.
+**Intent**: Wybór konta pokazowego, wspólny układ (nagłówek z kontem i datą systemową, nawigacja), ekran startowy z listą spraw zależną od roli. Tokeny i komponenty wyglądu pochodzą z design systemu autora (decyzja 10b), nie z własnych stylów agenta; dopóki nie ma go w repo, ekran powstaje na samym HTML z klasami, a zrzuty do akceptacji robi się po podpięciu.
 
 **Contract**: `GET /account`, `POST /account`, `GET /` (przekierowuje na `/account` bez ciasteczka), `POST /demo/date` (przesunięcie daty systemowej).
 
@@ -59,15 +59,15 @@ Jedna faza. Reguły zostają danymi (`rules/*.json` z `version` i `effectiveFrom
 
 #### Manual Verification:
 
-- Ekran startowy czytelny na telefonie (360 px) i komputerze (1440 px)
+- Ekran startowy czytelny na telefonie (360 px) i komputerze (1440 px); autor akceptuje zrzuty przed powieleniem wyglądu (zasada 10 w `AGENTS.md`)
 
 ## Testing Strategy
 
-Reguły sprawdza `src/engine/scoring.test.ts` (przykłady organizatora, granice przedziałów). Wejście bez konta, wybór konta i ekran startowy sprawdza `src/app.test.ts` przez `app.request`.
+Reguły sprawdza `src/engine/scoring.test.ts` (przykłady organizatora, granice przedziałów). Wejście bez konta, wybór konta i ekran startowy sprawdza `src/app.test.ts` przez `app.request`. Osobny test: wgrana notatka z 2025 roku nie jest widoczna przy dacie systemowej 2024-12-09 i jest widoczna po przesunięciu daty na 2026-03-11.
 
 ## References
 
-- `context/foundation/decisions.md` (decyzje 7 i 8)
+- `context/foundation/decisions.md` (decyzje 7, 8 i 10)
 - `context/foundation/demo.md` (osoby i dane pokazowe)
 - `context/foundation/prd.md` (FR-033, Business Logic, Access Control)
 - `context/foundation/roadmap.md` (F-01)
