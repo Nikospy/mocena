@@ -4,7 +4,7 @@
 
 ## What & Why
 
-Ocena psuje się przez 24 miesiące przed formularzem, nie w formularzu (decyzja 1). Plaster S-04 daje przełożonemu notatki o faktach zapisywane z telefonu przez cały cykl, a przy ocenie: notatki przy każdym kryterium, ostrzeżenie, gdy fakty są tylko z ostatniego miesiąca, i wstawianie zaznaczonych notatek do uzasadnienia.
+Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie (decyzja 1). Plaster S-04 daje przełożonemu notatki o faktach zapisywane z telefonu przez cały cykl, a przy ocenie: notatki przy każdym kryterium, ostrzeżenie, gdy fakty są tylko z ostatniego miesiąca, i wstawianie zaznaczonych notatek do uzasadnienia.
 
 ## Starting Point
 

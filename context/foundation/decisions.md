@@ -4,7 +4,7 @@ Decyzje podjęte przez autora 21.11.2026 (17:57–19:00) po przejściu całego p
 
 ## 1. Teza
 
-**Decyzja.** Ocena okresowa psuje się przez 24 miesiące przed formularzem, a nie w formularzu. Przełożony pisze ją raz na dwa lata, z pamięci o ostatnich tygodniach. Produkt to przewodnik po procesie i notatki o faktach zbierane przez cały cykl.
+**Decyzja.** Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie. Produkt to przewodnik po procesie i notatki o faktach zbierane przez cały cykl.
 
 **Dlaczego.** Trudności, które wymienia organizator, dotyczą wyboru kryteriów, rozmów, uzasadnienia i terminów. Żadna nie polega na tym, że brakuje tekstu oceny.
 
@@ -142,6 +142,7 @@ Przyjęte przez autora po sprawdzeniu decyzji na aktualnym brzmieniu ustawy o s�
 - **11c. Notatka nie jest „prywatna”.** Na ekranach i w pokazie: „Pracownik nie widzi notatki na swoim koncie. Na wniosek urząd mu ją wydaje”. Dlaczego: notatka o pracowniku to jego dane osobowe i ma on prawo dostępu do nich oraz do kopii (RODO art. 15 ust. 1 i 3); wymagania już przewidują eksport na wniosek. Odrzucono: słowo „prywatna” w interfejsie i w pokazie.
 - **11d. Zmiana terminu oceny.** Stan uproszczony na ekranie kadr pokazuje podstawę (art. 81 ust. 8 ustawy) i zdanie: „Po zmianie terminu oceniający zawiadamia pracownika pisemnie, a kopia pisma idzie do arkusza” (§ 8 rozporządzenia). Gdyby powstał formularz zmiany terminu, lista powodów jest zamknięta: cztery z art. 81 ust. 8.
 - **11e. HR partner: podstawa prawna zmiany zadań.** Karta „Rozmowa po zmianie zadań” ma zdanie: „Jeśli to zmiana stanowiska z istotną zmianą obowiązków, prawo wymaga nowej rozmowy o kryteriach albo oceny. Sprawdź terminy z kadrami”, z podstawą: art. 81 ust. 6 ustawy i § 9 ust. 1–2 rozporządzenia. System sam tego nie rozstrzyga.
+- **11f. Brzmienie tezy (22.11.2026).** Teza z decyzji 1 brzmi: „Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie”. Znaczenie i zakres bez zmian. Odrzucono: „Ocena okresowa psuje się przez 24 miesiące przed formularzem, a nie w formularzu” (kalka, nie brzmi po polsku).
 
 Potwierdzone bez zmian: prototyp na regułach nie jest „systemem AI” (AI Act art. 3 pkt 1, motyw 12); obowiązki dla systemów wysokiego ryzyka z załącznika III stosuje się od 2 grudnia 2027 (art. 113 lit. c (i) po zmianie rozporządzeniem (UE) 2026/1744); nieobecność bez rodzaju wystarcza (art. 81 ust. 7 ustawy); odrzucenie analizy nieobecności, wskaźników i etykiet (RODO art. 9 ust. 1 i art. 4 pkt 4).
 
