@@ -4,7 +4,7 @@ Scenariusz przyjęty przez autora 21.11.2026 (decyzja 6 w `decisions.md`). Wszys
 
 ## Scenariusz: 5 kroków na ocenie Piotra
 
-Trzy konta: Marek (oceniający), Piotr (oceniany), Joanna (kadry). Dwa telefony i komputer. Między krokami prowadzący przesuwa datę systemową, zawsze do przodu.
+Trzy konta: Marek (oceniający), Piotr (oceniany), Joanna (kadry). Dwa telefony i komputer. „Telefon” oznacza widok o szerokości 360 px: na pokazie to osobne okno przeglądarki na komputerze z aplikacją, każde konto w osobnym profilu albo oknie prywatnym (konto siedzi w ciasteczku, więc dwa okna tego samego profilu dzielą konto). Prawdziwy telefon można podłączyć tylko przez sieć lokalną do tego samego komputera; dane nie wychodzą do żadnej usługi zewnętrznej. Między krokami prowadzący przesuwa datę systemową, zawsze do przodu.
 
 | # | Kto, gdzie, kiedy | Co się dzieje | Co widać |
 |---|---|---|---|
@@ -21,7 +21,7 @@ Trzy konta: Marek (oceniający), Piotr (oceniany), Joanna (kadry). Dwa telefony 
 
 ## Daty w danych pokazowych
 
-- **Piotr.** Poprzednia ocena: 27.11.2024 (założenie, wynika z terminu). Rozmowa o kryteriach i początek cyklu: grudzień 2024, najpóźniej 27.12.2024 (30 dni od poprzedniej oceny, § 7 pkt 1); dokładny dzień wybiera autor danych. Termin oceny: 27.11.2026. Zmiana zadań od 9.03.2026.
+- **Piotr.** Poprzednia ocena: 27.11.2024 (założenie, wynika z terminu). Rozmowa o kryteriach i początek cyklu: grudzień 2024, najpóźniej 27.12.2024 (30 dni od poprzedniej oceny, § 7 pkt 1); przyjęty dzień to 9.12.2024 (sekcja „Ustalenia do scenariusza”). Termin oceny: 27.11.2026. Zmiana zadań od 9.03.2026.
 - **Nieobecności Piotra w kroku 3:** 05.10–16.10.2026 i 19.10–06.11.2026, obie usprawiedliwione. Dzieli je tylko weekend, więc liczą się jako jedna, od 05.10 do 06.11 (dłużej niż miesiąc). To te same daty, co w kryteriach akceptacji US-03 w `prd.md`.
 - **Ewa.** Poprzednia ocena 20.11.2024. Nieobecność 16.02.2026–28.08.2026. Jej cykl zaczął poprzedni naczelnik, potem wydział przejął Marek (zmiana oceniającego na jej osi czasu).
 - **Tomasz.** Oceny 12.11.2024 i 12.11.2026, obie „powyżej oczekiwań”; urzędnik mianowany.

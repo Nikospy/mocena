@@ -3,7 +3,7 @@ project: "mOcena"
 version: 1
 status: active
 created: 2026-11-21
-updated: 2026-11-21
+updated: 2026-11-22
 prd_version: 2
 main_goal: speed
 top_blocker: time
@@ -16,7 +16,7 @@ milestone_status: open
 
 > Derived from `context/foundation/prd.md` (v2) and `context/foundation/tech-stack.md` + codebase baseline.
 > Edit-in-place; the next milestone continues this file. Archive only when an independent roadmap replaces it.
-> Slices below are listed in dependency order. The "At a glance" table is the index.
+> Plastry są wypisane według ID, a nie według kolejności budowy. Kolejność budowy i zależności są w tabeli „At a glance” i w „Backlog Handoff”.
 > Kolejność budowy przyjęta przez autora 2026-11-21: F-01, S-01, S-02, S-04, S-05, S-06, S-03 (`decisions.md`, decyzje 8a i 10h). Budowa nowych funkcji kończy się 22.11 o 07:00 (decyzja 10g).
 
 ## Milestone
@@ -47,7 +47,7 @@ Ocena okresowa w służbie cywilnej powstaje raz na 24 miesiące, na papierze i 
 | S-02 | assessment-and-confirmation  | oceniający wystawia ocenę z blokadami, oceniany potwierdza zapoznanie                | S-01          | US-05, FR-018, FR-019, FR-022–FR-025       | planning |
 | S-04 | notes-and-justification      | oceniający notuje fakty z telefonu i składa z nich uzasadnienie                      | S-02          | FR-008, FR-009, FR-017, FR-020, FR-021     | planning |
 | S-05 | hr-partner-question          | oceniający dostaje pytanie HR partnera po notatce, zestawienie przed rozmową i przypomnienie o docenianiu | S-04 | US-04, FR-015, FR-016, FR-035, FR-036 | planning |
-| S-03 | timeline-and-absences        | kadry wpisują nieobecność i zmianę oceniającego, a wszyscy widzą oś czasu z regułami | S-01          | US-03, FR-010, FR-011, FR-014, FR-033, FR-034 | planning |
+| S-03 | timeline-and-absences        | kadry wpisują nieobecność i zmianę oceniającego, a wszyscy widzą oś czasu z regułami | S-01, S-06    | US-03, FR-010, FR-011, FR-014, FR-033, FR-034 | planning |
 | S-06 | hr-overview-and-print        | kadry widzą stan cykli i stopnie obowiązkowe, a arkusz da się pobrać i wydrukować    | S-02          | FR-026, FR-027, FR-029, FR-031             | planning |
 
 ## Streams
@@ -120,7 +120,7 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Outcome:** kadry mogą wpisać nieobecności i zmianę oceniającego, a każdy uczestnik widzi oś czasu cyklu z nowym terminem, regułą i wersją reguł; prowadzący pokaz może przesunąć datę systemową i zobaczyć przypomnienia.
 - **Change ID:** timeline-and-absences
 - **PRD refs:** US-03, FR-010, FR-011, FR-014, FR-033, FR-034
-- **Prerequisites:** S-01
+- **Prerequisites:** S-01, S-06 (wiersze `/hr` z S-06 potrzebne do linku HR)
 - **Parallel with:** S-02, S-04
 - **Blockers:** —
 - **Unknowns:** —
@@ -158,7 +158,7 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Outcome:** kadry i dyrektor generalny mogą zobaczyć stan wszystkich cykli na jednym ekranie, w tym przypomnienie o obowiązkowym stopniu służbowym z terminem, stany sprzeciwu i wniosku o termin; uprawniona osoba może zobaczyć historię ocen oraz pobrać i wydrukować arkusz.
 - **Change ID:** hr-overview-and-print
 - **PRD refs:** FR-026, FR-027, FR-029, FR-031 (oraz stany dla FR-013, FR-028, FR-030)
-- **Prerequisites:** S-02
+- **Prerequisites:** S-02 (czyta dane S-04, jeśli są)
 - **Parallel with:** S-04, S-05
 - **Blockers:** —
 - **Unknowns:** —
@@ -167,15 +167,15 @@ What's already in place in the codebase as of `2026-11-21`.
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID                   | Suggested issue title                                         | Ready for `/10x-plan` | Notes |
+| Roadmap ID | Change ID                   | Suggested issue title                                         | Stan planu | Notes |
 | ---------- | --------------------------- | ------------------------------------------------------------- | --------------------- | ----- |
-| F-01       | rules-engine-and-demo-data  | Silnik reguł, dane pokazowe i wybór konta                     | yes                   | Run `/10x-plan rules-engine-and-demo-data` |
-| S-01       | cycle-start-criteria        | Początek cyklu: arkusz, kryteria, potwierdzenie części I      | planned               | plan gotowy; budowa po F-01 |
-| S-02       | assessment-and-confirmation | Ocena z blokadami i potwierdzenie zapoznania                  | no                    | po S-01 |
-| S-03       | timeline-and-absences       | Oś czasu, nieobecności i zmiana oceniającego                  | no                    | po S-01 |
-| S-04       | notes-and-justification     | Notatki o faktach i uzasadnienie z notatek                    | no                    | po S-02 |
-| S-05       | hr-partner-question         | Pytanie HR partnera i przypomnienie o docenianiu              | no                    | po S-04 |
-| S-06       | hr-overview-and-print       | Stan cykli, stopień obowiązkowy i wydruk arkusza              | no                    | po S-02 |
+| F-01       | rules-engine-and-demo-data  | Silnik reguł, dane pokazowe i wybór konta                     | plan gotowy           | Budowa w toku (1. w kolejności): `/10x-implement rules-engine-and-demo-data`; bez zależności |
+| S-01       | cycle-start-criteria        | Początek cyklu: arkusz, kryteria, potwierdzenie części I      | plan gotowy           | Budowa (2.): `/10x-implement cycle-start-criteria`; po F-01 |
+| S-02       | assessment-and-confirmation | Ocena z blokadami i potwierdzenie zapoznania                  | plan gotowy           | Budowa (3.): `/10x-implement assessment-and-confirmation`; po S-01 |
+| S-03       | timeline-and-absences       | Oś czasu, nieobecności i zmiana oceniającego                  | plan gotowy           | Budowa (7., ostatni; wypada, jeśli nie ruszony do 05:45): `/10x-implement timeline-and-absences`; po S-01 i S-06 |
+| S-04       | notes-and-justification     | Notatki o faktach i uzasadnienie z notatek                    | plan gotowy           | Budowa (4.): `/10x-implement notes-and-justification`; po S-02 |
+| S-05       | hr-partner-question         | Pytanie HR partnera i przypomnienie o docenianiu              | plan gotowy           | Budowa (5.): `/10x-implement hr-partner-question`; po S-04 |
+| S-06       | hr-overview-and-print       | Stan cykli, stopień obowiązkowy i wydruk arkusza              | plan gotowy           | Budowa (6.): `/10x-implement hr-overview-and-print`; po S-02 (czyta dane S-04, jeśli są) |
 
 ## Open Roadmap Questions
 

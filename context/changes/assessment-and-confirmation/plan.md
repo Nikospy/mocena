@@ -98,7 +98,7 @@ Same nazwy z kontraktu wspólnego.
 
 **S-06 (później, nie warunek tego plastra):** `src/seed/assessments.ts` wgrywa oceny Tomasza jako pełne łańcuchy zdarzeń w kształcie migawki `AssessmentSnapshot` z sekcji niżej; zdarzenie `mandatory_grade_awarded` `{ personId, fromGrade, toGrade, basis }` zmienia bieżący stopień.
 
-**Bieżący stopień urzędnika** (do wniosku o stopień i do migawki) czyta się wyłącznie przez `currentGrade(personId)` z `src/people.ts` (F-01). Ten plaster nie czyta `people.civil_service_grade` ani zdarzeń `mandatory_grade_awarded` bezpośrednio i nie pisze własnej kopii reguły. S-06 korzysta z tej samej funkcji.
+**Bieżący stopień urzędnika** (do wniosku o stopień i do migawki) czyta się wyłącznie przez `currentGrade(personId, { asOf })` z `src/people.ts` (F-01); wniosek o stopień woła ją bez `asOf`, a `buildAssessmentSnapshot` z tą samą datą `asOf`, którą dostał. Ten plaster nie czyta `people.civil_service_grade` ani zdarzeń `mandatory_grade_awarded` bezpośrednio i nie pisze własnej kopii reguły. S-06 korzysta z tej samej funkcji.
 
 ## Co ten plaster udostępnia
 
@@ -336,37 +336,37 @@ Pomocniczo `gradeRequestOptions({ appointed, grade, outcome }): "not_applicable"
 
 - [ ] 1.1 Testy reguł zatwierdzenia przechodzą: `bun test src/engine/approval.test.ts`
 - [ ] 1.2 Testy stanu oceny przechodzą: `bun test src/assessment/state.test.ts`
-- [ ] 1.3 Testy migawki przechodzą: `bun test src/assessment/snapshot.test.ts`
-- [ ] 1.4 Testy tras oceny przechodzą: `bun test src/routes/assessment.test.ts`
-- [ ] 1.5 Test etykiet przechodzi
-- [ ] 1.6 Testy bezpośrednich żądań przechodzą
-- [ ] 1.7 Test wniosku o stopień przechodzi
-- [ ] 1.8 Testy potwierdzenia i zegara przechodzą
+- [ ] 1.3 Testy migawki przechodzą: `bun test src/assessment/snapshot.test.ts` (bez `asOf` migawka ma `periodTo`, `confirmation.date` i `deadline` z dnia `today()`; z historycznym `asOf` ma `deadline` = `effectiveDeadline(cycleId, { asOf })` oraz `grade` i `gradeAwardedOn` = `currentGrade(personId, { asOf })`, także gdy po dacie `asOf` jest zdarzenie `mandatory_grade_awarded` (migawka go nie uwzględnia); `rulesVersion` to obiekt `{ version, effectiveFrom, act }`; funkcja nie zmienia liczby zdarzeń)
+- [ ] 1.4 Testy tras oceny przechodzą: `bun test src/routes/assessment.test.ts` (scenariusze kroku 4: „1” przy Rzetelności i „7” przy pozostałych po „Zapisz” daje na ekranie „Ocena negatywna” i „powyżej oczekiwań”; zatwierdzenie bez wniosków do IPRZ → 422 i brak `assessment_approved`; z wnioskami, bez uzasadnienia przy wyniku negatywnym → 422; komplet → 303 i migawka z kompletem pól `AssessmentSnapshot`, w tym `periodFrom` = 2024-11-27, `deadline` równym `effectiveDeadline(cycleId)` w dniu zatwierdzenia (bez nieobecności Piotra 2026-11-27), `grade` = `null`, `gradeAwardedOn` = `null` i `rulesVersion` = `{ version, effectiveFrom, act }`; po zatwierdzeniu podgląd pokazuje termin z `snapshot.deadline`). Testy zaczynające od daty 2026-11-21 biorą potwierdzoną część I Piotra z `createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } })`
+- [ ] 1.5 Test etykiet przechodzi (ten sam plik): na ekranie oceny w trybie edycji i podglądu, na liście spraw i na ekranie części I element z imieniem i nazwiskiem ocenianego nie zawiera liczby, średniej, poziomu ani etykiety wyniku (zasada 7 z `AGENTS.md`); wynik stoi tylko w elemencie `id="assessment-result"`
+- [ ] 1.6 Testy bezpośrednich żądań przechodzą (te same pliki): zapis i zatwierdzenie przez osobę inną niż oceniający → 403; bez widocznego `part1_confirmed` → 409 i brak formularza na ekranie; ocena przy kryterium spoza cyklu albo wartość 4 → 422; brak oceny przy jednym kryterium przy zatwierdzeniu → 422; w każdym z tych przypadków brak `assessment_approved`; wniosek o stopień u Piotra → 422; dwa kolejne `approve` z kompletem → drugie 409, jedno `assessment_approved`; zapis szkicu po zatwierdzeniu → 409; zapis szkicu i `approve` po potwierdzeniu przez Piotra → 409. Żaden błąd walidacji nie odpowiada 400
+- [ ] 1.7 Test wniosku o stopień przechodzi: cykl Tomasza przy dacie 2026-11-10 (część I z `src/seed/part1.ts`, przed oceną z 12.11.2026); wynik pozytywny i wniosek bez umotywowania → 422, z umotywowaniem → zatwierdzone z `targetGrade` o jeden wyższym; ten sam wniosek przy wyniku negatywnym → 422; po wgranym w teście zdarzeniu `seedEvent("mandatory_grade_awarded", <cykl Tomasza>, <aktor>, { personId: <Tomasz>, fromGrade: 5, toGrade: 9, basis }, "2026-11-10")` → `currentGrade` zwraca 9 i wniosek → 422; migawka zatwierdzonej oceny Tomasza ma `grade` i `gradeAwardedOn` równe `currentGrade` z dnia zatwierdzenia
+- [ ] 1.8 Testy potwierdzenia i zegara przechodzą: potwierdzenie przez Piotra przy dacie 2026-11-22 zapisuje `objectionDeadline` = 2026-11-30 i ekran pokazuje 30.11.2026; potwierdzenie 2026-11-21 daje również 2026-11-30; po przesunięciu daty na 2026-11-30 ekran mówi „ostatni dzień”, na 2026-12-01 „Termin na sprzeciw minął 30.11.2026”, a payload się nie zmienia; w etapie `approved` zegara nie ma; potwierdzenie przez Marka → 403; przed zatwierdzeniem → 409; drugie potwierdzenie → 409 i jedno zdarzenie
 - [ ] 1.9 Wszystkie testy przechodzą: `bun test`
 
 #### Manual
 
-- [ ] 1.10 Kroki 4 i 5 pokazu: wynik negatywny po „Zapisz”, blokada bez wniosków do IPRZ, potwierdzenie Piotra z zegarem 30.11.2026, 360 px i 1440 px
-- [ ] 1.11 Na żadnym ekranie nie pada słowo „podpis”, a przy nazwisku ocenianego nie ma wyniku ani etykiety poza ekranem oceny
+- [ ] 1.10 Kroki 4 i 5 pokazu: Marek 21.11.2026 po „1” przy Rzetelności i „Zapisz” widzi wynik negatywny, uzasadnienie oznaczone jako wymagane, „Zatwierdź ocenę” bez wniosków do IPRZ pokazuje blokadę z przepisem; po zatwierdzeniu Piotr 22.11.2026 na telefonie trafia z listy spraw do oceny, potwierdza i widzi zegar z 30.11.2026; ekrany czytelne przy 360 px i 1440 px w układzie z design systemu
+- [ ] 1.11 Na żadnym ekranie nie pada słowo „podpis”, a przy nazwisku ocenianego nie ma wyniku, średniej ani etykiety poza samym ekranem oceny
 
 ### Phase 2: Fikcja zapoznania i wgląd kadr
 
 #### Automated
 
-- [ ] 2.1 Testy fikcji przechodzą: `bun test src/routes/assessment.test.ts`
+- [ ] 2.1 Testy fikcji przechodzą: `bun test src/routes/assessment.test.ts` (fikcja bez wyboru → 422 i brak zdarzenia; bez sposobu albo daty doręczenia, z datą po `today()` albo przed zatwierdzeniem → 422 i brak zdarzenia; przez Piotra albo Joannę → 403; z `would_not` przy dacie 2026-11-22 → zdarzenie z `objectionDeadline` = 2026-11-30, a potem potwierdzenie przez Piotra → 409; potwierdzenie, potem fikcja → 409; równoczesne żądania potwierdzenia i fikcji (`Promise.all`) → jedno zdarzenie końcowe; Joanna widzi wpis o fikcji i nie widzi przycisków; `cycleLinks` dla Joanny zawiera „Ocena” od `approved`, a przed `approved` nie; po fikcji `openCycle(Piotr)` zwraca `null`; ekran skutku nie zawiera słów „biegnie” ani „podpis”)
 - [ ] 2.2 Wszystkie testy przechodzą: `bun test`
 
 #### Manual
 
-- [ ] 2.3 Wersja 5-minutowa, osobny przebieg od czystych danych (`--after-step-1` bez `--live-step-2`): fikcja z ekranem skutku i wpisem widocznym dla Joanny
+- [ ] 2.3 Wersja 5-minutowa, osobny przebieg od czystych danych: `bun run seed -- --after-step-1` (bez `--live-step-2`, żeby notatka z 11.03.2026 istniała), potem daty jak w „Datach pokazu” kontraktu: krok 4 przy 2026-11-21, fikcja zamiast potwierdzenia Piotra przy 2026-11-22; albo kroki 1 i 2 odtworzone klikaniem. Marek przechodzi przez ekran skutku, wybiera powód i doręczenie kopii, a Joanna widzi wpis i zegar
 
 ### Phase 3: Dodatki — wniosek o stopień na ekranie, podgląd na żywo, data rozmowy
 
 #### Automated
 
-- [ ] 3.1 Testy dodatków przechodzą: `bun test src/routes/assessment.test.ts`
+- [ ] 3.1 Testy dodatków przechodzą: `bun test src/routes/assessment.test.ts` (podgląd z „1” przy Rzetelności odpowiada 200, zwraca „Ocena negatywna” i nie zmienia liczby zdarzeń; podgląd przez Piotra → 403; formularz Tomasza ma pole wniosku o stopień, formularz Piotra go nie ma; `interviewDate` z przyszłości → 422 i brak zdarzenia)
 - [ ] 3.2 Wszystkie testy przechodzą: `bun test`
 
 #### Manual
 
-- [ ] 3.3 Krok 4 pokazu: wynik zmienia się bez przeładowania
+- [ ] 3.3 Krok 4 pokazu: po „1” przy Rzetelności wynik zmienia się na negatywny bez przeładowania

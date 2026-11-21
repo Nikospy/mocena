@@ -28,7 +28,7 @@ Po notatce ze zmianą zadań Marek odpowiada na „To stała zmiana zadań?” i
 | Zapis | tylko zdarzenie `task_change_answered` przez `recordEvent` po kliknięciu | „Nic nie zapisuje się bez kliknięcia”. |
 | Odnośniki | `registerCycleLinks` na `GET /cycles/:id/part1`, `registerHomeTasks` na `GET /` | Wspólne miejsca z kontraktu, bez ręcznego wpisywania adresów. |
 | Odmiana imion | `content/name-forms.json` z zdaniem zastępczym | Zdania z decyzji 10k wymagają przypadków. |
-| Odczyty cudzych danych | jeden plik `src/hr-partner/data.ts`, tylko przez `notesAbout`, `noteById`, `lastFeedbackDate`, `cycleCriteria`, `visibleEvents` | Rozbieżność z kodem poprawia się w jednym miejscu. |
+| Odczyty cudzych danych | jeden plik `src/hr-partner/data.ts`, tylko przez `notesAbout`, `noteById`, `lastFeedbackDate`, `cycleCriteria`, `openCycle`, `visibleEvents` | Rozbieżność z kodem poprawia się w jednym miejscu. |
 | Progi | 90 dni docenianie, 6 miesięcy bez notatek, „ustawienie urzędu” | Brak progów w przepisach; 6 miesięcy z przykładu 10k. |
 
 ## Scope

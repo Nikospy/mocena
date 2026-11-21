@@ -3,7 +3,7 @@ change_id: notes-and-justification
 title: Notatki o faktach i uzasadnienie z notatek
 status: planned
 created: 2026-11-21
-updated: 2026-11-21
+updated: 2026-11-22
 archived_at: null
 ---
 

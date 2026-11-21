@@ -379,8 +379,8 @@ Każde ma domyślne rozstrzygnięcie, z którym implementacja idzie dalej.
 
 #### Manual
 
-- [ ] 1.6 Pełny przebieg do kroku 5 (2026-11-22): `/hr` pokazuje kartę Tomasza (14.12.2026), sprzeciw Katarzyny Lewandowskiej (04.12.2026), wniosek Anny i zapoznanie Piotra (sprzeciw do 30.11.2026)
-- [ ] 1.7 Podgląd wydruku arkusza Piotra z jego konta: bez nawigacji i przycisków, części od nowej strony, macierz w całości, pouczenie o sprzeciwie, bez słowa „podpis”
+- [ ] 1.6 Pełny przebieg pokazu do kroku 5 (data 2026-11-22): `/hr` pokazuje kartę Tomasza z terminem 14.12.2026, sprzeciw Katarzyny Lewandowskiej z rozpatrzeniem do 04.12.2026, wniosek Anny z podstawą i zdaniem o zawiadomieniu oraz zapoznanie Piotra z sprzeciwem do 30.11.2026
+- [ ] 1.7 Podgląd wydruku w przeglądarce (Chrome, A4) arkusza Piotra po potwierdzeniu zapoznania, z konta Piotra: bez nawigacji i przycisków, części od nowej strony, macierz nie łamie się między stronami, pouczenie o sprzeciwie jest, nigdzie słowo „podpis”
 - [ ] 1.8 Podgląd wydruku arkusza Tomasza z 12.11.2026: pole „Dane poprzedniej oceny” pokazuje ocenę z 12.11.2024
 
 ### Phase 2: Po wersji minimalnej
@@ -392,4 +392,4 @@ Każde ma domyślne rozstrzygnięcie, z którym implementacja idzie dalej.
 
 #### Manual
 
-- [ ] 2.3 Wersja 5-minutowa przy 2026-11-22: „Odnotuj przyznanie stopnia” usuwa kartę Tomasza, historia i arkusz nadal się otwierają
+- [ ] 2.3 Wersja 5-minutowa przy dacie 2026-11-22: kliknięcie „Odnotuj przyznanie stopnia” usuwa kartę Tomasza, a historia i arkusz nadal się otwierają

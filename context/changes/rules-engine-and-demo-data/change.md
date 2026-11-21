@@ -3,7 +3,7 @@ change_id: rules-engine-and-demo-data
 title: Silnik reguł, dane pokazowe i wybór konta
 status: implementing
 created: 2026-11-21
-updated: 2026-11-21
+updated: 2026-11-22
 archived_at: null
 ---
 

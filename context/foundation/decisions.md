@@ -145,6 +145,21 @@ Przyjęte przez autora po sprawdzeniu decyzji na aktualnym brzmieniu ustawy o s�
 
 Potwierdzone bez zmian: prototyp na regułach nie jest „systemem AI” (AI Act art. 3 pkt 1, motyw 12); obowiązki dla systemów wysokiego ryzyka z załącznika III stosuje się od 2 grudnia 2027 (art. 113 lit. c (i) po zmianie rozporządzeniem (UE) 2026/1744); nieobecność bez rodzaju wystarcza (art. 81 ust. 7 ustawy); odrzucenie analizy nieobecności, wskaźników i etykiet (RODO art. 9 ust. 1 i art. 4 pkt 4).
 
+## 12. Ustalenia agenta po recenzjach planów (22.11.2026, 00:00–01:30)
+
+To nie są decyzje autora. Agent przyjął je sam, bo są techniczne i dają się cofnąć; autor może każde zmienić. Szczegóły są w rozdziale „Kontrakt wspólny dla wszystkich plastrów” w `context/changes/rules-engine-and-demo-data/plan.md`.
+
+- **12a. Przykład sprzeciwu w danych pokazowych** jest na nowej osobie bez konta, Katarzynie Lewandowskiej (podwładna Anny). Maria nie ma żadnego cyklu, bo na niej widać zdanie „O Marii nie masz żadnej notatki…”.
+- **12b. Kryteria i termin części I blokują się już przy przekazaniu**, a nie dopiero po potwierdzeniu ocenianego, jak mówi PRD. Powód: nie budujemy wycofania przekazanej części I.
+- **12c. Trzy rzeczy potrzebne do wersji 5-minutowej pokazu** (fikcja zapoznania z wglądem kadr, przycisk odnotowania stopnia, zmiana oceniającego na osi Ewy) powstają zaraz po wersji minimalnej swoich plastrów.
+- **12d. Termin oceny ma trzy źródła:** termin przekazany w części I, termin bieżący przed zatwierdzeniem i termin zamrożony w ocenie po zatwierdzeniu. Nieobecność wpisana po zatwierdzeniu nie zmienia terminu tej oceny.
+- **12e. „Telefon” na pokazie** to widok 360 px w osobnym oknie przeglądarki na komputerze z aplikacją (osobny profil albo okno prywatne dla każdego konta). Prawdziwy telefon tylko przez sieć lokalną.
+- **12f. Datę systemową** może przesunąć każde konto, zawsze tylko do przodu.
+- **12g. Moduł podpowiedzi** (`src/suggestions/index.ts`) tworzy S-01 razem z podpowiedzią kryteriów; S-04 i S-05 dopisują swoje wejścia. Decyzja 9 mówiła o S-04, bo powstała przed planami.
+- **12h. Wersje pokazu** w planach to 90 sekund i 5 minut (`context/foundation/demo.md`); „3 minuty” w starszych zdaniach to założona długość slotu, nie osobna wersja.
+
+Trzy sprawy z warsztatu event stormingu czekają na decyzję autora (przyjęte ustawienie domyślne w nawiasie): czy oceniany widzi wpis o fikcji zapoznania (nie widzi, jak w PRD); czy pokaz Ewy mówi, że nowy oceniający nie widzi notatek poprzednika (nie mówi); czy rozmowa o kryteriach ma własną datę (nie ma, liczy się dzień przekazania części I). Pełna lista miejsc niepewnych: `context/domain/event-storming.board.json`.
+
 ## Pytania otwarte (do mentorów organizatora)
 
 1. Czy potwierdzenie w systemie na własnym koncie wystarcza zamiast podpisu? (Z przepisów: nie zastępuje podpisu, decyzja 11b. Pytanie zostaje o to, czego organizator oczekuje w prototypie.)

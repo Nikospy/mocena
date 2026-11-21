@@ -1,9 +1,9 @@
 ---
 change_id: hr-overview-and-print
 title: Stan cykli dla kadr, stopień obowiązkowy i wydruk arkusza
-status: new
+status: planned
 created: 2026-11-21
-updated: 2026-11-21
+updated: 2026-11-22
 archived_at: null
 ---
 

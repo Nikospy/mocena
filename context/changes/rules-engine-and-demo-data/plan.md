@@ -64,7 +64,7 @@ Terminu oceny nie zapisuje się w `cycles`. Skąd ekran go bierze, mówi tabela 
 - `rulesVersion()`: `{ version, effectiveFrom, act }`.
 - `setting(key)`: odczyt wartości z `settings` (na przykład `office_city`).
 - `visibleEvents(null)` zwraca zdarzenia bez cyklu; `visibleEventsOfType(type)` zwraca widoczne zdarzenia danego typu ze wszystkich cykli.
-- `currentGrade(personId, { asOf })` w `src/people.ts`: zwraca `{ grade, awardedOn }` z ostatniego widocznego `mandatory_grade_awarded` tej osoby (`toGrade` i data zdarzenia, szukane po `payload.personId`), a gdy go nie ma, z `people.civil_service_grade` i `people.grade_awarded_on`. Powstaje w fazie 1 F-01. Opcjonalne `{ asOf }` daje stopień na jawną datę (dla migawek historycznych). To jedyne źródło bieżącego stopnia dla S-02 i S-06.
+- `currentGrade(personId, { asOf })` w `src/people.ts`: zwraca `{ grade, awardedOn }` z ostatniego widocznego `mandatory_grade_awarded` tej osoby (`toGrade` i data zdarzenia, szukane po `payload.personId`), a gdy go nie ma, z `people.civil_service_grade` i `people.grade_awarded_on` (z `asOf` tylko wtedy, gdy `grade_awarded_on` nie jest późniejsze niż `asOf`; inaczej `{ grade: null, awardedOn: null }`). Powstaje w fazie 1 F-01. Opcjonalne `{ asOf }` daje stopień na jawną datę (dla migawek historycznych). To jedyne źródło bieżącego stopnia dla S-02 i S-06.
 
 ### Nazwy silnika po przeniesieniu
 
@@ -102,9 +102,12 @@ Terminu oceny nie zapisuje się w `cycles`. Skąd ekran go bierze, mówi tabela 
 ### Zasady wspólne tras
 
 - Po udanym `POST`, który coś zapisuje, trasa odpowiada przekierowaniem 303. `POST`, który niczego nie zapisuje (`POST /suggestions/note`, `POST /cycles/:id/assessment/preview`), odpowiada 200. `GET /cycles/:id` przekierowuje kodem 302.
+- `POST /cycles/:id/assessment/preview` niczego nie zapisuje, więc także przy ocenach spoza skali odpowiada 200 i pokazuje blokady w zwróconym fragmencie; 422 dotyczy tras, które zapisują.
+- `POST /demo/date` może wysłać każde konto (przełącznik daty jest w nagłówku dla wszystkich); przyjmuje tylko datę późniejszą niż bieżąca.
+- Odnośnik albo przycisk do czynności zapisu pokazuje się tylko wtedy, gdy zapis by przeszedł: przy czynnościach wymagających otwartego cyklu warunkiem jest `openCycle`, przy notatce `canWriteNoteAbout(viewer, subjectId)` z S-04.
 - Błąd walidacji to zawsze 422 z formularzem (nigdy 400), brak uprawnień to 403, zasób, którego nie ma, to 404, próba powtórzenia zamkniętego kroku to 409.
 - 409 za zapis do cyklu, który nie jest już otwarty, dotyczy tylko czynności wymagających otwartego cyklu: części I, oceny, nieobecności i zmiany oceniającego. Rozstrzygnięcie sprzeciwu i odnotowanie przyznania stopnia z natury następują po zamknięciu cyklu; ich warunki opisuje plan S-06.
-- Po widocznym `assessment_approved` termin tej oceny jest zamrożony w migawce: oś czasu i ekrany pokazują `AssessmentSnapshot.deadline`, a nieobecność wpisana później już go nie zmienia.
+- Po widocznym `assessment_approved` (kolejność zdarzeń z tego samego dnia rozstrzyga para `(date, id)`) termin tej oceny jest zamrożony w migawce: oś czasu i ekrany pokazują `AssessmentSnapshot.deadline`, a nieobecność wpisana później już go nie zmienia.
 - `GET /cycles/:id/sheet` obsługuje oba stany: przy otwartym cyklu pokazuje część I z bieżącym terminem, po zatwierdzeniu cały arkusz z terminem z migawki.
 - Kryteria i termin części I są zablokowane już od przekazania części I, czyli wcześniej, niż wymaga PRD (blokada po potwierdzeniu). To uproszczenie prototypu: nie budujemy wycofania przekazanej części I.
 
@@ -114,7 +117,7 @@ Terminu oceny nie zapisuje się w `cycles`. Skąd ekran go bierze, mówi tabela 
 - `content/cards.json` z `card(id)`: treści kart; tworzy S-01. Klucze: `opening` (S-01), `assessment` (S-04), `taskChange`, `appreciation`, `beforeMeeting` (S-05).
 - Miejscowość potwierdzeń pochodzi z `settings.office_city`. W `rules/office-settings.json` są tylko ustawienia wymyślone przez nas (tabela obowiązków, lista słów, progi, katalog form rozwoju).
 - `src/suggestions/index.ts`: jedno wymienne miejsce podpowiedzi. Tworzy S-01 z wejściem `suggestCriteria(sheet, dutyTypeIds)`; S-04 dopisuje `suggestForNote(text)` i `suggestionMode()`, które zwraca `rules`, `local-model` albo `none` (te same wartości co `notes.suggestion_source`); S-05 dopisuje `suggestDevelopmentForm(note)`. W katalogu `developmentForms` dokładnie jedna forma ma `default: true`.
-- `src/views/components.tsx`: `LegalBasis` i `ConfirmationBlock`; tworzy S-01. `ConfirmationBlock` ma od początku oba warianty: `kind: "confirmation"` (`name, place, date`) i `kind: "fiction"` (`name, reason, deliveryMethod, deliveredOn, date`; `name` to osoba, która stwierdziła fikcję). S-02 i S-06 tylko go używają; własnego bloku nie tworzy nikt.
+- `src/views/components.tsx`: `LegalBasis` i `ConfirmationBlock`; tworzy S-01. `ConfirmationBlock` ma od początku oba warianty: `kind: "confirmation"` (`name, place, date`; treść „Potwierdzenie w systemie: <miejscowość>, <DD.MM.RRRR>, <imię i nazwisko>”, bez danych „Jeszcze niepotwierdzone”) i `kind: "fiction"` (`name, reason, deliveryMethod, deliveredOn, date`; `name` to osoba, która stwierdziła fikcję). S-02 i S-06 tylko go używają; własnego bloku nie tworzy nikt.
 - Plik reguł po przeniesieniu ma klucze `criteriaConversation` i `assessmentConversation` (każdy z `basis` i `topics`); S-02 dopisuje `approval`, w tym jedyny klucz granicy stopnia `approval.gradeRequest.maxGrade` (9); S-06 dopisuje `deadlines.mandatoryGradeDays` i czyta granicę stopnia z klucza S-02; S-03 dopisuje podstawy nieobecności i zmiany oceniającego. Klucze terminów po przeniesieniu: `deadlines.assessmentEveryMonths`, `deadlines.criteriaTalkDays`, `deadlines.criteriaTalkAfterNegativeDays`, `deadlines.reassessmentAfterNegativeMonths`, `deadlines.objectionDays`, `deadlines.objectionReviewDays`, `deadlines.courtAppealDays`, `deadlines.positionChangeMinMonths`; każdy ma `value`, `basis` i, gdzie było, `from`. S-03 dopisuje `deadlines.longAbsenceOverMonths`, `deadlines.deadlineCounting` i `appraiserChange`, każdy z `basis`.
 
 ### Co plastry udostępniają sobie nawzajem
@@ -123,7 +126,7 @@ Terminu oceny nie zapisuje się w `cycles`. Skąd ekran go bierze, mówi tabela 
 |---|---|
 | S-01 | `part1Status(cycleId)`, `cycleCriteria(cycleId)`, `submitPart1(cycleId, actorId, input)` (sprawdza, że aktor jest bieżącym oceniającym), `savePart1(cycleId, actorId, input, date)` (sam zapis, bez sprawdzania aktora; woła go `submitPart1` i moduły danych pokazowych; arkusz dobiera z `people.position_kind` przez `sheetForPosition` i zapisuje w `cycles.sheet`) |
 | S-02 | `assessmentState(cycleId)`, `approvalBlockers(input)`, `buildAssessmentSnapshot(cycleId, draft, { asOf })` (jedyne miejsce, które składa migawkę; woła je zatwierdzenie i moduł danych S-06), migawka `AssessmentSnapshot` opisana w planie S-02, typ `Slots` i prop `slots` formularza: `criterionAside(criterionId)`, `justificationTools`, `conclusionsTools`, `beforeForm`; pola `justification` i `developmentConclusions`; zapisane oceny cząstkowe w `assessmentState(cycleId).draft.scores` |
-| S-04 | `noteById(id)`, `notesAbout`, `notesByAuthor`, `notesForCycle`, `lastFeedbackDate`, `afterNoteSaved(note)`, `suggestForNote`, `suggestionMode` |
+| S-04 | `canWriteNoteAbout(viewer, subjectId)`, `noteById(id)`, `notesAbout`, `notesByAuthor`, `notesForCycle`, `lastFeedbackDate`, `afterNoteSaved(note)`, `suggestForNote`, `suggestionMode` |
 | S-05 | zdarzenie `task_change_answered` |
 | S-06 | `cycleState(cycleId)`, `mandatoryGrade`, `sheetData(cycleId, options?)`, `canViewSheet`, `assessmentHistory` |
 | S-03 | tylko zdarzenia, trasy i rozszerzony `effectiveDeadline`; funkcje osi czasu są wewnętrzne |
@@ -256,4 +259,4 @@ Reguły sprawdza `src/engine/scoring.test.ts` (przykłady organizatora, granice 
 
 #### Manual
 
-- [ ] 1.3 Ekran startowy czytelny na telefonie (360 px) i komputerze (1440 px)
+- [ ] 1.3 Ekran startowy czytelny na telefonie (360 px) i komputerze (1440 px); autor akceptuje zrzuty przed powieleniem wyglądu (zasada 10 w `AGENTS.md`)

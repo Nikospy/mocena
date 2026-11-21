@@ -54,7 +54,7 @@ Faza 1. Krok 1 pokazu działa do końca na dwóch kontach, plus wgrana część 
 
 Wszystko poza wersją minimalną to faza 2 (ok. 15 min), budowana w tej kolejności; przy braku czasu wypada od końca listy:
 
-1. Zdanie „Część I czeka na potwierdzenie od X dni” na ekranie części I i w sprawie na ekranie startowym (`waitingDays`, `waitingDaysText`; decyzja 10d, z niego korzysta S-06).
+1. Zdanie „Część I czeka na potwierdzenie od X dni” na ekranie części I i w sprawie na ekranie startowym (`waitingDays`, `waitingDaysText`; decyzja 10d). S-06 od tego nie zależy: liczy dni sam z daty `part1_submitted`.
 2. Widok części I do odczytu dla kadr wraz z odnośnikiem cyklu „Część I” dla roli `hr` (w wersji minimalnej kadry dostają 403 i nie mają odnośnika).
 3. Rozszerzenie listy obowiązków do co najmniej 8 rodzajów.
 4. Sekcje „pytania” i „trudne sytuacje” karty rozmowy (w wersji minimalnej zostają cel i cztery tematy z § 5 ust. 1).
@@ -93,7 +93,7 @@ Dla S-02, S-03, S-04, S-05 i S-06, zgodnie z kontraktem wspólnym:
 - **Sprawy na ekranie startowym** przez `registerHomeTasks`: oceniający „Wyznacz kryteria oceny: …”, oceniany „Potwierdź część I oceny”.
 - **Dane pokazowe:** moduł `src/seed/part1.ts` z opcją `afterStep1` (patrz faza 1, pkt 4).
 - **Komponenty widoków** w `src/views/components.tsx` (tworzy je S-01, w wersji minimalnej): `LegalBasis` (dopisek z przepisem przy dacie) i `ConfirmationBlock`, czysty komponent widoku bez dostępu do bazy, od początku z oboma wariantami:
-  - `kind: "confirmation"` z `name, place, date`: linia „Potwierdził: imię i nazwisko, miejscowość, data”, a bez danych „Jeszcze niepotwierdzone”;
+  - `kind: "confirmation"` z `name, place, date`: linia „Potwierdzenie w systemie: <miejscowość>, <DD.MM.RRRR>, <imię i nazwisko>” (jedna treść dla ekranów i wydruku, kontrakt), a bez danych „Jeszcze niepotwierdzone”;
   - `kind: "fiction"` z `name, reason, deliveryMethod, deliveredOn, date`: wpis o fikcji zapoznania (przyczyna, sposób i dzień doręczenia, data wpisu).
   S-02 i S-06 tylko używają `ConfirmationBlock`; nikt nie tworzy drugiego bloku ani nie dopisuje wariantu.
 

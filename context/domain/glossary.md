@@ -30,7 +30,7 @@ Plastry: F-01 `rules-engine-and-demo-data`, S-01 `cycle-start-criteria`, S-02 `a
 | Słowo na ekranie | Znaczenie | Nazwa w kodzie | Nie nazywaj tego |
 |---|---|---|---|
 | cykl oceny | 24 miesiące od początku okresu do terminu oceny (art. 81 ust. 4 ustawy). | `cycles`; początek `cycle_started` | „kampania”; `review`, `appraisal` |
-| bieżący (otwarty) cykl | Widoczny cykl osoby bez zapoznania z oceną i bez fikcji zapoznania; gdy jest ich kilka, najpóźniejszy. Tylko do niego trafiają nowe notatki i zapisy. | `openCycle(personId)` | „pierwszy widoczny cykl”, „aktywny cykl”; `currentCycle`, `activeCycle` |
+| bieżący (otwarty) cykl | Widoczny cykl osoby bez zapoznania z oceną i bez fikcji zapoznania; gdy jest ich kilka, najpóźniejszy. Do niego trafiają nowe notatki i zapisy części I, oceny, nieobecności i zmiany oceniającego. Notatka o osobie bez otwartego cyklu ma puste `cycle_id`; rozstrzygnięcie sprzeciwu i przyznanie stopnia zapisuje się przy cyklu już zamkniętym. | `openCycle(personId)` | „pierwszy widoczny cykl”, „aktywny cykl”; `currentCycle`, `activeCycle` |
 | powód rozpoczęcia cyklu | Zatrudnienie na czas nieokreślony, mianowanie albo poprzednia ocena. | `cycle_started.payload.reason`: `hired`, `appointed`, `previous_assessment` | `trigger`, `type` |
 | początek okresu oceny | Dzień, od którego liczy się 24 miesiące (Piotr: 27.11.2024). | `cycles.period_start`, `periodStart`; w migawce `periodFrom` | „dzień rozmowy”; `start_date` |
 | poprzednia ocena | Dzień jej sporządzenia, dzień zapoznania i wynik. | `previousAssessmentOn`, `previousAcknowledgedOn`, `previousOutcome` w `cycle_started` | — |
@@ -91,7 +91,7 @@ Plastry: F-01 `rules-engine-and-demo-data`, S-01 `cycle-start-criteria`, S-02 `a
 | lista słów | Ustawienie urzędu, które tylko wstępnie zaznacza pole. | `taskChangeWords` | „model”, „NLP” |
 | podpowiedź (adapter) | Jedno wymienne miejsce na podpowiedzi; dostaje tekst bez nazwisk. | `src/suggestions/index.ts`, `suggestForNote`, `suggestionMode()`: `rules`, `local-model`, `none` | „AI”, „model językowy” |
 | „To stała zmiana zadań?” | Jedno pytanie zamknięte po notatce z zaznaczonym polem; odpowiada tylko autor notatki (inne konto: 403). | `task_change_answered { noteId, answer, developmentFormId }`, `GET/POST /notes/:noteId/task-change` | „alert”, „ryzyko” |
-| forma rozwoju | Pozycja z katalogu (ustawienie urzędu) pokazana po „Tak”. | `developmentForms`, `developmentFormId`, `pickDevelopmentForm` | „szkolenie zalecone przez AI” |
+| forma rozwoju | Pozycja z katalogu (ustawienie urzędu) pokazana po „Tak”. | `developmentForms`, `developmentFormId`, `suggestDevelopmentForm(note)` | „szkolenie zalecone przez AI” |
 | informacja zwrotna | Poprawiony tekst notatki wysłany przez autora notatki przyciskiem „Przekaż pracownikowi”; oceniany ją widzi. Cudza notatka: 403, notatki nie ma: 404. | `feedback_messages`, `sendFeedback`, `lastFeedbackDate`, `GET /feedback` | „udostępniona notatka”, `shared_note` |
 | „Wstaw do uzasadnienia” | Dopisuje zaznaczone notatki z datą do pola; nic nie zapisuje. | `formatNoteForInsert`, slot `justificationTools` | „generuj uzasadnienie” |
 | „Przed rozmową z pracownikiem” | Zestawienie własnych wpisów przełożonego z pytaniem albo działaniem przy każdej pozycji. | `GET /cycles/:id/before-meeting`, `beforeMeetingSummary` | „raport o pracowniku”, „analiza ryzyka” |
