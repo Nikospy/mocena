@@ -12,13 +12,15 @@ checkpoint:
     - topic: "podpis"
       decision: "potwierdzenie w systemie na koncie ocenianego; wydruk i PDF jako opcja"
     - topic: "fikcja zapoznania"
-      decision: "nazwa organizatora; adnotacja oceniającego i potwierdzenie kadr"
+      decision: "nazwa organizatora; stwierdza sam oceniający (nie mógł / nie chciał), kadry widzą wpis"
     - topic: "zakres pokazu"
       decision: "cały proces od początku cyklu, 5 kroków w 3 minuty"
   frs_drafted: 34
   quality_check_status: accepted
 ---
 
+> **Nieaktualne w części.** To notatki wejściowe do pierwszej wersji PRD, sprzed decyzji autora z 21.11.2026. Obowiązują `decisions.md` i `prd.md` (wersja 2, 36 wymagań). Różnice dotyczą HR partnera, fikcji zapoznania, podpowiedzi kryteriów i miejsca na model.
+>
 > Notatki powstały bez sesji pytań: źródłem jest opis wyzwania organizatora i plan budowy uzgodniony z autorem projektu. Treść sekcji odpowiada sekcjom PRD.
 
 # mOcena
@@ -120,7 +122,7 @@ Ocena nie psuje się przy formularzu, tylko przez 24 miesiące ciszy przed nim. 
 ### Początek cyklu
 - FR-001: System może rozpocząć cykl oceny po zatrudnieniu na czas nieokreślony, mianowaniu albo poprzedniej ocenie i przypomnieć oceniającemu o wyznaczeniu kryteriów w terminie 30 dni (7 dni po ocenie negatywnej). Priority: must-have
 - FR-002: Oceniający może zobaczyć arkusz A, B albo C dobrany do rodzaju stanowiska wraz z jego kryteriami obowiązkowymi. Priority: must-have
-- FR-003: Oceniający może wybrać do 3 kryteriów dodatkowych z wykazu, widząc podpowiedź wynikającą z opisu stanowiska z jednozdaniowym uzasadnieniem. Priority: must-have
+- FR-003: Oceniający może wybrać do 3 kryteriów dodatkowych z wykazu, widząc podpowiedź wynikającą z rodzajów obowiązków przypisanych do stanowiska, z jednozdaniowym uzasadnieniem. Priority: must-have
 - FR-004: Oceniający może zapisać oczekiwania co do sposobu spełniania kryteriów. Priority: must-have
 - FR-005: Oceniający może otworzyć kartę przygotowania do rozmowy rozpoczynającej: cel, wymagane tematy, pytania, trudne sytuacje. Priority: must-have
 - FR-006: Oceniający może potwierdzić rozmowę i kryteria oraz przekazać część I ocenianemu. Priority: must-have
@@ -201,7 +203,7 @@ Rodzaj nieobecności nie jest widoczny poza kadrami. Pola zablokowane zmienia wy
 ## Non-Goals
 
 - Asystent nie wystawia ocen i nie układa zdań o pracowniku. Uzasadnienie składa się z notatek przełożonego.
-- Prototyp nie używa modelu językowego. Pytanie HR partnera wynika z listy słów spisanej z góry.
+- Prototyp nie używa modelu językowego. Zmianę zadań pracownika zaznacza oceniający przy notatce; lista słów tylko podpowiada to zaznaczenie.
 - Brak wysyłki e-maili i integracji z elektronicznym systemem zarządzania dokumentacją; powiadomienia są widoczne w produkcie.
 - Brak podpisu kwalifikowanego, zaufanego i osobistego; potwierdzenie w systemie nazywamy potwierdzeniem, nie podpisem.
 - Brak importu danych z systemu kadrowego; dane pokazowe są wgrane z góry.
@@ -215,7 +217,7 @@ Rodzaj nieobecności nie jest widoczny poza kadrami. Pola zablokowane zmienia wy
 1. **Czy potwierdzenie w systemie wystarcza w prototypie jako odpowiednik podpisu, czy organizator chce zobaczyć podpis zaufany albo obieg w systemie dokumentacji?** — Owner: user (pytanie do mentorów DSC). By: 2026-11-21 wieczór. Block: no (przyjęte: potwierdzenie w systemie).
 2. **Co organizator chce zobaczyć w module HR partnera, żeby uznać go za innowacyjny?** — Owner: user (pytanie do mentorów DSC). By: 2026-11-21 wieczór. Block: no (przyjęte: wariant A+ bez modelu).
 3. **Czy składanie uzasadnienia z notatek przełożonego organizator uzna za wsparcie w formułowaniu treści oceny?** — Owner: user (pytanie do mentorów DSC). By: 2026-11-21 wieczór. Block: no.
-4. **Kto w praktyce stwierdza fikcję zapoznania i co musi być zapisane?** — Owner: user (pytanie do mentorów DSC). Block: no (przyjęte: adnotacja oceniającego i potwierdzenie kadr).
+4. **Kto w praktyce stwierdza fikcję zapoznania i co musi być zapisane?** — Owner: user (pytanie do mentorów DSC). Block: no (przyjęte przez autora 2026-11-21: stwierdza sam oceniający, kadry widzą wpis).
 5. **Długość slotu pokazu** — znana 2026-11-22 o 14:45. Przyjęte 3 minuty, z wersją 90 sekund i 5 minut.
 
 ## Forward: tech stack

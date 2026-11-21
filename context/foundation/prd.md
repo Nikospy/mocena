@@ -30,14 +30,14 @@ Ocena nie psuje się przy formularzu, tylko przez 24 miesiące ciszy przed nim. 
 ### Secondary persona
 
 - **Piotr, oceniany:** na własnym koncie potwierdza rozmowę i kryteria, czyta informację zwrotną, potwierdza zapoznanie się z oceną.
-- **Joanna Mazur, kadry (zarządzający):** wpisuje nieobecności i zmiany podległości, potwierdza fikcję zapoznania, dostaje przypomnienia o stopniach służbowych, widzi stan wszystkich cykli.
+- **Joanna Mazur, kadry (zarządzający):** wpisuje nieobecności i zmiany podległości, widzi wpisy o fikcji zapoznania, dostaje przypomnienia o stopniach służbowych, widzi stan wszystkich cykli.
 - **Dyrektor generalny:** widzi stan cykli i liczniki terminowości bez nazwisk.
 
 ## Success Criteria
 
 ### Primary
 - W trzyminutowym pokazie jury widzi cały proces jednej oceny: początek cyklu, wybór arkusza i kryteriów, potwierdzenie ocenianego, okres oceny z notatkami i nieobecnością, ocenę i potwierdzenie zapoznania, bez jednego dokumentu papierowego.
-- Z 30 czynności z listy przypadków użycia organizatora co najmniej 16 działa w prototypie, a pozostałe mają widoczny stan albo są jawnie nazwane jako poza prototypem.
+- Z 30 czynności z listy przypadków użycia organizatora co najmniej 15 działa w prototypie, a pozostałe mają widoczny stan albo są jawnie nazwane jako poza prototypem.
 
 ### Secondary
 - Moduł wirtualnego HR partnera w pokazie reaguje na notatkę przełożonego pytaniem i propozycją działania, a na notatkę bez sygnału nie reaguje.
@@ -82,7 +82,7 @@ Ocena nie psuje się przy formularzu, tylko przez 24 miesiące ciszy przed nim. 
 #### Acceptance Criteria
 - Nieobecności 05.10–16.10.2026 i 19.10–06.11.2026 są liczone jako jedna, od 05.10 do 06.11
 - Termin wypadający w sobotę albo dzień wolny przechodzi na następny dzień roboczy
-- Na osi widać też zmianę oceniającego: kryteria zostają bez zmian
+- Na osi czasu innej pracownicy (Ewy) widać zmianę oceniającego: kryteria zostają bez zmian
 
 ### US-04: HR partner pyta przełożonego o zmianę zadań
 
@@ -190,7 +190,7 @@ Role: oceniający, oceniany, kadry (zarządzający), dyrektor generalny, adminis
 | Notatki robocze (brudnopis) | tylko autor | brak | eksport na wniosek osoby, której dotyczą | brak |
 | Informacja zwrotna wysłana ocenianemu | autor | wgląd | brak | brak |
 | Nieobecności i zmiany podległości | wgląd w daty | brak | edycja | brak |
-| Fikcja zapoznania | adnotacja | brak | potwierdzenie | brak |
+| Fikcja zapoznania | stwierdzenie („nie mógł” albo „nie chciał”) | brak | wgląd | brak |
 | Stan cykli i przypomnienia o stopniach | własny zespół | własny cykl | wszyscy | wszyscy, liczniki bez nazwisk |
 
 Rodzaj nieobecności nie jest widoczny poza kadrami. Pola zablokowane zmienia wyłącznie administrator w trybie korekty błędów. W prototypie logowanie odbywa się przez wybór jednego z kont demonstracyjnych; osoba niezalogowana widzi tylko ekran wyboru konta.

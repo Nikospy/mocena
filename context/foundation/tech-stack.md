@@ -21,4 +21,6 @@ hints:
 
 ## Why this stack
 
+> Pola nagłówka tego pliku to dane wejściowe narzędzia startowego. Obowiązuje `decisions.md` (decyzja 7): bez CI, bez logowania hasłem (`has_auth` oznacza tylko podział ról przez wybór konta), bez zadań w tle.
+
 TypeScript na Bun z Hono: istniejący silnik wyniku oceny i terminów jest już w TypeScript i ma testy w `bun test`, więc przenosi się bez zmian. Hono daje routing i szablony JSX renderowane na serwerze bez etapu budowania, co pasuje do prostych ekranów na telefon i komputer oraz do stylu drukowania arkusza. Dane leżą w jednym pliku bazy (`bun:sqlite`), a przepisy w pliku JSON z wersją i datą obowiązywania. Całość to jeden proces bez płatnych licencji (Bun, Hono i htmx mają licencje MIT albo 0BSD), który urząd uruchamia u siebie, także w kontenerze. Skrypty przeglądarki i style są w repo, bez CDN, bo pokaz ma działać bez sieci. Odstępstwo od karty startera: szablon `bun` zamiast `nodejs` i `bun` jako menedżer pakietów. Kod i nazwy plików są po angielsku, interfejs po polsku. Bez CI: bramką jest `bun test` i przebieg pokazu.

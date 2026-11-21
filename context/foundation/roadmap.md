@@ -4,7 +4,7 @@ version: 1
 status: active
 created: 2026-11-21
 updated: 2026-11-21
-prd_version: 1
+prd_version: 2
 main_goal: speed
 top_blocker: time
 milestone_id: full-cycle-demo
@@ -14,7 +14,7 @@ milestone_status: open
 
 # Roadmap: mOcena
 
-> Derived from `context/foundation/prd.md` (v1) and `context/foundation/tech-stack.md` + codebase baseline.
+> Derived from `context/foundation/prd.md` (v2) and `context/foundation/tech-stack.md` + codebase baseline.
 > Edit-in-place; the next milestone continues this file. Archive only when an independent roadmap replaces it.
 > Slices below are listed in dependency order. The "At a glance" table is the index.
 > Kolejność budowy przyjęta przez autora 2026-11-21: F-01, S-01, S-02, S-04, S-05, S-03, S-06.
@@ -26,7 +26,7 @@ milestone_status: open
 - **Intent:** Jedna ocena okresowa przechodzi w prototypie całą drogę, od początku cyklu do potwierdzenia zapoznania, na trzech kontach (oceniający, oceniany, kadry), bez papieru.
 - **Source materials:** `context/foundation/prd.md` (v1)
 - **Done when:** every F-NN and S-NN below is `done`, plus dwa pełne przebiegi pokazu bez błędu, nagranie zapasowe i prezentacja PDF.
-- **Scope anchors:** FR-001–FR-034, US-01–US-05.
+- **Scope anchors:** FR-001–FR-036, US-01–US-05.
 
 ## Vision recap
 
@@ -70,7 +70,7 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Auth:** absent.
 - **Deploy / infra:** absent — uruchomienie lokalne przez `bun run dev`.
 - **Observability:** absent — poza zakresem prototypu.
-- **Poza repo:** gotowy, przetestowany silnik wyniku oceny i terminów w TypeScript oraz dane rozporządzenia w JSON (repo przygotowań autora); `F-01` go przenosi.
+- **W repo, do przemianowania:** przetestowany silnik wyniku oceny i terminów oraz dane rozporządzenia w JSON, skopiowane z nazwami po polsku (`reguly/`, `src/silnik/`); `F-01` przenosi je na nazwy angielskie.
 
 ## Foundations
 
@@ -85,7 +85,7 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Stoi pierwszy, bo każdy plaster potrzebuje kont, danych i reguł. Ryzyko: rozrośnie się w „warstwę danych”; granica to jeden wydział i tylko tabele, których potrzebuje S-01.
-- **Status:** ready
+- **Status:** in-progress
 
 ## Slices
 
@@ -98,7 +98,7 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:**
-  - Czy podpowiedź kryteriów z opisu stanowiska da się oprzeć na prostych regułach? — Owner: team. Block: no (wyjście awaryjne: stała podpowiedź dla stanowisk pokazowych).
+  - Czy podpowiedź kryteriów z opisu stanowiska da się oprzeć na prostych regułach? — Owner: team. Rozstrzygnięte 2026-11-21: tabela „rodzaj obowiązku → kryterium” w pliku reguł (`decisions.md`, decyzja 6b).
 - **Risk:** Pierwszy ekran ustala wygląd całego produktu, więc tu zapada kierunek wizualny. Pokazuje dwie pierwsze trudności wymienione przez organizatora.
 - **Status:** proposed
 
