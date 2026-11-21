@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nieobecności i oś czasu: Piotr Wójcik · mOcena</title>
+<link rel="stylesheet" href="../../../public/rodzina.css">
+<link rel="stylesheet" href="../../../public/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#"><b>m</b>Ocena</a>
+    <nav class="nav" aria-label="Główna">
+      <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>Stan cykli</a>
+      <a href="#" aria-current="page"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Nieobecności</a>
+    </nav>
+    <p class="who"><b>Joanna Mazur</b> · kadry<br>9 listopada 2026</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card hdr slim" aria-label="Cykl oceny">
+    <div class="hdr-id">
+      <p class="cap">Nieobecności i oś czasu cyklu oceny</p>
+      <h1>Piotr Wójcik</h1>
+    </div>
+    <ol class="steps5" aria-label="Etapy cyklu oceny"><li class="done"><span class="dot"><span class="n">1</span><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Kryteria</span></li><li class="cur"><span class="dot"><span class="n">2</span><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Okres oceny</span></li><li class=""><span class="dot"><span class="n">3</span><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Rozmowa</span></li><li class=""><span class="dot"><span class="n">4</span><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Ocena</span></li><li class=""><span class="dot"><span class="n">5</span><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Zapoznanie</span></li></ol>
+    <div class="demo" id="demo" hidden>
+      <button type="button" class="sw" role="switch" aria-checked="false" id="sw"><span class="trk"></span>Pokaż stan przed dodaniem</button>
+    </div>
+  </section>
+
+  <div class="t-grid">
+  <div class="t-main">
+  <section class="rule term-card" aria-labelledby="h-term">
+    <div class="term-top">
+      <div class="term-main">
+        <div class="voice rule-v"><span class="pg" aria-hidden="true">§</span><div><h2 class="term-cap" id="h-term">Termin oceny</h2> · wyliczony z przepisu</div></div>
+        <div class="term-date" aria-live="polite"><span class="big" id="term-big">27 listopada 2026</span><span class="cmp"><span class="old" id="term-old" hidden></span><span class="delta" id="term-delta" hidden></span></span></div>
+        <div class="term-meta">
+          <span class="basis act" id="term-basis"><span class="art">art. 81 ust. 4 ustawy o służbie cywilnej</span><span class="ver">reguły 2016-470/1</span></span>
+          <p class="cap" id="term-note">24 miesiące od poprzedniej oceny.</p>
+        </div>
+      </div>
+      <div class="legend" aria-hidden="true"><span><i></i>wpisał człowiek</span><span><i class="r"></i>wyliczone z przepisu</span><span><i class="b"></i>nieobecność</span></div>
+    </div>
+
+    <div class="ax-wrap">
+      <div class="ax" id="ax" role="img" aria-label="Oś czasu cyklu oceny od 27 listopada 2024 do 30 grudnia 2026"><div class="ax-in" id="ax-in"></div></div>
+      <ol class="ax-list" id="ax-list"></ol>
+    </div>
+  </section>
+
+  <section class="rule why" aria-labelledby="h-why">
+    <h2 id="h-why">Co z tego wynika</h2>
+    <p class="cap">Wyliczone z przepisu.</p>
+    <ol id="why-list"></ol>
+  </section>
+  </div>
+
+  <div class="t-side">
+      <section class="card" id="form-card" aria-labelledby="h-add">
+        <h2 id="h-add">Dodaj nieobecność</h2>
+        <div class="form-gap">
+          <div class="dates">
+            <div class="dt" id="dt-od"><button type="button" class="tok" aria-haspopup="dialog" aria-expanded="false"><span class="k">Od <i>Zmień</i></span><span class="v" id="v-od">19 października 2026</span></button></div>
+            <div class="dt" id="dt-do"><button type="button" class="tok" aria-haspopup="dialog" aria-expanded="false"><span class="k">Do <i>Zmień</i></span><span class="v" id="v-do">6 listopada 2026</span></button></div>
+          </div>
+          <div id="date-err" class="st bad" hidden><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4.5M12 17.5h.01"/></svg><div>Data końca jest przed datą początku. Zmień jedną z nich.</div></div>
+          <label class="cb">
+            <input type="checkbox" id="excused" checked>
+            <span class="box"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+            <span><span class="cbt">Usprawiedliwiona</span></span>
+          </label>
+          <div role="radiogroup" aria-labelledby="l-rodzaj">
+            <span class="lbl" id="l-rodzaj">Rodzaj</span>
+            <div class="seg fit">
+              <label><input type="radio" name="rodzaj" value="urlop" checked><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>urlop</span></label>
+              <label><input type="radio" name="rodzaj" value="inna nieobecność"><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>inna nieobecność</span></label>
+            </div>
+          </div>
+          <button type="button" class="btn primary full" id="add">Dodaj nieobecność</button>
+        </div>
+      </section>
+      <section class="card" aria-labelledby="h-abs">
+        <h2 id="h-abs">Nieobecności</h2>
+        <div id="abs-list"></div>
+        <p class="privacy"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>Rodzaj nieobecności widzą tylko kadry.</p>
+      </section>
+
+  </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var DAY = 86400000;
+  var $ = function (id) { return document.getElementById(id); };
+  var MONTHS = ["stycznia","lutego","marca","kwietnia","maja","czerwca","lipca","sierpnia","września","października","listopada","grudnia"];
+  var MONTHS_N = ["styczeń","luty","marzec","kwiecień","maj","czerwiec","lipiec","sierpień","wrzesień","październik","listopad","grudzień"];
+  var ICO_CHECK = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  var ICO_USER = '<svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>';
+  function U(y, m, d) { return Date.UTC(y, m, d); }
+  function ymd(t) { var d = new Date(t); return { y: d.getUTCFullYear(), m: d.getUTCMonth(), d: d.getUTCDate() }; }
+  function fmt(t) { var o = ymd(t); return o.d + " " + MONTHS[o.m] + " " + o.y; }
+  function fmtRange(a, b) {
+    var x = ymd(a), y = ymd(b);
+    if (x.y === y.y && x.m === y.m) return x.d + "–" + y.d + " " + MONTHS[x.m] + " " + x.y;
+    if (x.y === y.y) return x.d + " " + MONTHS[x.m] + " – " + y.d + " " + MONTHS[y.m] + " " + y.y;
+    return fmt(a) + " – " + fmt(b);
+  }
+  function nbsp(s) { return s.replace(/ (\d)/g, "\u00a0$1"); }
+
+  var TODAY = U(2026, 10, 9), CYCLE = U(2024, 10, 27), ORIG = U(2026, 10, 27), END0 = U(2026, 11, 30);
+  var FIRST = { from: U(2026, 9, 5), to: U(2026, 9, 16), excused: true, kind: "urlop", by: "Joanna Mazur" };
+  var added = null, view = "a";
+  var form = { od: U(2026, 9, 19), "do": U(2026, 10, 6) };
+
+  /* ---------- reguły: łączenie, dłuższe niż miesiąc, przesunięcie terminu ---------- */
+  function plDays(n) { return n === 1 ? "dzień" : "dni"; }
+  function compute(list) {
+    var xs = list.filter(function (a) { return a.excused; }).sort(function (a, b) { return a.from - b.from; });
+    var blocks = [], weekendGaps = [];
+    xs.forEach(function (a) {
+      var b = blocks[blocks.length - 1];
+      if (b) {
+        if (a.from <= b.to + DAY) { b.to = Math.max(b.to, a.to); b.parts++; return; }
+        var onlyWeekend = true;
+        for (var t = b.to + DAY; t < a.from; t += DAY) { var w = new Date(t).getUTCDay(); if (w !== 0 && w !== 6) onlyWeekend = false; }
+        if (onlyWeekend) { weekendGaps.push([b.to + DAY, a.from - DAY]); b.to = Math.max(b.to, a.to); b.parts++; return; }
+      }
+      blocks.push({ from: a.from, to: a.to, parts: 1 });
+    });
+    var shift = 0;
+    blocks.forEach(function (b) {
+      b.days = Math.round((b.to - b.from) / DAY) + 1;
+      var o = ymd(b.from), oneMonth = U(o.y, o.m + 1, o.d);
+      b.long = b.to + DAY > oneMonth;
+      if (b.long) shift += b.days;
+    });
+    return { blocks: blocks, gaps: weekendGaps, shift: shift, term: ORIG + shift * DAY };
+  }
+
+  function basis(art, mini) { var par = /^§ /.test(art); art = art.replace(/^§ /, ""); return '<span class="basis' + (mini ? " mini" : "") + (par ? "" : " act") + '">' + (par ? '<span class="pg">§</span>' : "") + '<span class="art">' + art + '</span><span class="ver">reguły 2016-470/1</span></span>'; }
+
+  /* ---------- oś czasu ---------- */
+  var CY = 140, OFF1 = 32, OFF2 = 150, OFF3 = 92; /* CY zgodne z --cy w .ax (styl.css); wysokość osi ustala CSS */
+  var axIn = $("ax-in"), els = {};
+  function mk(cls, parent) { var e = document.createElement("div"); e.className = cls; (parent || axIn).appendChild(e); return e; }
+  function evEl(key, dotCls, labCls, dash) {
+    els[key] = { lead: mk("ax-lead" + (dash ? " dash" : "")), dot: mk("ax-dot " + dotCls), lab: mk("ax-lab " + labCls) };
+  }
+  evEl("start", "", "l"); evEl("ev2", "", "l"); evEl("ev3", "", "r"); evEl("today", "now", "r today", true);
+  evEl("ghost", "rule ghost hid", "r struck hid"); evEl("term", "rule term", "r term");
+  var axisLine = mk("ax-line", axIn), axisFill = mk("ax-line fill", axIn);
+  var barsBox = mk("", axIn); barsBox.style.cssText = "position:absolute;inset:0;pointer-events:none";
+  var barLab = mk("ax-lab r bar"); var barLead = mk("ax-lead");
+  var ruler = mk("ruler");
+
+  function place(key, pct, side, off, html) {
+    var e = els[key], L = typeof pct === "string" ? pct : pct + "%"; e.dot.style.left = L; e.lead.style.left = L; e.lab.style.left = L;
+    e.lead.style.height = off + "px";
+    if (side === "up") { e.lead.style.top = (CY - off) + "px"; e.lab.style.bottom = "calc(100% - " + (CY - off) + "px)"; e.lab.style.top = "auto"; }
+    else { e.lead.style.top = CY + "px"; e.lab.style.top = (CY + off) + "px"; e.lab.style.bottom = "auto"; }
+    if (html !== undefined) e.lab.innerHTML = html;
+  }
+  function lab(title, sub, art) { return "<b>" + title + "</b>" + (sub ? "<span>" + sub + "</span>" : "") + (art ? "<br>" + basis(art, true) : ""); }
+
+  function renderAxis(c) {
+    var a = CYCLE, b = Math.max(END0, c.term), span = b - a;
+    function pos(t) { return ((t - a) / span) * 100; }
+    var shifted = c.shift > 0;
+    axisFill.style.width = pos(TODAY) + "%"; axisLine.style.right = (100 - pos(c.term)) + "%";
+    place("start", pos(CYCLE), "up", OFF1, lab("27 listopada 2024", "Poprzednia ocena. Początek cyklu.", "art. 81 ust. 4"));
+    place("ev2", "max(" + pos(U(2024, 11, 12)) + "%, calc(" + pos(CYCLE) + "% + 22px))", "down", OFF1, lab("12 grudnia 2024", "Rozmowa o kryteriach i potwierdzenie Piotra", "§ 7 pkt 1 rozporządzenia"));
+    place("ev3", pos(U(2026, 2, 9)), "up", OFF1, lab("9 marca 2026", "Zmiana zadań, z notatki przełożonego"));
+    var barEnd = -1; c.blocks.forEach(function (bl) { if (bl.to < TODAY) barEnd = Math.max(barEnd, pos(bl.to + DAY)); });
+    place("today", barEnd < 0 ? pos(TODAY) : "max(" + pos(TODAY) + "%, calc(" + barEnd + "% + 6px))", "down", OFF3, lab("Dziś", fmt(TODAY)));
+    place("term", pos(c.term), "up", OFF1, lab(nbsp(fmt(c.term)), shifted ? "Nowy termin oceny" : "Termin oceny", shifted ? "art. 81 ust. 7" : "art. 81 ust. 4"));
+    place("ghost", pos(ORIG), "down", OFF2, lab(nbsp(fmt(ORIG)), "Termin pierwotny", "art. 81 ust. 4"));
+    ["ghost"].forEach(function (k) { ["lead", "dot", "lab"].forEach(function (p) { els[k][p].classList.toggle("hid", !shifted); }); });
+    // nieobecności
+    barsBox.innerHTML = "";
+    var longest = null;
+    c.blocks.forEach(function (bl) {
+      var bar = document.createElement("div"); bar.className = "ax-bar"; bar.style.left = pos(bl.from) + "%"; bar.style.width = (pos(bl.to + DAY) - pos(bl.from)) + "%"; barsBox.appendChild(bar);
+      if (!longest || bl.days > longest.days) longest = bl;
+    });
+    if (longest) {
+      barLab.style.display = barLead.style.display = "";
+      barLab.style.left = barLead.style.left = pos(longest.from) + "%";
+      barLead.style.top = CY + "px"; barLead.style.height = OFF1 + "px"; barLab.style.top = (CY + OFF1) + "px";
+      barLab.innerHTML = "<b>" + nbsp(fmtRange(longest.from, longest.to)) + "</b><span>Nieobecność · " + longest.days + " " + plDays(longest.days) + "</span>";
+    } else { barLab.style.display = barLead.style.display = "none"; }
+    // podziałka
+    ruler.innerHTML = "";
+    for (var y = 2024; y <= 2027; y++) [[0, "styczeń"], [6, "lipiec"]].forEach(function (m) {
+      var t = U(y, m[0], 1); if (t <= a || t >= b) return;
+      var tk = document.createElement("i"); tk.style.left = pos(t) + "%"; ruler.appendChild(tk);
+      var sp = document.createElement("span"); sp.style.left = pos(t) + "%"; sp.textContent = m[1] + " " + y; ruler.appendChild(sp);
+    });
+    // lista na telefon
+    var items = [
+      [CYCLE, "27 listopada 2024", "Poprzednia ocena. Początek cyklu.", "art. 81 ust. 4", false],
+      [U(2024, 11, 12), "12 grudnia 2024", "Rozmowa o kryteriach i potwierdzenie Piotra", "§ 7 pkt 1 rozporządzenia", false],
+      [U(2026, 2, 9), "9 marca 2026", "Zmiana zadań, z notatki przełożonego", "", false]
+    ];
+    c.blocks.forEach(function (bl) { items.push([bl.from, fmtRange(bl.from, bl.to), "Nieobecność · " + bl.days + " " + plDays(bl.days), "", false]); });
+    items.push([TODAY, "Dziś, " + fmt(TODAY), "", "", false]);
+    if (shifted) items.push([ORIG, fmt(ORIG), "Termin pierwotny", "art. 81 ust. 4", true]);
+    items.push([c.term, fmt(c.term), shifted ? "Nowy termin oceny" : "Termin oceny", shifted ? "art. 81 ust. 7" : "art. 81 ust. 4", false]);
+    items.sort(function (x, y) { return x[0] - y[0]; });
+    $("ax-list").innerHTML = items.map(function (it) {
+      return '<li><b class="' + (it[4] ? "struck" : "") + '">' + it[1] + "</b>" + (it[2] ? "<span>" + it[2] + "</span>" : "") + (it[3] ? "<span>" + basis(it[3], true) + "</span>" : "") + "</li>";
+    }).join("");
+    $("ax").setAttribute("aria-label", "Oś czasu cyklu oceny od 27 listopada 2024 do " + fmt(b));
+  }
+
+  /* ---------- reszta ekranu ---------- */
+  var prevTerm = null;
+  function render(animateNew) {
+    var list = [FIRST].concat(view === "b" && added ? [added] : []);
+    var c = compute(list), shifted = c.shift > 0 && view === "b";
+    if (view === "a") c = compute([FIRST]);
+    shifted = c.shift > 0;
+
+    // nieobecności
+    $("abs-list").innerHTML = list.map(function (a, k) {
+      var days = Math.round((a.to - a.from) / DAY) + 1;
+      return '<div class="abs-row' + (k === list.length - 1 && k > 0 && animateNew ? " enter" : "") + '"><div><span class="d">' + nbsp(fmtRange(a.from, a.to)) + '</span><p class="cap" style="margin-top:var(--sp-50)">' + days + " " + plDays(days) + " · " + (a.excused ? "usprawiedliwiona" : "nieusprawiedliwiona") + " · rodzaj: " + a.kind + '</p></div><span class="sign">' + ICO_USER + a.by + "</span></div>";
+    }).join("");
+
+    // bohater: termin
+    var big = $("term-big");
+    big.textContent = nbsp(fmt(c.term));
+    $("term-old").hidden = $("term-delta").hidden = !shifted;
+    if (shifted) { $("term-old").textContent = nbsp(fmt(ORIG)); $("term-delta").textContent = "+" + c.shift + " " + plDays(c.shift); }
+    $("term-basis").outerHTML = basis(shifted ? "art. 81 ust. 7 ustawy o służbie cywilnej" : "art. 81 ust. 4 ustawy o służbie cywilnej", false).replace('<span class="basis', '<span id="term-basis" class="basis');
+    $("term-note").textContent = shifted ? "Nowy termin widzą Marek Zieliński i Piotr Wójcik, bez rodzaju nieobecności." : "24 miesiące od poprzedniej oceny.";
+    if (prevTerm !== null && prevTerm !== c.term) { big.classList.remove("flash"); void big.offsetWidth; big.classList.add("flash"); }
+    prevTerm = c.term;
+
+    // co z tego wynika
+    var steps = [];
+    var multi = c.blocks.filter(function (b) { return b.parts > 1; })[0];
+    if (multi) {
+      var g = c.gaps[0];
+      steps.push(["Obie nieobecności dzieli tylko weekend (" + (g ? fmtRange(g[0], g[1]) : "") + "), więc liczą się jako jedna: " + nbsp(fmtRange(multi.from, multi.to)) + ", " + multi.days + " " + plDays(multi.days) + ".", "art. 81 ust. 7"]);
+    } else if (c.blocks.length === 1) {
+      steps.push(["Wpisano jedną nieobecność: " + nbsp(fmtRange(c.blocks[0].from, c.blocks[0].to)) + ", " + c.blocks[0].days + " " + plDays(c.blocks[0].days) + ".", ""]);
+    }
+    c.blocks.forEach(function (bl) {
+      if (multi && bl !== multi) return;
+      steps.push([bl.long ? "To dłużej niż miesiąc, więc przedłuża termin oceny." : "To krócej niż miesiąc, więc nie przedłuża terminu oceny.", "art. 81 ust. 7"]);
+    });
+    steps.push([shifted ? "Termin oceny przesuwa się o " + c.shift + " " + plDays(c.shift) + ": z " + nbsp(fmt(ORIG)) + " na <b>" + nbsp(fmt(c.term)) + "</b>." : "Termin oceny bez zmian: " + nbsp(fmt(ORIG)) + ".", shifted ? "art. 81 ust. 7" : "art. 81 ust. 4"]);
+    $("why-list").innerHTML = steps.map(function (s) { return "<li" + (animateNew ? ' class="enter"' : "") + "><div><p>" + s[0] + "</p>" + (s[1] ? basis(s[1] + " ustawy o służbie cywilnej", false) : "") + "</div></li>"; }).join("");
+
+    renderAxis(c);
+    $("form-card").hidden = view === "b";
+    $("demo").hidden = !added;
+    $("sw").setAttribute("aria-checked", String(view === "a" && !!added));
+  }
+
+  /* ---------- własny wybór daty ---------- */
+  var cal = null, calKey = null, cv = null;
+  function closeCal() { if (cal) { cal.remove(); cal = null; } Array.prototype.forEach.call(document.querySelectorAll(".dt .tok"), function (b) { b.setAttribute("aria-expanded", "false"); }); calKey = null; }
+  function drawCal() {
+    var first = U(cv.y, cv.m, 1), lead = (new Date(first).getUTCDay() + 6) % 7, n = new Date(Date.UTC(cv.y, cv.m + 1, 0)).getUTCDate();
+    var h = '<div class="cal-h"><button type="button" data-nav="-1" aria-label="Poprzedni miesiąc"><svg class="ico" viewBox="0 0 24 24" style="transform:rotate(90deg)"><path d="M6 9.5l6 6 6-6"/></svg></button><b>' + MONTHS_N[cv.m] + " " + cv.y + '</b><button type="button" data-nav="1" aria-label="Następny miesiąc"><svg class="ico" viewBox="0 0 24 24" style="transform:rotate(-90deg)"><path d="M6 9.5l6 6 6-6"/></svg></button></div><div class="cal-g">';
+    ["Pn","Wt","Śr","Cz","Pt","So","Nd"].forEach(function (d) { h += '<span class="wd">' + d + "</span>"; });
+    for (var i = 0; i < lead; i++) h += "<span></span>";
+    for (var d = 1; d <= n; d++) {
+      var t = U(cv.y, cv.m, d), w = new Date(t).getUTCDay();
+      h += '<button type="button" data-t="' + t + '" class="' + (t === form[calKey] ? "sel " : "") + (w === 0 || w === 6 ? "we" : "") + '" aria-label="' + fmt(t) + '"' + (t === form[calKey] ? ' aria-pressed="true"' : "") + ">" + d + "</button>";
+    }
+    cal.innerHTML = h + "</div>";
+  }
+  ["od", "do"].forEach(function (key) {
+    var box = $("dt-" + key), btn = box.querySelector(".tok");
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var was = calKey === key; closeCal(); if (was) return;
+      calKey = key; var o = ymd(form[key]); cv = { y: o.y, m: o.m };
+      cal = document.createElement("div"); cal.className = "cal" + (key === "do" ? " r" : ""); if (key === "do") { cal.style.left = "auto"; cal.style.right = "0"; }
+      cal.setAttribute("role", "dialog"); cal.setAttribute("aria-label", key === "od" ? "Wybierz datę początku" : "Wybierz datę końca");
+      box.appendChild(cal); btn.setAttribute("aria-expanded", "true"); drawCal();
+      cal.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        var t = ev.target.closest("button"); if (!t) return;
+        if (t.dataset.nav) { cv.m += +t.dataset.nav; if (cv.m < 0) { cv.m = 11; cv.y--; } if (cv.m > 11) { cv.m = 0; cv.y++; } drawCal(); return; }
+        if (t.dataset.t) { form[key] = +t.dataset.t; $("v-" + key).textContent = fmt(form[key]); $("date-err").hidden = form.od <= form["do"]; closeCal(); btn.focus(); }
+      });
+    });
+  });
+  document.addEventListener("click", closeCal);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeCal(); });
+
+  $("add").addEventListener("click", function () {
+    if (form.od > form["do"]) { $("date-err").hidden = false; return; }
+    added = { from: form.od, to: form["do"], excused: $("excused").checked, kind: document.querySelector('input[name="rodzaj"]:checked').value, by: "Joanna Mazur" };
+    view = "b"; render(true);
+    $("h-term").scrollIntoView({ block: "nearest", behavior: "smooth" });
+  });
+  $("sw").addEventListener("click", function () {
+    view = this.getAttribute("aria-checked") === "true" ? "b" : "a";
+    render(false);
+  });
+  render(false);
+})();
+</script>
+</body>
+</html>

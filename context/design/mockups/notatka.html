@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nowa notatka · mOcena</title>
+<link rel="stylesheet" href="../../../public/rodzina.css">
+<link rel="stylesheet" href="../../../public/style.css">
+</head>
+<body class="phone">
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#"><b>m</b>Ocena</a>
+    <p class="who"><b>Marek Zieliński</b><br>11 marca 2026</p>
+  </div>
+  <nav class="nav" aria-label="Główna">
+    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>Zespół</a>
+    <a href="#" aria-current="page"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Nowa notatka</a>
+  </nav>
+</header>
+
+<main class="wrap">
+
+<!-- Stan 1: formularz -->
+<section id="s1" class="enter">
+  <h1 class="n-title">Nowa notatka</h1>
+  <form id="form" class="n-form" novalidate>
+    <div class="who-block">
+    <div class="who-row">
+      <button type="button" class="tok" id="tok-who" aria-expanded="false" aria-controls="pk-who">
+        <span class="k">O kim <i>Zmień</i></span><span class="v" id="v-who">Piotr Wójcik</span>
+      </button>
+      <button type="button" class="tok" id="tok-when" aria-expanded="false" aria-controls="pk-when">
+        <span class="k">Kiedy <i>Zmień</i></span><span class="v" id="v-when">dziś, 11 marca 2026</span>
+      </button>
+    </div>
+    <div class="picker seg" id="pk-who" hidden role="radiogroup" aria-label="O kim">
+      <label><input type="radio" name="who" value="Piotr Wójcik" checked><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Piotr Wójcik</span></label>
+      <label><input type="radio" name="who" value="Ewa Nowak"><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Ewa Nowak</span></label>
+    </div>
+    <div class="picker seg col" id="pk-when" hidden role="radiogroup" aria-label="Kiedy">
+      <label><input type="radio" name="when" value="dziś, 11 marca 2026" checked><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>dziś, 11 marca 2026</span></label>
+      <label><input type="radio" name="when" value="wczoraj, 10 marca 2026"><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>wczoraj, 10 marca 2026</span></label>
+      <label><input type="radio" name="when" value="9 marca 2026"><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>9 marca 2026</span></label>
+    </div>
+    </div>
+
+    <div class="card hero-field">
+      <label for="co"><h2>Co się stało</h2></label>
+      <textarea id="co" name="co">Po odejściu koleżanki 9 marca przejął jej kolejkę wniosków i spisał, co jest otwarte, a co czeka na brak. Przekazał listę mnie i Marii, bez sporu o podział.</textarea>
+      <div class="hero-foot">
+        <p class="sign"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>Marek Zieliński · 11 marca 2026</p>
+        <p class="privacy"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>Notatkę widzisz tylko ty.</p>
+      </div>
+    </div>
+
+    <div class="n-fields">
+      <div role="radiogroup" aria-labelledby="l-krit">
+        <span class="lbl" id="l-krit">Kryterium</span>
+        <div class="chips"><label class="chip"><input type="radio" name="krit" value="wiedza"><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Wiedza</span></label><label class="chip"><input type="radio" name="krit" value="rzetelnosc"><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Rzetelność</span></label><label class="chip"><input type="radio" name="krit" value="organizacja"><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Organizacja pracy</span></label><label class="chip"><input type="radio" name="krit" value="wspolpraca" checked><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Współpraca</span></label><label class="chip"><input type="radio" name="krit" value="komunikacja"><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Komunikacja</span></label><label class="chip"><input type="radio" name="krit" value="klient"><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Klient/interesant</span></label><label class="chip"><input type="radio" name="krit" value="analiza"><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Myślenie analityczne</span></label></div>
+      </div>
+      <div role="radiogroup" aria-labelledby="l-tb">
+        <span class="lbl" id="l-tb">To było</span>
+        <div class="seg">
+          <label><input type="radio" name="dp" value="dobrze" checked><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>dobrze</span></label>
+          <label><input type="radio" name="dp" value="do poprawy"><span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>do poprawy</span></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="hint">
+      <p class="voice hint-v"><span>Podpowiedź · z listy słów</span></p>
+      <label class="cb">
+        <input type="checkbox" id="zmiana" name="zmiana" checked aria-describedby="zmiana-h">
+        <span class="box"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+        <span><span class="cbt">Zmiana zadań pracownika</span><small id="zmiana-h">Zaznaczone, bo w notatce jest słowo „przejął”. Odznacz, jeśli to nie zmiana zadań.</small></span>
+      </label>
+    </div>
+
+    <div class="actionbar"><button class="btn primary full" type="submit">Zapisz notatkę</button></div>
+  </form>
+</section>
+
+<!-- Stan 2: zapisano, pytanie partnera zastępuje formularz -->
+<section id="s2" class="n-state" hidden>
+  <div class="st ok enter"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><div><b>Zapisano notatkę</b></div></div>
+  <div class="hint q-hero enter">
+    <p class="voice hint-v"><span>Podpowiedź · z listy słów</span></p>
+    <h2>To stała zmiana zadań?</h2>
+    <p class="txt">Jeśli tak, warto porozmawiać z Piotrem o priorytetach, zanim przyjdzie ocena.</p>
+    <div class="btns stack">
+      <button class="btn primary" type="button" id="stala">To stała zmiana</button>
+      <button class="btn" type="button" id="chwilowe">To chwilowe zastępstwo</button>
+    </div>
+  </div>
+</section>
+
+<!-- Stan 2b: zapisano, pole odznaczone -->
+<section id="s2b" class="n-state" hidden>
+  <div class="st ok enter"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><div><b>Zapisano notatkę</b></div></div>
+  <p class="again"><button class="btn again-btn" type="button">Dodaj kolejną notatkę</button></p>
+</section>
+
+<!-- Stan 2c: chwilowe zastępstwo -->
+<section id="s2c" class="n-state" hidden>
+  <div class="st ok enter"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><div><b>Zapisano notatkę</b></div></div>
+  <p class="again"><button class="btn again-btn" type="button">Dodaj kolejną notatkę</button></p>
+</section>
+
+<!-- Stan 3: karta rozmowy -->
+<section id="s3" class="n-state" hidden>
+  <div class="st ok enter"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><div><b>Zapisano notatkę</b></div></div>
+  <div class="card talk enter">
+    <p class="voice src"><span>Karta rozmowy · z tabeli urzędu</span></p>
+    <h2>Rozmowa po zmianie zadań</h2>
+    <p class="txt">Po co: żeby Piotr wiedział, czego oczekujesz po przejęciu drugiej kolejki.</p>
+    <ol class="points">
+      <li><span>Priorytety: które sprawy z obu kolejek idą pierwsze.</span></li>
+      <li><span>Co odpuścić albo przekazać, gdy nie da się zdążyć ze wszystkim.</span></li>
+      <li><span>Kiedy Piotr uprzedza interesanta, że termin się przesuwa.</span></li>
+      <li><span>Czego Piotr potrzebuje od ciebie i od zespołu.</span></li>
+    </ol>
+  </div>
+  <div class="hint dev enter">
+    <p class="voice hint-v"><span>Forma rozwoju · z katalogu urzędu</span></p>
+    <h3>Organizacja pracy przy dwóch kolejkach spraw</h3>
+    <p class="txt">Szkolenie jednodniowe w urzędzie.</p>
+    <div id="dodano" class="st ok" hidden><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><div><b>Dodano do wniosków rozwojowych</b><small>Wniosek zobaczysz przy ocenie Piotra.</small></div></div>
+    <div class="btns stack">
+      <button class="btn primary" type="button" id="dodaj">Dodaj do wniosków rozwojowych</button>
+      <button class="btn text" type="button" id="zamknij">Zamknij</button>
+    </div>
+  </div>
+  <p class="again"><button class="btn again-btn" type="button">Dodaj kolejną notatkę</button></p>
+</section>
+
+</main>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var ids = ["s1", "s2", "s2b", "s2c", "s3"];
+  function show(id) {
+    ids.forEach(function (i) { $(i).hidden = i !== id; });
+    window.scrollTo(0, 0);
+    if (id === "s1") $("s1").classList.add("enter");
+  }
+  function picker(tokId, pkId, name, outId) {
+    var tok = $(tokId), pk = $(pkId);
+    tok.addEventListener("click", function () {
+      var open = pk.hidden;
+      $("pk-who").hidden = true; $("pk-when").hidden = true;
+      $("tok-who").setAttribute("aria-expanded", "false"); $("tok-when").setAttribute("aria-expanded", "false");
+      pk.hidden = !open; tok.setAttribute("aria-expanded", String(open));
+    });
+    pk.addEventListener("change", function () {
+      $(outId).textContent = pk.querySelector("input:checked").value;
+      pk.hidden = true; tok.setAttribute("aria-expanded", "false");
+    });
+  }
+  picker("tok-who", "pk-who", "who", "v-who");
+  picker("tok-when", "pk-when", "when", "v-when");
+
+  $("zmiana").addEventListener("change", function () {
+    $("zmiana-h").textContent = this.checked
+      ? "Zaznaczone, bo w notatce jest słowo „przejął”. Odznacz, jeśli to nie zmiana zadań."
+      : "Zapiszesz notatkę bez zmiany zadań.";
+  });
+  $("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    show($("zmiana").checked ? "s2" : "s2b");
+  });
+  $("stala").addEventListener("click", function () { show("s3"); });
+  $("chwilowe").addEventListener("click", function () { show("s2c"); });
+  $("zamknij").addEventListener("click", function () { show("s2c"); });
+  $("dodaj").addEventListener("click", function () {
+    $("dodano").hidden = false; $("dodano").classList.add("enter");
+    this.hidden = true;
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".again-btn"), function (b) {
+    b.addEventListener("click", function () {
+      $("form").reset();
+      $("zmiana-h").textContent = "Zaznaczone, bo w notatce jest słowo „przejął”. Odznacz, jeśli to nie zmiana zadań.";
+      $("v-who").textContent = "Piotr Wójcik"; $("v-when").textContent = "dziś, 11 marca 2026";
+      $("dodano").hidden = true; $("dodaj").hidden = false;
+      show("s1");
+    });
+  });
+})();
+</script>
+</body>
+</html>

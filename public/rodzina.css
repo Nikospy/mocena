@@ -1,0 +1,85 @@
+/* mOcena: tokeny rodziny mObywatel.
+   Wartości odczytane 21.11.2026 z serwisu mObywatel.gov.pl (zmienne --wds-*) i z kodu interfejsu aplikacji
+   opublikowanego przez COI na licencji MIT. To są fakty o rodzinie; warianty różnią się tym, jak ich używają.
+   Tego pliku warianty nie zmieniają. Każdy wariant dokłada własny styl.css. */
+
+@font-face {
+  font-family: "Open Sans"; font-style: normal; font-weight: 300 800; font-display: swap;
+  src: url("fonts/open-sans-latin-ext-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Open Sans"; font-style: normal; font-weight: 300 800; font-display: swap;
+  src: url("fonts/open-sans-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  /* Krój: jeden, dwie grubości (tak jak w rodzinie) */
+  --font: "Open Sans", system-ui, sans-serif;
+  --w-regular: 400; --w-bold: 700;
+
+  /* Skala pisma rodziny: rozmiar/interlinia */
+  --f-h1: 48px; --lh-h1: 56px;
+  --f-h2: 28px; --lh-h2: 36px;
+  --f-h4: 24px; --lh-h4: 32px;
+  --f-h5: 20px; --lh-h5: 26px;
+  --f-h6: 18px; --lh-h6: 26px;
+  --f-p: 16px;  --lh-p: 24px;
+  --f-c1: 14px; --lh-c1: 21px;
+  --f-c2: 12px; --lh-c2: 18px;
+
+  /* Odstępy rodziny */
+  --sp-50: 4px; --sp-100: 8px; --sp-150: 12px; --sp-200: 16px; --sp-250: 20px;
+  --sp-300: 24px; --sp-400: 32px; --sp-500: 40px; --sp-600: 48px; --sp-800: 64px;
+
+  /* Zaokrąglenia rodziny */
+  --r-25: 2px; --r-50: 4px; --r-100: 8px; --r-150: 12px; --r-200: 16px; --r-250: 20px; --r-300: 24px; --r-500: 40px;
+
+  /* Kobalt: kolor główny rodziny */
+  --cobalt-10: #f4f6fb; --cobalt-20: #ddebfb; --cobalt-30: #bcd9f9; --cobalt-40: #9dc3ee; --cobalt-60: #5094df;
+  --cobalt-80: #1f71cc; --cobalt-100: #0452a8; --cobalt-200: #063477; --cobalt-300: #062256; --cobalt-400: #05163e; --cobalt-500: #030b28;
+
+  /* Szarości */
+  --grey-10: #f6f8f9; --grey-20: #eff1f3; --grey-30: #e7eaed; --grey-40: #d0d4db; --grey-60: #a4aab2;
+  --grey-80: #808893; --grey-100: #656a75; --grey-200: #52575f; --grey-300: #34383f; --grey-400: #1f2328; --grey-500: #101317;
+  --white: #ffffff;
+  --page-bg: #f0f5fa;              /* tło strony w serwisie mObywatel */
+
+  /* Stany: pary „20” tło i „100/200” treść */
+  --green-10: #f7fdf0; --green-20: #eefae1; --green-30: #dff4c6; --green-100: #317c26; --green-200: #115a22;
+  --orange-10: #fff9eb; --orange-20: #fdf1d2; --orange-30: #ffe6b7; --orange-100: #ae5e00; --orange-200: #924e00;
+  --red-10: #fdfbfa; --red-20: #f9f1f0; --red-30: #f4dfdc; --red-100: #cd3214; --red-200: #a12408;
+  --blue-10: #f2f8ff; --blue-20: #e7f2ff; --blue-30: #bbdbff; --blue-100: #0069dd; --blue-200: #0059bc;
+
+  /* Palety dodatkowe rodziny, do oszczędnego użycia */
+  --sea-10: #f2fbfe; --sea-20: #e2f7fe; --sea-30: #c8eefd; --sea-100: #1670b7; --sea-200: #0a4f8c; --sea-300: #0e3d72;
+  --plum-10: #e6e7f8; --plum-20: #d5d8f5; --plum-100: #4b50c5; --plum-200: #3d47ad; --plum-300: #373e8d;
+  --silver-10: #f3f8fd; --silver-20: #e6eef6; --silver-30: #d3dfed; --silver-100: #4e6a9a; --silver-200: #3f5482; --silver-300: #313f68;
+  --ruby-20: #ffecef; --ruby-100: #d4213d; --ruby-200: #b90f29;
+  --yellow-100: #ffdd00;
+
+  /* Role */
+  --primary: var(--cobalt-100); --on-primary: var(--white);
+  --secondary: var(--cobalt-10); --on-secondary: var(--cobalt-100);
+  --text: var(--grey-500); --text-2: var(--grey-200); --text-3: var(--grey-100);
+  --border: var(--grey-40); --border-strong: var(--grey-80);
+  --surface: var(--white);
+
+  /* Cień i fokus rodziny */
+  --elev-1: 0 0 12px 0 rgba(101, 106, 117, .10);
+  --elev-2: 0 0 12px 0 rgba(101, 106, 117, .35);
+  --focus: 0 0 0 2px var(--white), 0 0 0 4px var(--grey-500);
+
+  --hit: 48px;                      /* wysokość przycisku i pola */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body { font: var(--w-regular) var(--f-p)/var(--lh-p) var(--font); color: var(--text); background: var(--page-bg); -webkit-font-smoothing: antialiased; }
+:focus-visible { outline: none; box-shadow: var(--focus); }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.ico { width: 24px; height: 24px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.ico.s { width: 16px; height: 16px; stroke-width: 2; }
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 0ms !important; animation-duration: 0ms !important; } }
