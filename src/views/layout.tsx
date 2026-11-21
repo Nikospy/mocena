@@ -8,9 +8,25 @@ const ROLES: Record<Person["role"], string> = {
   admin: "administrator",
 };
 
-export function formatDate(iso: string): string {
+const MONTHS = [
+  "stycznia",
+  "lutego",
+  "marca",
+  "kwietnia",
+  "maja",
+  "czerwca",
+  "lipca",
+  "sierpnia",
+  "września",
+  "października",
+  "listopada",
+  "grudnia",
+];
+
+/** „2024-12-09” → „9 grudnia 2024”. */
+export function formatDateLong(iso: string): string {
   const [y, m, d] = iso.split("-");
-  return `${d}.${m}.${y}`;
+  return `${Number(d)} ${MONTHS[Number(m) - 1]} ${y}`;
 }
 
 export function Layout(props: { title: string; person: Person | null; today: string | null; children?: Child }) {
@@ -34,26 +50,29 @@ export function Layout(props: { title: string; person: Person | null; today: str
               <a href="/">Strona główna</a>
               <a href="/account">Zmień konto</a>
             </nav>
-            <div class="who">
+            <p class="who">
               {person ? (
-                <p>
+                <>
                   <b>{person.name}</b> · {ROLES[person.role]}
-                </p>
+                  <br />
+                </>
               ) : null}
-              {props.today ? (
-                <form method="post" action="/demo/date" class="date-switch">
-                  <label>
-                    <span>Data systemowa: {formatDate(props.today)}</span>
-                    <input type="date" name="date" min={props.today} required aria-label="Nowa data systemowa" />
-                  </label>
-                  <button class="btn text" type="submit">
-                    Przesuń datę
-                  </button>
-                </form>
-              ) : null}
-            </div>
+              {props.today ? formatDateLong(props.today) : null}
+            </p>
           </div>
         </header>
+        {props.today ? (
+          <form method="post" action="/demo/date" class="demo-bar">
+            <b>Pokaz</b>
+            <label>
+              <span>Przesuń datę systemową</span>
+              <input type="date" name="date" value={props.today} min={props.today} required aria-label="Nowa data systemowa" />
+            </label>
+            <button class="btn text" type="submit">
+              Przesuń datę
+            </button>
+          </form>
+        ) : null}
         <main class="wrap">{props.children}</main>
       </body>
     </html>
