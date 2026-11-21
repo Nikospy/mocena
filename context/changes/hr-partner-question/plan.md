@@ -2,34 +2,38 @@
 
 ## Overview
 
-Moduł wirtualnego HR partnera bez modelu: jedno pytanie zamknięte po notatce z zaznaczoną zmianą zadań, karta rozmowy i jedna forma rozwoju po „tak”, ekran „Przed rozmową z pracownikiem” złożony z dat, pól i liczby notatek przełożonego, przypomnienie o docenianiu oraz ekran administratora „Skąd biorą się podpowiedzi”. Wszystko na regułach i zdaniach z szablonów; system nie czyta treści notatek.
+Moduł wirtualnego HR partnera bez modelu: jedno pytanie zamknięte po notatce z zaznaczoną zmianą zadań, karta rozmowy i jedna forma rozwoju po „tak”, ekran „Przed rozmową z pracownikiem” złożony z dat i pól notatek przełożonego, przypomnienie o docenianiu oraz ekran administratora „Skąd biorą się podpowiedzi”. Wszystko na regułach i zdaniach z szablonów; system nie czyta treści notatek. Przy nazwisku nie ma liczby notatek ani żadnego wskaźnika (decyzja 10k).
+
+Najpierw powstaje **wersja minimalna** (fazy 1 i 2, ok. 50 minut): pytanie po notatce z kartą i jedną formą rozwoju, potem ekran „Przed rozmową”. Przypomnienie o docenianiu (faza 3) i ekran administratora (faza 4) powstają po niej i są pierwsze do cięcia.
 
 ## Current State Analysis
 
-Plaster stoi na F-01, S-01, S-02 i S-04, których dziś w repo jeszcze nie ma (repo ma starter Hono i silnik z nazwami po polsku). Ten plan opisuje stan po ich wdrożeniu; dokładne nazwy, które zakłada, są w sekcji „Założenia wobec wcześniejszych plastrów”. Po S-04 istnieją: tabela `notes` z polem `task_change`, formularz notatki z polem „Zmiana zadań pracownika” wstępnie zaznaczanym przez adapter w `src/suggestions/`, przycisk „Przekaż pracownikowi” z datą wysłania informacji zwrotnej. Brakuje wszystkiego, co reaguje na te wpisy.
+Plaster stoi na F-01, S-01, S-02 i S-04, których dziś w repo jeszcze nie ma (repo ma starter Hono i silnik z nazwami po polsku). Ten plan opisuje stan po ich wdrożeniu i używa wyłącznie nazw z rozdziału „Kontrakt wspólny dla wszystkich plastrów” w `context/changes/rules-engine-and-demo-data/plan.md` oraz nazw, które S-01 i S-04 udostępniają w swoich planach (lista w „Założenia wobec wcześniejszych plastrów”). Po S-04 istnieją: tabela `notes` z polem `task_change`, formularz notatki z polem „Zmiana zadań pracownika” wstępnie zaznaczanym przez adapter w `src/suggestions/`, przycisk „Przekaż pracownikowi” z datą wysłania w `feedback_messages`. Brakuje wszystkiego, co reaguje na te wpisy.
 
 Treści potrzebne temu plastrowi nie istnieją (`context/foundation/demo.md`, sekcja „Czego jeszcze nie ma”): katalog form rozwoju, karta rozmowy po zmianie zadań, karta docenienia, pytania na ekranie „Przed rozmową”. Pisze je wdrażający agent bez przeglądu autora (decyzja 10e), słownictwem organizatora i prostą polszczyzną.
 
 ## Desired End State
 
-1. Marek zapisuje z telefonu notatkę z zaznaczonym polem „Zmiana zadań pracownika” i od razu widzi pytanie „To stała zmiana zadań?” z odpowiedziami „Tak” i „Nie” oraz „Odpowiem później”. Po „Tak” widzi kartę „Rozmowa po zmianie zadań” i jedną formę rozwoju z katalogu. Notatka bez zaznaczenia nie wywołuje żadnego pytania. Odpowiedź zapisuje się tylko po kliknięciu.
-2. Marek otwiera z ekranu cyklu Piotra „Przed rozmową z pracownikiem” i widzi: swoje notatki sprzed zmiany zadań i po niej, kryteria bez żadnej notatki, kiedy ostatnio przekazał Piotrowi informację zwrotną, zdanie o podwładnych, o których od dawna nie ma notatki (np. „O Marii nie masz jeszcze żadnej notatki.” z przyciskiem „Dopisz notatkę”). Każda pozycja ma pytanie albo proponowane działanie. Przy nazwisku pracownika nie ma etykiety, liczby ani wskaźnika.
+1. Marek zapisuje z telefonu notatkę z zaznaczonym polem „Zmiana zadań pracownika” i od razu widzi pytanie „To stała zmiana zadań?” z odpowiedziami „Tak” i „Nie” oraz „Odpowiem później”. Po „Tak” widzi kartę „Rozmowa po zmianie zadań” ze zdaniem o podstawie prawnej (decyzja 11e) i jedną formę rozwoju z katalogu. Notatka bez zaznaczenia nie wywołuje żadnego pytania. Odpowiedź zapisuje się tylko po kliknięciu.
+2. Marek otwiera z ekranu wejściowego cyklu Piotra (`GET /cycles/:id/part1`) „Przed rozmową z pracownikiem” i widzi: swoje notatki sprzed zmiany zadań i po niej, kryteria bez żadnej notatki, kiedy ostatnio przekazał Piotrowi informację zwrotną, zdanie o podwładnych, o których od dawna nie ma notatki (np. „O Marii nie masz jeszcze żadnej notatki.” z przyciskiem „Dopisz notatkę”). Każda pozycja ma pytanie albo proponowane działanie. Przy nazwisku pracownika nie ma etykiety, liczby ani wskaźnika.
 3. Gdy od ostatniej rozmowy albo ostatniej informacji zwrotnej minęło więcej dni niż w ustawieniu urzędu, Marek widzi na ekranie startowym przypomnienie o docenianiu z kartą docenienia. Wysłanie informacji zwrotnej (S-04) je zeruje.
 4. Administrator widzi ekran „Skąd biorą się podpowiedzi”: tabela sześciu miejsc z decyzji 9, które źródło działa teraz, lista „Czego model nigdy nie robi” i warunki wspólne.
 
 ### Key Discoveries:
 
 - Wersja pokazu 90 sekund ma kroki 1, 4 i 5, bez kroku 2. Podział notatek na „przed” i „po” zmianie zadań w kroku 4 nie może więc zależeć od odpowiedzi „Tak” klikniętej w kroku 2. Granicą jest data najwcześniejszej notatki z polem `task_change`, chyba że przełożony odpowiedział na nią „Nie” (`context/foundation/demo.md`, „Wersja 90 sekund”).
+- Dwa warianty danych dają tę samą granicę 11.03.2026 (kontrakt, „Dane pokazowe”). Pełny pokaz i wersja 5-minutowa: `bun run seed -- --live-step-2` pomija wgraną notatkę z 11.03.2026, krok 2 idzie przy dacie systemowej 2026-03-11, a notatka napisana na żywo jest jedyną notatką ze zmianą zadań. Wersja 90-sekundowa: dane domyślne, granicę daje wgrana notatka z 11.03.2026, bez kliknięcia „Tak”.
 - System nie czyta tekstu, więc nie wie, że zmiana zaszła 9.03.2026. Granica to data notatki: 11.03.2026. Notatka z 11.03.2026 trafia do grupy „po zmianie”.
-- Notatka z 18.06.2026 („dobrze”, Komunikacja) jest w danych po to, żeby karta docenienia miała co zaproponować do przekazania.
-- Zdania po polsku wymagają odmiany imion („z Piotrem”, „o Marii”, „Piotrowi”). Bez modelu odmiana pochodzi z małego pliku form imion dla osób z danych pokazowych, z bezpiecznym zdaniem zastępczym w mianowniku.
+- Notatka z 18.06.2026 (`rating = good`, Komunikacja) jest w danych po to, żeby karta docenienia miała co zaproponować do przekazania.
+- Zdania po polsku wymagają odmiany imion („z Piotrem”, „o Marii”, „Piotrowi”). Bez modelu odmiana pochodzi z małego pliku form imion dla osób z danych pokazowych, z bezpiecznym zdaniem zastępczym w mianowniku. `people.name` to pełne imię i nazwisko; klucz w pliku form to pierwszy wyraz `people.name`.
 - Decyzja 10k sama używa w przykładzie liczby („od 6 miesięcy”). Liczba może wystąpić w zdaniu o tym, czego nie zrobił przełożony; zakaz dotyczy liczb i etykiet przy nazwisku (liczba notatek, wynik, wskaźnik).
+- Notatka o Marii, która nie ma cyklu, ma `cycle_id = null`. Odpowiedź na pytanie przy takiej notatce zapisuje się jako `task_change_answered` z pustym `cycle_id` (kontrakt na to pozwala) i jest odnajdywana po `payload.noteId`.
 
 ## What We're NOT Doing
 
 - Rozpoznawania sygnałów z treści notatek, wskaźnika motywacji, etykiet typu „ryzyko odejścia”, analizy nieobecności, porównywania pracowników, liczby notatek przy nazwisku (decyzje 2, 3, 10k).
-- Formularza notatki, listy słów, adaptera podpowiedzi, wysyłki informacji zwrotnej (S-04). Ten plaster tylko czyta ich wyniki i zmienia jedno przekierowanie po zapisie notatki.
-- Karty rozmowy rozpoczynającej (S-01) i oceniającej (S-04, FR-017). Ekran „Przed rozmową” tylko do nich linkuje, jeśli istnieją.
+- Formularza notatki, listy słów, adaptera podpowiedzi, wysyłki informacji zwrotnej (S-04). Ten plaster tylko czyta ich wyniki przez funkcje S-04 i podmienia adres w `afterNoteSaved(note)`.
+- Karty rozmowy rozpoczynającej (S-01) i oceniającej (S-04, FR-017). Ekran „Przed rozmową” tylko linkuje do `GET /cycles/:id/cards/assessment-conversation`.
 - Zapisu formy rozwoju do wniosków rozwojowych oceny; forma jest pokazana, a przełożony sam przenosi ją do arkusza (S-04, FR-021).
 - Pola „Od kiedy obowiązuje zmiana” przy odpowiedzi „Tak” (patrz „Open questions”).
 - Gałęzi modelu w adapterze (decyzja 10l, S-04, tylko jeśli zostanie czas).
@@ -37,80 +41,80 @@ Treści potrzebne temu plastrowi nie istnieją (`context/foundation/demo.md`, se
 
 ## Implementation Approach
 
-Cztery fazy. Najpierw czysta logika w `src/hr-partner/` z testami jednostkowymi na danych pokazowych, bez HTML. Wszystkie odczyty tabel innych plastrów idą przez jeden plik `src/hr-partner/data.ts`; jeśli wcześniejszy plaster nazwał coś inaczej, poprawka jest w jednym miejscu. Każda funkcja dostaje `today` jako parametr i pomija wiersze z datą późniejszą (decyzja 10i). Treści leżą w plikach JSON, nie w kodzie: progi i katalog form w `rules/office-settings.json` (oznaczone „ustawienie urzędu”), teksty kart i pytań w `content/cards.json`, tabela miejsc z decyzji 9 w `content/suggestion-sources.json`, formy imion w `content/name-forms.json`.
+Cztery fazy; fazy 1 i 2 to wersja minimalna. Czysta logika w `src/hr-partner/partner.ts` z testami na danych pokazowych, bez HTML. Wszystkie odczyty cudzych danych idą przez jeden plik `src/hr-partner/data.ts`, który woła wyłącznie funkcje z kontraktu i z planów S-01 i S-04: notatki przez `notesAbout` i `notesByAuthor`, datę ostatniej informacji zwrotnej przez `lastFeedbackDate`, kryteria cyklu przez `cycleCriteria`, zdarzenia przez `visibleEvents`. Żadne zapytanie do tabel `notes` ani `feedback_messages` nie powstaje w tym plastrze. Funkcje S-04 zwracają tylko wiersze z datą `<= today()` (decyzja 10i); czyste funkcje w `partner.ts` dostają `today` jako parametr, żeby testy mogły sprawdzić granicę dnia.
 
-Jedyny zapis tego plastra to zdarzenie `task_change_answered` w tabeli `events`, powstające wyłącznie z `POST` po kliknięciu. Ekrany używają wspólnego układu `src/views/layout.tsx` i komponentów design systemu; plan nie projektuje wyglądu.
+Treści leżą w plikach JSON, nie w kodzie: progi i katalog form w `rules/office-settings.json` (oznaczone „ustawienie urzędu”, odczyt przez `officeSettings()`), teksty kart i pytań w `content/cards.json` pod kluczami `taskChange`, `appreciation`, `beforeMeeting` (odczyt przez `card(id)`), tabela miejsc z decyzji 9 w `content/suggestion-sources.json`, formy imion w `content/name-forms.json`. Dwa ostatnie pliki są wewnętrzne dla tego plastra.
 
-**Kolejność cięcia** (gdy brakuje czasu; kroki 2 i 4 pokazu muszą działać): 1) lista notatek „dobrze” do przekazania w karcie docenienia (zostaje samo zdanie i karta); 2) przypomnienie o docenianiu na ekranie startowym (zostaje pozycja „ostatnia informacja zwrotna” na ekranie „Przed rozmową”); 3) kolumna „Teraz działa” na ekranie „Skąd biorą się podpowiedzi” (zostaje statyczna tabela z decyzji 9); 4) pytanie dla nieodpowiedzianej notatki na ekranie „Przed rozmową”. Nie tniemy: pytania po notatce, karty po „Tak”, podziału przed/po, kryteriów bez notatek, zdania o podwładnych bez notatek.
+Jedyny zapis tego plastra to zdarzenie `task_change_answered` przez `recordEvent`, powstające wyłącznie z `POST` po kliknięciu. Odnośniki: na ekranie wejściowym cyklu przez `registerCycleLinks`, na ekranie startowym przez `registerHomeTasks`. Ekrany używają wspólnego układu `src/views/layout.tsx` i komponentów design systemu; plan nie projektuje wyglądu.
+
+**Kolejność cięcia** (gdy brakuje czasu; kroki 2 i 4 pokazu muszą działać). Najpierw zawsze powstaje wersja minimalna (fazy 1 i 2). Tniemy od końca:
+
+1. Faza 4, ekran „Skąd biorą się podpowiedzi”: najpierw zostaje strona statyczna z tabelą sześciu miejsc i listą z decyzji 9, bez wiersza „Teraz działa” z `suggestionMode()`; przy dalszym braku czasu ekran wypada, a w `## Notes` pliku `change.md` zostaje wpis.
+2. Faza 3, lista notatek `good` do przekazania w karcie docenienia (zostaje samo zdanie i karta).
+3. Faza 3 w całości: przypomnienie na ekranie startowym i karta docenienia. Zostaje zdanie o ostatniej informacji zwrotnej na ekranie „Przed rozmową” (faza 2), z pytaniem zamiast przycisku do karty.
+
+Nie tniemy (wersja minimalna): pytania po notatce, karty po „Tak” z jedną formą rozwoju, podziału przed/po, kryteriów bez notatek, zdania o podwładnych bez notatek, odnośnika „Przed rozmową” na ekranie wejściowym cyklu.
 
 ## Critical Implementation Details
 
-- **Granica zmiany zadań.** `taskChangeBoundary(cycle, notes, answers)` zwraca datę najwcześniejszej notatki przełożonego o tym pracowniku w okresie cyklu z `task_change = 1`, której ostatnia odpowiedź nie jest `no`. Brak takiej notatki: ekran nie dzieli notatek i nie pokazuje sekcji zmiany zadań.
-- **Pytanie zaległe.** Na ekranie „Przed rozmową” pytanie „To stała zmiana zadań?” pojawia się przy notatce z `task_change = 1` bez odpowiedzi tylko wtedy, gdy w cyklu nie ma jeszcze odpowiedzi `yes`. Dzięki temu wgrana notatka z 11.03.2026 nie dubluje pytania po odpowiedzi na żywo w kroku 2.
-- **Forma rozwoju.** `pickDevelopmentForm(criterionId)`: pierwsza forma z katalogu, której lista `criteria` zawiera kryterium notatki; w przeciwnym razie forma z `default: true`. To jest miejsce 5 z decyzji 9 („dopasowuje formę rozwoju z katalogu”), dziś na regule.
-- **Przypomnienie o docenianiu.** Kotwica = późniejsza z dat: ostatnia rozmowa w cyklu (potwierdzenie części I z S-01, a gdy go nie ma, początek cyklu) i ostatnia wysłana informacja zwrotna (S-04). Przypomnienie, gdy `today - kotwica >= appreciationReminderDays`. Zdanie: „Od {data} nie przekazałeś {imię w celowniku} żadnej informacji zwrotnej.”
-- **Podwładni bez notatek.** Dla każdego podwładnego przełożonego poza osobą z bieżącego ekranu: brak notatek przełożonego o nim → „O {imię w miejscowniku} nie masz jeszcze żadnej notatki.”; ostatnia notatka starsza niż `teamSilenceMonths` pełnych miesięcy → „O {imię w miejscowniku} nie masz żadnej notatki od {n} miesięcy.” Obie z przyciskiem „Dopisz notatkę”. Liczba notatek nigdy nie jest pokazana.
-- **Odmiana imion.** `nameForm(person, case)` czyta `content/name-forms.json` (klucz: imię, przypadki `gen`, `dat`, `ins`, `loc`). Brak wpisu: zdanie zastępcze bez odmiany, np. „Nie masz żadnej notatki o osobie: {imię i nazwisko}.”
-- **Kto widzi.** „Przed rozmową” tylko oceniający cyklu, i tylko własne notatki (notatki widzi tylko autor). „Skąd biorą się podpowiedzi” tylko konto administratora. Inne konta: 403.
+- **Granica zmiany zadań.** `taskChangeBoundary(notes, answers, cycle, today)` zwraca datę najwcześniejszej notatki przełożonego o tym pracowniku z datą od `cycles.period_start` do `today`, z `task_change = 1`, której ostatnia odpowiedź nie jest `no`. Kliknięcie „Tak” nie jest warunkiem. Brak takiej notatki: ekran nie dzieli notatek i nie pokazuje sekcji zmiany zadań.
+- **Odpowiedzi.** Odpowiedź na notatkę to ostatnie (według `(date, id)`) zdarzenie `task_change_answered` z `payload.noteId` równym `notes.id`. Dla notatki z `cycle_id` zdarzenie ma ten sam `cycle_id`; dla notatki z `cycle_id = null` zdarzenie ma puste `cycle_id`. W obu przypadkach odczyt jest po `payload.noteId`, nigdy po samym `cycle_id`.
+- **Pytanie zaległe.** Na ekranie „Przed rozmową” pytanie „To stała zmiana zadań?” pojawia się przy notatce z `task_change = 1` bez żadnej odpowiedzi, z tymi samymi przyciskami co w fazie 1. W wersji 90-sekundowej pokazuje się więc przy wgranej notatce z 11.03.2026; w pełnym pokazie notatka z kroku 2 ma już odpowiedź „Tak” i pytania nie ma.
+- **Forma rozwoju.** `pickDevelopmentForm(criterionId)`: pierwsza forma z katalogu `developmentForms`, której lista `criteria` zawiera kryterium notatki; w przeciwnym razie forma z `default: true`. To jest miejsce 5 z decyzji 9 („dopasowuje formę rozwoju z katalogu”), dziś na regule.
+- **Data rozmowy.** Ostatnia rozmowa w cyklu to data zdarzenia `part1_submitted` (data rozmowy o kryteriach według S-01), a nie `part1_confirmed`, które jest potwierdzeniem ocenianego. Brak `part1_submitted`: kotwicą jest `cycles.period_start`.
+- **Przypomnienie o docenianiu (faza 3).** Kotwica = późniejsza z dat: data rozmowy (wyżej) i `lastFeedbackDate(appraiserId, personId)`. Przypomnienie, gdy `today - kotwica >= appreciationReminderDays`. Zdanie: „Od {data} nie przekazałeś {imię w celowniku} żadnej informacji zwrotnej.” Notatki do przekazania w karcie: notatki przełożonego o pracowniku z `rating = good` i datą późniejszą niż kotwica; nie potrzeba odczytu pojedynczych wiadomości, bo kotwica zawiera już datę ostatniej wysłanej.
+- **Podwładni bez notatek.** Dla każdej osoby z `people.supervisor_id` = przełożony, poza osobą z bieżącego ekranu: brak notatek przełożonego o niej (`notesAbout(subjectId, { authorId })` puste) → „O {imię w miejscowniku} nie masz jeszcze żadnej notatki.”; najnowsza notatka starsza niż `teamSilenceMonths` pełnych miesięcy → „O {imię w miejscowniku} nie masz żadnej notatki od {n} miesięcy.” Obie z przyciskiem „Dopisz notatkę” do `GET /people/:personId/notes/new`, także dla Marii bez cyklu. Liczba notatek nigdy nie jest pokazana.
+- **Odmiana imion.** `nameForm(person, case)` czyta `content/name-forms.json` (klucz: pierwszy wyraz `people.name`, przypadki `gen`, `dat`, `ins`, `loc`). Brak wpisu: zdanie zastępcze bez odmiany, np. „Nie masz żadnej notatki o osobie: {people.name}.”
+- **Kto widzi.** Pytanie po notatce: tylko autor notatki (`notes.author_id`). „Przed rozmową” i karta docenienia: tylko `cycles.appraiser_id` cyklu, i tylko własne notatki (`notesAbout` z `authorId` = oglądający). „Skąd biorą się podpowiedzi”: tylko konto z `people.role = 'admin'`. Inne konta: 403. Konto z `currentPerson(c)`.
 
 ## Założenia wobec wcześniejszych plastrów
 
-Jeśli wdrożony plaster ma inną nazwę, wdrażający poprawia tylko `src/hr-partner/data.ts` i wpisuje rozbieżność w `## Notes` pliku `change.md`.
+Wyłącznie nazwy z kontraktu wspólnego (F-01) oraz z sekcji „Co ten plaster udostępnia” planów S-01 i S-04. Gdy zbudowany kod różni się od kontraktu, wygrywa kod, poprawka jest tylko w `src/hr-partner/data.ts`, a rozbieżność trafia do `## Notes` pliku `change.md`.
 
-- **F-01:** tabele `people` (`id`, `first_name`, `last_name`, `role` z wartością dla administratora, `supervisor_id`), `cycles` (`id`, `employee_id`, `evaluator_id`, `start_date`, `due_date`), `cycle_criteria` (`cycle_id`, `criterion_id`), `events` (`id`, `type`, `cycle_id`, `actor_id`, `date`, `payload` JSON), `settings`; `today()`, `rulesVersion()`, `src/db.ts` (połączenie), `src/views/layout.tsx`; bieżące konto z ciasteczka dostępne w trasach przez wspólny helper F-01 (dalej `currentPerson(c)`); konto administratora; ekran startowy `GET /` z listą spraw, do której można dopisać pozycje.
-- **S-01:** lista wszystkich kryteriów cyklu (obowiązkowe z arkusza i wybrane dodatkowe) przez funkcję w rodzaju `getCycleCriteria(cycleId): { id, name }[]`; zdarzenie potwierdzenia części I w `events` (zakładany typ `part_one_confirmed`) z datą rozmowy; ekran cyklu `GET /cycles/:id`, na którym ten plaster dodaje link „Przed rozmową z pracownikiem”; `rules/office-settings.json` (S-01 dodaje tabelę „rodzaj obowiązku → kryterium”, ten plaster dopisuje swoje klucze); `content/cards.json` (S-01 dodaje kartę rozmowy rozpoczynającej).
+- **F-01, tabele:** `people(id, name, role, position_title, unit, supervisor_id, has_account, appointed, civil_service_grade)` z rolami `appraiser`, `employee`, `hr`, `admin`; `cycles(id, person_id, appraiser_id, period_start, sheet)`; `events(id, type, cycle_id, actor_id, date, payload)` z pustym `cycle_id` dozwolonym.
+- **F-01, funkcje:** `today()`, `currentPerson(c)`, `recordEvent(type, cycleId, actorId, payload)`, `visibleEvents(cycleId)` (porządek `(date, id)`, granica `date <= today()`), `registerHomeTasks(fn)` (lista `homeTasks(person)` na `GET /`), `registerCycleLinks(fn)` (lista `cycleLinks(cycle, person)` na `GET /cycles/:id/part1`), `createTestApp({ today })` w `src/test-helpers.ts`; układ `src/views/layout.tsx`.
+- **F-01, dane:** `bun run seed` i opcja `bun run seed -- --live-step-2` (pomija wgraną notatkę z 11.03.2026); daty pokazu z kontraktu: krok 2 = 2026-03-11, krok 4 = 2026-11-21.
+- **S-01:** zdarzenie `part1_submitted` (data zdarzenia = data rozmowy); `cycleCriteria(cycleId)` w `src/cycles/part1.ts`; ekran wejściowy cyklu `GET /cycles/:id/part1`; `rules/office-settings.json` z `officeSettings()` i `content/cards.json` z `card(id)` (ten plaster dopisuje klucze).
 - **S-02:** nic poza tym, że cykl istnieje i ma oceniającego.
-- **S-04:** tabela `notes` (`id`, `author_id`, `person_id`, `criterion_id`, `date`, `text`, `rating` z wartościami „dobrze”/„do poprawy”, `task_change` 0/1); informacja zwrotna z datą wysłania (zakładana tabela `feedback` z `note_id`, `author_id`, `employee_id`, `sent_on`); `POST` zapisu notatki z jednym miejscem przekierowania po zapisie; trasa nowej notatki o osobie (zakładana `GET /notes/new?person=:id`) dla przycisku „Dopisz notatkę”; trasa „Przekaż pracownikowi” dla notatki (zakładana `GET /notes/:id/feedback`); adapter `src/suggestions/` z funkcją zwracającą aktywne źródło `rules` | `local-model` | `none` (zakładana `activeSource()`); karta rozmowy oceniającej w `content/cards.json` (link z „Przed rozmową”, jeśli jest); dane pokazowe z `context/foundation/demo.md` łącznie z notatką z 11.03.2026 (`task_change = 1`) i notatką z 12.11.2026.
+- **S-04:** tabela `notes` (`subject_id`, `cycle_id` może być null, `rating` = `good` | `needs_improvement` | null, `task_change` 0/1) i `feedback_messages`, czytane wyłącznie przez `notesAbout(subjectId, { authorId, from? })`, `notesByAuthor(authorId)` i `lastFeedbackDate(authorId, recipientId)` z `src/notes/repo.ts`; `afterNoteSaved(note)` w `src/routes/notes.tsx` (adres przekierowania po zapisie); `suggestionMode()` z `src/suggestions/index.ts`; trasy `GET /people/:personId/notes/new`, `GET /notes/:id/feedback`, `GET /cycles/:id/cards/assessment-conversation`; moduł danych `src/seed/notes.ts` z 16 notatkami z `demo.md`.
 
 ## Co ten plaster udostępnia
 
-- **Zdarzenie** `task_change_answered` w `events`: `cycle_id`, `actor_id` (oceniający), `date` = `today()`, `payload` `{ "noteId": number, "answer": "yes" | "no", "developmentFormId": string | null }`.
-- **Funkcje** w `src/hr-partner/`: `taskChangeBoundary(cycleId, today): string | null` (data ISO), `beforeMeetingSummary(cycleId, viewerId, today)`, `appreciationReminder(evaluatorId, employeeId, today): { since: string } | null`, `teamWithoutNotes(evaluatorId, exceptPersonId, today)`, `pickDevelopmentForm(criterionId)`, `nameForm(person, case)`. S-06 (historia, wydruk) i S-03 (oś czasu) mogą pokazać datę granicy i odpowiedź „Tak” jako zdarzenie cyklu.
-- **Trasy:** `GET /notes/:noteId/task-change`, `POST /notes/:noteId/task-change`, `GET /cycles/:id/before-meeting`, `GET /cycles/:id/appreciation`, `GET /admin/suggestion-sources`.
-- **Pliki treści:** klucze `developmentForms`, `appreciationReminderDays`, `teamSilenceMonths` w `rules/office-settings.json`; klucze `taskChange`, `appreciation`, `beforeMeeting` w `content/cards.json`; `content/suggestion-sources.json`; `content/name-forms.json` (formy imion osób z danych pokazowych, do użycia przez inne plastry).
+Zgodnie z kontraktem wspólnym:
 
-## Phase 1: Treści i logika partnera
+- **Zdarzenie** `task_change_answered` w `events`: `cycle_id` = `notes.cycle_id` (puste dla notatki bez cyklu), `actor_id` = autor notatki, `date` = `today()`, `payload` `{ noteId, answer, developmentFormId }`, gdzie `answer` to `"yes"` albo `"no"`, a `developmentFormId` to identyfikator formy z katalogu albo `null`. S-06 i S-03 mogą pokazać je jako zdarzenie cyklu.
+- **Trasy:** `GET/POST /notes/:noteId/task-change`, `GET /cycles/:id/before-meeting`, `GET /cycles/:id/appreciation`, `GET /admin/suggestion-sources`.
+- **Klucze w plikach wspólnych:** `taskChange`, `appreciation`, `beforeMeeting` w `content/cards.json`; `developmentForms`, `appreciationReminderDays`, `teamSilenceMonths` w `rules/office-settings.json`.
+
+Funkcje w `src/hr-partner/` (`taskChangeBoundary`, `beforeMeetingSummary`, `appreciationReminder`, `teamWithoutNotes`, `pickDevelopmentForm`, `nameForm`) oraz pliki `content/suggestion-sources.json` i `content/name-forms.json` są wewnętrzne; inne plastry na nich nie polegają.
+
+## Phase 1: Pytanie po notatce i karta po „Tak” (wersja minimalna, ok. 25 min)
 
 ### Changes Required:
 
-#### 1. Ustawienia urzędu i treści
+#### 1. Treści do pytania
 
-**File**: `rules/office-settings.json`, `content/cards.json`, `content/suggestion-sources.json`, `content/name-forms.json`
+**File**: `rules/office-settings.json`, `content/cards.json`
 
-**Intent**: Dopisać katalog 4–6 form rozwoju (nazwa, jedno zdanie opisu, lista kryteriów, jedna forma `default: true`, np. szkolenie stanowiskowe z nowego zakresu zadań), próg `appreciationReminderDays` (90) i `teamSilenceMonths` (6), z polem `label: "ustawienie urzędu"`. Napisać karty: „Rozmowa po zmianie zadań” (cel, 4–5 pytań o priorytety, to, co można odłożyć, czego pracownik potrzebuje, kiedy kolejna rozmowa; trudna sytuacja: pracownik mówi, że nie zdąży), „Docenienie” (po co, jak powiedzieć o konkretnym fakcie, czego unikać), pytania do pozycji ekranu „Przed rozmową”. Tabela sześciu miejsc, lista „Czego model nigdy nie robi” i warunki wspólne przepisane z decyzji 9. Formy imion dla Piotra, Ewy, Marii, Tomasza i pozostałych osób z danych. Słownictwo organizatora („indywidualny program rozwoju zawodowego”, „informacja zwrotna”, „potwierdzenie”, nigdy „podpis”), zdania krótkie, w drugiej osobie do przełożonego, bez ocen o pracowniku.
+**Intent**: Dopisać katalog 4–6 form rozwoju `developmentForms` (nazwa, jedno zdanie opisu, lista kryteriów, jedna forma `default: true`, np. szkolenie stanowiskowe z nowego zakresu zadań) z polem `label: "ustawienie urzędu"`. Napisać kartę `taskChange` „Rozmowa po zmianie zadań”: cel, 4–5 pytań o priorytety, to, co można odłożyć, czego pracownik potrzebuje, kiedy kolejna rozmowa; trudna sytuacja: pracownik mówi, że nie zdąży; zdanie z podstawą prawną z decyzji 11e. Słownictwo organizatora („indywidualny program rozwoju zawodowego”, „informacja zwrotna”, „potwierdzenie”, nigdy „podpis”), zdania krótkie, w drugiej osobie do przełożonego, bez ocen o pracowniku.
 
-**Contract**: Pliki są poprawnym JSON; każda karta ma `title`, `purpose`, `questions[]`; każda forma ma `id`, `name`, `description`, `criteria[]`.
+**Contract**: Pliki są poprawnym JSON; karta ma kształt kart z S-01 (`title`, `purpose`, `questions[]`); każda forma ma `id`, `name`, `description`, `criteria[]`.
 
-#### 2. Logika partnera
+#### 2. Logika i odczyty
 
 **File**: `src/hr-partner/data.ts`, `src/hr-partner/partner.ts`, `src/hr-partner/partner.test.ts`
 
-**Intent**: `data.ts` to jedyne miejsce, które czyta tabele innych plastrów (notatki autora o osobie do daty, odpowiedzi, kryteria cyklu, data rozmowy, data ostatniej informacji zwrotnej, podwładni). `partner.ts` to czyste funkcje na tych danych: granica zmiany zadań, podział notatek, kryteria bez notatek, kryteria z notatkami po obu stronach granicy, przypomnienie o docenianiu, podwładni bez notatek, wybór formy rozwoju, forma imienia. Każda pozycja zestawienia ma pole `prompt` (pytanie) albo `action` (etykieta i adres przycisku), nigdy żadnego wyniku o pracowniku.
+**Intent**: `data.ts`: notatka po `id` z `notesByAuthor(authorId)` (tylko własne notatki autora), odpowiedzi `task_change_answered` dla zbioru `noteId`. `partner.ts`: `pickDevelopmentForm`, ostatnia odpowiedź na notatkę.
 
-**Contract**: Funkcje z sekcji „Co ten plaster udostępnia”; `beforeMeetingSummary` zwraca `{ boundary, before[], after[], bothSides[], pendingQuestion, criteriaWithoutNotes[], feedback, team[] }`, gdzie każdy element ma `prompt` albo `action`.
+**Contract**: Odczyt odpowiedzi działa tak samo dla notatki z cyklem i bez cyklu (po `payload.noteId`).
 
-### Success Criteria:
+#### 3. Trasy pytania
 
-#### Automated Verification:
+**File**: `src/routes/hr-partner.tsx`, `src/views/task-change-question.tsx`, `src/views/task-change-card.tsx`, `afterNoteSaved(note)` w `src/routes/notes.tsx`
 
-- Testy logiki partnera na danych pokazowych przechodzą: `bun test src/hr-partner`
-- Pliki treści i ustawień są poprawnym JSON: `bun test` (test ładujący pliki)
+**Intent**: `afterNoteSaved(note)` zwraca `/notes/:noteId/task-change` dla notatki z `task_change = 1`; dla pozostałych adres S-04 zostaje bez zmian. Ekran pytania: jedno zdanie „To stała zmiana zadań?”, krótkie wyjaśnienie, dlaczego partner pyta („Zaznaczyłeś przy notatce zmianę zadań”), przyciski „Tak” i „Nie” (formularz `POST`) oraz link „Odpowiem później”. Na 360 px przyciski mieszczą się w jednym widoku bez przewijania. `POST` zapisuje `task_change_answered` przez `recordEvent('task_change_answered', note.cycle_id, actorId, { noteId, answer, developmentFormId })` i dla „Tak” pokazuje kartę „Rozmowa po zmianie zadań” z jedną formą rozwoju, dopiskiem „Katalog form rozwoju: ustawienie urzędu” i zdaniem z podstawą prawną: „Jeśli to zmiana stanowiska z istotną zmianą obowiązków, prawo wymaga nowej rozmowy o kryteriach albo oceny. Sprawdź terminy z kadrami” (art. 81 ust. 6 ustawy, § 9 ust. 1–2 rozporządzenia; decyzja 11e); dla „Nie” krótkie potwierdzenie i powrót. `GET` niczego nie zapisuje. Tylko autor notatki może odpowiedzieć.
 
-#### Manual Verification:
-
-- Treści kart i pytań czytają się prostą polszczyzną i nie zawierają oceny pracownika
-
-## Phase 2: Pytanie po notatce i karta po „Tak”
-
-### Changes Required:
-
-#### 1. Trasy pytania
-
-**File**: `src/routes/hr-partner.tsx`, `src/views/task-change-question.tsx`, `src/views/task-change-card.tsx`, miejsce przekierowania w trasie zapisu notatki z S-04
-
-**Intent**: Po zapisie notatki z `task_change = 1` trasa S-04 przekierowuje na `GET /notes/:noteId/task-change`; bez zaznaczenia przekierowanie zostaje bez zmian. Ekran pytania: jedno zdanie „To stała zmiana zadań?”, krótkie wyjaśnienie, dlaczego partner pyta („Zaznaczyłeś przy notatce zmianę zadań”), przyciski „Tak” i „Nie” (formularz `POST`) oraz link „Odpowiem później”. Na 360 px przyciski mieszczą się w jednym widoku bez przewijania. `POST` zapisuje `task_change_answered` i dla „Tak” pokazuje kartę „Rozmowa po zmianie zadań” z jedną formą rozwoju, dopiskiem „Katalog form rozwoju: ustawienie urzędu” i zdaniem z podstawą prawną: „Jeśli to zmiana stanowiska z istotną zmianą obowiązków, prawo wymaga nowej rozmowy o kryteriach albo oceny. Sprawdź terminy z kadrami” (art. 81 ust. 6 ustawy, § 9 ust. 1–2 rozporządzenia; decyzja 11e); dla „Nie” krótkie potwierdzenie i powrót. `GET` niczego nie zapisuje. Tylko autor notatki może odpowiedzieć.
-
-**Contract**: `GET /notes/:noteId/task-change` → 200 dla autora notatki z `task_change = 1`, 404 dla notatki bez zaznaczenia, 403 dla innego konta; `POST` z `answer=yes|no` → 200 z kartą albo potwierdzeniem i jednym nowym wierszem w `events`.
+**Contract**: `GET /notes/:noteId/task-change` → 200 dla autora notatki z `task_change = 1`, 404 dla notatki bez zaznaczenia, 403 dla innego konta; `POST` z `answer=yes|no` → 200 z kartą albo potwierdzeniem i jednym nowym wierszem w `events`; dla notatki z `cycle_id = null` ten wiersz ma puste `cycle_id` i `payload.noteId` = id notatki.
 
 ### Success Criteria:
 
@@ -118,53 +122,80 @@ Jeśli wdrożony plaster ma inną nazwę, wdrażający poprawia tylko `src/hr-pa
 
 - Notatka z zaznaczeniem prowadzi do pytania, a notatka bez zaznaczenia nie: `bun test src/routes/hr-partner.test.ts`
 - `GET` pytania nie dodaje wiersza do `events`, a `POST` dodaje dokładnie jeden: `bun test src/routes/hr-partner.test.ts`
+- Odpowiedź na notatkę o Marii (bez cyklu) zapisuje zdarzenie z pustym `cycle_id` i jest odnajdywana po `payload.noteId`: `bun test src/routes/hr-partner.test.ts`
+- Forma rozwoju dla „Współpracy” i forma domyślna dla kryterium spoza katalogu; pliki treści są poprawnym JSON: `bun test src/hr-partner`
 
 #### Manual Verification:
 
-- Krok 2 pokazu na telefonie 360 px: notatka, pytanie, „Tak”, karta i forma rozwoju; druga notatka bez pola nie wywołuje pytania
+- Krok 2 pokazu na telefonie 360 px (dane z `bun run seed -- --live-step-2`, data systemowa 2026-03-11): notatka, pytanie, „Tak”, karta ze zdaniem o podstawie prawnej i forma rozwoju; druga notatka bez pola nie wywołuje pytania
+- Karta „Rozmowa po zmianie zadań” czyta się prostą polszczyzną i nie zawiera oceny pracownika
 
-## Phase 3: Ekran „Przed rozmową” i przypomnienie o docenianiu
+## Phase 2: Ekran „Przed rozmową z pracownikiem” (wersja minimalna, ok. 25 min)
 
 ### Changes Required:
 
-#### 1. Ekran „Przed rozmową z pracownikiem”
+#### 1. Treści i logika ekranu
 
-**File**: `src/routes/hr-partner.tsx`, `src/views/before-meeting.tsx`, link na ekranie cyklu z S-01
+**File**: `content/cards.json`, `rules/office-settings.json`, `content/name-forms.json`, `src/hr-partner/data.ts`, `src/hr-partner/partner.ts`, `src/hr-partner/partner.test.ts`
 
-**Intent**: `GET /cycles/:id/before-meeting` dla oceniającego cyklu. Tytuł „Przed rozmową z {imię w narzędniku}”. Sekcje w tej kolejności: zmiana zadań (zdanie „Zaznaczyłeś zmianę zadań w notatce z {data}.”, notatki sprzed i po, pod nimi pytanie przy każdym kryterium z notatkami po obu stronach, np. „Przy kryterium „Rzetelność” masz notatki sprzed zmiany zadań i po niej. Zapytaj, co się zmieniło po przejęciu nowych zadań.”; ewentualne zaległe pytanie z przyciskami jak w fazie 2); kryteria bez żadnej notatki z pytaniem do rozmowy i przyciskiem „Dopisz notatkę”; ostatnia informacja zwrotna (zdanie z datą albo „Od rozmowy {data} nie przekazałeś {imię w celowniku} żadnej informacji zwrotnej.” z przyciskiem do karty docenienia); zespół (zdania z decyzji 10k z przyciskiem „Dopisz notatkę”); na końcu link do karty rozmowy oceniającej, jeśli S-04 ją dodał. Każda notatka pokazuje datę, kryterium, pole „dobrze / do poprawy” i tekst przełożonego, bez żadnych dopisków systemu. Sekcja bez danych znika (bez pustych nagłówków). Każde ustawienie urzędu pokazane w zdaniu ma dopisek „ustawienie urzędu”.
+**Intent**: Klucz `beforeMeeting` w `content/cards.json` z pytaniami do pozycji ekranu; próg `teamSilenceMonths` (6) z `label: "ustawienie urzędu"`; formy imion dla Piotra, Ewy, Marii, Tomasza i pozostałych osób z danych. `data.ts` dokłada: notatki przełożonego o osobie od `period_start` (`notesAbout(personId, { authorId, from: period_start })`), kryteria cyklu (`cycleCriteria`), datę rozmowy (`part1_submitted` z `visibleEvents(cycleId)`), `lastFeedbackDate`, podwładnych (`people.supervisor_id`) i ich najnowszą notatkę od przełożonego (`notesAbout`). `partner.ts`: granica zmiany zadań, podział notatek, kryteria bez notatek, kryteria z notatkami po obu stronach granicy, pytanie zaległe, podwładni bez notatek, forma imienia. Każda pozycja zestawienia ma pole `prompt` (pytanie) albo `action` (etykieta i adres przycisku), nigdy żadnego wyniku o pracowniku.
 
-**Contract**: `GET /cycles/:id/before-meeting` → 200 dla oceniającego, 403 dla innych; odpowiedź nie zawiera słów z listy zakazanej w teście (`ryzyk`, `wskaźnik`, `motywac`, `ranking`, `%`) ani liczby notatek przy nazwisku.
+**Contract**: `beforeMeetingSummary` zwraca `{ boundary, before[], after[], bothSides[], pendingQuestion, criteriaWithoutNotes[], feedback, team[] }`, gdzie każdy element ma `prompt` albo `action`.
 
-#### 2. Przypomnienie i karta docenienia
+#### 2. Ekran i odnośnik
 
-**File**: `src/routes/hr-partner.tsx`, `src/views/appreciation.tsx`, lista spraw ekranu startowego F-01
+**File**: `src/routes/hr-partner.tsx`, `src/views/before-meeting.tsx`, rejestracja w `registerCycleLinks`
 
-**Intent**: Na ekranie startowym oceniającego jedna pozycja na podwładnego z należnym przypomnieniem (zdanie z kotwicą, link do karty). `GET /cycles/:id/appreciation` pokazuje kartę „Docenienie” i notatki „dobrze” od kotwicy, których przełożony jeszcze nie przekazał, każda z przyciskiem „Przekaż pracownikowi” prowadzącym do trasy S-04. Wysłanie informacji zwrotnej przesuwa kotwicę, więc przypomnienie znika bez dodatkowego kodu.
+**Intent**: Odnośnik „Przed rozmową z pracownikiem” na ekranie wejściowym cyklu `GET /cycles/:id/part1` przez `registerCycleLinks`, widoczny tylko dla `cycles.appraiser_id`. `GET /cycles/:id/before-meeting` dla oceniającego cyklu. Tytuł „Przed rozmową z {imię w narzędniku}”. Sekcje w tej kolejności: zmiana zadań (zdanie „Zaznaczyłeś zmianę zadań w notatce z {data}.”, notatki sprzed i po, pod nimi pytanie przy każdym kryterium z notatkami po obu stronach, np. „Przy kryterium „Rzetelność” masz notatki sprzed zmiany zadań i po niej. Zapytaj, co się zmieniło po przejęciu nowych zadań.”; ewentualne zaległe pytanie z przyciskami jak w fazie 1); kryteria bez żadnej notatki z pytaniem do rozmowy i przyciskiem „Dopisz notatkę” (`/people/:personId/notes/new`); ostatnia informacja zwrotna (zdanie z datą albo „Od rozmowy {data} nie przekazałeś {imię w celowniku} żadnej informacji zwrotnej.” z pytaniem, a po fazie 3 z przyciskiem do karty docenienia); zespół (zdania z decyzji 10k z przyciskiem „Dopisz notatkę” do `/people/:personId/notes/new`, także dla Marii bez cyklu); na końcu link do `GET /cycles/:id/cards/assessment-conversation`. Każda notatka pokazuje datę, kryterium, pole „dobrze / do poprawy” i tekst przełożonego, bez żadnych dopisków systemu. Sekcja bez danych znika (bez pustych nagłówków). Każde ustawienie urzędu pokazane w zdaniu ma dopisek „ustawienie urzędu”.
 
-**Contract**: `GET /cycles/:id/appreciation` → 200 dla oceniającego; po wysłaniu informacji zwrotnej z datą `today()` `appreciationReminder` zwraca `null`.
+**Contract**: `GET /cycles/:id/before-meeting` → 200 dla oceniającego, 403 dla innych; odpowiedź nie zawiera słów z listy zakazanej w teście (`ryzyk`, `wskaźnik`, `motywac`, `ranking`, `%`) ani liczby notatek przy nazwisku. `cycleLinks(cycle, person)` dla oceniającego zawiera adres `/cycles/:id/before-meeting`.
 
 ### Success Criteria:
 
 #### Automated Verification:
 
-- Ekran „Przed rozmową” dla Piotra przy dacie 2026-11-20 pokazuje podział na 11.03.2026, kryterium „Myślenie analityczne” bez notatek i zdanie o Marii: `bun test src/routes/hr-partner.test.ts`
-- Ekran nie zawiera słów z listy zakazanej ani liczby notatek przy nazwisku: `bun test src/routes/hr-partner.test.ts`
-- Przypomnienie o docenianiu znika po wysłaniu informacji zwrotnej: `bun test src/hr-partner`
+- Logika na danych pokazowych: granica 2026-03-11, brak granicy po „no” i przy dacie 2026-03-10, „Rzetelność”, „Komunikacja” i „Współpraca” po obu stronach, „Myślenie analityczne” bez notatek, zdanie o Marii i brak zdania o Ewie: `bun test src/hr-partner`
+- Wersja 90 sekund (dane domyślne, `createTestApp({ today: '2026-11-21' })`, bez kroków 2–3): ekran „Przed rozmową” dla Piotra pokazuje podział na 11.03.2026 bez kliknięcia „Tak” i zaległe pytanie przy notatce z 11.03.2026: `bun test src/routes/hr-partner.test.ts`
+- Pełny pokaz (dane jak po `--live-step-2`): notatka z zaznaczeniem zapisana przy dacie 2026-03-11, „Tak”, przesunięcie daty na 2026-11-21: ekran pokazuje podział na 11.03.2026, jedną notatkę ze zmianą zadań i brak zaległego pytania: `bun test src/routes/hr-partner.test.ts`
+- Ekran nie zawiera słów z listy zakazanej ani liczby notatek przy nazwisku; inne konto dostaje 403; ekran wejściowy cyklu ma odnośnik „Przed rozmową”, a przycisk „Dopisz notatkę” przy Marii prowadzi do `/people/:personId/notes/new`: `bun test src/routes/hr-partner.test.ts`
 
 #### Manual Verification:
 
 - Ekran „Przed rozmową z Piotrem” przejrzany wiersz po wierszu: przy żadnym nazwisku nie ma etykiety, liczby ani wskaźnika; każda pozycja ma pytanie albo działanie
-- Krok 4 pokazu na komputerze 1440 px czyta się w kilka sekund
+- Krok 4 pokazu na komputerze 1440 px (data systemowa 2026-11-21) czyta się w kilka sekund
 
-## Phase 4: Ekran „Skąd biorą się podpowiedzi”
+## Phase 3: Przypomnienie i karta docenienia (po wersji minimalnej, ok. 15 min)
+
+### Changes Required:
+
+#### 1. Przypomnienie i karta docenienia
+
+**File**: `content/cards.json`, `rules/office-settings.json`, `src/hr-partner/partner.ts`, `src/routes/hr-partner.tsx`, `src/views/appreciation.tsx`, rejestracja w `registerHomeTasks` i `registerCycleLinks`
+
+**Intent**: Karta `appreciation` „Docenienie” (po co, jak powiedzieć o konkretnym fakcie, czego unikać) i próg `appreciationReminderDays` (90) z `label: "ustawienie urzędu"`. `appreciationReminder` według „Critical Implementation Details”. Na ekranie startowym oceniającego, przez `registerHomeTasks`, jedna pozycja na podwładnego z należnym przypomnieniem (zdanie z kotwicą, link do karty). Przez `registerCycleLinks` odnośnik do karty docenienia na ekranie wejściowym cyklu. `GET /cycles/:id/appreciation` pokazuje kartę „Docenienie” i notatki `good` od kotwicy, każda z przyciskiem „Przekaż pracownikowi” prowadzącym do `GET /notes/:id/feedback` (S-04). Zdanie o informacji zwrotnej na ekranie „Przed rozmową” dostaje przycisk do karty. Wysłanie informacji zwrotnej przesuwa kotwicę przez `lastFeedbackDate`, więc przypomnienie znika bez dodatkowego kodu.
+
+**Contract**: `GET /cycles/:id/appreciation` → 200 dla oceniającego, 403 dla innych; po wysłaniu informacji zwrotnej z datą `today()` `appreciationReminder` zwraca `null`.
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- Przypomnienie przy dacie 2026-11-21 bez wysłanej informacji zwrotnej, z notatką z 18.06.2026 w karcie, i jego brak po wysłaniu: `bun test src/hr-partner`
+- Ekran startowy Marka ma pozycję przypomnienia, a karta docenienia daje 403 innemu kontu: `bun test src/routes/hr-partner.test.ts`
+
+#### Manual Verification:
+
+- Karta „Docenienie” czyta się prostą polszczyzną i nie zawiera oceny pracownika
+
+## Phase 4: Ekran „Skąd biorą się podpowiedzi” (po wersji minimalnej, ok. 10 min)
 
 ### Changes Required:
 
 #### 1. Ekran administratora
 
-**File**: `src/routes/admin.tsx`, `src/views/suggestion-sources.tsx`
+**File**: `content/suggestion-sources.json`, `src/routes/admin.tsx`, `src/views/suggestion-sources.tsx`, rejestracja w `registerHomeTasks`
 
-**Intent**: `GET /admin/suggestion-sources` tylko dla konta administratora. Zdanie wstępne: prototyp działa na regułach, urząd może w tych miejscach włączyć model uruchomiony u siebie. Tabela sześciu miejsc z `content/suggestion-sources.json` (miejsce, co robiłby model w tle, w prototypie) i nad nią „Teraz działa: reguły” z adaptera S-04. Pod tabelą lista „Czego model nigdy nie robi” i warunki wspólne z decyzji 9. Link do ekranu na ekranie startowym administratora.
+**Intent**: Strona może być statyczna. `GET /admin/suggestion-sources` tylko dla konta z rolą `admin`. Zdanie wstępne: prototyp działa na regułach, urząd może w tych miejscach włączyć model uruchomiony u siebie. Tabela sześciu miejsc z `content/suggestion-sources.json` (miejsce, co robiłby model w tle, w prototypie), przepisana z decyzji 9. Nad tabelą „Teraz działa: …” z `suggestionMode()` (pierwsze do cięcia, patrz „Kolejność cięcia”). Pod tabelą lista „Czego model nigdy nie robi” i warunki wspólne z decyzji 9. Odnośnik do ekranu na ekranie startowym administratora przez `registerHomeTasks`.
 
 **Contract**: `GET /admin/suggestion-sources` → 200 dla administratora, 403 dla innych kont; zawiera sześć wierszy i cztery pozycje listy „Czego model nigdy nie robi”.
 
@@ -181,66 +212,76 @@ Jeśli wdrożony plaster ma inną nazwę, wdrażający poprawia tylko `src/hr-pa
 
 ## Testing Strategy
 
-Testy jednostkowe `src/hr-partner/partner.test.ts` na danych pokazowych z `context/foundation/demo.md` (seed z S-04 albo te same wiersze wstawione w teście; kryteria cyklu Piotra z wybranymi w kroku 1 „Orientacja na klienta/interesanta” i „Myślenie analityczne”): granica 2026-03-11; po odpowiedzi „no” granicy nie ma; przy dacie 2026-03-10 granicy nie ma (decyzja 10i); „Rzetelność”, „Komunikacja” i „Współpraca” mają notatki po obu stronach (notatka z 11.03.2026 liczy się do „po”); „Myślenie analityczne” nie ma notatek; forma rozwoju dla „Współpracy” i forma domyślna dla kryterium spoza katalogu; przypomnienie przy dacie 2026-11-20 bez wysłanej informacji zwrotnej i jego brak po wysłaniu; Maria bez notatek daje zdanie „jeszcze żadnej”, Ewa z notatką z 03.09.2026 nie daje zdania. Trasy przez `app.request()` w `src/routes/hr-partner.test.ts` i `src/routes/admin.test.ts`: kody 200/403/404, zapis tylko po `POST`, brak pytania po notatce bez zaznaczenia, lista zakazana na ekranie „Przed rozmową”.
+Testy jednostkowe `src/hr-partner/partner.test.ts` na danych pokazowych z `src/seed/notes.ts` (albo tych samych wierszach podanych funkcjom wprost; kryteria cyklu Piotra z wybranymi w kroku 1 „Orientacja na klienta/interesanta” i „Myślenie analityczne”): granica 2026-03-11; po odpowiedzi „no” granicy nie ma; przy dacie 2026-03-10 granicy nie ma (decyzja 10i); „Rzetelność”, „Komunikacja” i „Współpraca” mają notatki po obu stronach (notatka z 11.03.2026 liczy się do „po”); „Myślenie analityczne” nie ma notatek; forma rozwoju dla „Współpracy” i forma domyślna dla kryterium spoza katalogu; przypomnienie przy dacie 2026-11-21 bez wysłanej informacji zwrotnej i jego brak po wysłaniu; Maria bez notatek daje zdanie „jeszcze żadnej”, Ewa z notatką z 03.09.2026 nie daje zdania.
+
+Trasy przez `app.request()` na `createTestApp({ today })` w `src/routes/hr-partner.test.ts` i `src/routes/admin.test.ts`: kody 200/403/404, zapis tylko po `POST`, brak pytania po notatce bez zaznaczenia, odpowiedź dla notatki o Marii z pustym `cycle_id` odnajdywana po `payload.noteId`, lista zakazana na ekranie „Przed rozmową”, odnośniki z `cycleLinks` i `homeTasks`. Dwa warianty danych pokazu:
+
+- **Wersja 90 sekund:** dane domyślne, od razu data 2026-11-21 (kroki 2–3 pominięte); granica 11.03.2026 z wgranej notatki bez kliknięcia „Tak”, zaległe pytanie widoczne.
+- **Pełny pokaz:** dane jak po `bun run seed -- --live-step-2` (bez wgranej notatki z 11.03.2026), data 2026-03-11, notatka z zaznaczeniem przez `POST /people/:personId/notes`, przekierowanie na pytanie, „Tak”, potem `POST /demo/date` na 2026-11-21; granica 11.03.2026, dokładnie jedna notatka ze zmianą zadań, bez zaległego pytania. Jeśli `createTestApp` nie przyjmuje opcji `--live-step-2`, test usuwa przed startem tę jedną wgraną notatkę (zgłoszone jako luka kontraktu w `## Notes` pliku `change.md`).
 
 ## Open questions
 
 Każde ma domyślne rozstrzygnięcie; wdrażający stosuje je bez pytania i wpisuje w `## Notes` pliku `change.md`.
 
-1. **Notatka z 11.03.2026 jest w danych, a w kroku 2 Marek pisze tę samą notatkę na żywo.** Przy dacie systemowej po 11.03.2026 będą dwie podobne notatki. Domyślnie: logika działa na obu (granica z najwcześniejszej, pytanie zaległe znika po „Tak”); prowadzący w kroku 2 ustawia datę 2026-03-10 i pisze krótszą notatkę o przejęciu kolejki. Rozstrzyga autor scenariusza.
-2. **Data zmiany zadań.** Granica to data notatki (11.03.2026), nie dzień zmiany z tekstu (9.03.2026). Domyślnie: bez pola „Od kiedy” przy „Tak”; dodać je tylko, jeśli zostanie czas.
-3. **Imiona w przypadkach zależnych.** Domyślnie: `content/name-forms.json` w tym plastrze zamiast nowych kolumn w `people`.
-4. **„Dopisz notatkę” dla Marii, która może nie mieć cyklu.** Domyślnie: link do formularza notatki o osobie z S-04; jeśli S-04 wymaga cyklu, przycisk prowadzi do ekranu startowego, a zdanie zostaje.
-5. **Progi.** Domyślnie 90 dni dla przypomnienia o docenianiu i 6 miesięcy dla podwładnych bez notatek (przykład z decyzji 10k), oba jako „ustawienie urzędu”.
-6. **Liczba w zdaniu „od 6 miesięcy”.** Domyślnie dozwolona, bo dotyczy przełożonego, nie pracownika (decyzja 10k sama jej używa); liczby notatek, wyniki i wskaźniki przy nazwisku są zakazane.
+1. **Data zmiany zadań.** Granica to data notatki (11.03.2026), nie dzień zmiany z tekstu (9.03.2026). Domyślnie: bez pola „Od kiedy” przy „Tak”; dodać je tylko, jeśli zostanie czas.
+2. **Imiona w przypadkach zależnych.** Domyślnie: `content/name-forms.json` w tym plastrze zamiast nowych kolumn w `people`.
+3. **Progi.** Domyślnie 90 dni dla przypomnienia o docenianiu i 6 miesięcy dla podwładnych bez notatek (przykład z decyzji 10k), oba jako „ustawienie urzędu”.
+4. **Liczba w zdaniu „od 6 miesięcy”.** Domyślnie dozwolona, bo dotyczy przełożonego, nie pracownika (decyzja 10k sama jej używa); liczby notatek, wyniki i wskaźniki przy nazwisku są zakazane.
+5. **`visibleEvents` dla zdarzeń bez cyklu.** Kontrakt nie mówi, czy `visibleEvents(null)` zwraca zdarzenia z pustym `cycle_id`. Domyślnie: `data.ts` czyta odpowiedzi przez `visibleEvents(note.cycle_id)`; jeśli F-01 nie obsługuje `null`, `data.ts` czyta własne zdarzenia `task_change_answered` z tą samą granicą `date <= today()` i porządkiem `(date, id)`, a rozbieżność trafia do `## Notes`.
 
 ## References
 
-- `context/foundation/decisions.md` (decyzje 2, 3, 9, 10e, 10i, 10j, 10k)
+- `context/changes/rules-engine-and-demo-data/plan.md` (rozdział „Kontrakt wspólny dla wszystkich plastrów”)
+- `context/changes/cycle-start-criteria/plan.md` (S-01, „Co ten plaster udostępnia”)
+- `context/changes/notes-and-justification/plan.md` (S-04, „Co ten plaster udostępnia”)
+- `context/foundation/decisions.md` (decyzje 2, 3, 9, 10e, 10i, 10j, 10k, 11c, 11e)
 - `context/foundation/prd.md` (US-04, FR-015, FR-016, FR-035, FR-036, Access Control, Non-Goals)
 - `context/foundation/roadmap.md` (S-05)
 - `context/foundation/demo.md` (kroki 2 i 4, wersja 90 sekund, „Ustalenia do scenariusza”, „Notatki do wgrania”, „Czego jeszcze nie ma”)
-- `context/changes/rules-engine-and-demo-data/plan.md` (F-01)
 - `AGENTS.md` (zasady 4, 5, 7, 8, 10)
 
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
 
-### Phase 1: Treści i logika partnera
+### Phase 1: Pytanie po notatce i karta po „Tak” (wersja minimalna)
 
 #### Automated
 
-- [ ] 1.1 Testy logiki partnera na danych pokazowych przechodzą: `bun test src/hr-partner`
-- [ ] 1.2 Pliki treści i ustawień są poprawnym JSON: `bun test` (test ładujący pliki)
+- [ ] 1.1 Notatka z zaznaczeniem prowadzi do pytania, a notatka bez zaznaczenia nie: `bun test src/routes/hr-partner.test.ts`
+- [ ] 1.2 `GET` pytania nie dodaje wiersza do `events`, a `POST` dodaje dokładnie jeden: `bun test src/routes/hr-partner.test.ts`
+- [ ] 1.3 Odpowiedź na notatkę o Marii (bez cyklu) zapisuje zdarzenie z pustym `cycle_id` i jest odnajdywana po `payload.noteId`: `bun test src/routes/hr-partner.test.ts`
+- [ ] 1.4 Forma rozwoju dla „Współpracy” i forma domyślna dla kryterium spoza katalogu; pliki treści są poprawnym JSON: `bun test src/hr-partner`
 
 #### Manual
 
-- [ ] 1.3 Treści kart i pytań czytają się prostą polszczyzną i nie zawierają oceny pracownika
+- [ ] 1.5 Krok 2 pokazu na telefonie 360 px (dane z `bun run seed -- --live-step-2`, data systemowa 2026-03-11): notatka, pytanie, „Tak”, karta ze zdaniem o podstawie prawnej i forma rozwoju; druga notatka bez pola nie wywołuje pytania
+- [ ] 1.6 Karta „Rozmowa po zmianie zadań” czyta się prostą polszczyzną i nie zawiera oceny pracownika
 
-### Phase 2: Pytanie po notatce i karta po „Tak”
+### Phase 2: Ekran „Przed rozmową z pracownikiem” (wersja minimalna)
 
 #### Automated
 
-- [ ] 2.1 Notatka z zaznaczeniem prowadzi do pytania, a notatka bez zaznaczenia nie: `bun test src/routes/hr-partner.test.ts`
-- [ ] 2.2 `GET` pytania nie dodaje wiersza do `events`, a `POST` dodaje dokładnie jeden: `bun test src/routes/hr-partner.test.ts`
+- [ ] 2.1 Logika na danych pokazowych: granica 2026-03-11, brak granicy po „no” i przy dacie 2026-03-10, „Rzetelność”, „Komunikacja” i „Współpraca” po obu stronach, „Myślenie analityczne” bez notatek, zdanie o Marii i brak zdania o Ewie: `bun test src/hr-partner`
+- [ ] 2.2 Wersja 90 sekund: podział na 11.03.2026 bez kliknięcia „Tak” i zaległe pytanie przy notatce z 11.03.2026: `bun test src/routes/hr-partner.test.ts`
+- [ ] 2.3 Pełny pokaz (`--live-step-2`): notatka z 2026-03-11, „Tak”, data 2026-11-21: podział na 11.03.2026, jedna notatka ze zmianą zadań, brak zaległego pytania: `bun test src/routes/hr-partner.test.ts`
+- [ ] 2.4 Brak słów z listy zakazanej i liczby notatek przy nazwisku, 403 dla innego konta, odnośnik „Przed rozmową” na ekranie wejściowym cyklu, „Dopisz notatkę” przy Marii prowadzi do `/people/:personId/notes/new`: `bun test src/routes/hr-partner.test.ts`
 
 #### Manual
 
-- [ ] 2.3 Krok 2 pokazu na telefonie 360 px: notatka, pytanie, „Tak”, karta i forma rozwoju; druga notatka bez pola nie wywołuje pytania
+- [ ] 2.5 Ekran „Przed rozmową z Piotrem” przejrzany wiersz po wierszu: przy żadnym nazwisku nie ma etykiety, liczby ani wskaźnika; każda pozycja ma pytanie albo działanie
+- [ ] 2.6 Krok 4 pokazu na komputerze 1440 px (data systemowa 2026-11-21) czyta się w kilka sekund
 
-### Phase 3: Ekran „Przed rozmową” i przypomnienie o docenianiu
+### Phase 3: Przypomnienie i karta docenienia
 
 #### Automated
 
-- [ ] 3.1 Ekran „Przed rozmową” dla Piotra przy dacie 2026-11-20 pokazuje podział na 11.03.2026, kryterium „Myślenie analityczne” bez notatek i zdanie o Marii: `bun test src/routes/hr-partner.test.ts`
-- [ ] 3.2 Ekran nie zawiera słów z listy zakazanej ani liczby notatek przy nazwisku: `bun test src/routes/hr-partner.test.ts`
-- [ ] 3.3 Przypomnienie o docenianiu znika po wysłaniu informacji zwrotnej: `bun test src/hr-partner`
+- [ ] 3.1 Przypomnienie przy dacie 2026-11-21 bez wysłanej informacji zwrotnej, z notatką z 18.06.2026 w karcie, i jego brak po wysłaniu: `bun test src/hr-partner`
+- [ ] 3.2 Ekran startowy Marka ma pozycję przypomnienia, a karta docenienia daje 403 innemu kontu: `bun test src/routes/hr-partner.test.ts`
 
 #### Manual
 
-- [ ] 3.4 Ekran „Przed rozmową z Piotrem” przejrzany wiersz po wierszu: przy żadnym nazwisku nie ma etykiety, liczby ani wskaźnika; każda pozycja ma pytanie albo działanie
-- [ ] 3.5 Krok 4 pokazu na komputerze 1440 px czyta się w kilka sekund
+- [ ] 3.3 Karta „Docenienie” czyta się prostą polszczyzną i nie zawiera oceny pracownika
 
 ### Phase 4: Ekran „Skąd biorą się podpowiedzi”
 

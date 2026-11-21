@@ -8,7 +8,7 @@ Moduł wirtualnego HR partnera, który organizator ocenia osobno. Bez modelu: pa
 
 ## Starting Point
 
-Po F-01, S-01, S-02 i S-04 są notatki z polem zmiany zadań, adapter podpowiedzi i informacja zwrotna z datą. Nic na nie nie reaguje; brak katalogu form rozwoju i kart.
+Po F-01, S-01, S-02 i S-04 są notatki z polem zmiany zadań (`notes.task_change`), adapter podpowiedzi (`suggestionMode()`) i informacja zwrotna z datą (`feedback_messages`, odczyt przez `lastFeedbackDate`). Nic na nie nie reaguje; brak katalogu form rozwoju i kart. Nazwy pochodzą z kontraktu wspólnego w planie F-01.
 
 ## Desired End State
 
@@ -18,43 +18,46 @@ Po notatce ze zmianą zadań Marek odpowiada na „To stała zmiana zadań?” i
 
 | Decision | Choice | Why (1 sentence) |
 | --- | --- | --- |
-| Granica „przed / po” | data najwcześniejszej notatki z polem zmiany zadań, bez odpowiedzi „Nie” | Wersja 90 sekund pomija krok 2, a krok 4 musi mieć podział. |
+| Granica „przed / po” | data najwcześniejszej notatki z polem zmiany zadań, bez odpowiedzi „Nie”; „Tak” nie jest warunkiem | Wersja 90 sekund pomija krok 2, a krok 4 musi mieć podział. |
+| Duplikat notatki z 11.03.2026 | opcja seeda `--live-step-2` w pełnym pokazie; w wersji 90 s granicę daje wgrana notatka | Ustalenie kontraktu i `demo.md`; obie drogi dają granicę 11.03.2026. |
+| Odpowiedź przy notatce bez cyklu | `task_change_answered` z pustym `cycle_id`, odczyt po `payload.noteId` | Maria nie ma cyklu, a kontrakt pozwala na puste `cycle_id`. |
 | Data zmiany | data notatki (11.03.2026), nie 9.03 z tekstu | System nie czyta treści notatek. |
 | Forma rozwoju | pierwsza z katalogu pasująca do kryterium notatki, inaczej domyślna | Reguła w miejscu 5 z decyzji 9. |
-| Zapis | tylko zdarzenie `task_change_answered` po kliknięciu | „Nic nie zapisuje się bez kliknięcia”. |
+| Zapis | tylko zdarzenie `task_change_answered` przez `recordEvent` po kliknięciu | „Nic nie zapisuje się bez kliknięcia”. |
+| Odnośniki | `registerCycleLinks` na `GET /cycles/:id/part1`, `registerHomeTasks` na `GET /` | Wspólne miejsca z kontraktu, bez ręcznego wpisywania adresów. |
 | Odmiana imion | `content/name-forms.json` z zdaniem zastępczym | Zdania z decyzji 10k wymagają przypadków. |
-| Odczyty cudzych tabel | jeden plik `src/hr-partner/data.ts` | Plany plastrów powstają równolegle; rozbieżność nazw poprawia się w jednym miejscu. |
+| Odczyty cudzych danych | jeden plik `src/hr-partner/data.ts`, tylko przez `notesAbout`, `notesByAuthor`, `lastFeedbackDate`, `cycleCriteria`, `visibleEvents` | Rozbieżność z kodem poprawia się w jednym miejscu. |
 | Progi | 90 dni docenianie, 6 miesięcy bez notatek, „ustawienie urzędu” | Brak progów w przepisach; 6 miesięcy z przykładu 10k. |
 
 ## Scope
 
-**In scope:** pytanie po notatce, karta i forma rozwoju po „Tak”, ekran „Przed rozmową z pracownikiem”, przypomnienie i karta docenienia, ekran „Skąd biorą się podpowiedzi”, treści (katalog, karty, pytania).
+**In scope:** wersja minimalna: pytanie po notatce, karta (ze zdaniem o podstawie prawnej, decyzja 11e) i forma rozwoju po „Tak”, ekran „Przed rozmową z pracownikiem”. Po niej, do cięcia: przypomnienie i karta docenienia, ekran „Skąd biorą się podpowiedzi” (może być statyczny). Treści: katalog, karty, pytania.
 
 **Out of scope:** formularz notatki, lista słów, adapter i informacja zwrotna (S-04); karty rozmowy rozpoczynającej i oceniającej; etykiety, wskaźniki, analiza nieobecności; style.
 
 ## Architecture / Approach
 
-Czysta logika w `src/hr-partner/partner.ts` na danych z `data.ts`, każda funkcja z `today` i filtrem dat (decyzja 10i). Trasy w `src/routes/hr-partner.tsx` i `src/routes/admin.tsx`, widoki we wspólnym układzie. Treści w `rules/office-settings.json` i `content/*.json`.
+Czysta logika w `src/hr-partner/partner.ts` na danych z `data.ts`, każda funkcja z `today` i filtrem dat (decyzja 10i). Trasy w `src/routes/hr-partner.tsx` i `src/routes/admin.tsx`, widoki we wspólnym układzie. Po zapisie notatki S-04 woła `afterNoteSaved(note)`, które dla `task_change = 1` prowadzi na pytanie. „Dopisz notatkę” prowadzi do `/people/:personId/notes/new`, także dla Marii. Treści w `rules/office-settings.json` i `content/*.json`.
 
 ## Phases at a Glance
 
 | Phase | What it delivers | Key risk |
 | --- | --- | --- |
-| 1. Treści i logika | katalog, karty, funkcje z testami | nazwy z wcześniejszych plastrów inne niż zakładane |
-| 2. Pytanie po notatce | krok 2 pokazu na telefonie | przekierowanie w trasie S-04 |
-| 3. Przed rozmową i docenianie | krok 4 pokazu, FR-016 | słowo albo liczba przy nazwisku |
-| 4. Skąd biorą się podpowiedzi | FR-036 | brak — ekran statyczny z jedną wartością z adaptera |
+| 1. Pytanie po notatce (minimalna) | krok 2 pokazu na telefonie, katalog i karta | `afterNoteSaved` w trasie S-04 |
+| 2. Przed rozmową (minimalna) | krok 4 pokazu w obu wariantach danych | słowo albo liczba przy nazwisku |
+| 3. Docenianie | FR-016, przypomnienie na ekranie startowym | brak; pierwsze do cięcia po fazie 4 |
+| 4. Skąd biorą się podpowiedzi | FR-036, strona może być statyczna | brak; pierwsze do cięcia |
 
 **Prerequisites:** F-01, S-01, S-02, S-04 wdrożone.
-**Estimated effort:** ok. 80 minut, jeden agent (25 / 15 / 30 / 10).
+**Estimated effort:** wersja minimalna ok. 50 minut (25 / 25), całość ok. 75 minut (+15 / +10), jeden agent.
 
 ## Open Risks & Assumptions
 
-- Notatka z 11.03.2026 jest w danych, a krok 2 pisze ją na żywo: możliwy duplikat (pytanie otwarte 1 w planie).
-- Zakładane nazwy tabel i tras S-01 i S-04 są w planie w sekcji „Założenia wobec wcześniejszych plastrów”.
+- Kontrakt nie mówi, czy `visibleEvents(null)` zwraca zdarzenia bez cyklu, ani czy `createTestApp` przyjmuje opcję `--live-step-2`; domyślne rozstrzygnięcia są w planie.
+- Nazwy z kontraktu i z planów S-01 i S-04 są w planie w sekcji „Założenia wobec wcześniejszych plastrów”.
 
 ## Success Criteria (Summary)
 
-- Krok 2 i krok 4 pokazu działają; notatka bez pola nie wywołuje pytania.
+- Krok 2 (2026-03-11) i krok 4 (2026-11-21) pokazu działają, krok 4 w obu wariantach danych; notatka bez pola nie wywołuje pytania.
 - Ekran „Przed rozmową” nie ma przy nazwisku etykiety, liczby ani wskaźnika; każda pozycja ma pytanie albo działanie.
 - `bun test` przechodzi.

@@ -2,49 +2,56 @@
 
 ## Overview
 
-Plaster S-04, czyli teza produktu (decyzja 1): przełożony przez 24 miesiące zapisuje z telefonu krótkie notatki o faktach przy kryteriach, a przy ocenie ma je pod ręką. Plaster daje tabelę notatek z danymi pokazowymi, formularz notatki z polem „Zmiana zadań pracownika” wstępnie zaznaczanym przez adapter podpowiedzi, informację zwrotną dla pracownika, notatki i ostrzeżenia przy każdym kryterium w formularzu oceny, wstawianie zaznaczonych notatek do uzasadnienia i wniosków rozwojowych oraz kartę rozmowy oceniającej.
+Plaster S-04, czyli teza produktu (decyzja 1): przełożony przez 24 miesiące zapisuje z telefonu krótkie notatki o faktach przy kryteriach, a przy ocenie ma je pod ręką. Plaster daje tabelę notatek z danymi pokazowymi, formularz notatki z polem „Zmiana zadań pracownika” wstępnie zaznaczanym przez adapter podpowiedzi, notatki i ostrzeżenie przy każdym kryterium w formularzu oceny, wstawianie zaznaczonych notatek do uzasadnienia, kartę rozmowy oceniającej, a po wersji minimalnej: informację zwrotną dla pracownika, drugie „Wstaw” (do wniosków rozwojowych) i gałąź modelu.
 
-**Kolejność cięcia** (gdy brakuje czasu; kroki 2 i 4 pokazu działają do końca listy): 1) faza 4, czyli gałąź modelu (i tak opcjonalna); 2) ostrzeżenie „skrajna ocena bez faktu” (pokaz go nie wywołuje); 3) ekran pracownika „Informacja zwrotna” (zostaje wysyłka i data wysłania, której potrzebuje S-05); 4) pole daty w formularzu notatki (data = `today()` bez wyboru); 5) przycisk „Wstaw do wniosków rozwojowych” (zostaje „Wstaw do uzasadnienia”). Nie tniemy: tabeli i danych notatek, wstępnego zaznaczenia pola, notatek przy kryteriach, ostrzeżenia „fakty tylko z ostatniego miesiąca”, „Wstaw do uzasadnienia”, karty rozmowy oceniającej.
+**Wersja minimalna (fazy 1 i 2, około 50 minut).** Formularz notatki na telefonie z wstępnie zaznaczanym polem, notatki przy kryteriach w formularzu oceny S-02, jedno „Wstaw” do uzasadnienia, ostrzeżenie „fakty tylko z ostatniego miesiąca”, karta rozmowy oceniającej z odnośnikami z ekranu wejściowego cyklu i z formularza oceny. Na niej działają kroki 2 i 4 pokazu. Wszystko później jest dokładką.
+
+**Kolejność cięcia** (co odpada pierwsze, gdy brakuje czasu; wersja minimalna nie jest cięta): 1) faza 4, czyli gałąź modelu (i tak opcjonalna, decyzja 10l); 2) ostrzeżenie „skrajna ocena bez faktu” (pokaz go nie wywołuje); 3) ekran pracownika „Informacja zwrotna” (`GET /feedback`); 4) pole daty w formularzu notatki (data = `today()` bez wyboru); 5) drugi przycisk „Wstaw do wniosków rozwojowych”; 6) „Przekaż pracownikowi” z datą wysłania (potrzebna S-05 do przypomnienia o docenianiu; bez niej `lastFeedbackDate` zwraca `null`). Nie tniemy niczego z wersji minimalnej.
 
 ## Current State Analysis
 
-- Kodu tego plastra nie ma. Repo ma starter Hono (`src/index.ts`) i silnik pod polskimi nazwami (`reguly/`, `src/silnik/`); F-01 przenosi go na nazwy angielskie (`rules/regulation-2016-470.json`, `src/engine/`).
-- Plik reguł ma już identyfikatory kryteriów (`reguly/rozporzadzenie-2016-470.json:142–281`, np. `rzetelnosc`, `orientacja-na-klienta`, `wykorzystywanie-wiedzy`) i tematy rozmowy oceniającej z § 10 (`reguly/rozporzadzenie-2016-470.json:298–305`, klucz `rozmowaOceniajaca`; po F-01 zakładamy `assessmentConversation.topics`). Karta rozmowy bierze tematy stąd, nie z kopii.
-- Plan F-01 (`context/changes/rules-engine-and-demo-data/plan.md`) każe seedowi wziąć „notatki” z `demo.md`, ale jego schemat nie ma tabeli notatek. Tabelę i wgranie notatek robi ten plaster (sekcja „Dane pokazowe” w fazie 1).
-- `public/` jest pusty; htmx nie jest wgrany. Plaster nie zakłada htmx: dwa małe skrypty bez zależności (`public/note-form.js`, `public/insert-notes.js`).
-- Tabela notatek do wgrania: `context/foundation/demo.md`, sekcja „Notatki do wgrania” (16 wierszy: Piotr 9, Ewa 4, Tomasz 3).
+- Kodu tego plastra nie ma. Repo ma starter Hono (`src/index.ts`) i silnik pod polskimi nazwami (`reguly/`, `src/silnik/`); F-01 przenosi go na nazwy angielskie (`rules/regulation-2016-470.json`, `src/engine/`), a wejście aplikacji na `src/index.tsx`.
+- Plik reguł ma identyfikatory kryteriów (`reguly/rozporzadzenie-2016-470.json:142–281`, np. `rzetelnosc`, `orientacja-na-klienta`, `wykorzystywanie-wiedzy`); kontrakt zostawia je bez zmian. Tematy rozmowy oceniającej z § 10 są w kluczu `rozmowaOceniajaca` (`:298–305`); po F-01 klucz to `assessmentConversation` z polami `basis` i `topics` (nazwa z recenzji, ustalenie 5). Karta rozmowy bierze tematy stąd, nie z kopii.
+- `public/` jest pusty; htmx nie jest wgrany. Plaster nie zakłada htmx: dwa małe skrypty bez zależności (`public/note-form.js`, `public/insert-notes.js`), serwowane lokalnie przez `serveStatic` z F-01.
+- Tabela notatek do wgrania: `context/foundation/demo.md`, sekcja „Notatki do wgrania” (16 wierszy: Piotr 9, Ewa 4, Tomasz 3). F-01 notatek nie wgrywa; robi to moduł tego plastra.
 
 ## Desired End State
 
-Marek na telefonie (360 px) zapisuje notatkę o Piotrze; gdy w tekście jest słowo z listy, pole „Zmiana zadań pracownika” zaznacza się samo z dopiskiem, skąd ta podpowiedź, a Marek może je odznaczyć. Na liście „Moje notatki” przy notatce jest „Przekaż pracownikowi”; Piotr widzi wysłany (poprawiony) tekst, a samej notatki nie widzi na swoim koncie (decyzja 11c: w interfejsie nie ma słowa „prywatna”). W formularzu oceny Piotra (data systemowa 23.11.2026) przy każdym kryterium widać notatki Marka z okresu oceny z datą i polem „dobrze / do poprawy”; przy „Wykorzystywanie wiedzy i doskonalenie zawodowe” widać ostrzeżenie „fakty tylko z ostatniego miesiąca”; zaznaczone notatki przycisk „Wstaw” dopisuje z datą do pola uzasadnienia, nad którym stoi „Ten tekst przeczyta pracownik”. Karta rozmowy oceniającej pokazuje trzy tematy z § 10. `bun test` przechodzi.
+Marek na telefonie (360 px) zapisuje notatkę o Piotrze; gdy w tekście jest słowo z listy, pole „Zmiana zadań pracownika” zaznacza się samo z dopiskiem, skąd ta podpowiedź, a Marek może je odznaczyć. W formularzu oceny Piotra (data systemowa 21.11.2026, krok 4 pokazu) przy każdym kryterium widać notatki Marka z okresu oceny z datą i polem „dobrze / do poprawy”; przy „Wykorzystywanie wiedzy i doskonalenie zawodowe” widać ostrzeżenie „fakty tylko z ostatniego miesiąca”; zaznaczone notatki przycisk „Wstaw do uzasadnienia” dopisuje z datą do pola uzasadnienia S-02, nad którym stoi „Ten tekst przeczyta pracownik”; pole da się dalej edytować, a nic się nie zapisuje przed przyciskiem formularza. Karta rozmowy oceniającej pokazuje trzy tematy z § 10. Po wersji minimalnej: przy notatce jest „Przekaż pracownikowi”; Piotr widzi wysłany (poprawiony) tekst, a samej notatki nie widzi na swoim koncie (decyzja 11c: w interfejsie nie ma słowa „prywatna”). `bun test` przechodzi.
 
 ### Key Discoveries:
 
-- Kryteria w notatkach pokazowych mają nazwy urzędowe; seed rozwiązuje je na identyfikatory przez wyszukanie po nazwie w pliku reguł (`reguly/rozporzadzenie-2016-470.json:142–281`), a nie przez wpisane na sztywno id, bo F-01 może przetłumaczyć identyfikatory.
-- Notatka 12.11.2026 (Piotr, „Wykorzystywanie wiedzy…”) jest jedyną przy tym kryterium (decyzja 10c, `demo.md` „Ustalenia do scenariusza”), a inne kryteria Piotra mają notatki starsze niż miesiąc: ostrzeżenie pojawi się dokładnie w jednym miejscu.
-- „Orientacja na klienta/interesanta” nie jest kryterium obowiązkowym arkusza C (`reguly/…json:668–676`). Notatka Ewy z 12.12.2024 trafi pod swoje kryterium tylko, gdy F-01 wgra je Ewie jako dodatkowe; inaczej ląduje w bloku „Notatki przy innych kryteriach”.
+- Kryteria w notatkach pokazowych mają nazwy urzędowe. Kontrakt zostawia identyfikatory kryteriów bez zmian, więc moduł danych trzyma stałą mapę „nazwa z `demo.md` → identyfikator”, a test sprawdza każdą pozycję przez `criterion(id)` (nazwa musi się zgadzać; brak = błąd, nie cichy pominięty wiersz).
+- Notatka 12.11.2026 (Piotr, „Wykorzystywanie wiedzy…”) jest jedyną przy tym kryterium (decyzja 10c, `demo.md` „Ustalenia do scenariusza”), a inne kryteria Piotra mają notatki starsze niż miesiąc od 21.11.2026: ostrzeżenie pojawi się dokładnie w jednym miejscu.
+- „Orientacja na klienta/interesanta” nie jest kryterium obowiązkowym arkusza C (`reguly/…json:668–676`). U Piotra jest dodatkowe z kroku 1 (decyzja 10i). Notatka Ewy z 12.12.2024 trafi pod swoje kryterium tylko, gdy `src/seed/part1.ts` (S-01) wpisze je Ewie do `cycle_criteria`; inaczej ląduje w bloku „Notatki przy innych kryteriach”.
 
 ## Założenia wobec wcześniejszych plastrów
 
-Nazwy poniżej to założenia. Gdy zbudowany kod używa innych, implementujący bierze nazwy z kodu i nie zmienia zachowania.
+Wszystkie nazwy pochodzą z rozdziału „Kontrakt wspólny dla wszystkich plastrów” w `context/changes/rules-engine-and-demo-data/plan.md`. Gdy zbudowany kod F-01 różni się od kontraktu, wygrywa kod, a zachowanie tego plastra się nie zmienia.
 
-- **F-01, tabele:** `people(id, name, …, supervisor_id)` — `supervisor_id` wskazuje bezpośredniego przełożonego (Marek dla Ewy, Piotra i Marii; Anna dla Tomasza); `cycles(id, person_id, assessor_id, period_start, due_date, …)` — `period_start` to początek 24-miesięcznego okresu (dla Piotra 2024-11-27); `cycle_criteria(cycle_id, criterion_id, …)`; `events(id, type, cycle_id, actor_id, date, payload)`; `settings`.
-- **F-01, funkcje i trasy:** `today(): string` (ISO `YYYY-MM-DD`); `db` z `src/db.ts` (schemat tworzony przy starcie); `currentAccount(c)` albo równoważny odczyt osoby z ciasteczka; układ `src/views/layout.tsx`; `GET /` z listą spraw zależną od roli; `POST /demo/date`; skrypt `src/seed.ts` (`bun run seed`); loader reguł w `src/engine/rules.ts` z listą kryteriów (`id`, `name`) i tematami `assessmentConversation.{basis, topics}`.
-- **S-01:** `rules/office-settings.json` istnieje (tabela „rodzaj obowiązku → kryterium”) i ma loader `officeSettings()`; `content/cards.json` z kartą rozmowy rozpoczynającej i widok karty `src/views/card.tsx`. Gdy któregoś brak, ten plaster dodaje go w tym samym miejscu.
-- **S-02:** formularz oceny `GET /cycles/:id/assessment` w `src/routes/assessment.tsx` z widokiem `src/views/assessment.tsx`, który renderuje blok na każde kryterium cyklu i zna zapisane oceny cząstkowe (`scores: Record<criterionId, 1|3|5|7|9>`); pola tekstowe `<textarea name="justification" id="justification">` i `<textarea name="development_conclusions" id="development-conclusions">`. Zapis formularza należy do S-02; ten plaster niczego w nim nie zapisuje.
+- **F-01, tabele:** `people(id, name, role, position_title, unit, supervisor_id, has_account, appointed, civil_service_grade)`; `cycles(id, person_id, appraiser_id, period_start, sheet)` — `period_start` to początek 24-miesięcznego okresu (dla Piotra 2024-11-27); `cycle_criteria(cycle_id, criterion_id, kind, expectation)`; `events(id, type, cycle_id, actor_id, date, payload)`; `settings(key, value)`.
+- **F-01, funkcje:** `today()`, `currentPerson(c)`, `visibleEvents(cycleId)` (cykl jest widoczny od swojego zdarzenia `cycle_started`), `registerHomeTasks(fn)`, `registerCycleLinks(fn)`, `rulesVersion()`, `createTestApp({ today })` w `src/test-helpers.ts`; silnik: `criterion(id)` w `src/engine/scoring.ts`, `addMonths` w `src/engine/deadlines.ts`.
+- **F-01, uruchomienie:** `bun run seed` uruchamia `src/seed.ts`, który woła moduły z `src/seed/`; pliki z `public/` przez `serveStatic`.
+- **Daty pokazu:** krok 1 2024-12-09, krok 2 2026-03-11, krok 3 2026-11-10, krok 4 2026-11-21, krok 5 2026-11-22.
+- **S-01:** `content/cards.json` i `card(id)`; ten plaster dopisuje klucz `assessment`. Ekran wejściowy cyklu to `GET /cycles/:id/part1` z `cycleLinks`. `cycle_criteria` danego cyklu wypełnione po `part1_submitted`. `rules/office-settings.json` z `officeSettings()`; ten plaster dopisuje klucze.
+- **S-02:** formularz `GET/POST /cycles/:id/assessment`; widok przyjmuje props `slots` (domyślnie puste): `criterionAside(criterionId)`, `justificationTools`, `conclusionsTools`, `beforeForm`. Pola tekstowe `justification` i `developmentConclusions` mają `id` równe `name`. Zdanie „Ten tekst przeczyta pracownik” nad uzasadnieniem stawia S-02. Zapis formularza należy do S-02; ten plaster niczego w nim nie zapisuje.
 
 ## Co ten plaster udostępnia
 
 Dla S-05 (HR partner), S-06 i S-03:
 
-- **Tabela `notes`:** `id`, `author_id`, `subject_id`, `cycle_id` (może być null), `criterion_id`, `date` (ISO), `text`, `rating` (`good` | `needs_improvement` | null), `task_change` (0/1, wartość kliknięta przez człowieka), `suggested_task_change` (0/1/null, co podpowiedział adapter), `suggestion_source` (`rules` | `local-model` | `none`), `created_at`.
-- **Tabela `feedback_messages`:** `id`, `note_id`, `author_id`, `recipient_id`, `sent_on` (ISO, = `today()` przy wysyłce), `text`.
-- **Funkcje w `src/notes/repo.ts`:** `notesByAuthor(authorId)`, `notesAbout(subjectId, { authorId, from? })`, `notesForCycle(cycleId, authorId)`, `noteById(id)`, `lastNoteDate(authorId, subjectId)`, `lastFeedbackDate(authorId, recipientId)`, `feedbackFor(recipientId)`. Każda zwraca tylko wiersze z datą `<= today()` (decyzja 10i).
-- **Adapter w `src/suggestions/index.ts`:** `suggestForNote(text): Promise<NoteSuggestion>` i `suggestionMode(): 'rules' | 'local-model' | 'off'` (dla ekranu „Skąd biorą się podpowiedzi”, FR-036).
+- **Tabela `notes`** (kontrakt): `id`, `author_id`, `subject_id`, `cycle_id` (może być null), `criterion_id`, `date` (ISO, data faktu wybrana przez człowieka, nie później niż `today()`), `text`, `rating` (`good` | `needs_improvement` | null), `task_change` (0/1, wartość kliknięta przez człowieka), `suggested_task_change` (0/1/null, co podpowiedział adapter), `suggestion_source` (`rules` | `local-model` | `none`), `created_at` (ISO, data systemowa `today()` w chwili kliknięcia „Zapisz notatkę”; w danych pokazowych równa `date`).
+- **Tabela `feedback_messages`** (kontrakt): `id`, `note_id`, `author_id`, `recipient_id`, `sent_on` (ISO, `today()` przy wysyłce), `text`.
+- **Widoczność:** jedna granica `date <= today()` dla notatek i `sent_on <= today()` dla wiadomości (decyzja 10i, ustalenie 11 recenzji). Widoczność liczy się od daty faktu (`date`), nigdy od `created_at`.
+- **Funkcje dla S-05** w `src/notes/repo.ts`: `notesAbout(subjectId, { authorId, from? })` (notatki autora o osobie, rosnąco po dacie), `notesByAuthor(authorId)` (wszystkie notatki autora, od najnowszej), `lastFeedbackDate(authorId, recipientId)` (ISO albo `null`). Poza tym `notesForCycle(cycleId, authorId)` i `noteById(id)`. Każda zwraca tylko wiersze widoczne według granicy wyżej.
+- **Adapter** w `src/suggestions/index.ts`: `suggestForNote(text): Promise<NoteSuggestion>` (wejście dla notatki) i `suggestionMode(): 'rules' | 'local-model' | 'none'` (dla ekranu „Skąd biorą się podpowiedzi”, FR-036). Wejście dla reguł kryteriów (S-01) leży w tym samym module jako osobne wejście (szczegóły w fazie 1, punkt 4).
 - **Punkt zaczepienia po zapisie notatki:** `afterNoteSaved(note): string` w `src/routes/notes.tsx` zwraca adres przekierowania (dziś `/notes?saved=<id>`). S-05 podmienia go dla notatek z `task_change = 1`, żeby zadać pytanie „To stała zmiana zadań?”.
 - **Trasa „Dopisz notatkę”:** `GET /people/:personId/notes/new` działa także dla osoby bez cyklu (Maria, decyzja 10k).
+- **Trasy** (kontrakt): `GET /people/:personId/notes/new`, `POST /people/:personId/notes`, `GET /notes`, `GET/POST /notes/:id/feedback`, `GET /feedback`, `POST /suggestions/note`, `GET /cycles/:id/cards/assessment-conversation`.
+- **Dane pokazowe:** `src/seed/notes.ts` (16 notatek z `demo.md`), wołany z `src/seed.ts`; opcja `--live-step-2` pomija notatkę z 11.03.2026.
+- **Karta:** klucz `assessment` w `content/cards.json`.
 - **Komponenty:** `NoteItem` (notatka z datą, kryterium, oceną przełożonego, znacznikiem zmiany zadań) i `CriterionNotes` (notatki przy kryterium z ostrzeżeniami i „Wstaw”).
-- **Ustawienia urzędu** w `rules/office-settings.json`: `taskChangeWords`, `recentFactsWindowMonths`, `suggestions.{mode, localModelUrl, timeoutMs}`.
+- **Ustawienia urzędu** w `rules/office-settings.json`: `taskChangeWords`, `recentFactsWindowMonths`. Bez klucza włączającego model ani adresu usługi.
 
 ## What We're NOT Doing
 
@@ -53,23 +60,25 @@ Dla S-05 (HR partner), S-06 i S-03:
 - Żadnej podpowiedzi kryterium, ostrzeżenia o danych o zdrowiu ani „podobna notatka już jest” (decyzja 9, miejsca 2–4: tylko na ekranie S-05).
 - Automatycznego wstawiania notatek do uzasadnienia i jakiegokolwiek zdania pisanego przez system o pracowniku (decyzja 10f).
 - Liczb, podsumowań „dobrze / do poprawy” ani etykiet przy nazwisku pracownika na żadnej liście (zasada 7 w `AGENTS.md`).
-- Modelu językowego. Faza 4 dodaje tylko gałąź, która woła lokalną usługę, i test na atrapie; domyślnie wyłączona.
+- Modelu językowego i jakiegokolwiek połączenia z usługą. Faza 4 dodaje tylko gałąź w kodzie, sprawdzaną testem z podstawioną atrapą; konfiguracja prototypu nie może jej przełączyć na prawdziwą usługę.
 - Stylów: wygląd pochodzi z design systemu autora (decyzja 10b).
 - Wgranych informacji zwrotnych (notatka z 18.06.2026 sugeruje, że Marek jej nie przekazał; to zasila przypomnienie S-05).
 
 ## Implementation Approach
 
-Notatki to osobna tabela, a nie wiersze `events`, bo mają własne pola i są odczytywane przy każdym kryterium; każdy odczyt filtruje `date <= today()`, tak jak `events`. Notatka należy do osoby (`subject_id`), a `cycle_id` jest dopisywany przy zapisie, gdy osoba ma otwarty cykl; dzięki temu „Dopisz notatkę” działa też dla Marii. Notatki widzi tylko autor.
+Notatki to osobna tabela, a nie wiersze `events`, bo mają własne pola i są odczytywane przy każdym kryterium; każdy odczyt filtruje `date <= today()`, tak jak `visibleEvents`. Data faktu (`date`) i data zapisu przez człowieka (`created_at`) są osobnymi kolumnami: pierwsza decyduje o widoczności i o miejscu w okresie oceny, druga mówi, kiedy kliknięto „Zapisz notatkę”. Notatka należy do osoby (`subject_id`), a `cycle_id` jest dopisywany przy zapisie, gdy osoba ma widoczny cykl; dzięki temu „Dopisz notatkę” działa też dla Marii.
 
-Podpowiedzi przechodzą przez jedno miejsce, `src/suggestions/index.ts`: usuwa z tekstu imiona i nazwiska osób z tabeli `people`, wybiera implementację według `suggestions.mode` i zwraca źródło oraz podpowiedź pola. Formularz pyta o podpowiedź skryptem w trakcie pisania i zaznacza pole tylko, dopóki człowiek go nie dotknął. Serwer zapisuje dokładnie to, co człowiek wysłał w polu `task_change`, a obok, do wglądu, wynik adaptera policzony ponownie z tekstu.
+Dostęp (ustalenie 17 recenzji): zapis notatki o osobie z widocznym cyklem wolno temu, kto jest `cycles.appraiser_id` tego cyklu; o osobie bez cyklu — temu, kto jest jej `people.supervisor_id`. Odczyt notatki i wysyłka informacji zwrotnej tylko przez autora (`notes.author_id`), także po zmianie oceniającego: nowy oceniający nie widzi notatek poprzedniego, a poprzedni dalej widzi swoje.
+
+Podpowiedzi przechodzą przez jedno miejsce, `src/suggestions/index.ts`: usuwa z tekstu imiona i nazwiska osób z tabeli `people`, woła reguły notatki i zwraca źródło oraz podpowiedź pola. Formularz pyta o podpowiedź skryptem w trakcie pisania i zaznacza pole tylko, dopóki człowiek go nie dotknął. Serwer zapisuje dokładnie to, co człowiek wysłał w polu `task_change`, a obok, do wglądu, wynik adaptera policzony ponownie z tekstu.
 
 „Wstaw” działa w przeglądarce: serwer renderuje przy każdej notatce gotowy fragment tekstu (`Kryterium, DD.MM.RRRR: treść`), a skrypt dopisuje zaznaczone fragmenty na końcu pola S-02. Nic nie zapisuje się samo; zapis robi przycisk S-02.
 
-## Phase 1: Dane notatek i adapter podpowiedzi
+## Phase 1: Dane notatek i adapter podpowiedzi (wersja minimalna)
 
 ### Overview
 
-Tabela, dane pokazowe, odczyty z filtrem daty, ustawienia urzędu i adapter z regułami. Bez ekranów. Około 25 minut.
+Tabele, dane pokazowe, odczyty z jedną granicą daty, ustawienia urzędu i adapter z regułami. Bez ekranów. Około 20 minut.
 
 ### Changes Required:
 
@@ -77,31 +86,31 @@ Tabela, dane pokazowe, odczyty z filtrem daty, ustawienia urzędu i adapter z re
 
 **File**: `src/db.ts`
 
-**Intent**: Dopisać tabele `notes` i `feedback_messages` do schematu tworzonego przy starcie, z indeksem po `(subject_id, date)` i `(author_id, date)`.
+**Intent**: Dopisać tabele `notes` i `feedback_messages` z kontraktu do schematu tworzonego przy starcie, z indeksami `(subject_id, date)` i `(author_id, date)`.
 
-**Contract**: Kolumny jak w „Co ten plaster udostępnia”. `rating` z CHECK na `good` / `needs_improvement` / NULL. `suggestion_source` NOT NULL, domyślnie `none`.
+**Contract**: Kolumny jak w „Co ten plaster udostępnia”. `rating` z CHECK na `good` / `needs_improvement` / NULL. `suggestion_source` NOT NULL, domyślnie `none`. `created_at` NOT NULL.
 
 #### 2. Odczyty i zapisy notatek
 
 **File**: `src/notes/repo.ts`
 
-**Intent**: Jedno miejsce dostępu do notatek i informacji zwrotnych; każda funkcja odczytu dokleja warunek `date <= today()` (dla wiadomości `sent_on <= today()`).
+**Intent**: Jedno miejsce dostępu do notatek i informacji zwrotnych; każda funkcja odczytu dokleja warunek `date <= today()` (dla wiadomości `sent_on <= today()`). Bez innych filtrów daty w widokach.
 
-**Contract**: Funkcje z sekcji „Co ten plaster udostępnia” oraz `addNote({ authorId, subjectId, criterionId, date, text, rating, taskChange, suggestion })` i `sendFeedback({ noteId, authorId, text })` (odbiorca = `subject_id` notatki, `sent_on = today()`). `notesForCycle` zwraca notatki autora o osobie z cyklu z datą od `cycles.period_start` do `today()`, posortowane rosnąco po dacie.
+**Contract**: Funkcje z sekcji „Co ten plaster udostępnia” oraz `addNote({ authorId, subjectId, criterionId, date, text, rating, taskChange, suggestion })` (`created_at = today()`, `cycle_id` = widoczny cykl osoby albo NULL) i `sendFeedback({ noteId, authorId, text })` (odbiorca = `subject_id` notatki, `sent_on = today()`). `notesForCycle` zwraca notatki autora o osobie z cyklu z datą od `cycles.period_start` do `today()`, rosnąco po dacie. Funkcja `canWriteNoteAbout(actorId, personId)` w tym samym pliku: widoczny cykl osoby → `cycles.appraiser_id`, brak cyklu → `people.supervisor_id`.
 
 #### 3. Ustawienia urzędu
 
 **File**: `rules/office-settings.json`
 
-**Intent**: Dopisać listę słów wstępnie zaznaczających pole „Zmiana zadań pracownika”, próg „ostatni miesiąc” i tryb adaptera. Każdy nowy klucz ma opis z dopiskiem „ustawienie urzędu”, bo nie pochodzi z przepisów (decyzja 10e: treść piszemy przy budowie, autor jej osobno nie przegląda).
+**Intent**: Dopisać listę słów wstępnie zaznaczających pole „Zmiana zadań pracownika” i próg „ostatni miesiąc”. Każdy nowy klucz ma opis z dopiskiem „ustawienie urzędu”, bo nie pochodzi z przepisów (decyzja 10e).
 
-**Contract**: `taskChangeWords: string[]` — rdzenie porównywane jako podciąg tekstu po zamianie na małe litery, np. `przejął`, `przejęła`, `przejmuje`, `przejęcie`, `po odejściu`, `kolejkę`, `nowy zakres`, `nowe zadania`, `zakres obowiązków`, `zastępuje`, `zastępstw`; `recentFactsWindowMonths: 1`; `suggestions: { mode: "rules", localModelUrl: "http://127.0.0.1:8089/suggest", timeoutMs: 800 }`.
+**Contract**: `taskChangeWords: string[]` — rdzenie porównywane jako podciąg tekstu po zamianie na małe litery, np. `przejął`, `przejęła`, `przejmuje`, `przejęcie`, `po odejściu`, `kolejkę`, `nowy zakres`, `nowe zadania`, `zakres obowiązków`, `zastępuje`, `zastępstw`; `recentFactsWindowMonths: 1`. Żadnego klucza trybu modelu ani adresu usługi.
 
 #### 4. Adapter podpowiedzi
 
-**File**: `src/suggestions/types.ts`, `src/suggestions/redact.ts`, `src/suggestions/rules.ts`, `src/suggestions/index.ts`
+**File**: `src/suggestions/types.ts`, `src/suggestions/redact.ts`, `src/suggestions/note-rules.ts`, `src/suggestions/index.ts`
 
-**Intent**: Jedno wymienne miejsce na podpowiedzi (zasada 5 w `AGENTS.md`, decyzje 9 i 10l). `index.ts` usuwa nazwiska, wybiera implementację według trybu i nigdy nie rzuca wyjątku do trasy. Reguły szukają słów z listy i zwracają też znalezione słowa, żeby ekran mógł powiedzieć, skąd podpowiedź.
+**Intent**: Jedno wymienne miejsce na podpowiedzi (zasada 5 w `AGENTS.md`, decyzje 9 i 10l), z osobnymi wejściami dla notatki i dla reguł kryteriów (ustalenie 18 recenzji). `index.ts` usuwa nazwiska, woła reguły notatki i nigdy nie rzuca wyjątku do trasy. Reguły zwracają też znalezione słowa, żeby ekran mógł powiedzieć, skąd podpowiedź. Wejście kryteriów to `suggestCriteria(sheet, dutyTypeIds)`, które S-01 utworzył już w `src/suggestions/index.ts` (kontrakt wspólny); ten plaster tylko dopisuje obok wejście notatki.
 
 **Contract**:
 
@@ -113,38 +122,38 @@ export interface NoteSuggestion {
   matched: string[];          // słowa z listy; pusta przy local-model i none
 }
 export interface NoteSuggester { suggest(redactedText: string): Promise<NoteSuggestion> }
-export function suggestForNote(text: string): Promise<NoteSuggestion>; // redakcja + wybór implementacji
-export function suggestionMode(): 'rules' | 'local-model' | 'off';
+export function suggestForNote(text: string): Promise<NoteSuggestion>; // redakcja + reguły notatki
+export function suggestionMode(): 'rules' | 'local-model' | 'none';  // w prototypie zawsze 'rules'
 ```
 
-Kształt wyniku nie ma pól na punkty, ocenę „dobrze / do poprawy”, kryterium ani tekst o pracowniku; to ograniczenie z decyzji 9 trzyma typ, nie dyscyplina. `redact(text, names)` zamienia imiona i nazwiska wszystkich osób z `people` (bez rozróżniania wielkości liter, także odmienione formy przez dopasowanie rdzenia imienia, np. `Piotr` łapie `Piotra`) na `[osoba]`. Tryb `off` albo pusty tekst daje `{ source: 'none', taskChange: null, matched: [] }`.
+Kształt wyniku nie ma pól na punkty, ocenę „dobrze / do poprawy”, kryterium ani tekst o pracowniku; to ograniczenie z decyzji 9 trzyma typ, nie dyscyplina. `redact(text, names)` zamienia imiona i nazwiska wszystkich osób z `people` (bez rozróżniania wielkości liter, także odmienione formy przez dopasowanie rdzenia imienia, np. `Piotr` łapie `Piotra`) na `[osoba]`. Pusty tekst daje `{ source: 'none', taskChange: null, matched: [] }`.
 
 #### 5. Dane pokazowe
 
-**File**: `src/notes/seed-notes.ts`, wywołanie z `src/seed.ts`
+**File**: `src/seed/notes.ts`, wywołanie z `src/seed.ts`
 
-**Intent**: Wgrać 16 notatek z tabeli „Notatki do wgrania” w `context/foundation/demo.md`, dosłownie, z datami z przyszłości względem startowej daty systemowej 2024-12-09 (odsłania je przesuwanie daty, decyzja 10i). Bez informacji zwrotnych.
+**Intent**: Wgrać 16 notatek z tabeli „Notatki do wgrania” w `context/foundation/demo.md`, dosłownie, z datami z przyszłości względem startowej daty systemowej 2024-12-09 (odsłania je przesuwanie daty, decyzja 10i). Bez informacji zwrotnych. Z opcją `--live-step-2` moduł pomija jedną notatkę z 11.03.2026 (Piotr, Współpraca), bo w kroku 2 Marek pisze ją na żywo.
 
-**Contract**: Na każdy wiersz jeden rekord `notes`: `author_id` = Marek Zieliński dla Ewy i Piotra, Anna Kwiatkowska dla Tomasza; `subject_id` po imieniu; `criterion_id` przez wyszukanie nazwy kryterium w pliku reguł (brak dopasowania = błąd seeda, nie cichy pominięty wiersz); `date` z kolumny „Data” w ISO; `rating`: „dobrze” → `good`, „do poprawy” → `needs_improvement`; `task_change = 1` tylko dla 11.03.2026 (Piotr, Współpraca), reszta 0; `suggested_task_change = NULL`, `suggestion_source = 'none'`; `cycle_id` = cykl osoby obejmujący datę notatki, gdy F-01 go wgrał, inaczej NULL. Teksty notatek są kopiowane bez zmian, bo z nich składa się uzasadnienie w kroku 4.
+**Contract**: `seedNotes(db, { liveStep2 }: { liveStep2: boolean })`; `src/seed.ts` przekazuje `liveStep2 = process.argv.includes('--live-step-2')` (gdy F-01 tego nie czyta, ten plaster dopisuje tę jedną linię). Na każdy wiersz jeden rekord `notes`: `author_id` = Marek Zieliński dla Ewy i Piotra, Anna Kwiatkowska dla Tomasza; `subject_id` po imieniu; `criterion_id` ze stałej mapy nazw (sprawdzanej testem przez `criterion(id)`); `date` z kolumny „Data” w ISO; `created_at = date`; `rating`: „dobrze” → `good`, „do poprawy” → `needs_improvement`; `task_change = 1` tylko dla 11.03.2026, reszta 0; `suggested_task_change = NULL`, `suggestion_source = 'none'`; `cycle_id` = cykl osoby z najpóźniejszym `period_start <= date`, gdy jest, inaczej NULL. Teksty notatek są kopiowane bez zmian, bo z nich składa się uzasadnienie w kroku 4.
 
 ### Success Criteria:
 
 #### Automated Verification:
 
-- Testy odczytów, adaptera i danych pokazowych przechodzą: `bun test src/notes src/suggestions`
-- Dane pokazowe wgrywają się bez błędu i dają 16 notatek: `bun run seed`
+- Testy odczytów, dostępu, adaptera i danych pokazowych przechodzą: `bun test src/notes src/suggestions src/seed`
+- Dane pokazowe wgrywają się bez błędu i dają 16 notatek, a z `--live-step-2` 15: `bun run seed` i `bun run seed -- --live-step-2`
 
 #### Manual Verification:
 
-- Słowa w `taskChangeWords` łapią tekst z kroku 2 pokazu i nie łapią drugiej notatki z tego kroku
+- Słowa w `taskChangeWords` łapią tekst notatki z 11.03.2026 i nie łapią drugiej notatki z kroku 2
 
 ---
 
-## Phase 2: Formularz notatki, moje notatki, informacja zwrotna
+## Phase 2: Formularz notatki, notatki przy kryteriach, „Wstaw do uzasadnienia” i karta (wersja minimalna)
 
 ### Overview
 
-Ekrany przełożonego i pracownika na wspólnym układzie. Formularz notatki działa na telefonie 360 px. Około 25 minut.
+Ekran przełożonego na telefonie i wpięcie w formularz oceny S-02. Na końcu tej fazy działają kroki 2 i 4 pokazu. Około 30 minut.
 
 ### Changes Required:
 
@@ -152,71 +161,40 @@ Ekrany przełożonego i pracownika na wspólnym układzie. Formularz notatki dzi
 
 **File**: `src/routes/notes.tsx` (podpięte w `src/index.tsx`)
 
-**Intent**: Zapis notatki tylko przez bezpośredniego przełożonego osoby (`people.supervisor_id`); odczyt i wysyłka tylko przez autora. Zapis to jedyny moment, w którym coś trafia do bazy, i dzieje się po kliknięciu „Zapisz notatkę”.
+**Intent**: Zapis notatki według `canWriteNoteAbout`; odczyt tylko przez autora. Zapis to jedyny moment, w którym coś trafia do bazy, i dzieje się po kliknięciu „Zapisz notatkę”.
 
 **Contract**:
-- `GET /people/:personId/notes/new` — formularz; 403, gdy konto nie jest przełożonym tej osoby.
-- `POST /people/:personId/notes` — pola `criterion_id` (wymagane), `text` (wymagany, po przycięciu 1–2000 znaków), `date` (domyślnie `today()`, nie później niż `today()`), `rating` (`good` | `needs_improvement` | brak), `task_change` (checkbox). Serwer liczy `suggestForNote(text)` ponownie i zapisuje jego wynik w `suggested_task_change` i `suggestion_source`, a w `task_change` wyłącznie wartość z formularza. Błąd walidacji: formularz wraca z wpisanymi wartościami i komunikatem przy polu („Wpisz, co się wydarzyło.”, „Wybierz kryterium.”, „Data nie może być późniejsza niż dziś.”). Sukces: przekierowanie na `afterNoteSaved(note)`.
+- `GET /people/:personId/notes/new` — formularz; 403, gdy `canWriteNoteAbout` zwraca fałsz. Działa dla osoby bez cyklu (Maria).
+- `POST /people/:personId/notes` — pola `criterion_id` (wymagane), `text` (wymagany, po przycięciu 1–2000 znaków), `rating` (`good` | `needs_improvement` | brak), `task_change` (checkbox); data faktu = `today()` (pole daty dochodzi w fazie 3). Ta sama kontrola dostępu co przy GET (403). Serwer liczy `suggestForNote(text)` ponownie i zapisuje jego wynik w `suggested_task_change` i `suggestion_source`, a w `task_change` wyłącznie wartość z formularza. Błąd walidacji: formularz wraca z wpisanymi wartościami i komunikatem przy polu („Wpisz, co się wydarzyło.”, „Wybierz kryterium.”). Sukces: przekierowanie na `afterNoteSaved(note)`.
 - `POST /suggestions/note` — przyjmuje `text`, zwraca JSON `NoteSuggestion`; nic nie zapisuje.
-- `GET /notes` — „Moje notatki”: notatki zalogowanego autora pogrupowane po osobie, od najnowszej, przy każdej osobie przycisk „Dopisz notatkę”; przy każdej notatce „Przekaż pracownikowi”.
-- `GET /notes/:id/feedback` — tekst notatki w polu do poprawy, nad polem „To zobaczy pracownik. Notatka zostaje tylko u Ciebie.”; 404 dla notatki innego autora.
-- `POST /notes/:id/feedback` — zapis wiadomości z poprawionym tekstem (wymagany), przekierowanie na `/notes` z potwierdzeniem „Wysłano pracownikowi”.
-- `GET /feedback` — „Informacja zwrotna”: wiadomości do zalogowanej osoby, od najnowszej, z nadawcą i datą.
+- `GET /notes` — „Moje notatki”: `notesByAuthor` zalogowanego autora pogrupowane po osobie, od najnowszej; przy każdej osobie, o której konto może pisać (także Maria), przycisk „Dopisz notatkę” do `/people/:personId/notes/new`.
 
-Lista kryteriów w formularzu: kryteria otwartego cyklu osoby (z `cycle_criteria`), a pod nimi pozostałe kryteria z pliku reguł w grupie „Inne kryteria”; osoba bez cyklu dostaje pełną listę.
+Lista kryteriów w formularzu: kryteria widocznego cyklu osoby (z `cycle_criteria`), a pod nimi pozostałe kryteria z pliku reguł w grupie „Inne kryteria”; osoba bez cyklu dostaje pełną listę.
 
-#### 2. Widoki i komponenty
+Wejście do ekranów przez `registerHomeTasks`: oceniający i przełożeni dostają na `GET /` pozycję „Notatki o zespole” prowadzącą do `/notes`.
 
-**File**: `src/views/note-form.tsx`, `src/views/notes-list.tsx`, `src/views/feedback.tsx`, `src/views/components/note-item.tsx`
+#### 2. Widoki i podpowiedź w trakcie pisania
 
-**Intent**: Nowe komponenty na wspólnym układzie `src/views/layout.tsx`, z tokenami i komponentami z design systemu autora (decyzja 10b; bez własnych stylów). Formularz notatki to jedna kolumna mieszcząca się na 360 px, bez przewijania w poziomie.
+**File**: `src/views/note-form.tsx`, `src/views/notes-list.tsx`, `src/views/components/note-item.tsx`, `public/note-form.js`
+
+**Intent**: Komponenty na wspólnym układzie F-01, z tokenami i komponentami z design systemu autora (decyzja 10b; bez własnych stylów). Formularz notatki to jedna kolumna mieszcząca się na 360 px, bez przewijania w poziomie. Skrypt: kilkanaście linii bez zależności; po przerwie w pisaniu (ok. 600 ms) wysyła tekst do `POST /suggestions/note`, zaznacza albo odznacza checkbox i pokazuje linię podpowiedzi, ale tylko dopóki człowiek nie kliknął checkboxa. Po pierwszym kliknięciu skrypt przestaje zmieniać pole. Bez JavaScriptu checkbox działa ręcznie.
 
 **Contract**:
-- `NoteForm`: wybór kryterium, data, pole tekstu, wybór „dobrze” / „do poprawy” bez wartości domyślnej (wypełnia wyłącznie przełożony, decyzja 3 pkt 3), checkbox „Zmiana zadań pracownika” z linią podpowiedzi, przycisk „Zapisz notatkę”.
+- `NoteForm`: wybór kryterium, pole tekstu, wybór „dobrze” / „do poprawy” bez wartości domyślnej (wypełnia wyłącznie przełożony, decyzja 3 pkt 3), checkbox „Zmiana zadań pracownika” z linią podpowiedzi, przycisk „Zapisz notatkę”.
 - `SuggestionHint` (linia pod checkboxem): przy `rules` — „Zaznaczone na podstawie listy słów (ustawienie urzędu): „przejął”. Możesz odznaczyć.”; przy `local-model` — „Zaznaczone przez model uruchomiony w urzędzie. Możesz odznaczyć.”; przy braku podpowiedzi linii nie ma.
 - `NoteItem`: data, nazwa kryterium, ocena przełożonego, znacznik „zmiana zadań”, tekst, akcje przekazane przez rodzica.
-- Lista „Moje notatki” i ekran „Informacja zwrotna”: nagłówek osoby to samo imię i nazwisko, bez liczby notatek i bez podsumowań.
-- Nawigacja układu: „Notatki” dla osób, które mają podwładnych; „Informacja zwrotna” dla każdego konta.
+- Lista „Moje notatki”: nagłówek osoby to samo imię i nazwisko, bez liczby notatek i bez podsumowań.
+- `public/note-form.js` nie wysyła formularza i nie zapisuje niczego; serwowany z `public/` bez CDN.
 
-#### 3. Podpowiedź w trakcie pisania
-
-**File**: `public/note-form.js`
-
-**Intent**: Kilkanaście linii bez zależności: po przerwie w pisaniu (ok. 600 ms) wysyła tekst do `POST /suggestions/note` i zaznacza albo odznacza checkbox oraz pokazuje `SuggestionHint`, ale tylko dopóki człowiek nie kliknął checkboxa. Po pierwszym kliknięciu skrypt przestaje zmieniać pole. Bez JavaScriptu checkbox działa ręcznie.
-
-**Contract**: Skrypt nie wysyła formularza i nie zapisuje niczego. Serwowany z `public/` bez CDN (pokaz działa bez sieci).
-
-### Success Criteria:
-
-#### Automated Verification:
-
-- Testy tras notatek i informacji zwrotnej przechodzą: `bun test src/routes/notes.test.ts`
-
-#### Manual Verification:
-
-- Na telefonie 360 px pole „Zmiana zadań pracownika” zaznacza się w trakcie pisania z linią „listy słów”; po odznaczeniu nie wraca
-- Druga notatka z kroku 2 zapisuje się z pustym polem i bez linii podpowiedzi
-- „Przekaż pracownikowi”: Piotr widzi poprawiony tekst w „Informacja zwrotna”, a nie widzi notatki
-
----
-
-## Phase 3: Notatki przy kryteriach, ostrzeżenia, „Wstaw” i karta rozmowy oceniającej
-
-### Overview
-
-Wpięcie w formularz oceny S-02 i karta z FR-017. Około 25 minut.
-
-### Changes Required:
-
-#### 1. Ostrzeżenia FR-020
+#### 3. Ostrzeżenie „fakty tylko z ostatniego miesiąca” (FR-020)
 
 **File**: `src/notes/warnings.ts`
 
-**Intent**: Czysta funkcja bez bazy. Ostrzeżenie „fakty tylko z ostatniego miesiąca”: przy kryterium jest co najmniej jedna notatka i wszystkie mają datę późniejszą niż `today()` minus `recentFactsWindowMonths` miesięcy kalendarzowych (notatka dokładnie sprzed miesiąca jest już „starsza”). Ostrzeżenie „skrajna ocena bez faktu”: ocena cząstkowa 1 albo 9 przy kryterium bez żadnej notatki. Ostrzeżenia nie blokują zatwierdzenia (blokady należą do S-02, FR-022).
+**Intent**: Czysta funkcja bez bazy. Ostrzeżenie: przy kryterium jest co najmniej jedna notatka i wszystkie mają datę późniejszą niż `addMonths(today, -recentFactsWindowMonths)` (notatka dokładnie sprzed miesiąca jest już „starsza”). Ostrzeżenie nie blokuje zatwierdzenia (blokady należą do S-02, FR-022).
 
-**Contract**: `criterionWarnings({ notes, score, today, windowMonths }): Array<'recent_only' | 'extreme_without_facts'>`. Teksty: „Wszystkie notatki przy tym kryterium są z ostatniego miesiąca. Co działo się wcześniej w okresie oceny?” oraz „Ocena skrajna, a przy tym kryterium nie masz żadnej notatki.”
+**Contract**: `criterionWarnings({ notes, score, today, windowMonths }): Array<'recent_only' | 'extreme_without_facts'>`; w tej fazie zwraca tylko `recent_only` (drugi rodzaj dochodzi w fazie 3, sygnatura się nie zmienia). Tekst: „Wszystkie notatki przy tym kryterium są z ostatniego miesiąca. Co działo się wcześniej w okresie oceny?”
 
-#### 2. Formatowanie do wstawienia
+#### 4. Formatowanie do wstawienia
 
 **File**: `src/notes/insert.ts`
 
@@ -224,33 +202,97 @@ Wpięcie w formularz oceny S-02 i karta z FR-017. Około 25 minut.
 
 **Contract**: `formatNoteForInsert(note, criterionName): string` → `Rzetelność, 11.02.2025: Pismo do gminy poszło 11 lutego, …`. Pole `rating` nie trafia do tekstu.
 
-#### 3. Notatki przy kryterium w formularzu oceny
+#### 5. Notatki przy kryterium i „Wstaw do uzasadnienia”
 
-**File**: `src/views/components/criterion-notes.tsx`, wpięcie w `src/views/assessment.tsx` i `src/routes/assessment.tsx` (S-02), `public/insert-notes.js`
+**File**: `src/views/components/criterion-notes.tsx`, `src/notes/assessment-slots.tsx`, przekazanie `slots` w `src/routes/assessment.tsx` (S-02), `public/insert-notes.js`
 
-**Intent**: W bloku każdego kryterium formularza S-02: notatki autora z okresu oceny (`notesForCycle`) jako `NoteItem` z checkboxem, ostrzeżenia z `criterionWarnings`, stan pusty „Brak notatek przy tym kryterium” i dwa przyciski „Wstaw do uzasadnienia” i „Wstaw do wniosków rozwojowych”. Notatki o kryteriach spoza cyklu w osobnym bloku „Notatki przy innych kryteriach” pod listą kryteriów. Nad polami `justification` i `development_conclusions` zdanie „Ten tekst przeczyta pracownik” (jeśli S-02 go nie dodał). Skrypt dopisuje na końcu wskazanego pola fragmenty zaznaczonych notatek, każdy w nowej linii, i odznacza je; nie zapisuje formularza.
+**Intent**: Wypełnić istniejące `slots` widoku oceny S-02, bez nowych propsów. `criterionAside(criterionId)`: notatki zalogowanego oceniającego z okresu oceny (`notesForCycle(cycleId, viewer.id)`) przy tym kryterium jako `NoteItem` z checkboxem, ostrzeżenie z `criterionWarnings`, stan pusty „Brak notatek przy tym kryterium”. Notatki o kryteriach spoza `cycle_criteria` w osobnym bloku „Notatki przy innych kryteriach” na końcu listy kryteriów (przez ostatni `criterionAside` albo `beforeForm`, zależnie od tego, co S-02 renderuje). `justificationTools`: przycisk „Wstaw do uzasadnienia”. `beforeForm`: odnośnik „Karta rozmowy oceniającej”. Skrypt dopisuje na końcu pola `justification` fragmenty zaznaczonych notatek, każdy w nowej linii, odznacza je i wysyła zdarzenie `input` na polu (pole zachowuje się jak po wpisaniu ręcznym); formularza nie wysyła i nic nie zapisuje.
 
-**Contract**: Każdy checkbox notatki niesie `data-insert="<formatNoteForInsert>"`; przyciski mają `type="button"` i `data-target="justification"` albo `data-target="development-conclusions"`. Kontroler S-02 przekazuje do widoku `notesByCriterion` i `warningsByCriterion`. Widzi to tylko oceniający cyklu (`cycles.assessor_id`), a notatki pochodzą wyłącznie od niego.
+**Contract**: `assessmentSlots({ cycleId, viewer }): Slots` w `src/notes/assessment-slots.tsx` (kontroler S-02 przekazuje wynik jako `slots`). Każdy checkbox notatki niesie `data-insert="<formatNoteForInsert>"`; przycisk ma `type="button"` i `data-target="justification"`. Sloty są puste, gdy `viewer.id` nie jest `cycles.appraiser_id` cyklu; notatki pochodzą wyłącznie od zalogowanego autora.
 
-#### 4. Karta rozmowy oceniającej (FR-017)
+#### 6. Karta rozmowy oceniającej (FR-017)
 
-**File**: `content/cards.json`, trasa w `src/routes/notes.tsx` albo w module kart S-01, widok `src/views/card.tsx` (S-01, użyty ponownie)
+**File**: `content/cards.json` (klucz `assessment`), `src/routes/notes.tsx`, `src/views/assessment-card.tsx`, rejestracja w `registerCycleLinks`
 
-**Intent**: Karta przygotowania do rozmowy oceniającej: cel, trzy tematy z § 10 wzięte z pliku reguł z podstawą prawną, pytania pomocnicze i trudne sytuacje (treść pisana przy budowie, decyzja 10e), na dole link „Notatki przy kryteriach” do formularza oceny. Wejście z formularza oceny i z ekranu cyklu.
+**Intent**: Karta przygotowania do rozmowy oceniającej: cel, trzy tematy z § 10 wzięte z pliku reguł z podstawą prawną, pytania pomocnicze i trudne sytuacje (treść pisana przy budowie, decyzja 10e), na dole link „Notatki przy kryteriach” do formularza oceny. Wejście z ekranu wejściowego cyklu (`GET /cycles/:id/part1`, przez `registerCycleLinks`) i z formularza oceny (slot `beforeForm`). Oba odnośniki należą do wersji minimalnej (ustalenie 4 recenzji). Własny widok, bez zależności od widoku karty S-01.
 
-**Contract**: `GET /cycles/:id/cards/assessment-conversation`; klucz `assessmentConversation: { goal, questions[], difficultSituations[] }` w `content/cards.json`; tematy i `basis` (`§ 10`) z `assessmentConversation` w pliku reguł, nie z kopii w `cards.json`.
+**Contract**: `GET /cycles/:id/cards/assessment-conversation` (tylko `cycles.appraiser_id`, inaczej 403); treść z `card('assessment')` w kształcie karty S-01 (`{ title, purpose, questions: string[], hardSituations: [{ situation, whatToDo }] }`); tematy i podstawa (`§ 10`) z `assessmentConversation.{basis, topics}` w pliku reguł, nie z kopii w `cards.json`. `registerCycleLinks` dodaje „Karta rozmowy oceniającej” tylko dla oceniającego cyklu.
 
 ### Success Criteria:
 
 #### Automated Verification:
 
-- Testy ostrzeżeń, formatowania i wpięcia w formularz przechodzą: `bun test`
+- Testy tras notatek, dostępu, ostrzeżenia, formatowania, slotów i karty przechodzą: `bun test src/routes/notes.test.ts src/notes`
+- Test DOM „Wstaw” przechodzi: `bun test src/notes/insert-notes.dom.test.ts`
 
 #### Manual Verification:
 
-- Przy dacie 23.11.2026 formularz oceny Piotra pokazuje notatki przy kryteriach i jedno ostrzeżenie „z ostatniego miesiąca”
-- „Wstaw do uzasadnienia” dopisuje zaznaczone notatki z datami; nic nie zapisuje się bez przycisku S-02
-- Karta rozmowy oceniającej pokazuje trzy tematy z § 10
+- Krok 2 (data 2026-03-11, dane z `--live-step-2`), telefon 360 px: pole „Zmiana zadań pracownika” zaznacza się w trakcie pisania notatki z 11.03.2026 z linią „listy słów”; po odznaczeniu nie wraca; druga notatka zapisuje się z pustym polem i bez linii podpowiedzi
+- Krok 4 (data 2026-11-21): formularz oceny Piotra pokazuje notatki przy kryteriach, notatkę z 04.08.2025 przy „Orientacja na klienta/interesanta”, puste „Myślenie analityczne” i jedno ostrzeżenie „z ostatniego miesiąca”
+- „Wstaw do uzasadnienia” dopisuje zaznaczone notatki z datami; pole da się dalej poprawić; nic nie zapisuje się bez przycisku S-02
+- Karta rozmowy oceniającej otwiera się z ekranu cyklu i z formularza oceny i pokazuje trzy tematy z § 10
+
+---
+
+## Phase 3: Informacja zwrotna, drugie „Wstaw”, data notatki i ostrzeżenie o ocenie skrajnej
+
+### Overview
+
+Dokładki po wersji minimalnej, w odwrotnej kolejności cięcia: najpierw to, co odpada ostatnie. Około 25 minut.
+
+### Changes Required:
+
+#### 1. „Przekaż pracownikowi”
+
+**File**: `src/routes/notes.tsx`, `src/views/feedback-form.tsx`
+
+**Intent**: Przy każdej notatce na liście „Moje notatki” przycisk „Przekaż pracownikowi”. Otwiera tekst notatki do poprawy; wysyłka zapisuje wiadomość z `sent_on = today()` (decyzja 10j). Data wysłania zasila `lastFeedbackDate` dla S-05.
+
+**Contract**:
+- `GET /notes/:id/feedback` — tekst notatki w polu do poprawy, nad polem „To zobaczy pracownik. Pracownik nie widzi notatki na swoim koncie. Na wniosek urząd mu ją wydaje.” (decyzja 11c, bez słowa „prywatna”); 404 dla notatki innego autora.
+- `POST /notes/:id/feedback` — zapis wiadomości z poprawionym tekstem (wymagany), tylko autor (inaczej 404), przekierowanie na `/notes` z potwierdzeniem „Wysłano pracownikowi”.
+
+#### 2. Drugie „Wstaw” — do wniosków rozwojowych
+
+**File**: `src/notes/assessment-slots.tsx`, `public/insert-notes.js`
+
+**Intent**: Slot `conclusionsTools` z przyciskiem „Wstaw do wniosków rozwojowych”; ten sam skrypt, inny cel.
+
+**Contract**: przycisk `type="button"`, `data-target="developmentConclusions"`.
+
+#### 3. Data notatki
+
+**File**: `src/views/note-form.tsx`, `src/routes/notes.tsx`
+
+**Intent**: Pole daty faktu, domyślnie `today()`, nie później niż `today()`, bez dolnej granicy. `created_at` zostaje `today()` niezależnie od wybranej daty.
+
+**Contract**: pole `date`; błąd „Data nie może być późniejsza niż dziś.”
+
+#### 4. Ekran pracownika „Informacja zwrotna”
+
+**File**: `src/routes/notes.tsx`, `src/views/feedback.tsx`
+
+**Intent**: Wiadomości do zalogowanej osoby, od najnowszej, z nadawcą i datą. Wejście przez `registerHomeTasks`: pozycja „Informacja zwrotna” dla osoby, która ma co najmniej jedną widoczną wiadomość.
+
+**Contract**: `GET /feedback`; nagłówek bez liczby wiadomości.
+
+#### 5. Ostrzeżenie „skrajna ocena bez faktu”
+
+**File**: `src/notes/warnings.ts`
+
+**Intent**: Ocena cząstkowa 1 albo 9 przy kryterium bez żadnej notatki. Liczone przy renderze z zapisanych ocen S-02, bez dodatkowego skryptu.
+
+**Contract**: `criterionWarnings` zwraca też `extreme_without_facts`; tekst „Ocena skrajna, a przy tym kryterium nie masz żadnej notatki.”
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- Testy informacji zwrotnej, drugiego „Wstaw”, daty i ostrzeżenia skrajnego przechodzą: `bun test src/routes/notes.test.ts src/notes`
+
+#### Manual Verification:
+
+- „Przekaż pracownikowi”: Piotr widzi poprawiony tekst w „Informacja zwrotna”, a nie widzi notatki
 
 ---
 
@@ -258,111 +300,113 @@ Wpięcie w formularz oceny S-02 i karta z FR-017. Około 25 minut.
 
 ### Overview
 
-Pierwsza rzecz do zrobienia, jeśli zostanie czas przed 07:00 (decyzja 10l). Domyślnie wyłączona. Około 10–15 minut.
+Pierwsza rzecz do zrobienia, jeśli zostanie czas przed 07:00 (decyzja 10l), i pierwsza do cięcia. Około 10–15 minut.
 
 ### Changes Required:
 
-#### 1. Implementacja `local-model`
+#### 1. Implementacja `local-model` sprawdzana atrapą
 
-**File**: `src/suggestions/local-model.ts`, wybór w `src/suggestions/index.ts`
+**File**: `src/suggestions/local-model.ts`, punkt podstawienia w `src/suggestions/index.ts`
 
-**Intent**: Gdy `suggestions.mode = "local-model"`, adapter wysyła zredagowany tekst do lokalnej usługi i przyjmuje tylko wartość z zamkniętej listy. Gdy usługa nie odpowie w `timeoutMs`, odpowie błędem albo czymś spoza listy, wynik dają reguły (`source: 'rules'`).
+**Intent**: Gałąź, przez którą urząd podłączy model uruchomiony u siebie. Przyjmuje funkcję wywołania usługi podaną w kodzie, wysyła zredagowany tekst i przyjmuje tylko wartość z zamkniętej listy. Gdy funkcja nie odpowie w czasie, odpowie błędem albo czymś spoza listy, wynik dają reguły (`source: 'rules'`). Prototyp nie ma żadnego klucza w ustawieniach ani adresu usługi, więc konfiguracją nie da się włączyć prawdziwej usługi (ustalenie 18 recenzji, zasada 8). Sprawdza ją wyłącznie test z podstawioną atrapą.
 
-**Contract**: `POST <localModelUrl>` z JSON `{ "text": "<zredagowany tekst>" }`; oczekiwana odpowiedź `{ "taskChange": true | false }`; przerwanie przez `AbortSignal.timeout(timeoutMs)`. Adres musi być lokalny (`127.0.0.1` albo `localhost`); inny adres = tryb reguł (dane nie wychodzą poza komputer, zasada 8).
+**Contract**: `localModelSuggester(call: (redactedText: string) => Promise<unknown>, timeoutMs = 800): NoteSuggester`; poprawna odpowiedź `{ taskChange: true | false }`; `setNoteSuggester(s: NoteSuggester | null)` w `index.ts` (używany tylko w testach i przy przyszłym podłączeniu w urzędzie); `suggestionMode()` zwraca `'local-model'` tylko po podstawieniu, inaczej `'rules'`.
 
 ### Success Criteria:
 
 #### Automated Verification:
 
-- Test na atrapie lokalnej usługi przechodzi: `bun test src/suggestions/local-model.test.ts`
+- Test z podstawioną atrapą przechodzi: `bun test src/suggestions/local-model.test.ts`
 
 ## Testing Strategy
 
-Jedna reguła, jeden test, na najtańszej warstwie, która ją naprawdę wykonuje. Trasy przez `app.request()` na bazie wgranej seedem w pamięci albo w pliku tymczasowym, z datą ustawioną przez `POST /demo/date`.
+Jedna reguła, jeden test, na najtańszej warstwie, która ją naprawdę wykonuje. Trasy przez `app.request()` na aplikacji z `createTestApp({ today })`; daty z tabeli „Daty pokazu” kontraktu.
 
-| Reguła | Test |
-|---|---|
-| R1. Odczyt notatek i wiadomości pokazuje tylko daty `<= today()`: przy 2024-12-09 notatek Piotra nie ma, przy 2026-11-23 jest ich 9 | `src/notes/repo.test.ts` |
-| R2. Seed: 16 notatek, `task_change = 1` tylko 11.03.2026, każda nazwa kryterium rozwiązana na id | `src/notes/repo.test.ts` |
-| R3. Reguły: „Od dziś przejął kolejkę wniosków po koleżance, która odeszła 9 marca.” → `rules`, `true`, `matched` niepuste; „Na odprawie sam zgłosił, że pismo do gminy wyjdzie w piątek, i wyszło w piątek.” → `rules`, `false`; pusty tekst → `none` | `src/suggestions/rules.test.ts` |
-| R4. Do implementacji nie trafia imię ani nazwisko (podstawiona implementacja zapisuje, co dostała; tekst „Piotra Wójcika” dochodzi jako `[osoba]`) | `src/suggestions/index.test.ts` |
-| R5. Zapisuje się wybór człowieka: POST z tekstem z R3 i bez `task_change` daje `task_change = 0`, `suggested_task_change = 1`, `suggestion_source = 'rules'` | `src/routes/notes.test.ts` |
-| R6. Notatki widzi tylko autor: Piotr na `/notes` nie widzi tekstu notatki Marka; `GET /notes/:id/feedback` cudzej notatki → 404; POST notatki o osobie, której konto nie jest przełożonym → 403 | `src/routes/notes.test.ts` |
-| R7. Informacja zwrotna: Piotr na `/feedback` widzi poprawiony tekst z datą `today()`, a nie oryginał notatki | `src/routes/notes.test.ts` |
-| R8. Ostrzeżenia: jedna notatka 2026-11-12 przy dziś 2026-11-23 → `recent_only`; notatka 2026-10-23 (dokładnie miesiąc) → brak; ocena 1 bez notatek → `extreme_without_facts`; ocena 1 z notatką → brak | `src/notes/warnings.test.ts` |
-| R9. Format wstawki: `Rzetelność, 11.02.2025: <tekst>` bez oceny przełożonego | `src/notes/insert.test.ts` |
-| R10. Wpięcie (dym): formularz oceny Piotra przy 2026-11-23 zawiera fragment notatki z 04.08.2025, znacznik ostrzeżenia `recent_only` przy `wykorzystywanie-wiedzy`, zdanie „Ten tekst przeczyta pracownik”; karta zawiera „§ 10” | `src/routes/assessment.test.ts` (dopisany do testu S-02) |
-| R11 (faza 4). Atrapa `Bun.serve` na losowym porcie: odpowiada → `local-model`; odpowiada po czasie dłuższym niż `timeoutMs` → `rules`; tryb `rules` → atrapa nie dostaje żadnego żądania | `src/suggestions/local-model.test.ts` |
+| Reguła | Test | Faza |
+|---|---|---|
+| R1. Jedna granica `date <= today()`: notatka 2026-11-12 niewidoczna przy 2026-11-11, widoczna przy 2026-11-12 i 2026-11-13; przy 2024-12-09 notatek Piotra nie ma, przy 2026-11-21 jest ich 9 | `src/notes/repo.test.ts` | 1 |
+| R2. Data faktu osobno od daty zapisu: notatka z `date` wcześniejszą niż `today()` ma `created_at = today()`; widoczność liczy się od `date` | `src/notes/repo.test.ts` | 1 (data wybierana od fazy 3) |
+| R3. Seed: 16 notatek, `task_change = 1` tylko 11.03.2026, każda nazwa kryterium zgodna z `criterion(id)`; z `liveStep2: true` 15 notatek i brak notatki z 11.03.2026 | `src/seed/notes.test.ts` | 1 |
+| R4. Reguły: tekst notatki z 11.03.2026 → `rules`, `true`, `matched` niepuste; „Na odprawie sam zgłosił, że pismo do gminy wyjdzie w piątek, i wyszło w piątek.” → `rules`, `false`; pusty tekst → `none` | `src/suggestions/note-rules.test.ts` | 1 |
+| R5. Do reguł nie trafia imię ani nazwisko (podstawiona implementacja zapisuje, co dostała; tekst „Piotra Wójcika” dochodzi jako `[osoba]`) | `src/suggestions/index.test.ts` | 1 |
+| R6. Zapisuje się wybór człowieka: POST z tekstem z R4 i bez `task_change` daje `task_change = 0`, `suggested_task_change = 1`, `suggestion_source = 'rules'` | `src/routes/notes.test.ts` | 2 |
+| R7. Dostęp po zmianie oceniającego: test ustawia `cycles.appraiser_id` cyklu Piotra na Annę; Anna może zapisać notatkę o Piotrze, Marek dostaje 403; Marek dalej widzi swoje dawne notatki na `/notes`; Anna nie widzi ich ani na `/notes`, ani w slotach formularza oceny; Marek o Marii (bez cyklu, `supervisor_id`) może pisać, Anna o Marii dostaje 403 | `src/routes/notes.test.ts` | 2 |
+| R8. Notatki widzi tylko autor: Piotr na `/notes` nie widzi tekstu notatki Marka; `GET /notes/:id/feedback` cudzej notatki → 404 | `src/routes/notes.test.ts` | 2 (feedback od fazy 3) |
+| R9. Ostrzeżenie: jedna notatka 2026-11-12 przy dziś 2026-11-21 → `recent_only`; notatka 2026-10-21 (dokładnie miesiąc) → brak | `src/notes/warnings.test.ts` | 2 |
+| R10. Format wstawki: `Rzetelność, 11.02.2025: <tekst>` bez oceny przełożonego | `src/notes/insert.test.ts` | 2 |
+| R11. Wpięcie (dym): formularz oceny Piotra przy 2026-11-21 zawiera fragment notatki z 04.08.2025, znacznik `recent_only` przy `wykorzystywanie-wiedzy`, brak notatek przy „Myślenie analityczne”, odnośnik do karty; karta zawiera „§ 10” i trzy tematy; ekran `GET /cycles/:id/part1` ma odnośnik do karty dla Marka, a dla Piotra nie | `src/routes/assessment.test.ts` (dopisany do testu S-02) | 2 |
+| R12. „Wstaw” na DOM: HTML formularza z `app.request()` ładowany do `happy-dom` (licencja MIT, zależność tylko do testów) z `public/insert-notes.js`; zaznaczone dwie z trzech notatek, klik „Wstaw do uzasadnienia” → pole `justification` zawiera dokładnie te dwa fragmenty, niezaznaczonego nie ma; potem wpisanie tekstu do pola działa; formularz nie dostał `submit`, nie było żądania na `POST /cycles/:id/assessment`, a w bazie nie przybyło `assessment_draft_saved` | `src/notes/insert-notes.dom.test.ts` | 2 |
+| R13. Informacja zwrotna: Piotr na `/feedback` widzi poprawiony tekst z datą `today()`, a nie oryginał notatki; `lastFeedbackDate(Marek, Piotr)` zwraca tę datę; ekran wysyłki nie zawiera słowa „prywatna” | `src/routes/notes.test.ts` | 3 |
+| R14. Ostrzeżenie skrajne: ocena 1 bez notatek → `extreme_without_facts`; ocena 1 z notatką → brak | `src/notes/warnings.test.ts` | 3 |
+| R15. Gałąź modelu na atrapie: atrapa odpowiada `{ taskChange: true }` → `local-model`; odpowiada po czasie dłuższym niż `timeoutMs` → `rules`; odpowiada spoza listy → `rules`; bez podstawienia atrapa nie dostaje żadnego wywołania, a `suggestionMode()` to `'rules'` | `src/suggestions/local-model.test.ts` | 4 |
 
-Skryptów przeglądarki (`note-form.js`, `insert-notes.js`) nie testujemy automatycznie; sprawdza je przebieg ręczny z faz 2 i 3.
+Skrypt `note-form.js` (podpowiedź w trakcie pisania) sprawdza przebieg ręczny z fazy 2. Słowa „podpis”, liczby przy nazwisku i zapis bez kliknięcia sprawdzają R6, R8, R12 i R13 na wynikowym HTML i w bazie.
 
 ### Manual Testing Steps:
 
-1. `bun run seed`, konto Marek, data 10.03.2026, telefon 360 px: notatka o Piotrze z tekstem z R3 (pole zaznacza się samo), potem druga z neutralnym tekstem (pole puste).
-2. „Moje notatki” → „Przekaż pracownikowi” → popraw tekst → wyślij; konto Piotr → „Informacja zwrotna”.
-3. Data 23.11.2026, konto Marek, formularz oceny Piotra: ostrzeżenie przy „Wykorzystywanie wiedzy…”, „Wstaw do uzasadnienia” przy „Rzetelności”, karta rozmowy oceniającej.
+1. `bun run seed -- --live-step-2`, konto Marek, data 2026-03-11, telefon 360 px: notatka o Piotrze z tekstem notatki z 11.03.2026 (pole zaznacza się samo), potem druga z neutralnym tekstem (pole puste).
+2. Data 2026-11-21, konto Marek: ekran cyklu Piotra → karta rozmowy oceniającej → formularz oceny: notatka z 04.08.2025, puste „Myślenie analityczne”, ostrzeżenie przy „Wykorzystywanie wiedzy…”, „Wstaw do uzasadnienia” przy „Rzetelności”, poprawka wstawionego tekstu, brak zapisu przed „Zapisz”.
+3. (Faza 3) „Moje notatki” → „Przekaż pracownikowi” → popraw tekst → wyślij; konto Piotr → „Informacja zwrotna”.
 
 ## Open questions
 
 Każde ma przyjętą wartość domyślną; implementujący nie czeka na odpowiedź.
 
-1. **Krok 2 pokazu a wgrana notatka z 11.03.2026.** Krok 2 każe pisać notatkę o przejęciu kolejki na żywo, a ta sama treść jest wgrana z datą 11.03.2026 (potrzebna wersji 90-sekundowej, która pomija krok 2). Domyślnie: wgrana notatka zostaje; prowadzący w kroku 2 ustawia datę 10.03.2026 i pisze krótszą notatkę z R3. Wtedy przy Piotrze są dwie notatki ze zmianą zadań, obie po 9.03.2026.
-2. **Ocena „dobrze / do poprawy” obowiązkowa?** Domyślnie nie: pole bez wartości domyślnej, można zapisać notatkę bez oceny.
-3. **Data notatki.** Domyślnie edytowalna, nie późniejsza niż `today()`; bez dolnej granicy.
-4. **„Ostatni miesiąc” liczony od `today()`**, nie od terminu oceny. Domyślnie od `today()`, bo przy ocenie data systemowa jest blisko terminu.
-5. **Ostrzeżenie „skrajna ocena bez faktu”** pojawia się po zapisaniu ocen cząstkowych przez S-02 (przy renderze), nie w trakcie wybierania. Domyślnie tak, bez dodatkowego skryptu.
-6. **Notatki Ewy a zmiana oceniającego.** Tabela w `demo.md` przypisuje Markowi notatkę o Ewie z 12.12.2024, a jej cykl zaczął poprzedni naczelnik. Domyślnie seed wpisuje autora zgodnie z tabelą (Marek); data przejęcia wydziału przez Marka w danych F-01/S-03 powinna być wcześniejsza niż 12.12.2024.
+1. **Ocena „dobrze / do poprawy” obowiązkowa?** Domyślnie nie: pole bez wartości domyślnej, można zapisać notatkę bez oceny.
+2. **„Ostatni miesiąc” liczony od `today()`**, nie od terminu oceny. Domyślnie od `today()`, bo przy ocenie data systemowa jest blisko terminu.
+3. **Notatki Ewy a zmiana oceniającego.** Tabela w `demo.md` przypisuje Markowi notatkę o Ewie z 12.12.2024; Marek przejął wydział 5.12.2024 (`demo.md`, „Ustalenia do scenariusza”). Seed wpisuje autora zgodnie z tabelą. Czy Marek jest `cycles.appraiser_id` cyklu Ewy przed zbudowaniem S-03, zależy od `src/seed/base.ts`; gdy nie jest, Marek nie dopisze nowej notatki o Ewie i nie zobaczy jej notatek w formularzu oceny Ewy. Pokaz tego nie używa.
 
 ## References
 
-- `context/foundation/decisions.md` (decyzje 1, 3, 9, 10c, 10e, 10f, 10i, 10j, 10l)
+- `context/changes/rules-engine-and-demo-data/plan.md` (rozdział „Kontrakt wspólny dla wszystkich plastrów”)
+- `context/foundation/decisions.md` (decyzje 1, 3, 9, 10c, 10e, 10f, 10i, 10j, 10k, 10l, 11c)
 - `context/foundation/prd.md` (FR-008, FR-009, FR-017, FR-020, FR-021; US-04; Access Control)
 - `context/foundation/roadmap.md` (S-04)
 - `context/foundation/demo.md` (kroki 2 i 4, „Ustalenia do scenariusza”, „Notatki do wgrania”)
-- `context/changes/rules-engine-and-demo-data/plan.md` (F-01: schemat, `today()`, seed, układ)
+- `context/changes/assessment-and-confirmation/plan.md` (S-02: `slots` i nazwy pól)
 - `reguly/rozporzadzenie-2016-470.json:142–281` (kryteria), `:298–305` (tematy § 10)
 
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
 
-### Phase 1: Dane notatek i adapter podpowiedzi
+### Phase 1: Dane notatek i adapter podpowiedzi (wersja minimalna)
 
 #### Automated
 
-- [ ] 1.1 Testy odczytów, adaptera i danych pokazowych przechodzą: `bun test src/notes src/suggestions`
-- [ ] 1.2 Dane pokazowe wgrywają się bez błędu i dają 16 notatek: `bun run seed`
+- [ ] 1.1 Testy odczytów, dostępu, adaptera i danych pokazowych przechodzą: `bun test src/notes src/suggestions src/seed`
+- [ ] 1.2 Dane pokazowe wgrywają się bez błędu i dają 16 notatek, a z `--live-step-2` 15: `bun run seed` i `bun run seed -- --live-step-2`
 
 #### Manual
 
-- [ ] 1.3 Słowa w `taskChangeWords` łapią tekst z kroku 2 pokazu i nie łapią drugiej notatki z tego kroku
+- [ ] 1.3 Słowa w `taskChangeWords` łapią tekst notatki z 11.03.2026 i nie łapią drugiej notatki z kroku 2
 
-### Phase 2: Formularz notatki, moje notatki, informacja zwrotna
+### Phase 2: Formularz notatki, notatki przy kryteriach, „Wstaw do uzasadnienia” i karta (wersja minimalna)
 
 #### Automated
 
-- [ ] 2.1 Testy tras notatek i informacji zwrotnej przechodzą: `bun test src/routes/notes.test.ts`
+- [ ] 2.1 Testy tras notatek, dostępu, ostrzeżenia, formatowania, slotów i karty przechodzą: `bun test src/routes/notes.test.ts src/notes`
+- [ ] 2.2 Test DOM „Wstaw” przechodzi: `bun test src/notes/insert-notes.dom.test.ts`
 
 #### Manual
 
-- [ ] 2.2 Na telefonie 360 px pole „Zmiana zadań pracownika” zaznacza się w trakcie pisania z linią „listy słów”; po odznaczeniu nie wraca
-- [ ] 2.3 Druga notatka z kroku 2 zapisuje się z pustym polem i bez linii podpowiedzi
-- [ ] 2.4 „Przekaż pracownikowi”: Piotr widzi poprawiony tekst w „Informacja zwrotna”, a nie widzi notatki
+- [ ] 2.3 Krok 2 (data 2026-03-11, dane z `--live-step-2`), telefon 360 px: pole „Zmiana zadań pracownika” zaznacza się w trakcie pisania notatki z 11.03.2026 z linią „listy słów”; po odznaczeniu nie wraca; druga notatka zapisuje się z pustym polem i bez linii podpowiedzi
+- [ ] 2.4 Krok 4 (data 2026-11-21): formularz oceny Piotra pokazuje notatki przy kryteriach, notatkę z 04.08.2025 przy „Orientacja na klienta/interesanta”, puste „Myślenie analityczne” i jedno ostrzeżenie „z ostatniego miesiąca”
+- [ ] 2.5 „Wstaw do uzasadnienia” dopisuje zaznaczone notatki z datami; pole da się dalej poprawić; nic nie zapisuje się bez przycisku S-02
+- [ ] 2.6 Karta rozmowy oceniającej otwiera się z ekranu cyklu i z formularza oceny i pokazuje trzy tematy z § 10
 
-### Phase 3: Notatki przy kryteriach, ostrzeżenia, „Wstaw” i karta rozmowy oceniającej
+### Phase 3: Informacja zwrotna, drugie „Wstaw”, data notatki i ostrzeżenie o ocenie skrajnej
 
 #### Automated
 
-- [ ] 3.1 Testy ostrzeżeń, formatowania i wpięcia w formularz przechodzą: `bun test`
+- [ ] 3.1 Testy informacji zwrotnej, drugiego „Wstaw”, daty i ostrzeżenia skrajnego przechodzą: `bun test src/routes/notes.test.ts src/notes`
 
 #### Manual
 
-- [ ] 3.2 Przy dacie 23.11.2026 formularz oceny Piotra pokazuje notatki przy kryteriach i jedno ostrzeżenie „z ostatniego miesiąca”
-- [ ] 3.3 „Wstaw do uzasadnienia” dopisuje zaznaczone notatki z datami; nic nie zapisuje się bez przycisku S-02
-- [ ] 3.4 Karta rozmowy oceniającej pokazuje trzy tematy z § 10
+- [ ] 3.2 „Przekaż pracownikowi”: Piotr widzi poprawiony tekst w „Informacja zwrotna”, a nie widzi notatki
 
 ### Phase 4 (opcjonalna): Gałąź modelu uruchomionego w urzędzie
 
 #### Automated
 
-- [ ] 4.1 Test na atrapie lokalnej usługi przechodzi: `bun test src/suggestions/local-model.test.ts`
+- [ ] 4.1 Test z podstawioną atrapą przechodzi: `bun test src/suggestions/local-model.test.ts`
