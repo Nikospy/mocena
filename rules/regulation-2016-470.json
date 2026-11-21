@@ -302,5 +302,11 @@
       "sposób realizowania celów do osiągnięcia w okresie, w którym oceniany podlegał ocenie, jeżeli cele te zostały wyznaczone",
       "kierunki dalszego rozwoju zawodowego i potrzeby ocenianego w zakresie podnoszenia kwalifikacji i doskonalenia umiejętności"
     ]
+  },
+  "approval": {
+    "justification": { "basis": "§ 11 ust. 3" },
+    "developmentConclusions": { "basis": "art. 81 ust. 5 ustawy" },
+    "gradeRequest": { "basis": "§ 11 ust. 5, art. 89 ust. 1 ustawy", "maxGrade": 9 },
+    "acknowledgement": { "basis": "§ 12" }
   }
 }

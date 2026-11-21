@@ -6,6 +6,7 @@ import { homeTasks } from "./home-tasks";
 import { PERSON_COOKIE, currentPerson, personById } from "./people";
 import { today } from "./settings";
 import cycleStart from "./routes/cycle-start";
+import assessment from "./routes/assessment";
 import { Layout } from "./views/layout";
 
 const app = new Hono();
@@ -102,5 +103,6 @@ app.post("/demo/date", async (c) => {
 });
 
 app.route("/", cycleStart);
+app.route("/", assessment);
 
 export default app;

@@ -530,3 +530,8 @@ h2, h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w
 /* F-01 */
 .plain-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-150); }
 .date-switch { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
+
+/* S-02 assessment-and-confirmation */
+.st-none:empty { display: none; }
+.verdict-box .reason { padding-inline-start: var(--sp-250); }
+.crit .scorebox .big { font-size: var(--f-h2); line-height: var(--lh-h2); font-weight: var(--w-bold); }
