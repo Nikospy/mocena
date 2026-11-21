@@ -16,6 +16,8 @@ export type Person = {
   appointed: number;
   civil_service_grade: string | null;
   grade_awarded_on: string | null;
+  position_kind: "head_of_office" | "manager" | "staff" | null;
+  duty_types: string;
 };
 
 export function personById(id: string): Person | null {

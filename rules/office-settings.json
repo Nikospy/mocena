@@ -1,0 +1,16 @@
+{
+  "label": "ustawienie urzędu",
+  "note": "Ta tabela jest ustawieniem urzędu: nie pochodzi z przepisów ani z materiałów organizatora. Urząd może ją zmienić u siebie.",
+  "dutyTypes": [
+    { "id": "client-service", "name": "obsługa interesantów" },
+    { "id": "analyses-and-reports", "name": "przygotowywanie analiz i zestawień" },
+    { "id": "inter-office-agreements", "name": "uzgodnienia z innymi urzędami" },
+    { "id": "official-correspondence", "name": "prowadzenie korespondencji urzędowej" }
+  ],
+  "dutyToCriterion": {
+    "client-service": "orientacja-na-klienta",
+    "analyses-and-reports": "myslenie-analityczne",
+    "inter-office-agreements": "negocjowanie",
+    "official-correspondence": "komunikacja"
+  }
+}

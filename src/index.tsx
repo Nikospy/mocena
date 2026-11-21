@@ -5,6 +5,7 @@ import { getDb } from "./db";
 import { homeTasks } from "./home-tasks";
 import { PERSON_COOKIE, currentPerson, personById } from "./people";
 import { today } from "./settings";
+import cycleStart from "./routes/cycle-start";
 import { Layout } from "./views/layout";
 
 const app = new Hono();
@@ -99,5 +100,7 @@ app.post("/demo/date", async (c) => {
   getDb().query("INSERT INTO settings (key, value) VALUES ('demo_date', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").run(date);
   return c.redirect("/", 303);
 });
+
+app.route("/", cycleStart);
 
 export default app;
