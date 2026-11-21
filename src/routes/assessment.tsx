@@ -3,6 +3,7 @@ import "../assessment/home";
 import { buildAssessmentSnapshot } from "../assessment/snapshot";
 import { assessmentState, currentGradeNumber, type AssessmentDraft } from "../assessment/state";
 import { cycleById, type Cycle } from "../cycles";
+import { assessmentSlots } from "../notes/assessment-slots";
 import { cycleCriteria } from "../cycles/part1";
 import { getDb } from "../db";
 import { approvalBlockers, gradeRequestOptions } from "../engine/approval";
@@ -125,6 +126,7 @@ function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; er
       today={today()}
       blockers={d.blockers}
       draft={draft}
+      slots={appraiser ? assessmentSlots({ cycleId: cx.cycle.id, viewer: cx.person }) : undefined}
       result={d.result}
       gradeOption={d.gradeOption}
       grade={d.grade}
