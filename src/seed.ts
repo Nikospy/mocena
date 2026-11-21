@@ -1,5 +1,6 @@
 import { createSchema, setDb, type Db } from "./db";
 import { seedBase } from "./seed/base";
+import { seedPart1 } from "./seed/part1";
 
 export type SeedOptions = { liveStep2?: boolean; afterStep1?: boolean };
 
@@ -8,5 +9,6 @@ export function runSeed(db: Db, options: SeedOptions = {}): void {
   setDb(db);
   createSchema(db);
   seedBase(opts);
-  // Kolejne plastry dopisują tu swoje moduły: part1, notes, assessments, absences.
+  seedPart1(opts);
+  // Kolejne plastry dopisują tu swoje moduły: notes, assessments, absences.
 }

@@ -307,13 +307,13 @@ Dokumenty tego nie rozstrzygają; podany wariant domyślny obowiązuje, dopóki 
 
 #### Automated
 
-- [ ] 1.1 Testy doboru arkusza i podpowiedzi przechodzą: `bun test src/engine/criteria.test.ts`
-- [ ] 1.2 Testy logiki części I przechodzą: `bun test src/cycles/part1.test.ts`
-- [ ] 1.3 Testy tras i przejścia kroku 1 przechodzą: `bun test src/routes/cycle-start.test.tsx`
-- [ ] 1.4 Testy modułu danych części I (z opcją `afterStep1` i bez niej) przechodzą: `bun test src/seed/part1.test.ts`
-- [ ] 1.5 Testy renderowania obu wariantów `ConfirmationBlock` przechodzą: `bun test src/views/components.test.tsx`
-- [ ] 1.6 Dane pokazowe wgrywają się bez błędu, z pełną częścią I Ewy i Tomasza: `bun run seed`
-- [ ] 1.7 Wszystkie testy przechodzą: `bun test`
+- [x] 1.1 Testy doboru arkusza i podpowiedzi przechodzą: `bun test src/engine/criteria.test.ts` — c2d4751
+- [x] 1.2 Testy logiki części I przechodzą: `bun test src/cycles/part1.test.ts` — c2d4751
+- [x] 1.3 Testy tras i przejścia kroku 1 przechodzą: `bun test src/routes/cycle-start.test.tsx` — c2d4751
+- [x] 1.4 Testy modułu danych części I (z opcją `afterStep1` i bez niej) przechodzą: `bun test src/seed/part1.test.ts` — c2d4751
+- [x] 1.5 Testy renderowania obu wariantów `ConfirmationBlock` przechodzą: `bun test src/views/components.test.tsx` — c2d4751
+- [x] 1.6 Dane pokazowe wgrywają się bez błędu, z pełną częścią I Ewy i Tomasza: `bun run seed` — c2d4751
+- [x] 1.7 Wszystkie testy przechodzą: `bun test` — c2d4751
 
 #### Manual
 
@@ -323,8 +323,8 @@ Dokumenty tego nie rozstrzygają; podany wariant domyślny obowiązuje, dopóki 
 
 #### Automated
 
-- [ ] 2.1 Testy stanu oczekiwania, widoku kadr i karty przechodzą: `bun test src/routes/cycle-start.test.tsx src/cycles/part1.test.ts`
-- [ ] 2.2 Wszystkie testy przechodzą: `bun test`
+- [x] 2.1 Testy stanu oczekiwania, widoku kadr i karty przechodzą: `bun test src/routes/cycle-start.test.tsx src/cycles/part1.test.ts` — 4877f96
+- [x] 2.2 Wszystkie testy przechodzą: `bun test` — 4877f96
 
 #### Manual
 

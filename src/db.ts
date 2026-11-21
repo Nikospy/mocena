@@ -27,7 +27,8 @@ export function createSchema(d: Db): void {
 CREATE TABLE IF NOT EXISTS people (
   id TEXT PRIMARY KEY, name TEXT NOT NULL, role TEXT NOT NULL, position_title TEXT, unit TEXT,
   supervisor_id TEXT, has_account INTEGER NOT NULL DEFAULT 0, appointed INTEGER NOT NULL DEFAULT 0,
-  civil_service_grade TEXT, grade_awarded_on TEXT
+  civil_service_grade TEXT, grade_awarded_on TEXT,
+  position_kind TEXT, duty_types TEXT NOT NULL DEFAULT '[]'
 );
 CREATE TABLE IF NOT EXISTS cycles (
   id TEXT PRIMARY KEY, person_id TEXT NOT NULL, appraiser_id TEXT NOT NULL, period_start TEXT NOT NULL, sheet TEXT
