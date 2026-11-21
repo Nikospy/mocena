@@ -15,14 +15,25 @@ export function part1Status(cycleId: string): {
   state: Part1State;
   submittedOn?: string;
   confirmedOn?: string;
+  waitingDays?: number;
 } {
   const ev = visibleEvents(cycleId);
   const submitted = ev.find((e) => e.type === "part1_submitted");
   const confirmed = ev.find((e) => e.type === "part1_confirmed");
   if (submitted && confirmed) return { state: "confirmed", submittedOn: submitted.date, confirmedOn: confirmed.date };
-  if (submitted) return { state: "submitted", submittedOn: submitted.date };
+  if (submitted) {
+    return { state: "submitted", submittedOn: submitted.date, waitingDays: daysBetween(submitted.date, today()) };
+  }
   const rows = getDb().query("SELECT 1 FROM cycle_criteria WHERE cycle_id = ? LIMIT 1").get(cycleId);
   return { state: rows ? "draft" : "not_started" };
+}
+
+function daysBetween(from: string, to: string): number {
+  return Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000);
+}
+
+export function waitingDaysText(days: number): string {
+  return days <= 0 ? "od dziś" : days === 1 ? "od 1 dnia" : `od ${days} dni`;
 }
 
 export function isPart1Locked(cycleId: string): boolean {

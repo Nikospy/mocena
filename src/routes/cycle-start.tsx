@@ -2,7 +2,7 @@ import { Hono, type Context } from "hono";
 import { card } from "../content";
 import { cycleById, effectiveDeadline, openCycle, type Cycle } from "../cycles";
 import { cycleLinks, registerCycleLinks } from "../cycle-links";
-import { confirmPart1, cycleCriteria, isPart1Locked, part1Status, saveCriteria, submitPart1, type Part1Input } from "../cycles/part1";
+import { confirmPart1, cycleCriteria, isPart1Locked, part1Status, saveCriteria, submitPart1, waitingDaysText, type Part1Input } from "../cycles/part1";
 import { sheetForPosition } from "../engine/criteria";
 import { criteriaTalkDeadline } from "../engine/deadlines";
 import { rules } from "../engine/rules";
@@ -22,13 +22,24 @@ registerCycleLinks((cycle, person) =>
   isParty(cycle, person) ? [{ label: "Karta rozmowy rozpoczynającej", href: `/cycles/${cycle.id}/cards/opening` }] : [],
 );
 
+registerCycleLinks((cycle, person) =>
+  person.role === "hr" && !isParty(cycle, person) ? [{ label: "Część I", href: `/cycles/${cycle.id}/part1` }] : [],
+);
+
 registerHomeTasks((person) => {
   const tasks: { title: string; href: string; detail?: string }[] = [];
   if (person.role === "appraiser") {
     for (const personId of appraiseeIds(person.id)) {
       const cycle = openCycle(personId);
       if (!cycle || cycle.appraiser_id !== person.id) continue;
-      const { state } = part1Status(cycle.id);
+      const { state, waitingDays } = part1Status(cycle.id);
+      if (state === "submitted") {
+        tasks.push({
+          title: `Część I czeka na potwierdzenie ${waitingDaysText(waitingDays ?? 0)}`,
+          detail: `Pracownik: ${personById(cycle.person_id)?.name}`,
+          href: `/cycles/${cycle.id}/part1`,
+        });
+      }
       if (state !== "not_started" && state !== "draft") continue;
       const started = visibleEvents(cycle.id).filter((e) => e.type === "cycle_started").pop()?.payload;
       const negative = started?.previousOutcome === "negative";
@@ -118,6 +129,7 @@ function renderPart1(c: Context, cx: Ctx, extra: { errors?: string[]; input?: Pa
       confirmation={confirmed ? { name: confirmed.payload.appraiseeName, place: confirmed.payload.place, date: confirmed.date } : undefined}
       links={cycleLinks(cycle, person)}
       errors={extra.errors}
+      waiting={cycle.appraiser_id === person.id && status.state === "submitted" ? waitingDaysText(status.waitingDays ?? 0) : undefined}
     />,
     extra.status ?? 200,
   );
@@ -130,7 +142,7 @@ app.get("/cycles/:id", (c) => {
 });
 
 app.get("/cycles/:id/part1", (c) => {
-  const g = guard(c);
+  const g = guard(c, { hrRead: true });
   if (g instanceof Response) return g;
   return renderPart1(c, g);
 });

@@ -3,7 +3,7 @@ import { effectiveDeadline } from "../cycles";
 import { rulesVersion } from "../engine/rules";
 import { visibleEvents } from "../events";
 import { createTestApp } from "../test-helpers";
-import { confirmPart1, cycleCriteria, part1Status, saveCriteria, savePart1, submitPart1 } from "./part1";
+import { confirmPart1, waitingDaysText, cycleCriteria, part1Status, saveCriteria, savePart1, submitPart1 } from "./part1";
 
 const piotr = "cycle-piotr";
 const input = { additional: ["orientacja-na-klienta", "myslenie-analityczne"], expectations: { "orientacja-na-klienta": "Szybko." } };
@@ -74,5 +74,16 @@ describe("część I", () => {
     savePart1(piotr, "marek", { additional: [], expectations: {} }, "2024-12-09");
     const p = visibleEvents(piotr).find((e) => e.type === "part1_submitted")!.payload;
     expect(p.dueDate).toBe("2025-06-01");
+  });
+});
+
+describe("oczekiwanie na potwierdzenie", () => {
+  test("waitingDays liczy dni od przekazania; tekst: dziś, 1 dnia, n dni", () => {
+    const { db } = createTestApp({ today: "2024-12-09" });
+    submitPart1(piotr, "marek", input);
+    expect(part1Status(piotr).waitingDays).toBe(0);
+    db.query("UPDATE settings SET value = '2024-12-12' WHERE key = 'demo_date'").run();
+    expect(part1Status(piotr).waitingDays).toBe(3);
+    expect([0, 1, 3].map(waitingDaysText)).toEqual(["od dziś", "od 1 dnia", "od 3 dni"]);
   });
 });

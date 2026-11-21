@@ -1,5 +1,6 @@
 import type { CycleLink } from "../cycle-links";
 import type { Person } from "../people";
+import type { Card } from "../content";
 import { officeSettings } from "../office-settings";
 import { criterion } from "../engine/scoring";
 import { ConfirmationBlock, LegalBasis } from "./components";
@@ -26,6 +27,7 @@ export type Part1ViewProps = {
   links: CycleLink[];
   errors?: string[];
   notice?: string;
+  waiting?: string;
 };
 
 function CriterionRow(props: { id: string; kind: string; expectation: string; editable: boolean; extra?: string; checkbox?: { checked: boolean } }) {
@@ -47,6 +49,10 @@ function CriterionRow(props: { id: string; kind: string; expectation: string; ed
             <h3>{c.name}</h3>
           )}
           <p class="kind">{props.kind}</p>
+          <details>
+            <summary>Opis kryterium</summary>
+            <ul>{c.description.map((d) => <li>{d}</li>)}</ul>
+          </details>
         </div>
       </div>
       {props.editable ? (
@@ -82,6 +88,7 @@ export function Part1View(p: Part1ViewProps) {
           {p.deadline.label}: <b>{formatDate(p.deadline.date)}</b> <LegalBasis basis={p.deadline.basis} />
         </p>
         {p.notice ? <p class="st info">{p.notice}</p> : null}
+        {p.waiting ? <p class="st info">Część I czeka na potwierdzenie {p.waiting}.</p> : null}
         {p.errors?.length ? (
           <div class="st bad" role="alert">
             <ul>{p.errors.map((e) => <li>{e}</li>)}</ul>
@@ -151,10 +158,11 @@ export function OpeningCardView(props: {
   viewer: Person;
   today: string;
   cycleId: string;
-  card: { title: string; purpose: string };
+  card: Card;
   basis: string;
   topics: string[];
 }) {
+  const { questions, hardSituations } = props.card;
   return (
     <Layout title="Karta rozmowy rozpoczynającej" person={props.viewer} today={props.today}>
       <section class="card">
@@ -162,6 +170,18 @@ export function OpeningCardView(props: {
         <p>{props.card.purpose}</p>
         <h2>Tematy rozmowy <LegalBasis basis={props.basis} /></h2>
         <ol>{props.topics.map((t) => <li>{t}</li>)}</ol>
+        {questions?.length ? (
+          <>
+            <h2>Pytania</h2>
+            <ul>{questions.map((q) => <li>{q}</li>)}</ul>
+          </>
+        ) : null}
+        {hardSituations?.length ? (
+          <>
+            <h2>Trudne sytuacje</h2>
+            <ul>{hardSituations.map((h) => <li><b>{h.situation}</b> {h.whatToDo}</li>)}</ul>
+          </>
+        ) : null}
         <a class="btn text" href={`/cycles/${props.cycleId}/part1`}>Wróć do części I</a>
       </section>
     </Layout>
