@@ -11,7 +11,7 @@ import { computeAssessment, POINTS } from "../engine/scoring";
 import { recordEvent } from "../events";
 import { currentPerson, personById, type Person } from "../people";
 import { setting, today } from "../settings";
-import { AssessmentMessage, AssessmentView } from "../views/assessment";
+import { AssessmentMessage, AssessmentView, BlockerList, ResultPanel } from "../views/assessment";
 import { FictionView } from "../views/acknowledgement-fiction";
 
 type Ctx = { cycle: Cycle; person: Person; appraisee: Person };
@@ -216,6 +216,19 @@ app.post("/cycles/:id/assessment/acknowledge", (c) => {
   })();
   if (!ok) return render(c, g, { status: 409, errors: ["Ocena nie czeka na potwierdzenie zapoznania."] });
   return c.redirect(`/cycles/${g.cycle.id}/assessment`, 303);
+});
+
+app.post("/cycles/:id/assessment/preview", async (c) => {
+  const g = guard(c);
+  if (!isCtx(g)) return g;
+  if (!isAppraiser(g)) return c.text("Tylko oceniający może zobaczyć podgląd wyniku.", 403);
+  const d = screenData(g, readDraft(await c.req.parseBody()));
+  return c.html(
+    <div>
+      <ResultPanel result={d.result} />
+      <BlockerList blockers={d.blockers} />
+    </div>,
+  );
 });
 
 const REASONS = ["could_not", "would_not"];

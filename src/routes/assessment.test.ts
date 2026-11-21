@@ -3,6 +3,7 @@ import { assessmentState, type AssessmentSnapshot } from "../assessment/state";
 import { cycleLinks } from "../cycle-links";
 import { cycleById, effectiveDeadline, openCycle } from "../cycles";
 import { currentGrade, personById } from "../people";
+import { getDb } from "../db";
 import { rulesVersion } from "../engine/rules";
 import { seedEvent, visibleEvents } from "../events";
 import { homeTasks } from "../home-tasks";
@@ -338,5 +339,40 @@ describe("fikcja zapoznania i wgląd kadr", () => {
     expect(html.slice(html.indexOf("<main"))).not.toContain("<button");
     expect(html).not.toContain("Stwierdź fikcję");
     expect(html).not.toContain("Potwierdzam zapoznanie");
+  });
+});
+
+describe("dodatki: podgląd, pole wniosku o stopień, data rozmowy", () => {
+  test("podgląd: 200, wynik negatywny, nic nie zapisuje; także przy ocenie spoza skali; Piotr 403", async () => {
+    const app = fresh();
+    const count = () => (getDb().query("SELECT COUNT(*) AS n FROM events").get() as { n: number }).n;
+    const before = count();
+    const r = await call(app, "marek", `/cycles/${piotr}/assessment/preview`, form(PIOTR_IDS, {}, ["rzetelnosc"]));
+    expect(r.status).toBe(200);
+    expect(await r.text()).toContain("Ocena negatywna");
+    const bad = await call(app, "marek", `/cycles/${piotr}/assessment/preview`, form(PIOTR_IDS, { "score[rzetelnosc]": "4" }));
+    expect(bad.status).toBe(200);
+    expect(await bad.text()).toContain("musi wynosić 1, 3, 5, 7 albo 9");
+    expect((await call(app, "piotr", `/cycles/${piotr}/assessment/preview`, form(PIOTR_IDS))).status).toBe(403);
+    expect(count()).toBe(before);
+  });
+
+  test("formularz Tomasza ma pole wniosku o stopień, formularz Piotra nie", async () => {
+    const app = createTestApp({ today: "2026-11-10", seedOptions: { afterStep1: true } }).app;
+    expect(await (await call(app, "anna", `/cycles/${tomasz}/assessment`)).text()).toContain('name="gradeRequestAttached"');
+    const p = await (await call(app, "marek", `/cycles/${piotr}/assessment`)).text();
+    expect(p).not.toContain("gradeRequestAttached");
+    expect(p).toContain('src="/assessment.js"');
+  });
+
+  test("data rozmowy z przyszłości: 422 i brak zdarzenia; poprawna trafia do migawki", async () => {
+    const app = fresh();
+    const future = form(PIOTR_IDS, { interviewDate: "2026-11-22", developmentConclusions: "x" });
+    expect((await call(app, "marek", `/cycles/${piotr}/assessment`, future)).status).toBe(422);
+    expect((await call(app, "marek", `/cycles/${piotr}/assessment/approve`, future)).status).toBe(422);
+    expect(visibleEvents(piotr).filter((e) => e.type.startsWith("assessment_"))).toHaveLength(0);
+    const ok = form(PIOTR_IDS, { interviewDate: "2026-11-20", developmentConclusions: "x" });
+    expect((await call(app, "marek", `/cycles/${piotr}/assessment/approve`, ok)).status).toBe(303);
+    expect((events("assessment_approved")[0].payload as AssessmentSnapshot).interviewDate).toBe("2026-11-20");
   });
 });
