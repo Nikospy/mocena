@@ -113,6 +113,21 @@ Adapter powstaje w plastrze notatek (S-04), ekran w plastrze HR partnera (S-05).
 
 **Odrzucono.** Uruchomienie modelu w prototypie. Działające ostrzeżenie o danych o zdrowiu jako dodatkowa funkcja.
 
+## 10. Decyzje z dialogu przed budową (21.11.2026, 21:30–22:00)
+
+Przyjęte przez autora, po jednej naraz.
+
+- **10a. Start budowy.** Budowa stoi do końca dialogu o decyzjach, także część F-01 bez ekranów. Odrzucono: silnik i baza równolegle z dialogiem.
+- **10b. Wygląd.** Jedynym źródłem wyglądu jest design system autora (powstaje osobno). Pierwszy ekran autor akceptuje na zrzutach 360 i 1440 px jeszcze 21.11 przed snem; potem wygląd jest powielany bez pytań. Gdy design system nie jest gotowy, powstaje logika i testy kolejnych plastrów bez stylów. Odrzucono: własne style agenta z podmianą na końcu.
+- **10c. Ostrzeżenie „fakty tylko z ostatniego miesiąca”.** Do danych pokazowych dochodzi jedna notatka Marka o Piotrze z 12.11.2026 przy kryterium bez innych notatek; bez niej ostrzeżenie z kroku 4 pokazu by się nie pojawiło. Odrzucono: pisanie notatki na żywo, pokaz bez tego ostrzeżenia.
+- **10d. Część I bez potwierdzenia.** Luka zostaje. Oceniający i kadry widzą „czeka na potwierdzenie od X dni”. Zdanie dla jury: „Tryb na brak potwierdzenia ustala urząd, system go nie przesądza”. Odrzucono: wpis oceniającego jak przy fikcji zapoznania (brak podstawy prawnej).
+- **10e. Treści pisane przy budowie** (tabela „rodzaj obowiązku → kryterium”, lista słów, katalog form rozwoju, karty rozmów, pytania „Przed rozmową”). Autor ich osobno nie przegląda.
+- **10f. Uzasadnienie z notatek.** Przełożony zaznacza notatki przy kryterium i klika „Wstaw”; trafiają z datą do zwykłego pola tekstowego, które może poprawić. Nic nie wstawia się samo. Nad polem zdanie „Ten tekst przeczyta pracownik”. Odrzucono: wstępne wypełnienie wszystkimi notatkami, same odsyłacze bez wklejania.
+
+**Czekają na odpowiedź autora** (do tego czasu obowiązuje rekomendacja jako założenie): koniec budowy o 07:00; oś czasu (S-03) budowana po S-06, czyli zmiana decyzji 8a; wgrane zdarzenia ukryte do swojej daty; informacja zwrotna jako poprawiana kopia notatki.
+
+**Jeszcze nie omówione:** kształt adaptera podpowiedzi; „liczba notatek o każdym podwładnym” (decyzja 3) wobec zasady „żadnych liczb przy nazwisku”; nieobecność bez rodzaju; kiedy dostępny jest przycisk fikcji zapoznania.
+
 ## Pytania otwarte (do mentorów organizatora)
 
 1. Czy potwierdzenie w systemie na własnym koncie wystarcza zamiast podpisu?
