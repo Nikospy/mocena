@@ -126,7 +126,7 @@ Ocena nie psuje się przy formularzu, tylko przez 24 miesiące ciszy przed nim. 
 - FR-009: Oceniający może wysłać ocenianemu informację zwrotną, a oceniany może ją przeczytać. Priority: must-have
 - FR-010: Kadry mogą wpisać nieobecność ocenianego, po której system łączy nieobecności rozdzielone dniami wolnymi i przedłuża termin oceny o czas nieobecności dłuższej niż miesiąc. Priority: must-have
 - FR-011: Kadry mogą zarejestrować zmianę oceniającego w trakcie cyklu z zachowaniem kryteriów. Priority: must-have
-- FR-012: Oceniający może zmienić termin oceny w przypadkach dopuszczonych ustawą, a oceniany dostaje informację o nowym terminie. Priority: nice-to-have
+- FR-012: Oceniający może zmienić termin oceny w przypadkach dopuszczonych ustawą, a oceniany dostaje pisemną informację o nowym terminie (§ 8 rozporządzenia). Priority: nice-to-have
 - FR-013: Oceniany może złożyć wniosek o zmianę terminu po 6 miesiącach, a oceniający może go rozpatrzyć. Priority: nice-to-have
 - FR-014: Uczestnik cyklu może zobaczyć oś czasu cyklu z regułą i wersją reguł, z której wynika każdy termin. Priority: must-have
 
@@ -144,7 +144,7 @@ Ocena nie psuje się przy formularzu, tylko przez 24 miesiące ciszy przed nim. 
 - FR-022: Oceniający może zatwierdzić ocenę dopiero wtedy, gdy są wnioski rozwojowe, uzasadnienie przy ocenie negatywnej i umotywowanie dołączonego wniosku o stopień. Priority: must-have
 - FR-023: Oceniający może dołączyć wniosek o kolejny stopień służbowy dla urzędnika mianowanego z oceną pozytywną. Priority: must-have
 - FR-024: Oceniany może na własnym koncie potwierdzić zapoznanie się z oceną, od którego liczy się 7 dni na sprzeciw. Priority: must-have
-- FR-025: Oceniający może stwierdzić fikcję zapoznania z oceną, wskazując, czy oceniany nie mógł, czy nie chciał jej potwierdzić, a kadry widzą ten wpis. Priority: must-have
+- FR-025: Oceniający może stwierdzić fikcję zapoznania z oceną, wskazując, czy oceniany nie mógł, czy nie chciał jej potwierdzić, oraz jak i kiedy doręczono kopię arkusza, a kadry widzą ten wpis. Priority: must-have
 - FR-026: Uprawniona osoba może obejrzeć, pobrać i wydrukować arkusz ze wszystkimi polami w układzie wzoru z rozporządzenia. Priority: must-have
 
 ### Po ocenie i widoki kadr

@@ -34,7 +34,7 @@ Kadry (Joanna) na komputerze otwierają cykl Piotra, wpisują dwie nieobecności
 - Edycji i usuwania wpisanej nieobecności (decyzja 4: „usunięcie danych” i „edycja danych pracownika” są poza prototypem). Pomyłkę poprawia się w danych pokazowych.
 - Zmiany terminu przez oceniającego, wniosku ocenianego o zmianę terminu (art. 81 ust. 8; FR-012, FR-013): tylko stan na ekranie kadr w S-06.
 - Przedłużania terminu ponownej oceny po ocenie negatywnej (FAQ pyt. 19).
-- Nieobecności oceniającego, zastępstw, przekazywania notatek starego oceniającego nowemu (notatki są prywatne, własność S-04).
+- Nieobecności oceniającego, zastępstw, przekazywania notatek starego oceniającego nowemu (notatki widzi tylko autor, własność S-04).
 - Wstecznego datowania wpisów: każdy zapis z ekranu dostaje datę systemową (`today()`).
 - Wyglądu: tokeny i komponenty pochodzą z design systemu autora (decyzja 10b). Plan wskazuje tylko ekrany i nowe komponenty.
 

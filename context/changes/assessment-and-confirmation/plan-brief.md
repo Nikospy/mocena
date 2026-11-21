@@ -23,7 +23,7 @@ Na koncie Marka „1” przy Rzetelności daje ocenę negatywną mimo średniej 
 | Wynik na żywo | trasa podglądu bez zapisu, liczy silnik na serwerze | jedno źródło reguł i „nic bez kliknięcia” | Plan |
 | Blokady | jedna czysta funkcja `approvalBlockers` dla ekranu i serwera | te same komunikaty i przepisy w obu miejscach | Plan |
 | Uzasadnienie | zwykłe pole z miejscem na „Wstaw” dla S-04 | decyzja 10f | decisions.md |
-| Fikcja | przycisk od zatwierdzenia, ekran skutku, wymagany wybór, kadry tylko widzą | decyzje 5b i 10n | decisions.md |
+| Fikcja | przycisk od zatwierdzenia, ekran skutku, wymagany wybór i pola doręczenia kopii arkusza, kadry tylko widzą | decyzje 5b, 10n i 11a | decisions.md |
 | Potwierdzenia | miejscowość, data, nazwisko wpisywane same, słowo „potwierdzenie” | decyzja 5a | decisions.md |
 | Wniosek o stopień | tylko urzędnik mianowany z wynikiem pozytywnym, sprawdzony testem | Piotr nie jest mianowany, pokaz tego nie klika | brief zlecenia |
 

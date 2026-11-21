@@ -46,11 +46,11 @@ Decyzje podjęte przez autora 21.11.2026 (17:57–19:00) po przejściu całego p
 
 ## 5. Potwierdzenia i fikcja zapoznania
 
-**Decyzja 5a.** Oceniający i oceniany potwierdzają kliknięciem, każdy na własnym koncie. System sam wpisuje miejscowość, datę i nazwisko, a pola się blokują. Konta pokazowe są bez hasła. Mówimy „potwierdzenie”, nigdy „podpis”. Zdanie dla jury: „Urząd, który ma podpis zaufany albo EZD, podpina go w tym miejscu”.
+**Decyzja 5a.** Oceniający i oceniany potwierdzają kliknięciem, każdy na własnym koncie. System sam wpisuje miejscowość, datę i nazwisko, a pola się blokują. Konta pokazowe są bez hasła. Mówimy „potwierdzenie”, nigdy „podpis”. Zdanie dla jury: „Kliknięcie to potwierdzenie w systemie. Moc prawną daje dziś wydruk z podpisem. Urząd może w tym miejscu podpiąć podpis kwalifikowany albo zaufany” (brzmienie po decyzji 11b).
 
 Pracownik potwierdza w cyklu dokładnie dwie rzeczy: część I (rozmowa o kryteriach, kryteria, termin) i część II (zapoznanie z oceną). Notatek przełożonego nie potwierdza.
 
-**Decyzja 5b.** Gdy oceniany nie potwierdza zapoznania, oceniający sam klika „Stwierdź fikcję zapoznania” i wybiera „nie mógł” albo „nie chciał”. Terminy biegną od tego dnia. Kadry tylko widzą wpis. Nie ma automatu, który wpisuje fikcję po upływie czasu.
+**Decyzja 5b.** Gdy oceniany nie potwierdza zapoznania, oceniający sam klika „Stwierdź fikcję zapoznania” i wybiera „nie mógł” albo „nie chciał”. System liczy terminy od tego dnia (brzmienie po decyzji 11a). Kadry tylko widzą wpis. Nie ma automatu, który wpisuje fikcję po upływie czasu.
 
 **Dlaczego.** Organizator sam opisuje potwierdzenie z automatycznym wpisem; prawdziwy podpis to osobny projekt. Słów „fikcja zapoznania” nie ma w ustawie ani w rozporządzeniu, są tylko w materiałach organizatora, bez trybu i terminu. System nie przesądza więc sam skutku prawnego wobec pracownika, a oceniający nie potrzebuje drugiej osoby do jednego wpisu.
 
@@ -127,15 +127,27 @@ Przyjęte przez autora, po jednej naraz.
 - **10g. Koniec budowy.** Nowe funkcje powstają do 07:00 w niedzielę 22.11. Od 07:00 do 11:00: dwa pełne przebiegi pokazu, naprawa błędów z przebiegów, nagranie zapasowe, prezentacja PDF. Plaster, który o 07:00 nie działa, zostaje jako stan na ekranie albo wypada ze scenariusza. Odrzucono: 05:00, 09:00, brak sztywnej godziny.
 - **10h. Co wypada pierwsze.** Oś czasu (S-03) jest budowana na końcu, po ekranie kadr i wydruku (S-06). Dlaczego: S-06 to 5 z 15 czynności liczonych jako „działa” i ostatni krok każdej wersji pokazu; S-03 to 3 z 15 i krok, którego wersja 90-sekundowa nie ma. Zmienia decyzję 8a. Odrzucono: S-06 na końcu; S-06 zaraz po S-02 (cierpiałby HR partner).
 - **10i. Dane wgrane z przyszłości.** Każde wgrane zdarzenie ma datę, a ekrany pokazują tylko te, których data już minęła według daty systemowej. To, co kliknięte na żywo, zapisuje się z datą systemową i zostaje. Zdanie dla jury: „Dwa lata pracy są wgrane z góry, a przesunięcie daty je odsłania”. Wymóg: w kroku 1 Marek wybiera kryterium „Orientacja na klienta/interesanta”, bo wgrana notatka z 04.08.2025 jest do niego przypisana. Odrzucono: dwa stany bazy podmieniane przy zmianie daty; początek cyklu na innej osobie.
-- **10j. Informacja zwrotna.** Przy notatce jest przycisk „Przekaż pracownikowi”. Otwiera tekst notatki do poprawy; pracownik widzi wysłaną wersję, a notatka zostaje prywatna. Data wysłania zeruje przypomnienie o docenianiu. Odrzucono: osobny formularz; przełączenie notatki na widoczną.
+- **10j. Informacja zwrotna.** Przy notatce jest przycisk „Przekaż pracownikowi”. Otwiera tekst notatki do poprawy; pracownik widzi wysłaną wersję, a samej notatki nie widzi na swoim koncie; na wniosek urząd mu ją wydaje (brzmienie po decyzji 11c). Data wysłania zeruje przypomnienie o docenianiu. Odrzucono: osobny formularz; przełączenie notatki na widoczną.
 - **10k. Rozkład notatek w zespole.** Ekran „Przed rozmową” mówi zdaniem o przełożonym, na przykład „O Marii nie masz żadnej notatki od 6 miesięcy”, z przyciskiem „Dopisz notatkę”. Nazwiska bez liczb. Zmienia brzmienie decyzji 3 pkt 4. Odrzucono: liczby notatek przy nazwiskach (czyta się jak ranking); usunięcie pozycji.
 - **10l. Adapter podpowiedzi.** Jedno wejście (treść notatki bez nazwisk), wynik: źródło i podpowiedź pola. Działają reguły. Gałąź modelu z testem na atrapie lokalnej usługi (przełączenie i powrót do reguł po przekroczeniu czasu) powstaje jako pierwsza rzecz, jeśli zostanie czas. Odrzucono: atrapa od razu; sam opis bez gałęzi.
 - **10m. Nieobecność bez rodzaju.** System zapisuje tylko daty i to, czy nieobecność jest usprawiedliwiona. Zdanie dla jury: „System nie wie, czy to choroba, bo do terminu wystarcza mu data”. Odrzucono: rodzaj widoczny tylko dla kadr.
-- **10n. Fikcja zapoznania.** Przycisk jest dostępny od razu po zatwierdzeniu oceny. Przed zapisem ekran pokazuje skutek („Od dziś biegnie 7 dni na sprzeciw”) i wymaga wyboru „nie mógł” albo „nie chciał”. Odrzucono: próg dni z ustawień urzędu (liczba bez podstawy); zapis bez ekranu skutku.
+- **10n. Fikcja zapoznania.** Przycisk jest dostępny od razu po zatwierdzeniu oceny. Przed zapisem ekran pokazuje skutek („Urząd przyjmuje dzisiejszy dzień jako dzień zapoznania. Od dziś system liczy 7 dni na sprzeciw”), wymaga wyboru „nie mógł” albo „nie chciał” oraz wpisania, jak i kiedy doręczono kopię arkusza (brzmienie po decyzji 11a). Odrzucono: próg dni z ustawień urzędu (liczba bez podstawy); zapis bez ekranu skutku.
+
+## 11. Poprawki po sprawdzeniu przepisów (21.11.2026, 23:30)
+
+Przyjęte przez autora po sprawdzeniu decyzji na aktualnym brzmieniu ustawy o służbie cywilnej, rozporządzenia o ocenach, Kodeksu pracy, RODO i AI Act. Żadna nie zmienia zakresu. 11a–11c zmieniają brzmienie decyzji 10n, 5a, 5b i 10j (naniesione także w ich treści wyżej).
+
+- **11a. Fikcja zapoznania: słowa i jedno pole.** Ekran skutku mówi: „Urząd przyjmuje dzisiejszy dzień jako dzień zapoznania. Od dziś system liczy 7 dni na sprzeciw”. Wpis wymaga dodatkowo dwóch pól: jak doręczono kopię arkusza (osobiście, pocztą, pocztą elektroniczną) i kiedy. Dlaczego: sprzeciw służy „w terminie 7 dni od dnia zapoznania się z oceną” (art. 83 ust. 1 ustawy), a ustawa i rozporządzenie nie znają fikcji zapoznania, więc system nie może podawać biegu terminu jako faktu prawnego. Kopię arkusza oceniający doręcza ocenianemu (§ 12 ust. 2 rozporządzenia); to doręczenie jest przesłanką wpisu, zwłaszcza przy „nie mógł”. Odrzucono: zdanie „Od dziś biegnie 7 dni na sprzeciw”.
+- **11b. Potwierdzenie a podpis.** Zdanie dla jury: „Kliknięcie to potwierdzenie w systemie. Moc prawną daje dziś wydruk z podpisem. Urząd może w tym miejscu podpiąć podpis kwalifikowany albo zaufany”. Dlaczego: ocenę „sporządza się na piśmie” (art. 81 ust. 3 ustawy), a część I oceniany „potwierdza podpisem” (§ 6 ust. 2 rozporządzenia). EZD to system obiegu dokumentów, nie podpis. Odrzucono: „Urząd, który ma podpis zaufany albo EZD, podpina go w tym miejscu”.
+- **11c. Notatka nie jest „prywatna”.** Na ekranach i w pokazie: „Pracownik nie widzi notatki na swoim koncie. Na wniosek urząd mu ją wydaje”. Dlaczego: notatka o pracowniku to jego dane osobowe i ma on prawo dostępu do nich oraz do kopii (RODO art. 15 ust. 1 i 3); wymagania już przewidują eksport na wniosek. Odrzucono: słowo „prywatna” w interfejsie i w pokazie.
+- **11d. Zmiana terminu oceny.** Stan uproszczony na ekranie kadr pokazuje podstawę (art. 81 ust. 8 ustawy) i zdanie: „Po zmianie terminu oceniający zawiadamia pracownika pisemnie, a kopia pisma idzie do arkusza” (§ 8 rozporządzenia). Gdyby powstał formularz zmiany terminu, lista powodów jest zamknięta: cztery z art. 81 ust. 8.
+- **11e. HR partner: podstawa prawna zmiany zadań.** Karta „Rozmowa po zmianie zadań” ma zdanie: „Jeśli to zmiana stanowiska z istotną zmianą obowiązków, prawo wymaga nowej rozmowy o kryteriach albo oceny. Sprawdź terminy z kadrami”, z podstawą: art. 81 ust. 6 ustawy i § 9 ust. 1–2 rozporządzenia. System sam tego nie rozstrzyga.
+
+Potwierdzone bez zmian: prototyp na regułach nie jest „systemem AI” (AI Act art. 3 pkt 1, motyw 12); obowiązki dla systemów wysokiego ryzyka z załącznika III stosuje się od 2 grudnia 2027 (art. 113 lit. c (i) po zmianie rozporządzeniem (UE) 2026/1744); nieobecność bez rodzaju wystarcza (art. 81 ust. 7 ustawy); odrzucenie analizy nieobecności, wskaźników i etykiet (RODO art. 9 ust. 1 i art. 4 pkt 4).
 
 ## Pytania otwarte (do mentorów organizatora)
 
-1. Czy potwierdzenie w systemie na własnym koncie wystarcza zamiast podpisu?
+1. Czy potwierdzenie w systemie na własnym koncie wystarcza zamiast podpisu? (Z przepisów: nie zastępuje podpisu, decyzja 11b. Pytanie zostaje o to, czego organizator oczekuje w prototypie.)
 2. Czego organizator oczekuje od modułu HR partnera?
 3. Czy uzasadnienie złożone z notatek przełożonego jest akceptowalne?
 4. Kto w praktyce stwierdza fikcję zapoznania i co musi być zapisane?

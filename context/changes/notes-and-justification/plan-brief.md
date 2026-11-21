@@ -12,7 +12,7 @@ Po F-01, S-01 i S-02: baza z osobami i cyklami, `today()` z filtrem dat, formula
 
 ## Desired End State
 
-Marek zapisuje notatkę na 360 px; pole „Zmiana zadań pracownika” zaznacza się samo z listy słów i da się je odznaczyć. Piotr czyta przekazaną informację zwrotną, notatka zostaje prywatna. W formularzu oceny (23.11.2026) przy kryteriach są notatki z datami, jedno ostrzeżenie „z ostatniego miesiąca” i przyciski „Wstaw”. Karta rozmowy oceniającej ma trzy tematy z § 10.
+Marek zapisuje notatkę na 360 px; pole „Zmiana zadań pracownika” zaznacza się samo z listy słów i da się je odznaczyć. Piotr czyta przekazaną informację zwrotną, a samej notatki nie widzi na swoim koncie (decyzja 11c: w interfejsie nie ma słowa „prywatna”). W formularzu oceny (23.11.2026) przy kryteriach są notatki z datami, jedno ostrzeżenie „z ostatniego miesiąca” i przyciski „Wstaw”. Karta rozmowy oceniającej ma trzy tematy z § 10.
 
 ## Key Decisions Made
 
@@ -24,7 +24,7 @@ Marek zapisuje notatkę na 360 px; pole „Zmiana zadań pracownika” zaznacza 
 | Co się zapisuje | `task_change` = klik człowieka; wynik adaptera obok, do wglądu | Nic bez kliknięcia; S-05 widzi źródło | Plan |
 | Podpowiedź w trakcie pisania | Mały skrypt bez zależności; przestaje po pierwszym kliknięciu pola | htmx nie jest wgrany; człowiek ma ostatnie słowo | Plan |
 | „Wstaw” | W przeglądarce; serwer renderuje gotowy fragment `Kryterium, data: treść` | Nie rusza zapisu S-02, nic nie wstawia się samo | Decyzja 10f |
-| Informacja zwrotna | Tabela `feedback_messages`, tekst do poprawy, `sent_on = today()` | Data zeruje przypomnienie S-05; notatka zostaje prywatna | Decyzja 10j |
+| Informacja zwrotna | Tabela `feedback_messages`, tekst do poprawy, `sent_on = today()` | Data zeruje przypomnienie S-05; notatki pracownik nie widzi na koncie | Decyzje 10j i 11c |
 | Gałąź modelu | Faza 4, opcjonalna, tylko adres lokalny, powrót do reguł po czasie | Pierwsza rzecz, jeśli zostanie czas | Decyzja 10l |
 
 ## Scope

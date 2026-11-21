@@ -37,7 +37,7 @@ Przy dacie 01.11.2026 karty Tomasza nie ma (decyzja 10i: ocena z 12.11.2026 jesz
 - Pełnego obiegu sprzeciwu, wniosku o zmianę terminu i decyzji o stopniu (roadmapa, „Parked”). Są widoczne stany i najwyżej jedno kliknięcie odnotowania.
 - Generatora PDF. „Pobranie” to zapis do PDF w oknie druku przeglądarki (decyzja 7).
 - Wierności 1:1 ze wzorem (PRD, Non-Goals). Jest komplet pól w kolejności wzoru.
-- Notatek i informacji zwrotnej na arkuszu i wydruku: notatki są prywatne (S-04), na arkusz trafia tylko tekst uzasadnienia, który przełożony sam wstawił (decyzja 10f).
+- Notatek i informacji zwrotnej na arkuszu i wydruku: notatki widzi tylko autor (S-04), na arkusz trafia tylko tekst uzasadnienia, który przełożony sam wstawił (decyzja 10f).
 - Osi czasu, nieobecności i zmiany oceniającego (S-03). Termin w tabeli czyta jedna funkcja, którą S-03 później podmieni.
 - Wyszukiwania, filtrów i sortowania po wyniku (decyzja 4: lista bez wyszukiwania). Sortujemy tylko po terminie.
 - Przypomnienia o stopniu na ekranie oceniającej (Anny). PRD daje oceniającemu wgląd w „własny zespół”, ale FR-027 dotyczy kadr; funkcja reguły jest gotowa do użycia później.
@@ -122,7 +122,7 @@ Nazwy w nawiasach to założenie tego planu. Przy budowie sprawdź je w `src/`; 
 | `fiction` | „Fikcja zapoznania stwierdzona DD.MM.RRRR przez oceniającego: oceniany nie mógł / nie chciał potwierdzić” | sprzeciw do …, art. 83 ust. 1 ustawy |
 | `objection_filed` | „Sprzeciw wniesiony DD.MM.RRRR do dyrektora generalnego urzędu” | rozpatrzenie do …, art. 83 ust. 3 ustawy |
 | `objection_resolved` | „Sprzeciw rozpatrzony: zmiana oceny / ponowne sporządzenie oceny / sprzeciw nieuwzględniony” | — |
-| `due_change_requested` | „Wniosek ocenianego o zmianę terminu czeka na rozpatrzenie przez oceniającego” | art. 81 ust. 8 ustawy |
+| `due_change_requested` | „Wniosek ocenianego o zmianę terminu czeka na rozpatrzenie przez oceniającego. Po zmianie terminu oceniający zawiadamia pracownika pisemnie, a kopia pisma idzie do arkusza” | art. 81 ust. 8 ustawy, § 8 rozporządzenia (decyzja 11d) |
 
 Termin po upływie dostaje dopisek „termin minął DD.MM.RRRR”, bez kolorów przy nazwisku. Historia: zatwierdzone oceny osoby (wszystkie jej cykle) z datą, arkuszem, średnią, poziomem, wynikiem, wersją reguł i datą zapoznania. Liczniki: liczba cykli w każdym kroku, oceny zatwierdzone w terminie i po terminie (`assessment_approved.date` względem `cycleDueDate(cycleId)`), cykle po terminie bez oceny. Liczniki są dla całego urzędu, bez podziału na komórki i bez nazwisk.
 
