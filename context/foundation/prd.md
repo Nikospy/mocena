@@ -21,7 +21,7 @@ timeline_budget:
 
 Przełożony w służbie cywilnej ocenia podwładnego raz na 24 miesiące, na papierowym arkuszu A, B albo C. Między rozmową rozpoczynającą a rozmową oceniającą nic nie jest zapisywane, więc ocena powstaje z pamięci o ostatnich tygodniach. Oceniający mają kłopot z wyborem kryteriów dodatkowych, sformułowaniem oczekiwań, informacją zwrotną i wnioskami rozwojowymi, a uwagę zabierają terminy i poprawność formularza. Dotyczy to ok. 123 tys. osób w ok. 1743 urzędach.
 
-Ocena nie psuje się przy formularzu, tylko przez 24 miesiące ciszy przed nim. mOcena prowadzi oceniającego, ocenianego i kadry przez cały cykl: od wyboru arkusza i kryteriów, przez notatki o faktach i rozmowy, po potwierdzenie oceny bez papieru. Asystent pilnuje faktów, terminów i przepisów, a decyzję zawsze podejmuje przełożony.
+Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie. mOcena prowadzi oceniającego, ocenianego i kadry przez cały cykl: od wyboru arkusza i kryteriów, przez notatki o faktach i rozmowy, po potwierdzenie oceny bez papieru. Asystent pilnuje faktów, terminów i przepisów, a decyzję zawsze podejmuje przełożony.
 
 ## User & Persona
 
