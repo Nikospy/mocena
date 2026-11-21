@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { openCycle } from "../cycles";
 import { seedEvent } from "../events";
+import { lastFeedbackDate } from "../notes/repo";
 import { createTestApp } from "../test-helpers";
 
 type App = ReturnType<typeof createTestApp>["app"];
@@ -94,5 +95,38 @@ describe("zasada 7: przy nazwisku nic poza nazwiskiem", () => {
       const html = await (await call(app, "marek", `/people/${id}/notes/new`)).text();
       expect(html).toContain(`<h1 class="n-title">Nowa notatka: ${name}</h1>`);
     }
+  });
+});
+
+describe("faza 3", () => {
+  test("informacja zwrotna: wysyłka, ekran pracownika, uprawnienia", async () => {
+    const { app, db } = createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } });
+    const id = (db.query("SELECT id FROM notes WHERE date = '2025-02-11'").get() as { id: number }).id;
+    const form = await (await call(app, "marek", `/notes/${id}/feedback`)).text();
+    expect(form).toContain("Pracownik nie widzi notatki na swoim koncie");
+    expect(form.toLowerCase()).not.toContain("prywatn");
+    expect((await call(app, "piotr", `/notes/${id}/feedback`)).status).toBe(403);
+    expect((await call(app, "anna", `/notes/${id}/feedback`, { text: "x" })).status).toBe(403);
+    expect((await call(app, "marek", "/notes/99999/feedback")).status).toBe(404);
+    expect((await call(app, "marek", `/notes/${id}/feedback`, { text: " " })).status).toBe(422);
+    expect((await call(app, "piotr", "/feedback")).status).toBe(200);
+    const ok = await call(app, "marek", `/notes/${id}/feedback`, { text: "Przy terminach uprzedzaj mnie z wyprzedzeniem." });
+    expect(ok.status).toBe(303);
+    const fb = await (await call(app, "piotr", "/feedback")).text();
+    expect(fb).toContain("Przy terminach uprzedzaj mnie z wyprzedzeniem.");
+    expect(fb).toContain("21.11.2026");
+    expect(fb).not.toContain("Pismo do gminy poszło 11 lutego");
+    expect(lastFeedbackDate("marek", "piotr")).toBe("2026-11-21");
+    expect(await (await call(app, "piotr", "/")).text()).toContain("Informacja zwrotna");
+  });
+
+  test("data notatki: wcześniejsza zapisuje się, późniejsza niż dziś daje 422; created_at to dziś", async () => {
+    const { app, db } = createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } });
+    const base = { criterion_id: "rzetelnosc", text: "Fakt." };
+    const late = await call(app, "marek", "/people/piotr/notes", { ...base, date: "2026-11-22" });
+    expect(late.status).toBe(422);
+    expect(await late.text()).toContain("Data nie może być późniejsza niż dziś.");
+    expect((await call(app, "marek", "/people/piotr/notes", { ...base, date: "2026-11-10" })).status).toBe(303);
+    expect(db.query("SELECT date, created_at FROM notes ORDER BY id DESC LIMIT 1").get()).toEqual({ date: "2026-11-10", created_at: "2026-11-21" });
   });
 });

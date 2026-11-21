@@ -72,3 +72,10 @@ export function sendFeedback(f: { noteId: number; authorId: string; text: string
     .query("INSERT INTO feedback_messages (note_id, author_id, recipient_id, sent_on, text) VALUES (?, ?, ?, ?, ?)")
     .run(f.noteId, f.authorId, note.subject_id, today(), f.text);
 }
+
+/** Wiadomości do osoby, od najnowszej. */
+export function feedbackFor(recipientId: string): FeedbackMessage[] {
+  return getDb()
+    .query("SELECT * FROM feedback_messages WHERE recipient_id = ? AND sent_on <= ? ORDER BY sent_on DESC, id DESC")
+    .all(recipientId, today()) as FeedbackMessage[];
+}

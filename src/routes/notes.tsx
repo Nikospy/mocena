@@ -7,10 +7,12 @@ import { getDb } from "../db";
 import { rules } from "../engine/rules";
 import { CRITERIA } from "../engine/scoring";
 import { registerHomeTasks } from "../home-tasks";
-import { addNote, canWriteNoteAbout, notesByAuthor, type Note, type Rating } from "../notes/repo";
+import { addNote, canWriteNoteAbout, feedbackFor, noteById, notesByAuthor, sendFeedback, type Note, type Rating } from "../notes/repo";
 import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
 import { suggestForNote } from "../suggestions";
+import { FeedbackFormView } from "../views/feedback-form";
+import { FeedbackView } from "../views/feedback";
 import { AssessmentCardView } from "../views/assessment-card";
 import { NoteFormView, type CriteriaGroup, type NoteFormValues } from "../views/note-form";
 import { NotesListView, type NoteGroup } from "../views/notes-list";
@@ -26,7 +28,13 @@ registerCycleLinks((cycle, person) =>
 
 registerHomeTasks((person) => (person.role === "appraiser" ? [{ title: "Notatki o zespole", href: "/notes" }] : []));
 
+registerHomeTasks((person) => (feedbackFor(person.id).length > 0 ? [{ title: "Informacja zwrotna", href: "/feedback" }] : []));
+
 const app = new Hono();
+
+function isIsoDate(v: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v)) && new Date(v).toISOString().slice(0, 10) === v;
+}
 
 function str(v: unknown): string {
   return typeof v === "string" ? v : "";
@@ -74,7 +82,11 @@ app.post("/people/:personId/notes", async (c) => {
   const errors: Partial<Record<"criterion_id" | "text" | "date", string>> = {};
   if (!CRITERIA.some((k) => k.id === criterionId)) errors.criterion_id = "Wybierz kryterium.";
   if (text.length < 1 || text.length > 2000) errors.text = text ? "Notatka może mieć najwyżej 2000 znaków." : "Wpisz, co się wydarzyło.";
-  const values: NoteFormValues = { criterion_id: criterionId, text: str(body.text), rating, task_change: taskChange, date: today() };
+  const rawDate = str(body.date).trim();
+  const date = rawDate || today();
+  if (!isIsoDate(date)) errors.date = "Podaj poprawną datę.";
+  else if (date > today()) errors.date = "Data nie może być późniejsza niż dziś.";
+  const values: NoteFormValues = { criterion_id: criterionId, text: str(body.text), rating, task_change: taskChange, date };
   if (Object.keys(errors).length > 0) {
     const suggestion = taskChange ? await suggestForNote(text) : null;
     return c.html(
@@ -87,7 +99,7 @@ app.post("/people/:personId/notes", async (c) => {
     authorId: g.viewer.id,
     subjectId: g.subject.id,
     criterionId,
-    date: today(),
+    date,
     text,
     rating: rating === "good" || rating === "needs_improvement" ? (rating as Rating) : null,
     taskChange,
@@ -126,7 +138,41 @@ app.get("/notes", (c) => {
   }
   const latest = (g: NoteGroup) => g.notes[0]?.date ?? "";
   groups.sort((a, b) => latest(b).localeCompare(latest(a)) || a.person.name.localeCompare(b.person.name, "pl"));
-  return c.html(<NotesListView viewer={viewer} today={today()} groups={groups} saved={c.req.query("saved") !== undefined} />);
+  return c.html(<NotesListView viewer={viewer} today={today()} groups={groups} saved={c.req.query("saved") !== undefined} sent={c.req.query("sent") !== undefined} />);
+});
+
+/** Wspólny początek obu tras informacji zwrotnej: konto, notatka (404), autor (403). */
+function feedbackGuard(c: Context): { viewer: Person; note: Note; subject: Person } | Response {
+  const viewer = currentPerson(c);
+  if (!viewer) return c.redirect("/account");
+  const id = Number(c.req.param("id"));
+  const note = Number.isInteger(id) ? noteById(id) : null;
+  const subject = note ? personById(note.subject_id) : null;
+  if (!note || !subject) return c.text("Nie ma takiej notatki.", 404);
+  if (note.author_id !== viewer.id) return c.text("Brak uprawnień do tej notatki.", 403);
+  return { viewer, note, subject };
+}
+
+app.get("/notes/:id/feedback", (c) => {
+  const g = feedbackGuard(c);
+  if (g instanceof Response) return g;
+  return c.html(<FeedbackFormView {...g} today={today()} text={g.note.text} />);
+});
+
+app.post("/notes/:id/feedback", async (c) => {
+  const g = feedbackGuard(c);
+  if (g instanceof Response) return g;
+  const text = str((await c.req.parseBody()).text).trim();
+  if (!text) return c.html(<FeedbackFormView {...g} today={today()} text="" error="Wpisz tekst dla pracownika." />, 422);
+  sendFeedback({ noteId: g.note.id, authorId: g.viewer.id, text });
+  return c.redirect("/notes?sent=1", 303);
+});
+
+app.get("/feedback", (c) => {
+  const viewer = currentPerson(c);
+  if (!viewer) return c.redirect("/account");
+  const messages = feedbackFor(viewer.id).map((m) => ({ ...m, sender: personById(m.author_id)?.name ?? "" }));
+  return c.html(<FeedbackView viewer={viewer} today={today()} messages={messages} />);
 });
 
 app.get("/cycles/:id/cards/assessment-conversation", (c) => {

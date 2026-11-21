@@ -1,3 +1,4 @@
+import { assessmentState } from "../assessment/state";
 import { cycleById } from "../cycles";
 import { cycleCriteria } from "../cycles/part1";
 import { criterion } from "../engine/scoring";
@@ -19,6 +20,7 @@ export function assessmentSlots(p: { cycleId: string; viewer: Person }): Slots {
   const inCycle = new Set(cycleCriteria(p.cycleId).map((c) => c.id));
   const byCriterion = (id: string): Note[] => notes.filter((n) => n.criterion_id === id);
   const others = notes.filter((n) => !inCycle.has(n.criterion_id));
+  const scores = assessmentState(p.cycleId).draft?.scores ?? {};
   const now = today();
   const windowMonths = officeSettings().recentFactsWindowMonths;
 
@@ -30,8 +32,14 @@ export function assessmentSlots(p: { cycleId: string; viewer: Person }): Slots {
     ),
     criterionAside: (criterionId) => {
       const own = byCriterion(criterionId);
-      return <CriterionNotes criterionId={criterionId} notes={own} warnings={criterionWarnings({ notes: own, today: now, windowMonths })} />;
+      return <CriterionNotes criterionId={criterionId} notes={own} warnings={criterionWarnings({ notes: own, score: scores[criterionId], today: now, windowMonths })} />;
     },
+    conclusionsTools: (
+      <div class="insert-tools">
+        <button type="button" class="btn" data-target="developmentConclusions">Wstaw do wniosków rozwojowych</button>
+        <script src="/insert-notes.js" defer></script>
+      </div>
+    ),
     justificationTools: (
       <div class="insert-tools">
         {others.length > 0 ? (

@@ -20,7 +20,9 @@ export function NotesListView(props: { viewer: Person; today: string; groups: No
             {g.canWrite ? <a class="btn" href={`/people/${g.person.id}/notes/new`}>Dopisz notatkę</a> : null}
             {g.notes.length > 0 ? (
               <ul class="note-list">
-                {g.notes.map((n) => <NoteItem note={n} />)}
+                {g.notes.map((n) => (
+                  <NoteItem note={n} actions={<a class="btn text" href={`/notes/${n.id}/feedback`}>Przekaż pracownikowi</a>} />
+                ))}
               </ul>
             ) : null}
           </section>

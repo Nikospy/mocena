@@ -383,6 +383,7 @@ describe("S-04: notatki w formularzu oceny", () => {
     const html = await (await call(app, "marek", `/cycles/${piotr}/assessment`)).text();
     expect(html).toContain("Orientacja na klienta/interesanta, 04.08.2025: Interesant dzwonił");
     expect(html).toContain("<h1>Piotr Wójcik</h1>");
+    expect(html).toContain('data-target="developmentConclusions"');
     expect(html.match(/Wszystkie notatki przy tym kryterium są z ostatniego miesiąca/g)).toHaveLength(1);
     const think = html.slice(html.indexOf('data-crit="myslenie-analityczne"'));
     expect(think.slice(0, think.indexOf("</article>"))).toContain("Brak notatek przy tym kryterium");
