@@ -1,0 +1,7 @@
+mocena.sqlite*
+dist
+context
+docs
+.wrangler
+caissa-slots.json
+CLAUDE.local.md

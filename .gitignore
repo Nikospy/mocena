@@ -13,3 +13,4 @@ docs/video/*
 
 # dowiązanie do zależności w katalogach roboczych
 node_modules
+.vercel
