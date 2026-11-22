@@ -10,10 +10,11 @@ const SORTS: { id: Sort; label: string }[] = [
 ];
 const SHEET_LABEL: Record<string, string> = { A: "A: kierownik urzędu", B: "B: kieruje pracownikami", C: "C: pozostali pracownicy" };
 
-export function PeopleListView(props: { viewer: Person; today: string; rows: PersonRow[]; q: string; sort: Sort; saved?: string }) {
+export function PeopleListView(props: { viewer: Person; today: string; rows: PersonRow[]; q: string; sort: Sort; saved?: string; deleted?: boolean }) {
   return (
     <Layout title="Pracownicy" person={props.viewer} today={props.today}>
       <PageHeader title="Pracownicy" lead="Dane, z których system liczy arkusz i termin oceny. Termin pochodzi z przepisów, nie z oceny osoby." />
+      {props.deleted ? <p class="st ok" role="status">Usunięto dane pracownika.</p> : null}
       {props.saved ? (
         <div class="st ok" role="status">
           <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
@@ -232,6 +233,7 @@ export function PersonFormView(props: {
           <p>
             <a href="/hr/people">Wróć do listy</a>
             {props.personId ? <a href={`/people/${props.personId}/history`}>Historia ocen</a> : null}
+            {props.personId && props.viewer.role === "hr" ? <a href={`/hr/people/${props.personId}/delete`}>Usuń dane pracownika</a> : null}
           </p>
         </form>
       </section>

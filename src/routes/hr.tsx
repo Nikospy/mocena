@@ -1,5 +1,7 @@
 import { Hono } from "hono";
 import "../hr/links";
+import { assessmentState } from "../assessment/state";
+import { registerHomeTasks } from "../home-tasks";
 import { cycleLinks } from "../cycle-links";
 import { getDb } from "../db";
 import { recordEvent, visibleEvents, visibleEventsOfType } from "../events";
@@ -8,23 +10,49 @@ import { fullNameForm } from "../hr-partner/partner";
 import { mandatoryGradeOf } from "../hr/history";
 import { latestCycles } from "../hr/latest-cycles";
 import { officeStats } from "../hr/stats";
-import { cycleById } from "../cycles";
-import { currentPerson, personById, type Person } from "../people";
+import { cycleById, previousCycleOf } from "../cycles";
+import { currentPerson, DEMO_DIRECTOR_GENERAL_ID, personById, type Person } from "../people";
 import { today } from "../settings";
-import { HrOverviewView, type StateRow } from "../views/hr-overview";
+import { Layout } from "../views/layout";
+import { PageHeader } from "../views/components";
+import { HrOverviewView, StatsBlock, type StateRow } from "../views/hr-overview";
 
 const app = new Hono();
 
+registerHomeTasks((person) => person.id === DEMO_DIRECTOR_GENERAL_ID
+  ? [{ title: "Terminowość w urzędzie", href: "/office/statistics", action: "Zobacz statystyki" }]
+  : []);
+
+app.get("/office/statistics", (c) => {
+  const viewer = currentPerson(c);
+  if (!viewer) return c.redirect("/account");
+  if (viewer.id !== DEMO_DIRECTOR_GENERAL_ID) return c.text("Ten ekran widzi dyrektor generalny urzędu.", 403);
+  return c.html(
+    <Layout title="Terminowość w urzędzie" person={viewer} today={today()}>
+      <PageHeader title="Statystyki urzędu" />
+      <StatsBlock stats={officeStats()} />
+    </Layout>,
+  );
+});
+
+
 const CLOSED_STEPS = new Set<CycleStep>(["acknowledged", "fiction", "objection_resolved"]);
 export function overviewData(viewer: Person) {
-  const rows: StateRow[] = latestCycles().map((c) => ({
+  const cycles = latestCycles().flatMap((cycle) => {
+    const previous = previousCycleOf(cycle.id);
+    return previous ? [cycle, previous] : [cycle];
+  });
+  const rows: StateRow[] = cycles.map((c) => ({
     cycleId: c.id,
     personName: personById(c.person_id)?.name ?? c.person_id,
     appraiserName: personById(c.appraiser_id)?.name ?? c.appraiser_id,
     sheet: c.sheet,
     state: cycleState(c.id),
     today: today(),
-    links: cycleLinks(c, viewer),
+    links: [
+      ...cycleLinks(c, viewer),
+      ...(assessmentState(c.id).snapshot ? [{ label: "Pobierz ocenę (JSON)", href: `/cycles/${c.id}/assessment/export.json` }] : []),
+    ],
   }));
   // Najpierw cykle wymagające działania, zamknięte (zapoznanie, fikcja, rozpatrzony sprzeciw) na końcu; w grupie od najbliższego terminu.
   const closed = (r: StateRow) => (CLOSED_STEPS.has(r.state.step) ? 1 : 0);

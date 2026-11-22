@@ -129,8 +129,15 @@ p, li { text-wrap: pretty; }
 @media (hover: hover) and (pointer: fine) { .nav a:not([aria-current]):hover { color: var(--text); text-decoration: underline; text-underline-offset: .3em; } }
 
 .wrap { max-inline-size: var(--maxw); margin-inline: auto; padding: var(--sp-300) var(--gutter) var(--sp-600); }
-.wrap.has-nav { padding-block-end: calc(var(--nav-h) + var(--sp-600)); }
-@media (min-width: 900px) { .wrap, .wrap.has-nav { padding-block-end: var(--sp-800); } }
+
+/* stopka aplikacji: dwa zwykłe odnośniki 14 px, bez ramek; w druku ukryta */
+.foot { border-block-start: 1px solid var(--line); }
+.foot.has-nav { padding-block-end: var(--nav-h); }
+.foot-in { max-inline-size: var(--maxw); margin-inline: auto; padding: var(--sp-200) var(--gutter); display: flex; flex-wrap: wrap; gap: 0 var(--sp-300);
+  font-size: var(--f-c1); line-height: var(--lh-c1); }
+.foot-in a { display: inline-flex; align-items: center; min-block-size: var(--sp-500); color: var(--text-2); }
+@media (min-width: 900px) { .foot.has-nav { padding-block-end: 0; } }
+@media print { .foot { display: none !important; } }
 
 /* ================= 3. Pismo (role) =================
    Cztery stopnie na całą usługę: 28 nagłówek strony (telefon 24) · 20 sekcja, termin, werdykt · 16 treść · 14 metadane

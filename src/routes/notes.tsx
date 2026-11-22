@@ -1,9 +1,9 @@
 import { Hono, type Context } from "hono";
 import { assessmentPhaseOpen } from "../assessment/phase";
 import { card } from "../content";
-import { cycleById, openCycle } from "../cycles";
+import { visibleCycleById, openCycle } from "../cycles";
 import { registerCycleLinks } from "../cycle-links";
-import { cycleCriteria } from "../cycles/part1";
+import { cycleCriteria, part1Status } from "../cycles/part1";
 import { getDb } from "../db";
 import { rules } from "../engine/rules";
 import { CRITERIA } from "../engine/scoring";
@@ -140,7 +140,8 @@ app.get("/notes", (c) => {
     const own = notes.filter((n) => n.subject_id === id);
     if (own.length === 0 && !canWrite) continue;
     const cycle = openCycle(id);
-    groups.push({ person, notes: own, canWrite, cycleHref: cycle && cycle.appraiser_id === viewer.id ? `/cycles/${cycle.id}` : undefined });
+    const needsCriteria = cycle && ["not_started", "draft"].includes(part1Status(cycle.id).state);
+    groups.push({ person, notes: own, canWrite, cycleAction: needsCriteria ? "Wyznacz kryteria" : undefined, cycleHref: cycle && cycle.appraiser_id === viewer.id ? `/cycles/${cycle.id}` : undefined });
   }
   const latest = (g: NoteGroup) => g.notes[0]?.date ?? "";
   groups.sort((a, b) => latest(b).localeCompare(latest(a)) || a.person.name.localeCompare(b.person.name, "pl"));
@@ -184,7 +185,7 @@ app.get("/feedback", (c) => {
 app.get("/cycles/:id/cards/assessment-conversation", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  const cycle = cycleById(c.req.param("id") ?? "");
+  const cycle = visibleCycleById(c.req.param("id") ?? "");
   if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
   if (cycle.appraiser_id !== viewer.id) return c.text("Brak uprawnień do tego cyklu.", 403);
   return c.html(

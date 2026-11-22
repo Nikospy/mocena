@@ -1,8 +1,10 @@
 import { getDb } from "../db";
 import { seedEvent } from "../events";
+import type { PositionKind } from "../engine/criteria";
 import { savePart1 } from "../cycles/part1";
 
-const KIND: Record<string, "manager" | "staff"> = {
+const KIND: Record<string, PositionKind> = {
+  "office-head": "head_of_office", "office-head-supervisor": "manager",
   piotr: "staff", ewa: "staff", maria: "staff", joanna: "staff", admin: "staff", katarzyna: "staff",
   marek: "manager", anna: "manager", tomasz: "manager", "poprzedni-naczelnik": "manager", "dyrektor-urzedu": "manager",
 };
@@ -13,6 +15,7 @@ const DUTIES: Record<string, string[]> = {
 };
 
 const GENDER: Record<string, "f" | "m"> = {
+  "office-head": "f", "office-head-supervisor": "m",
   anna: "f", ewa: "f", maria: "f", joanna: "f", katarzyna: "f", "dyrektor-urzedu": "f",
   marek: "m", piotr: "m", tomasz: "m", admin: "m", "poprzedni-naczelnik": "m",
 };

@@ -203,6 +203,19 @@ describe("krok 5 pokazu: potwierdzenie i zegar", () => {
     }
   });
 
+  test("po pozytywnej ocenie nowy cykl i 30 dni od jej sporządzenia", async () => {
+    const app = fresh();
+    expect((await call(app, "marek", `/cycles/${piotr}/assessment/approve`, form(PIOTR_IDS, { developmentConclusions: "Kurs." }))).status).toBe(303);
+    await setDate(app, "2026-11-22");
+    expect((await call(app, "piotr", `/cycles/${piotr}/assessment/acknowledge`, {})).status).toBe(303);
+    const successor = openCycle("piotr")!;
+    expect(successor.period_start).toBe("2026-11-21");
+    const home = await (await call(app, "marek", "/")).text();
+    expect(home).toContain(`href="/cycles/${successor.id}/part1"`);
+    expect(home).toContain("21.12.2026");
+    expect(home).toContain("§ 7 pkt 1");
+  });
+
   test("zegar: ostatni dzień, po terminie; payload bez zmian; w etapie approved zegara nie ma", async () => {
     const app = fresh("2026-11-22");
     await approvePiotr(app);
@@ -223,7 +236,9 @@ describe("krok 5 pokazu: potwierdzenie i zegar", () => {
     expect((await call(app, "piotr", `/cycles/${piotr}/assessment/acknowledge`, {})).status).toBe(303);
     expect((await call(app, "piotr", `/cycles/${piotr}/assessment/acknowledge`, {})).status).toBe(409);
     expect(events("assessment_acknowledged")).toHaveLength(1);
-    expect(openCycle("piotr")).toBeNull();
+    const successor = openCycle("piotr")!;
+    expect(successor.id).not.toBe(piotr);
+    expect(effectiveDeadline(successor.id).date).toBe("2027-05-21");
   });
 });
 
@@ -241,7 +256,8 @@ describe("lista spraw, odnośniki, etykiety", () => {
     const cycle = cycleById(piotr)!;
     expect(cycleLinks(cycle, personById("piotr")!).map((l) => l.label)).toContain("Ocena");
     await call(app, "piotr", `/cycles/${piotr}/assessment/acknowledge`, {});
-    expect(m().join()).not.toContain("Piotr");
+    expect(m()).not.toContain("Czeka na potwierdzenie zapoznania: Piotr Wójcik");
+    expect(m().join()).toContain("Wyznacz kryteria oceny: Piotr Wójcik, do 30.11.2026 (§ 7 pkt 2)");
     expect(p()).not.toContain("Zapoznaj się z oceną");
   });
 
@@ -303,7 +319,9 @@ describe("fikcja zapoznania i wgląd kadr", () => {
     expect(events("acknowledgement_fiction")[0].payload).toEqual({ ...good, objectionDeadline: "2026-11-30" });
     expect((await call(app, "piotr", `/cycles/${piotr}/assessment/acknowledge`, {})).status).toBe(409);
     expect(closing()).toHaveLength(1);
-    expect(openCycle("piotr")).toBeNull();
+    const successor = openCycle("piotr")!;
+    expect(successor.id).not.toBe(piotr);
+    expect(effectiveDeadline(successor.id).date).toBe("2027-05-22");
   });
 
   test("potwierdzenie, potem fikcja: 409; równoczesne żądania zostawiają jedno zdarzenie końcowe", async () => {
@@ -382,7 +400,7 @@ describe("S-04: notatki w formularzu oceny", () => {
   test("krok 4: notatki przy kryteriach, jedno ostrzeżenie, karta rozmowy i odnośniki", async () => {
     const app = fresh();
     const html = await (await call(app, "marek", `/cycles/${piotr}/assessment`)).text();
-    expect(html).toContain("04.08.2025: Interesant dzwonił");
+    expect(html).toContain("Notatka z 04.08.2025: „Interesant dzwonił");
     expect(html).toContain("<h1>Ocena okresowa: Piotr Wójcik</h1>");
     expect(html).toContain('data-target="developmentConclusions"');
     expect(html.match(/Wszystkie notatki przy tym kryterium są z ostatniego miesiąca/g)).toHaveLength(1);

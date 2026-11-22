@@ -2,7 +2,7 @@ import { Hono, type Context } from "hono";
 import { card } from "../content";
 import { assessmentWindowReached } from "../assessment/phase";
 import { registerCycleLinks } from "../cycle-links";
-import { cycleById, type Cycle } from "../cycles";
+import { visibleCycleById, type Cycle } from "../cycles";
 import { recordEvent } from "../events";
 import { registerHomeTasks } from "../home-tasks";
 import {
@@ -113,7 +113,7 @@ app.post("/notes/:noteId/task-change", async (c) => {
 function cycleGuard(c: Context): { viewer: Person; cycle: Cycle; subject: Person } | Response {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  const cycle = cycleById(c.req.param("id") ?? "");
+  const cycle = visibleCycleById(c.req.param("id") ?? "");
   const subject = cycle ? personById(cycle.person_id) : null;
   if (!cycle || !subject) return c.text("Nie ma takiego cyklu.", 404);
   if (cycle.appraiser_id !== viewer.id) return c.text("Brak uprawnień do tego cyklu.", 403);
