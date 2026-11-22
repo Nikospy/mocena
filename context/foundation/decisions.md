@@ -34,6 +34,12 @@ Decyzje podjęte przez autora 21.11.2026 (17:57–19:00) po przejściu całego p
 
 **Odrzucono.** Wskaźnik motywacji, etykiety typu „ryzyko odejścia”, analizę nieobecności. Seria zwolnień lekarskich to dane o zdrowiu. Etykieta przy nazwisku to profilowanie pracownika.
 
+**Uzupełnienie z 22.11.2026 (final-polish). Gdy po zmianie zadań wraca praca po godzinach.** Jeśli notatki przełożonego datowane po granicy zmiany zadań zawierają słowa z listy urzędu („po 18”, „wieczorami”, „nadgodziny”, „weekend”; lista to ustawienie urzędu, jak lista słów zmiany zadań), ekran „Przed rozmową z pracownikiem” pokazuje mu pytanie: „Od zmiany zadań w Twoich notatkach wraca praca po godzinach. Czy zakres zadań jest do udźwignięcia?” — z odnośnikami do tych notatek i z kartą rozmowy o podziale zadań (po odpowiedzi „tak” na notatce ze zmianą zadań). Pytanie opiera się wyłącznie na datach, polach i własnych wpisach oceniającego: bez etykiety i wskaźnika przy nazwisku, bez punktów, bez modelu językowego (zasady 4, 5 i 7 w `AGENTS.md`). Przeciążenie po zmianie zadań trafia do rozmowy o podziale zadań, nie do uzasadnienia oceny.
+
+**Autor (22.11.2026 ok. 03:15):** „z twojego przeglądu naprawiamy wszystko, co tam było do zaznaczenia i poprawy, oraz naprawiamy wszystko, co ten grog nam tutaj pokazał”.
+
+**Odrzucono.** Etykieta „przeciążony” i wskaźnik przy nazwisku (profilowanie), punkty ryzyka, ocena „1” oparta na notatkach o pracy po godzinach (dane pokazowe rozdzielają te dwie sprawy).
+
 ## 4. Zakres
 
 **Decyzja.** Cały proces płytko, nie jeden fragment głęboko. Z 30 czynności z listy organizatora: 15 działa, 12 jest uproszczonych, 3 są poza prototypem.

@@ -9,6 +9,7 @@ export type OfficeSettings = {
   dutyTypes: DutyType[];
   dutyToCriterion: Record<string, string>;
   taskChangeWords: string[];
+  afterHoursWords: string[];
   recentFactsWindowMonths: number;
   assessmentReminderDays?: { value: number; label: string };
   appreciationReminderDays: number;

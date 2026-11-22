@@ -67,33 +67,6 @@ export function daysBetween(from: string, to: string): number {
   return Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000);
 }
 
-export type TeamMember = { id: string; name: string; latestNoteDate: string | null; canWrite: boolean };
-
-/** Podwładni bez notatek albo bez notatki od `teamSilenceMonths` pełnych miesięcy. Bez liczby notatek. */
-export function teamWithoutNotes(team: TeamMember[], today: string, silenceMonths: number): Item[] {
-  const items: Item[] = [];
-  for (const m of team) {
-    let sentence: string | null = null;
-    if (m.latestNoteDate === null) {
-      const loc = nameForm(m.name, "loc");
-      sentence = loc ? fillTemplate(text("beforeMeeting", "teamNone"), { loc }) : fillTemplate(text("beforeMeeting", "teamFallback"), { name: m.name });
-    } else {
-      const months = fullMonthsBetween(m.latestNoteDate, today);
-      if (months >= silenceMonths) {
-        const loc = nameForm(m.name, "loc");
-        sentence = loc ? fillTemplate(text("beforeMeeting", "teamOld"), { loc, n: months }) : fillTemplate(text("beforeMeeting", "teamFallback"), { name: m.name });
-      }
-    }
-    if (sentence === null) continue;
-    items.push({
-      text: sentence,
-      prompt: "Czy jest coś, co warto zapisać o tej osobie?",
-      action: m.canWrite ? { label: "Dopisz notatkę", href: `/people/${m.id}/notes/new` } : undefined,
-    });
-  }
-  return items;
-}
-
 export type BeforeMeetingInput = {
   subject: { id: string; name: string };
   cycleId: string;
@@ -104,9 +77,10 @@ export type BeforeMeetingInput = {
   events: AppEvent[];
   criteriaIds: string[];
   lastFeedback: string | null;
-  team: TeamMember[];
-  silenceMonths: number;
 };
+
+/** Pytanie o pracę po godzinach: notatki po zmianie zadań, w których wracają słowa z listy urzędu, i karta rozmowy po „tak”. */
+export type AfterHours = { notes: Note[]; cardHref: string | null };
 
 export type BeforeMeetingSummary = {
   boundary: string | null;
@@ -115,9 +89,9 @@ export type BeforeMeetingSummary = {
   after: Note[];
   bothSides: Item[];
   pendingQuestion: { note: Note; prompt: string } | null;
+  afterHours: AfterHours | null;
   criteriaWithoutNotes: Item[];
   feedback: Item;
-  team: Item[];
 };
 
 export function beforeMeetingSummary(i: BeforeMeetingInput): BeforeMeetingSummary {
@@ -140,6 +114,17 @@ export function beforeMeetingSummary(i: BeforeMeetingInput): BeforeMeetingSummar
   }
 
   const pending = notes.find((n) => n.task_change === 1 && lastAnswer(n.id, i.events) === null);
+
+  /** Lista słów pracy po godzinach to ustawienie urzędu, jak lista słów zmiany zadań. */
+  const words = officeSettings().afterHoursWords;
+  const overload = after.filter((n) => {
+    const lower = n.text.toLowerCase();
+    return words.some((w) => lower.includes(w.toLowerCase()));
+  });
+  const cardNote = notes.find((n) => n.task_change === 1 && lastAnswer(n.id, i.events) === "yes");
+  const afterHours: AfterHours | null = overload.length
+    ? { notes: overload, cardHref: cardNote ? `/notes/${cardNote.id}/task-change` : null }
+    : null;
 
   const criteriaWithoutNotes: Item[] = i.criteriaIds
     .filter((id) => !notes.some((n) => n.criterion_id === id))
@@ -167,9 +152,9 @@ export function beforeMeetingSummary(i: BeforeMeetingInput): BeforeMeetingSummar
     after,
     bothSides,
     pendingQuestion: pending ? { note: pending, prompt: text("beforeMeeting", "pending") } : null,
+    afterHours,
     criteriaWithoutNotes,
     feedback,
-    team: teamWithoutNotes(i.team.filter((m) => m.id !== i.subject.id), i.today, i.silenceMonths),
   };
 }
 
