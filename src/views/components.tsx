@@ -1,3 +1,4 @@
+import type { Child } from "hono/jsx";
 import { rulesVersionLabel } from "../engine/rules";
 import { formatDate } from "./layout";
 
@@ -45,4 +46,28 @@ export function ConfirmationBlock(props: ConfirmationBlockProps) {
   }
   if (!props.name || !props.place || !props.date) return <p class="sign">Jeszcze niepotwierdzone</p>;
   return <p class="sign">Potwierdzenie w systemie: {props.place}, {formatDate(props.date)}, {props.name}</p>;
+}
+
+/**
+ * Nagłówek strony: jeden wzór na wszystkich ekranach.
+ * Linia kontekstu (czyja sprawa, jaki dokument), h1 z czynnością, jedno zdanie objaśnienia, jeden rząd odnośników tekstowych.
+ * `aside` to miejsce na krótki stan po prawej (np. termin) – tylko gdy ekran go potrzebuje.
+ */
+export function PageHeader(props: { context?: Child; title: Child; lead?: Child; links?: Child; linksLabel?: string; aside?: Child; extra?: Child }) {
+  return (
+    <header class="page-h">
+      <div class="page-h-main">
+        {props.context ? <p class="page-ctx">{props.context}</p> : null}
+        <h1>{props.title}</h1>
+        {props.lead ? <p class="page-lead">{props.lead}</p> : null}
+        {props.extra}
+        {props.links ? (
+          <nav class="page-links" aria-label={props.linksLabel ?? "Powiązane"}>
+            {props.links}
+          </nav>
+        ) : null}
+      </div>
+      {props.aside ? <div class="page-h-aside">{props.aside}</div> : null}
+    </header>
+  );
 }
