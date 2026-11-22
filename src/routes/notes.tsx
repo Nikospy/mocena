@@ -17,9 +17,9 @@ import { AssessmentCardView } from "../views/assessment-card";
 import { NoteFormView, type CriteriaGroup, type NoteFormValues } from "../views/note-form";
 import { NotesListView, type NoteGroup } from "../views/notes-list";
 
-/** Adres przekierowania po zapisie notatki. S-05 podmienia go dla notatek ze zmianą zadań. */
+/** Adres przekierowania po zapisie notatki. Notatka ze zmianą zadań prowadzi na pytanie S-05. */
 export function afterNoteSaved(note: Note): string {
-  return `/notes?saved=${note.id}`;
+  return note.task_change === 1 ? `/notes/${note.id}/task-change` : `/notes?saved=${note.id}`;
 }
 
 registerCycleLinks((cycle, person) =>

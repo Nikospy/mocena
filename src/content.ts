@@ -5,6 +5,8 @@ export type Card = {
   purpose: string;
   questions?: string[];
   hardSituations?: { situation: string; whatToDo: string }[];
+  legal?: { text: string; basis: string };
+  texts?: Record<string, string>;
 };
 
 export function card(id: string): Card {

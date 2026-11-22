@@ -10,7 +10,8 @@ export function suggestCriteria(
 }
 
 import { getDb } from "../db";
-import { officeSettings } from "../office-settings";
+import { pickDevelopmentForm } from "../hr-partner/partner";
+import { officeSettings, type DevelopmentForm } from "../office-settings";
 import { suggestByWords } from "./note-rules";
 import { redact } from "./redact";
 import type { NoteSuggestion, SuggestionSource } from "./types";
@@ -33,4 +34,9 @@ export async function suggestForNote(text: string): Promise<NoteSuggestion> {
   } catch {
     return NONE;
   }
+}
+
+/** Forma rozwoju z katalogu urzędu dla notatki. Dziś reguła; urząd może podmienić to wejście (miejsce 5 z decyzji 9). */
+export function suggestDevelopmentForm(note: { criterion_id: string }): DevelopmentForm {
+  return pickDevelopmentForm(note.criterion_id);
 }

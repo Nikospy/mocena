@@ -8,6 +8,8 @@ import { today } from "./settings";
 import cycleStart from "./routes/cycle-start";
 import assessment from "./routes/assessment";
 import notes from "./routes/notes";
+import hrPartner from "./routes/hr-partner";
+import admin from "./routes/admin";
 import { Layout } from "./views/layout";
 
 const app = new Hono();
@@ -106,5 +108,7 @@ app.post("/demo/date", async (c) => {
 app.route("/", cycleStart);
 app.route("/", assessment);
 app.route("/", notes);
+app.route("/", hrPartner);
+app.route("/", admin);
 
 export default app;
