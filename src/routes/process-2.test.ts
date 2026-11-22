@@ -131,3 +131,22 @@ describe("proces 2: termin i sprawa po rozstrzygnięciu „ponowne sporządzenie
     expect(await html(app, "anna", "/")).not.toContain("Ponowne sporządzenie oceny");
   });
 });
+
+describe("proces 2: zaproszenie e-mailem (mailto) obok pliku .ics", () => {
+  test("po wysłaniu zaproszenia Marek ma odnośnik mailto z tematem i treścią; Piotr go nie ma", async () => {
+    const { app } = createTestApp();
+    const r = await call(app, "marek", "/cycles/cycle-piotr/invitations", { kind: "opening", date: "2024-12-12", time: "10:00", place: "pokój 214", note: "" });
+    expect(r.status).toBe(303);
+    const page = await html(app, "marek", r.headers.get("location")!);
+    const href = page.match(/href="(mailto:[^"]+)"/)?.[1].replaceAll("&amp;", "&");
+    expect(href).toBeDefined();
+    const url = new URL(href!);
+    expect(url.searchParams.get("subject")).toBe("Rozmowa o kryteriach oceny: Piotr Wójcik, 12.12.2024, godz. 10:00");
+    const body = url.searchParams.get("body")!;
+    expect(body).toContain("Miejsce: pokój 214");
+    expect(body).toContain("§ 5 ust. 1");
+    expect(body).toContain("Marek");
+    expect(page).toContain(".ics");
+    expect(await html(app, "piotr", r.headers.get("location")!)).not.toContain("mailto:");
+  });
+});

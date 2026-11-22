@@ -117,3 +117,29 @@ export function invitationStatus(i: Invitation, cycle: Cycle): string {
   const name = personById(cycle.person_id)?.name ?? "";
   return `Potwierdzone przez ${nameForm(name, "gen") ?? name} ${shortDate(i.confirmedOn)}`;
 }
+
+/**
+ * Odnośnik `mailto:` z gotowym tematem i treścią zaproszenia. Bez adresu: system nie przechowuje adresów e-mail,
+ * odbiorcę wybiera oceniający w swoim programie pocztowym. Nic się nie wysyła bez jego kliknięcia.
+ */
+export function invitationMailto(i: Invitation, personName: string, senderName: string): string {
+  const k = INVITATION_KINDS[i.kind];
+  const [y, m, d] = i.date.split("-");
+  const subject = `${k.title}: ${personName}, ${d}.${m}.${y}, godz. ${i.time}`;
+  const body = [
+    "Dzień dobry,",
+    "",
+    `zapraszam na rozmowę: ${k.title.toLowerCase()}.`,
+    `Termin: ${d}.${m}.${y}, godz. ${i.time}`,
+    `Miejsce: ${i.place}`,
+    "",
+    `Tematy rozmowy (${k.basis}):`,
+    ...k.topics.map((t) => `- ${t}`),
+    ...(i.note ? ["", i.note] : []),
+    "",
+    "Proszę o potwierdzenie terminu w mOcenie. Tam jest też plik do kalendarza.",
+    "",
+    senderName,
+  ].join("\r\n");
+  return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}

@@ -1,4 +1,4 @@
-import { INVITATION_KINDS, daysBetween, invitationHeadline, invitationStatus, type Invitation, type InvitationErrors, type InvitationInput, type InvitationKind } from "../invitations";
+import { INVITATION_KINDS, daysBetween, invitationHeadline, invitationMailto, invitationStatus, type Invitation, type InvitationErrors, type InvitationInput, type InvitationKind } from "../invitations";
 import type { Cycle } from "../cycles";
 import type { Person } from "../people";
 import { LegalBasis } from "./components";
@@ -138,6 +138,7 @@ export function InvitationView(props: { viewer: Person; today: string; cycle: Cy
           </form>
         ) : null}
         <a class="btn" href={`/cycles/${props.cycle.id}/invitations/${i.id}.ics`}>Pobierz do kalendarza</a>
+        {isEmployee ? null : <a class="btn" href={invitationMailto(i, props.personName, props.viewer.name)}>Wyślij e-mailem</a>}
       </div>
     </Layout>
   );
