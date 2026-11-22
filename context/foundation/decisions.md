@@ -170,6 +170,9 @@ Autor: „samo kodowanie szybko nam teraz idzie wiec mozna powiedziec ze mamy mn
 - **13c. Każdy ekran na poziomie przyjętych makiet** (`context/design/`). Ekran, którego makieta nie pokazuje, najpierw powstaje jako wizja do oceny okiem autora, potem w kodzie.
 - **13d. Zakres i to, co widać na ekranach, ustalamy z autorem** w kolejnym kroku workflow 10x (roadmapa i plany), zanim powstanie kod.
 - Odrzucono: oddanie „bo działa” i poprawianie wyglądu na końcu.
+- **13e. Juror poznaje mOcenę przez przewodnik pokazu** na żywej stronie: wejście z tezą i przyciskiem „Rozpocznij pokaz”, 5 kroków, w każdym jedno kliknięcie zmienia konto i datę, a ramka mówi, na co patrzeć i który przepis działa. Odrzucono: nagranie i PDF jako główna droga, swobodne klikanie z instrukcją.
+- **13f. Widoczny zostaje cały proces**, dopracowany, bez nowych funkcji. Odrzucono: chowanie funkcji spoza 5 kroków, nowe funkcje.
+- **13g. Push na GitHub po każdym sprawdzonym etapie**, po kontroli, że w repo nie ma prywatnych ścieżek ani materiałów organizatora. Zmienia decyzję 8c (push tylko przez autora) na ten czas.
 
 ## Pytania otwarte (do mentorów organizatora)
 
