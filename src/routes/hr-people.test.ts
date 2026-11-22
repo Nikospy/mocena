@@ -133,3 +133,20 @@ describe("zestawienie CSV", () => {
     expect(lines.length).toBeGreaterThan(3);
   });
 });
+
+describe("arkusz w cyklu przed częścią I", () => {
+  test("nowa osoba dostaje arkusz z formularza", async () => {
+    expect((await call(app, "joanna", "/hr/people", { ...newPerson, sheet: "B" })).status).toBe(303);
+    expect(openCycle("jan-kowalski")!.sheet).toBe("B");
+  });
+  test("następny cykl po zapoznaniu dziedziczy arkusz poprzedniego", async () => {
+    const res = await app.request("/tour/5b", { method: "POST" });
+    const next = openCycle("piotr")!;
+    expect(next.id).not.toBe("cycle-piotr");
+    expect(next.sheet).toBe("C");
+    const cookie = res.headers.getSetCookie().map((c) => c.split(";")[0]).join("; ");
+    const hr = await (await app.request("/hr", { headers: { cookie: `${cookie}; person_id=joanna` } })).text();
+    expect(hr).not.toContain("arkusz jeszcze nie przypisany");
+    expect((await call(app, "joanna", `/cycles/${next.id}/sheet`)).status).toBe(200);
+  });
+});

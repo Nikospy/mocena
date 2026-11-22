@@ -84,8 +84,9 @@ export function openCycle(personId: string): Cycle | null {
 export function startNextCycle(previous: Cycle, actorId: string, assessedOn: string, acquaintedOn: string, outcome: "positive" | "negative"): void {
   const id = crypto.randomUUID();
   const periodStart = outcome === "negative" ? acquaintedOn : assessedOn;
-  getDb().query("INSERT INTO cycles (id, person_id, appraiser_id, period_start) VALUES (?, ?, ?, ?)")
-    .run(id, previous.person_id, previous.appraiser_id, periodStart);
+  // Następny cykl dziedziczy arkusz poprzedniego; oceniający potwierdza go w części I.
+  getDb().query("INSERT INTO cycles (id, person_id, appraiser_id, period_start, sheet) VALUES (?, ?, ?, ?, ?)")
+    .run(id, previous.person_id, previous.appraiser_id, periodStart, previous.sheet ?? null);
   recordEvent("cycle_started", id, actorId, {
     reason: "previous_assessment",
     periodStart,
