@@ -45,7 +45,7 @@ export type SheetData = {
     gradeRequest: "yes" | "no" | "not_applicable" | null;
     appraiserConfirmation: Confirmation | null;
     appraiseeConfirmation: (Confirmation & { objectionDeadline: string }) | null;
-    fiction: { reason: "could_not" | "would_not"; deliveryMethod: "in_person" | "post" | "email"; deliveredOn: string; date: string; appraiserName: string } | null;
+    fiction: { reason: "could_not" | "would_not"; deliveryMethod: "in_person" | "post" | "email"; deliveredOn: string; date: string; gender: Person["gender"]; appraiserName: string } | null;
     objectionTo: string | null;
     /** Dopisek przy ocenie sporządzonej po raz drugi po uwzględnieniu sprzeciwu. */
     redoNote: string | null;
@@ -148,6 +148,7 @@ export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetDat
             deliveredOn: st.fiction.deliveredOn,
             date: st.fiction.eventDate,
             appraiserName: appraiser.name,
+            gender: appraisee.gender,
           }
         : null,
       objectionTo: objectionRecipientFor(sheet, snap?.objectionRecipient),

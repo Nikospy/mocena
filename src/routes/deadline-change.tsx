@@ -1,6 +1,6 @@
 import { actsAsAppraiser } from "../substitutions";
 import { Hono, type Context } from "hono";
-import { visibleCycleById, effectiveDeadline, type Cycle } from "../cycles";
+import { visibleCycleById, effectiveDeadline, visibleAbsences, type Cycle } from "../cycles";
 import { deadlineCase, deadlineChangeBlocked, newDeadlineError, pendingRequest, requestState } from "../deadline-change";
 import { toWorkingDay } from "../engine/deadlines";
 import { recordEvent, visibleEvents } from "../events";
@@ -75,6 +75,7 @@ app.post("/cycles/:id/deadline-change", async (c) => {
     case: kase!.n,
     oldDeadline: effectiveDeadline(cycle.id).date,
     newDeadline: toWorkingDay(values.newDate),
+    knownAbsenceIds: visibleAbsences(cycle.person_id).map((absence) => absence.id),
     reason: values.reason,
     ...(kase!.n === 4 ? { requestId: pending!.id } : {}),
   });

@@ -1,5 +1,5 @@
 import type { CycleLink } from "../cycle-links";
-import { METHOD_LABEL, REASON_LABEL } from "./assessment";
+import { METHOD_LABEL, fictionReasonLabel } from "./assessment";
 import { romanGrade } from "../engine/grades";
 import { rules } from "../engine/rules";
 import { criterion } from "../engine/scoring";
@@ -283,7 +283,7 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
                     <ConfirmationBlock
                       kind="fiction"
                       name={p2.fiction.appraiserName}
-                      reason={REASON_LABEL[p2.fiction.reason]}
+                      reason={fictionReasonLabel(p2.fiction.reason, p2.fiction.gender)}
                       deliveryMethod={METHOD_LABEL[p2.fiction.deliveryMethod]}
                       deliveredOn={p2.fiction.deliveredOn}
                       date={p2.fiction.date}

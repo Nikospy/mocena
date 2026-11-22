@@ -1,6 +1,5 @@
 import { getDb } from "./db";
 import { recordEvent, visibleEvents } from "./events";
-import { addDays, toWorkingDay } from "./engine/deadlines";
 import { assessmentDeadline, type CycleKind } from "./engine/absences";
 import { rules, rulesVersion } from "./engine/rules";
 import { today } from "./settings";
@@ -37,22 +36,27 @@ export type CycleDeadlineDetails = ReturnType<typeof assessmentDeadline> & {
 export function cycleDeadlineDetails(cycleId: string, opts: { asOf?: string } = {}): CycleDeadlineDetails {
   const cycle = cycleById(cycleId);
   if (!cycle) throw new Error(`Brak cyklu ${cycleId}`);
-  const p = visibleEvents(cycleId, opts).filter((e) => e.type === "cycle_started" || e.type === "previous_assessment_recorded").pop()?.payload;
+  const events = visibleEvents(cycleId, opts);
+  const p = events.findLast((e) => e.type === "cycle_started" || e.type === "previous_assessment_recorded")?.payload;
   const kind: CycleKind = p?.previousOutcome === "negative" && p.previousAcknowledgedOn ? "after_negative" : "regular";
-  const absences = visibleAbsences(cycle.person_id, opts).map((a) => ({ id: a.id, from: a.date_from, to: a.date_to, excused: a.excused === 1 }));
-  const r = assessmentDeadline({ kind, periodStart: cycle.period_start, previousAcknowledgedOn: p?.previousAcknowledgedOn ?? null }, absences);
+  const rows = visibleAbsences(cycle.person_id, opts);
+  const absences = rows.map((a) => ({ id: a.id, from: a.date_from, to: a.date_to, excused: a.excused === 1 }));
   const D = rules.deadlines;
-  const changeEv = kind === "regular" ? visibleEvents(cycleId, opts).filter((e) => e.type === "deadline_changed").pop() : undefined;
+  const changeEv = kind === "regular" ? events.findLast((e) => e.type === "deadline_changed") : undefined;
   const change = changeEv ? { eventId: changeEv.id, case: Number(changeEv.payload.case), from: String(changeEv.payload.oldDeadline), to: String(changeEv.payload.newDeadline) } : null;
-  if (change && changeEv) {
-    // Data z pisma zastępuje termin (art. 81 ust. 8): nieobecności wliczone już w termin sprzed zmiany nie doliczają się drugi raz.
-    const before = absences.filter((a) => visibleAbsences(cycle.person_id, { asOf: changeEv.date }).some((v) => v.id === a.id));
-    const counted = assessmentDeadline({ kind, periodStart: cycle.period_start, previousAcknowledgedOn: p?.previousAcknowledgedOn ?? null }, before).extensionDays;
-    r.extensionDays = Math.max(0, r.extensionDays - counted);
-    const raw = addDays(change.to, r.extensionDays);
-    r.deadline = toWorkingDay(raw);
-    r.movedToWorkingDay = r.deadline !== raw;
-  }
+  const bounds = { kind, periodStart: cycle.period_start, previousAcknowledgedOn: p?.previousAcknowledgedOn ?? null };
+  // Starsze pisma bez zapisanych identyfikatorów zachowują porównanie według dnia wpisu.
+  const knownIds = Array.isArray(changeEv?.payload.knownAbsenceIds)
+    ? new Set<number>(changeEv.payload.knownAbsenceIds)
+    : null;
+  const r = change && changeEv
+    ? assessmentDeadline(bounds, absences, {
+        date: change.to,
+        knownAbsences: absences.filter((_, index) => knownIds
+          ? knownIds.has(rows[index].id)
+          : rows[index].recorded_on <= changeEv.date),
+      })
+    : assessmentDeadline(bounds, absences);
   const basis =
     kind === "after_negative"
       ? [D.reassessmentAfterNegativeMonths.basis]
@@ -102,11 +106,14 @@ export function startNextCycle(previous: Cycle, actorId: string, assessedOn: str
 }
 
 /**
- * Zapoznanie z oceną sporządzoną po raz drugi (art. 83 ust. 4 ustawy). Następny cykl powstał już przy zapoznaniu z pierwszą oceną:
- * nie zakładamy drugiego, tylko dopisujemy w nim nowe `cycle_started` z datą i wynikiem drugiej oceny i przestawiamy początek okresu.
+ * Po rozstrzygnięciu sprzeciwu następny cykl może już istnieć od zapoznania z pierwszą oceną:
+ * dopisujemy w nim nowe `cycle_started` z datą i obowiązującym wynikiem oraz przestawiamy początek okresu.
  * Wszystkie odczyty biorą ostatnie `cycle_started`, więc termin następnego cyklu liczy się od drugiej oceny. Bez następnego cyklu: zwykły start.
  */
-export function restartNextCycle(previous: Cycle, actorId: string, assessedOn: string, acquaintedOn: string, outcome: "positive" | "negative"): void {
+export function restartNextCycle(
+  previous: Cycle, actorId: string, assessedOn: string, acquaintedOn: string, outcome: "positive" | "negative",
+  reason: "previous_assessment_redone" | "previous_assessment_changed" = "previous_assessment_redone",
+): void {
   const next = (getDb().query("SELECT id FROM cycles WHERE person_id = ?").all(previous.person_id) as { id: string }[]).find((c) =>
     getDb().query("SELECT 1 FROM events WHERE cycle_id = ? AND type = 'cycle_started' AND json_extract(payload, '$.previousCycleId') = ?").get(c.id, previous.id),
   );
@@ -114,7 +121,7 @@ export function restartNextCycle(previous: Cycle, actorId: string, assessedOn: s
   const periodStart = outcome === "negative" ? acquaintedOn : assessedOn;
   getDb().query("UPDATE cycles SET period_start = ? WHERE id = ?").run(periodStart, next.id);
   recordEvent("cycle_started", next.id, actorId, {
-    reason: "previous_assessment_redone",
+    reason,
     periodStart,
     previousAssessmentOn: assessedOn,
     previousAcknowledgedOn: acquaintedOn,

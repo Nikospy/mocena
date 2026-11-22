@@ -53,6 +53,7 @@ export function mergeAbsences(absences: AbsenceInput[]): MergedAbsence[] {
 export function assessmentDeadline(
   cycle: CycleBasis,
   absences: AbsenceInput[],
+  change?: { date: string; knownAbsences: AbsenceInput[] },
 ): { base: string; extensionDays: number; deadline: string; movedToWorkingDay: boolean; merged: MergedAbsence[] } {
   const merged = mergeAbsences(absences);
   if (cycle.kind === "after_negative") {
@@ -60,20 +61,26 @@ export function assessmentDeadline(
     const date = periodEndAfterNegative(cycle.previousAcknowledgedOn);
     return { base: date, extensionDays: 0, deadline: date, movedToWorkingDay: false, merged };
   }
-  let rawEnd = addMonths(cycle.periodStart, rules.deadlines.assessmentEveryMonths.value);
+  let rawEnd = change?.date ?? addMonths(cycle.periodStart, rules.deadlines.assessmentEveryMonths.value);
+  // Znane długie okresy uwzględnia pismo. Po połączeniu z nowym wpisem odliczamy tylko ich wspólne dni.
+  const known = change ? mergeAbsences(change.knownAbsences).filter((absence) => absence.longerThanMonth) : [];
   let extensionDays = 0;
   for (const m of merged) {
     if (m.to < cycle.periodStart) continue;
     if (m.from > rawEnd) break;
     if (!m.longerThanMonth) continue;
-    const days = inclusiveDays(m.from > cycle.periodStart ? m.from : cycle.periodStart, m.to);
+    const from = m.from > cycle.periodStart ? m.from : cycle.periodStart;
+    const knownDays = known.filter((absence) => absence.from >= m.from && absence.to <= m.to && absence.to >= from)
+      .reduce((days, absence) => days + inclusiveDays(absence.from > from ? absence.from : from, absence.to), 0);
+    const days = inclusiveDays(from, m.to) - knownDays;
+    if (days === 0) continue;
     rawEnd = addDays(rawEnd, days);
     extensionDays += days;
     m.counted = true;
   }
   const deadline = toWorkingDay(rawEnd);
   return {
-    base: nextAssessmentDeadline(cycle.periodStart, 0),
+    base: change?.date ?? nextAssessmentDeadline(cycle.periodStart, 0),
     extensionDays,
     deadline,
     movedToWorkingDay: deadline !== rawEnd,

@@ -25,6 +25,7 @@ export type Part1ViewProps = {
   selected: string[];
   expectations: Record<string, string>;
   deadline: { label: string; date: string; basis: string[] };
+  currentDeadline?: { date: string; basis: string[] };
   confirmation?: { name: string; place: string; date: string };
   links: CycleLink[];
   errors?: string[];
@@ -117,6 +118,9 @@ export function Part1View(p: Part1ViewProps) {
       <p class="term-date">
         <b class="big">{formatDate(p.deadline.date)}</b> <LegalBasis basis={p.deadline.basis} />
       </p>
+      {p.currentDeadline ? (
+        <p>Termin bieżący: <b>{formatDate(p.currentDeadline.date)}</b> <LegalBasis basis={p.currentDeadline.basis} /></p>
+      ) : null}
     </section>
   );
   const links = p.links.map((l) => <a href={l.href}>{l.label}</a>);

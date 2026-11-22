@@ -9,7 +9,7 @@ import { cycleState, type CycleStep } from "../hr/cycle-state";
 import "../hr/reassessment-task";
 import { fullNameForm } from "../hr-partner/partner";
 import { mandatoryGradeOf } from "../hr/history";
-import { latestCycles } from "../hr/latest-cycles";
+import { latestCycles, pendingReassessmentPredecessor } from "../hr/latest-cycles";
 import { officeStats } from "../hr/stats";
 import { cycleById, previousCycleOf } from "../cycles";
 import { currentPerson, DEMO_DIRECTOR_GENERAL_ID, personById, type Person } from "../people";
@@ -41,6 +41,8 @@ app.get("/office/statistics", (c) => {
 const CLOSED_STEPS = new Set<CycleStep>(["acknowledged", "fiction", "objection_resolved"]);
 export function overviewData(viewer: Person) {
   const cycles = latestCycles().flatMap((cycle) => {
+    const redo = pendingReassessmentPredecessor(cycle);
+    if (redo) return [redo];
     const previous = previousCycleOf(cycle.id);
     return previous ? [cycle, previous] : [cycle];
   });

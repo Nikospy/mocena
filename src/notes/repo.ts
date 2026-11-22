@@ -52,7 +52,12 @@ export function notesForCycle(cycleId: string, authorId: string): Note[] {
     | { person_id: string; period_start: string }
     | null;
   if (!c) return [];
-  return notesAbout(c.person_id, { authorId, from: c.period_start });
+  const firstStart = visibleEvents(cycleId).filter((event) => event.type === "cycle_started").reduce((earliest, event) => {
+    const start = event.payload.periodStart;
+    return typeof start === "string" && start < earliest ? start : earliest;
+  }, c.period_start);
+  return notesAbout(c.person_id, { authorId, from: firstStart })
+    .filter((note) => note.date >= c.period_start || note.cycle_id === cycleId);
 }
 
 export function lastFeedbackDate(authorId: string, recipientId: string): string | null {

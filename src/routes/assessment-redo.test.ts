@@ -144,3 +144,92 @@ describe("ocena sporządzona po raz drugi (art. 83 ust. 4 ustawy)", () => {
     expect(JSON.parse(last.payload).on_behalf_of).toBe("anna");
   });
 });
+
+test("kadry, CSV i statystyki pokazują drugą ocenę aż do zapoznania", async () => {
+  const { cycleById, startNextCycle } = await import("../cycles");
+  const { officeStats } = await import("../hr/stats");
+  for (const hasSuccessor of [true, false]) {
+    const app = await redone();
+    if (hasSuccessor) startNextCycle(cycleById("cycle-katarzyna")!, "katarzyna", "2026-11-16", "2026-11-17", "positive");
+    const exportRow = async () => {
+      const csv = await html(app, "joanna", "/hr/export.csv");
+      return csv.split("\r\n").find((line) => line.startsWith("Katarzyna Lewandowska;"))!.split(";");
+    };
+    setToday("2026-12-04");
+    const due = officeStats().overdueOpen;
+    setToday("2026-12-06");
+    const draft = await exportRow();
+    expect(draft[4]).toContain("ponowne sporządzenie oceny");
+    expect(draft.slice(5, 7)).toEqual(["04.12.2026", ""]);
+    expect(officeStats().byStep.objection_resolved).toBe(1);
+    expect(officeStats().overdueOpen).toBe(due + 1);
+    const overview = await html(app, "joanna", "/hr");
+    expect(overview.match(/>Katarzyna Lewandowska<\/a>/g)).toHaveLength(1);
+    expect(overview).toMatch(/Ponowna ocena do: <b[^>]*>04\.12\.2026<\/b>/);
+    const office = await html(app, "dyrektor-urzedu", "/office/statistics");
+    expect(office).toContain("Ponowne sporządzenie oceny lub zapoznanie z nią");
+    expect(office).not.toContain("Katarzyna Lewandowska");
+
+    expect((await call(app, "anna", `${CYCLE}/assessment/approve`, form([5, 5, 5, 5, 5]))).status).toBe(303);
+    const approved = await exportRow();
+    expect(approved[4]).toContain("po raz drugi");
+    expect(approved[5]).toBe("04.12.2026");
+    expect(officeStats().overdueOpen).toBe(due);
+    expect((await call(app, "katarzyna", `${CYCLE}/assessment/acknowledge`, {})).status).toBe(303);
+    expect((await exportRow())[5]).toBe("06.12.2028");
+    expect(await html(app, "dyrektor-urzedu", "/office/statistics")).not.toContain("Ponowne sporządzenie oceny lub zapoznanie z nią");
+  }
+});
+
+test("notatka przypisana do następnego cyklu pozostaje po przesunięciu jego początku", async () => {
+  const { cycleById, openCycle, startNextCycle } = await import("../cycles");
+  const { notesForCycle } = await import("../notes/repo");
+  const app = await redone();
+  startNextCycle(cycleById("cycle-katarzyna")!, "katarzyna", "2026-11-16", "2026-11-17", "positive");
+  const next = openCycle("katarzyna")!;
+  const note = "Notatka przypisana do rozpoczętego cyklu.";
+  expect((await call(app, "anna", "/people/katarzyna/notes", { criterion_id: "rzetelnosc", date: "2026-11-18", text: note })).status).toBe(303);
+  expect(notesForCycle(next.id, "anna").map((n) => n.text)).toContain(note);
+  expect((await call(app, "anna", `${CYCLE}/assessment/approve`, form([7, 5, 5, 5, 5]))).status).toBe(303);
+  setToday("2026-11-24");
+  expect((await call(app, "katarzyna", `${CYCLE}/assessment/acknowledge`, {})).status).toBe(303);
+  expect(openCycle("katarzyna")).toMatchObject({ id: next.id, period_start: "2026-11-22" });
+  expect(notesForCycle(next.id, "anna").map((n) => n.text)).toContain(note);
+  expect(notesForCycle(next.id, "marek").map((n) => n.text)).not.toContain(note);
+});
+
+test("fikcja zapoznania z drugą oceną odmienia opis według ocenianej", async () => {
+  const app = await redone();
+  expect((await call(app, "anna", `${CYCLE}/assessment/approve`, form([5, 5, 5, 5, 5]))).status).toBe(303);
+  setToday("2026-11-24");
+  const formPage = await html(app, "anna", `${CYCLE}/assessment/fiction`);
+  expect(formPage).toContain("Oceniana nie mogła potwierdzić zapoznania");
+  expect(formPage).toContain("Oceniana nie chciała potwierdzić zapoznania");
+  expect((await call(app, "anna", `${CYCLE}/assessment/fiction`, { reason: "could_not", deliveryMethod: "post", deliveredOn: "2026-11-22" })).status).toBe(303);
+  for (const path of [`${CYCLE}/assessment`, `${CYCLE}/sheet`, "/hr"]) {
+    expect(await html(app, "joanna", path)).toContain("nie mogła potwierdzić");
+  }
+  const assessment = await html(app, "katarzyna", `${CYCLE}/assessment`);
+  expect(assessment).toContain("22.11.2026");
+  expect(assessment).toContain("24.11.2026");
+  expect(assessment).toContain("01.12.2026");
+});
+
+test("część I zachowuje przekazany termin i pokazuje bieżący po zapoznaniu z drugą oceną", async () => {
+  const { cycleById, openCycle, startNextCycle } = await import("../cycles");
+  const app = await redone();
+  startNextCycle(cycleById("cycle-katarzyna")!, "katarzyna", "2026-11-16", "2026-11-17", "positive");
+  const part1 = `/cycles/${openCycle("katarzyna")!.id}/part1`;
+  expect((await call(app, "anna", `${part1}/submit`, {})).status).toBe(303);
+  expect((await call(app, "katarzyna", `${part1}/confirm`, {})).status).toBe(303);
+  const before = await html(app, "katarzyna", part1);
+  expect(before).toContain("16.11.2028");
+  expect(before).not.toContain("Termin bieżący");
+
+  expect((await call(app, "anna", `${CYCLE}/assessment/approve`, form([5, 5, 5, 5, 5]))).status).toBe(303);
+  setToday("2026-11-24");
+  expect((await call(app, "katarzyna", `${CYCLE}/assessment/acknowledge`, {})).status).toBe(303);
+  const after = await html(app, "katarzyna", part1);
+  expect(after).toMatch(/Termin przekazany w części I[\s\S]*16\.11\.2028/);
+  expect(after).toMatch(/Termin bieżący[\s\S]*22\.11\.2028/);
+});

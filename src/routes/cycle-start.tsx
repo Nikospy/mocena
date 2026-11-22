@@ -124,9 +124,10 @@ function renderPart1(c: Context, cx: Ctx, extra: { errors?: string[]; input?: Pa
   const duties: string[] = JSON.parse(personById(cycle.person_id)?.duty_types ?? "[]");
   const selected = extra.input?.additional ?? criteria.filter((x) => x.kind === "additional").map((x) => x.id);
   const expectations = extra.input?.expectations ?? Object.fromEntries(criteria.map((x) => [x.id, x.expectation ?? ""]));
+  const currentDeadline = effectiveDeadline(cycle.id);
   const deadline = submitted
     ? { label: "Termin przekazany w części I", date: submitted.payload.dueDate as string, basis: submitted.payload.dueDateBasis as string[] }
-    : { label: "Termin oceny", ...effectiveDeadline(cycle.id) };
+    : { label: "Termin oceny", ...currentDeadline };
   const confirmed = visibleEvents(cycle.id).find((e) => e.type === "part1_confirmed");
   const appraisee = personById(cycle.person_id)?.name ?? "";
   const storedMandatory = criteria.filter((x) => x.kind === "mandatory");
@@ -150,6 +151,7 @@ function renderPart1(c: Context, cx: Ctx, extra: { errors?: string[]; input?: Pa
       selected={selected}
       expectations={expectations}
       deadline={deadline}
+      currentDeadline={currentDeadline.date !== deadline.date ? currentDeadline : undefined}
       confirmation={confirmed ? { name: confirmed.payload.appraiseeName, place: confirmed.payload.place, date: confirmed.date } : undefined}
       links={cycleLinks(cycle, person)}
       errors={extra.errors}

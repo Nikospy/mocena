@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { assessmentState } from "../assessment/state";
 import { effectiveDeadline, previousCycleOf } from "../cycles";
 import { cycleState } from "../hr/cycle-state";
-import { latestCycles } from "../hr/latest-cycles";
+import { latestCycles, pendingReassessmentPredecessor } from "../hr/latest-cycles";
 import { EXPORT_HEADER } from "../hr/csv-import";
 import { lastAssessmentOf, OUTCOME_LABEL } from "../hr/people";
 import { personById } from "../people";
@@ -22,13 +22,16 @@ function field(v: string): string {
 app.get("/hr/export.csv", (c) => {
   const viewer = hrGuard(c);
   if (viewer instanceof Response) return viewer;
-  const rows = latestCycles().map((cycle) => {
+  const rows = latestCycles().map((latestCycle) => {
+    const cycle = pendingReassessmentPredecessor(latestCycle) ?? latestCycle;
     const person = personById(cycle.person_id);
     const state = cycleState(cycle.id);
     const latest = assessmentState(cycle.id);
-    const previous = !latest.snapshot ? previousCycleOf(cycle.id) : null;
-    const deadline = latest.snapshot?.deadline ?? effectiveDeadline(cycle.id);
-    const objection = latest.objectionDeadline ?? (previous ? assessmentState(previous.id).objectionDeadline : null);
+    const previous = !latest.snapshot && !latest.redo ? previousCycleOf(cycle.id) : null;
+    const redoDeadline = latest.redo && latest.stage === "draft" ? state.deadline : null;
+    const deadline = redoDeadline ?? latest.snapshot?.deadline ?? effectiveDeadline(cycle.id);
+    const objectionState = previous ? assessmentState(previous.id) : latest;
+    const objection = objectionState.objection?.resolvedOn ? null : objectionState.objectionDeadline;
     const last = lastAssessmentOf(cycle.person_id);
     return [
       person?.name ?? cycle.person_id,
