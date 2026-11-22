@@ -69,47 +69,79 @@ function AccountScreen(props: { error?: string }) {
   );
 }
 
+/** Sprawy z terminem na górze (od najbliższego), potem pozostałe w kolejności dostawców. */
+function sortTasks<T extends { due?: string }>(tasks: T[]): T[] {
+  return tasks
+    .map((t, i) => ({ t, i }))
+    .sort((a, b) => (a.t.due && b.t.due ? a.t.due.localeCompare(b.t.due) : a.t.due ? -1 : b.t.due ? 1 : a.i - b.i))
+    .map((x) => x.t);
+}
+
+/** Termin słowami: „za 6 dni”, „jutro”, „dziś”, „po terminie od 3 dni”. */
+function dueWords(due: string, now: string): { text: string; late: boolean } {
+  const days = Math.round((Date.parse(due) - Date.parse(now)) / 86_400_000);
+  const n = (k: number) => (k === 1 ? "1 dzień" : `${k} dni`);
+  if (days < 0) return { text: `po terminie od ${n(-days)}`, late: true };
+  if (days === 0) return { text: "termin dziś", late: false };
+  if (days === 1) return { text: "termin jutro", late: false };
+  return { text: `za ${n(days)}`, late: false };
+}
+
 app.use("*", tourContext);
 
 app.get("/", (c) => {
   const person = currentPerson(c);
   if (!person) return c.html(<TourEntry />);
   const tasks = homeTasks(person);
+  const now = today();
   return c.html(
     <Layout title="Start" person={person} today={today()}>
       <section>
         <PageHeader title="Sprawy do załatwienia" />
         {tasks.length === 0 ? (
-          <p class="card">Brak spraw do załatwienia.</p>
+          <p class="empty">Brak spraw do załatwienia.</p>
         ) : (
           <ul class="tasks">
-            {tasks.map((t) => (
-              <li class="card task">
-                <div class="task-main">
-                  <h2>{t.heading ?? t.title}</h2>
-                  {t.person ? <p>{t.person}</p> : null}
-                  {t.detail ? <p class="cap">{t.detail}</p> : null}
-                  {t.due ? (
-                    <p class="task-due">
-                      do <b>{formatDate(t.due)}</b> {t.basis ? <LegalBasis basis={t.basis} /> : null}
-                    </p>
-                  ) : null}
-                </div>
-                {t.post || t.secondary ? (
-                  <div class="btns">
-                    <a class="btn primary" href={t.href}>{t.action ?? "Otwórz"}</a>
-                    {t.post ? (
-                      <form method="post" action={t.post.action}>
-                        <button class="btn" type="submit">{t.post.label}</button>
-                      </form>
+            {sortTasks(tasks).map((t) => {
+              const when = t.due ? dueWords(t.due, now) : null;
+              return (
+                <li class={when?.late ? "task late" : "task"}>
+                  <div class="task-main">
+                    <h2>
+                      <a class="task-link" href={t.href}>
+                        {t.heading ?? t.title}
+                      </a>
+                    </h2>
+                    {t.person ? <p class="task-person">{t.person}</p> : null}
+                    {t.detail ? <p class="task-detail">{t.detail}</p> : null}
+                    {t.post || t.secondary ? (
+                      <div class="task-more">
+                        {t.post ? (
+                          <form method="post" action={t.post.action}>
+                            <button class="btn outline" type="submit">{t.post.label}</button>
+                          </form>
+                        ) : null}
+                        {t.secondary ? <a class="btn text" href={t.secondary.href}>{t.secondary.label}</a> : null}
+                      </div>
                     ) : null}
-                    {t.secondary ? <a class="btn" href={t.secondary.href}>{t.secondary.label}</a> : null}
                   </div>
-                ) : (
-                  <a class="btn primary" href={t.href}>{t.action ?? "Otwórz"}</a>
-                )}
-              </li>
-            ))}
+                  <div class="task-side">
+                    {t.due && when ? (
+                      <p class="task-due">
+                        <b>{when.text}</b>
+                        <span>
+                          do {formatDate(t.due)} {t.basis ? <LegalBasis basis={t.basis} /> : null}
+                        </span>
+                      </p>
+                    ) : null}
+                    <span class="task-go" aria-hidden="true">
+                      {t.action ?? "Otwórz"}
+                      <svg class="ico s" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></svg>
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

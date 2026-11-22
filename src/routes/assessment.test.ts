@@ -258,7 +258,7 @@ describe("lista spraw, odnośniki, etykiety", () => {
     const view = await (await call(app, "piotr", `/cycles/${piotr}/assessment`)).text();
     expect(outside(view)).not.toMatch(/Ocena (negatywna|pozytywna)|6,14/);
     const home = await (await call(app, "marek", "/")).text();
-    expect(home).toContain("<h2>Czeka na potwierdzenie zapoznania: Piotr Wójcik</h2>");
+    expect(home).toMatch(/<h2><a class="task-link" href="[^"]+">Czeka na potwierdzenie zapoznania: Piotr Wójcik<\/a><\/h2>/);
     expect(home).toContain('href="/cycles/cycle-piotr/assessment"');
     expect(home).not.toMatch(/Ocena (negatywna|pozytywna)|6,14/);
     const part1 = await (await call(app, "marek", `/cycles/${piotr}/part1`)).text();
