@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pokaz · mOcena</title>
+<link rel="stylesheet" href="../../../../public/rodzina.css">
+<link rel="stylesheet" href="../../../../public/style.css">
+<style>
+
+.e-wrap { max-inline-size: var(--maxw); margin-inline: auto; padding: var(--sp-800) var(--sp-300) var(--sp-600); display: grid; gap: var(--sp-500); }
+.e-head { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--sp-600); align-items: center; }
+.e-h1 { font-size: var(--f-h1); line-height: var(--lh-h1); font-weight: var(--w-bold); color: var(--cobalt-300); }
+.e-lead { font-size: var(--f-h6); line-height: var(--lh-h6); color: var(--text-2); }
+.e-cta { display: grid; gap: var(--sp-150); justify-items: start; }
+.e-cta .btn { padding-inline: var(--sp-500); gap: var(--sp-100); }
+.e-cta p, .e-foot { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+.axis-card { padding: var(--sp-400) var(--sp-400) var(--sp-300); }
+.axis-card h2 { font-size: var(--f-h6); line-height: var(--lh-h6); }
+.axis-card .sub { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+.ax2 { position: relative; block-size: 96px; margin-block-start: var(--sp-300); }
+.ax2 .line { position: absolute; inset-inline: 0; inset-block-start: 40px; block-size: var(--sp-50); background: var(--cobalt-30); border-radius: var(--pill-r); }
+.ax2 .memo { position: absolute; inset-block-start: 22px; block-size: 40px; inset-inline-end: 0; inline-size: 15%; background: var(--orange-20); border: 1px dashed var(--orange-100); border-radius: var(--r-100); }
+.ax2 .memo-l { position: absolute; inset-block-start: 0; inset-inline-end: 0; font-size: var(--f-c2); line-height: var(--lh-c2); color: var(--orange-200); white-space: nowrap; }
+.ax2 .tick { position: absolute; inset-block-start: 68px; font-size: var(--f-c2); line-height: var(--lh-c2); color: var(--text-3); transform: translateX(-50%); }
+.ax2 .tick:first-of-type { transform: none; } .ax2 .tick.end { transform: translateX(-100%); }
+.stop { position: absolute; inset-block-start: 30px; transform: translateX(-50%); }
+.stop .dot { display: grid; place-items: center; inline-size: var(--sp-300); block-size: var(--sp-300); border-radius: var(--pill-r); background: var(--primary); color: var(--on-primary); font-size: var(--f-c1); line-height: 1; font-weight: var(--w-bold); box-shadow: 0 0 0 3px var(--white); }
+.lab { position: absolute; inset-block-start: 96px; inline-size: 210px; display: grid; gap: var(--sp-50); font-size: var(--f-c1); line-height: var(--lh-c1); }
+.lab::before { content: ""; position: absolute; inset-block-start: -22px; inline-size: 1px; block-size: 18px; background: var(--cobalt-40); }
+.lab b { font-size: var(--f-p); line-height: var(--lh-p); }
+.lab small { color: var(--text-2); font-size: var(--f-c2); line-height: var(--lh-c2); }
+.lab .n { color: var(--primary); font-weight: var(--w-bold); }
+.labs { list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--sp-300); border-block-start: 1px solid var(--line); padding-block-start: var(--sp-300); }
+.labs li { display: grid; gap: var(--sp-50); align-content: start; justify-items: start; font-size: var(--f-c1); line-height: var(--lh-c1); }
+.labs .n { display: grid; place-items: center; inline-size: var(--sp-300); block-size: var(--sp-300); border-radius: var(--pill-r); background: var(--primary); color: var(--on-primary); font-weight: var(--w-bold); margin-block-end: var(--sp-50); }
+.labs .d { color: var(--primary); font-weight: var(--w-bold); }
+.labs b { font-size: var(--f-p); line-height: var(--lh-p); }
+.labs small { color: var(--text-2); font-size: var(--f-c2); line-height: var(--lh-c2); margin-block-end: var(--sp-100); }
+.labs li { grid-template-columns: minmax(0, 1fr); } .labs li > * { max-inline-size: 100%; } .labs .basis .art { white-space: normal; min-inline-size: 0; }
+.ax2 .tick { white-space: nowrap; }
+.e-mob { display: none; }
+@media (max-width: 899px) {
+  .e-wrap { padding: var(--sp-400) var(--sp-200); gap: var(--sp-300); }
+  .e-head { grid-template-columns: 1fr; gap: var(--sp-300); }
+  .e-h1 { font-size: var(--f-h2); line-height: var(--lh-h2); }
+  .e-lead { font-size: var(--f-p); line-height: var(--lh-p); }
+  .e-cta .btn { inline-size: 100%; }
+  .axis-card { padding: var(--sp-250) var(--sp-200); }
+  .ax2, .labs { display: none; }
+  .e-mob { display: block; list-style: none; margin-block-start: var(--sp-200); position: relative; }
+  .e-mob::before { content: ""; position: absolute; inset-block: var(--sp-150); inset-inline-start: 11px; inline-size: 2px; background: var(--cobalt-30); }
+  .e-mob li { position: relative; display: grid; grid-template-columns: var(--sp-300) 1fr; gap: var(--sp-150); padding-block: var(--sp-100); }
+  .e-mob .dot { display: grid; place-items: center; inline-size: var(--sp-300); block-size: var(--sp-300); border-radius: var(--pill-r); background: var(--primary); color: var(--on-primary); font-size: var(--f-c1); font-weight: var(--w-bold); box-shadow: 0 0 0 3px var(--white); }
+  .e-mob b { display: block; } .e-mob small { display: block; font-size: var(--f-c2); line-height: var(--lh-c2); color: var(--text-2); }
+  .e-mob li.gap, .e-mob li.memo { display: block; }
+  .e-mob .gap { color: var(--text-3); font-size: var(--f-c2); line-height: var(--lh-c2); padding-inline-start: calc(var(--sp-300) + var(--sp-150)); }
+  .e-mob .memo { background: var(--orange-20); border-radius: var(--r-100); margin-inline-start: calc(var(--sp-300) + var(--sp-150)); padding: var(--sp-50) var(--sp-100); color: var(--orange-200); font-size: var(--f-c2); line-height: var(--lh-c2); }
+}
+.lab::before { inset-inline-start: 12px; }
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="#"><b>m</b>Ocena</a><p class="who">Pokaz dla jury</p></div></header>
+<main class="e-wrap">
+  <div class="e-head">
+    <h1 class="e-h1">Ten asystent nie pisze oceny.</h1>
+    <div style="display:grid;gap:var(--sp-250)"><p class="e-lead">Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie. mOcena prowadzi go przez cały cykl: zbiera fakty, kiedy się dzieją, i pilnuje każdego terminu z przepisu. Punkty stawia człowiek.</p><div class="e-cta"><a class="btn primary" href="v3-step.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg>Rozpocznij pokaz</a><p>5 kroków na ocenie Piotra Wójcika, około 3 minut. Każdy krok sam przełącza konto i datę.</p></div></div>
+  </div>
+  <section class="card axis-card" aria-labelledby="h-ax">
+    <h2 id="h-ax">Dwa lata Piotra w pięciu chwilach</h2>
+    <p class="sub">Formularz to ostatni tydzień. Asystent pracuje przez cały okres od 27 listopada 2024 do 27 listopada 2026.</p>
+    <div class="ax2" aria-hidden="true">
+      <span class="memo-l">ostatnie tygodnie (powiększone): to, co pamięta przełożony</span><span class="memo"></span>
+      <span class="line"></span>
+      <span class="tick" style="inset-inline-start:0">XI 2024</span><span class="tick" style="inset-inline-start:25.47945205479452%">2025</span><span class="tick" style="inset-inline-start:62.87671232876713%">2026</span><span class="tick end" style="inset-inline-start:100%">XI 2026</span>
+      <span class="stop" style="inset-inline-start:1.643835616438356%"><span class="dot">1</span></span><span class="stop" style="inset-inline-start:64.24657534246575%"><span class="dot">2</span></span><span class="stop" style="inset-inline-start:88%"><span class="dot">3</span></span><span class="stop" style="inset-inline-start:93%"><span class="dot">4</span></span><span class="stop" style="inset-inline-start:98%"><span class="dot">5</span></span>
+    </div>
+    <ol class="labs"><li><span class="n">1</span><span class="d">9 grudnia 2024</span><b>Kryteria na początku cyklu</b><small>Marek, oceniający</small><span class="basis mini"><span class="pg" aria-hidden="true">§</span><span class="art">5 ust. 1</span><span class="ver">reguły 2016-470/1</span></span></li><li><span class="n">2</span><span class="d">11 marca 2026</span><b>Notatka o zmianie zadań</b><small>Marek, oceniający</small><span class="basis mini"><span class="art">art. 81 ust. 6 ustawy</span><span class="ver">reguły 2016-470/1</span></span></li><li><span class="n">3</span><span class="d">10 listopada 2026</span><b>Nieobecność przesuwa termin</b><small>Joanna, kadry</small><span class="basis mini"><span class="art">art. 81 ust. 8 ustawy</span><span class="ver">reguły 2016-470/1</span></span></li><li><span class="n">4</span><span class="d">21 listopada 2026</span><b>Jedna „1” przesądza o wyniku</b><small>Marek, oceniający</small><span class="basis mini"><span class="pg" aria-hidden="true">§</span><span class="art">11 ust. 1 pkt 4</span><span class="ver">reguły 2016-470/1</span></span></li><li><span class="n">5</span><span class="d">22 listopada 2026</span><b>Zapoznanie i 7 dni na sprzeciw</b><small>Piotr, oceniany</small><span class="basis mini"><span class="art">art. 83 ust. 1 ustawy</span><span class="ver">reguły 2016-470/1</span></span></li></ol>
+    <ol class="e-mob">
+      <li><span class="dot">1</span><span><b>Kryteria na początku cyklu</b><small>9 grudnia 2024 · Marek, oceniający</small></span></li><li class="gap">15 miesięcy notatek</li><li><span class="dot">2</span><span><b>Notatka o zmianie zadań</b><small>11 marca 2026 · Marek, oceniający</small></span></li><li class="gap">8 miesięcy notatek</li><li class="memo">ostatnie 2 tygodnie: to, co przełożony pamięta</li><li><span class="dot">3</span><span><b>Nieobecność przesuwa termin</b><small>10 listopada 2026 · Joanna, kadry</small></span></li><li><span class="dot">4</span><span><b>Jedna „1” przesądza o wyniku</b><small>21 listopada 2026 · Marek, oceniający</small></span></li><li><span class="dot">5</span><span><b>Zapoznanie i 7 dni na sprzeciw</b><small>22 listopada 2026 · Piotr, oceniany</small></span></li>
+    </ol>
+  </section>
+  <p class="e-foot">Działa na regułach, bez modelu językowego. Osoby i zdarzenia są fikcyjne.</p>
+</main>
+</body>
+</html>

@@ -173,6 +173,7 @@ Autor: „samo kodowanie szybko nam teraz idzie wiec mozna powiedziec ze mamy mn
 - **13e. Juror poznaje mOcenę przez przewodnik pokazu** na żywej stronie: wejście z tezą i przyciskiem „Rozpocznij pokaz”, 5 kroków, w każdym jedno kliknięcie zmienia konto i datę, a ramka mówi, na co patrzeć i który przepis działa. Odrzucono: nagranie i PDF jako główna droga, swobodne klikanie z instrukcją.
 - **13f. Widoczny zostaje cały proces**, dopracowany, bez nowych funkcji. Odrzucono: chowanie funkcji spoza 5 kroków, nowe funkcje.
 - **13g. Push na GitHub po każdym sprawdzonym etapie**, po kontroli, że w repo nie ma prywatnych ścieżek ani materiałów organizatora. Zmienia decyzję 8c (push tylko przez autora) na ten czas.
+- **13h. Wygląd przewodnika: wejście V3 (oś dwóch lat z pięcioma przystankami) i krok V2 (karta boczna z numerowaną listą „Na co patrzeć”, na telefonie zwijana karta u dołu).** Wzorzec: `context/design/mockups/tour/`. Odrzucono: pasek u góry (V1), przyciemniony ekran z dymkiem (V3 krok).
 
 ## Pytania otwarte (do mentorów organizatora)
 

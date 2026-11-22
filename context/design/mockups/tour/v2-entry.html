@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pokaz · mOcena</title>
+<link rel="stylesheet" href="../../../../public/rodzina.css">
+<link rel="stylesheet" href="../../../../public/style.css">
+<style>
+
+.e-grid { max-inline-size: var(--maxw); margin-inline: auto; padding: var(--sp-800) var(--sp-300); display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--sp-600); align-items: start; }
+.e-l { display: grid; gap: var(--sp-300); align-content: start; }
+.e-h1 { font-size: var(--f-h1); line-height: var(--lh-h1); font-weight: var(--w-bold); color: var(--cobalt-300); }
+.e-lead { font-size: var(--f-h6); line-height: var(--lh-h6); color: var(--text-2); }
+.e-cta { display: grid; gap: var(--sp-150); justify-items: start; }
+.e-cta .btn { padding-inline: var(--sp-500); gap: var(--sp-100); }
+.e-cta p, .e-foot { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+.vs { display: grid; gap: var(--sp-200); }
+.vs h2 { font-size: var(--f-h6); line-height: var(--lh-h6); }
+.vs ul { list-style: none; display: grid; gap: var(--sp-150); margin-block-start: var(--sp-200); }
+.vs li { display: flex; gap: var(--sp-150); align-items: flex-start; }
+.vs .no { background: var(--white); border: 1px dashed var(--grey-60); border-radius: var(--card-r); padding: var(--sp-300); color: var(--text-2); }
+.vs .no li::before { content: "—"; color: var(--grey-80); flex: none; }
+.vs .yes li .ico { color: var(--primary); margin-block-start: var(--sp-50); }
+@media (max-width: 899px) {
+  .e-grid { grid-template-columns: 1fr; padding: var(--sp-400) var(--sp-200); gap: var(--sp-400); }
+  .e-h1 { font-size: var(--f-h2); line-height: var(--lh-h2); }
+  .e-lead { font-size: var(--f-p); line-height: var(--lh-p); }
+  .e-cta .btn { inline-size: 100%; }
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="#"><b>m</b>Ocena</a><p class="who">Pokaz dla jury</p></div></header>
+<main class="e-grid">
+  <div class="e-l">
+    <h1 class="e-h1">Ten asystent nie pisze oceny.</h1>
+    <p class="e-lead">Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie. mOcena prowadzi go przez cały cykl: zbiera fakty, kiedy się dzieją, i pilnuje każdego terminu z przepisu. Punkty stawia człowiek.</p>
+    <div class="e-cta"><a class="btn primary" href="v2-step.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg>Rozpocznij pokaz</a><p>5 kroków na ocenie Piotra Wójcika, około 3 minut. Każdy krok sam przełącza konto i datę.</p></div>
+    <p class="e-foot">Działa na regułach, bez modelu językowego. Osoby i zdarzenia są fikcyjne.</p>
+  </div>
+  <div class="vs">
+    <section class="no" aria-labelledby="h-no"><h2 id="h-no">Czego mOcena nie robi</h2><ul>
+      <li>Nie pisze tekstu o pracowniku.</li><li>Nie proponuje punktów.</li><li>Nie porównuje ludzi i nie stawia etykiet przy nazwisku.</li></ul></section>
+    <section class="card yes" aria-labelledby="h-yes"><h2 id="h-yes">Co robi przez 24 miesiące</h2><ul>
+      <li><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Przypomina o rozmowie i o terminie, z podstawą prawną przy każdej dacie.</span></li>
+      <li><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Zbiera notatki o faktach i kładzie je przy kryteriach.</span></li>
+      <li><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Liczy wynik z rozporządzenia i blokuje to, czego brakuje.</span></li></ul>
+      <span class="basis"><span class="pg" aria-hidden="true">§</span><span class="art">11 ust. 1 pkt 4 rozporządzenia</span><span class="ver">reguły 2016-470/1</span></span></section>
+  </div>
+</main>
+</body>
+</html>

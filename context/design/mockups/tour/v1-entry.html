@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pokaz · mOcena</title>
+<link rel="stylesheet" href="../../../../public/rodzina.css">
+<link rel="stylesheet" href="../../../../public/style.css">
+<style>
+
+.e-wrap { max-inline-size: 720px; margin-inline: auto; padding: var(--sp-800) var(--sp-200) var(--sp-600); display: grid; gap: var(--sp-400); }
+.e-kick { color: var(--primary); font-weight: var(--w-bold); font-size: var(--f-c1); line-height: var(--lh-c1); }
+.e-h1 { font-size: var(--f-h1); line-height: var(--lh-h1); font-weight: var(--w-bold); color: var(--cobalt-300); }
+.e-lead { font-size: var(--f-h6); line-height: var(--lh-h6); color: var(--text-2); max-inline-size: 60ch; }
+.e-cta { display: grid; gap: var(--sp-150); justify-items: start; }
+.e-cta .btn { padding-inline: var(--sp-500); gap: var(--sp-100); }
+.e-cta p { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+.e-steps { list-style: none; padding: 0; }
+.e-steps li { display: grid; grid-template-columns: var(--sp-500) 1fr auto; gap: var(--sp-200); align-items: center; padding-block: var(--sp-200); border-block-start: 1px solid var(--line); }
+.e-steps li:last-child { border-block-end: 1px solid var(--line); }
+.e-steps .n { inline-size: var(--sp-500); block-size: var(--sp-500); border-radius: var(--pill-r); background: var(--cobalt-10); color: var(--primary); display: grid; place-items: center; font-weight: var(--w-bold); }
+.e-steps b { display: block; }
+.e-steps small { display: block; color: var(--text-2); font-size: var(--f-c1); line-height: var(--lh-c1); }
+.e-foot { font-size: var(--f-c2); line-height: var(--lh-c2); color: var(--text-3); }
+@media (max-width: 640px) {
+  .e-wrap { padding-block-start: var(--sp-400); gap: var(--sp-300); }
+  .e-h1 { font-size: var(--f-h2); line-height: var(--lh-h2); }
+  .e-lead { font-size: var(--f-p); line-height: var(--lh-p); }
+  .e-cta .btn { inline-size: 100%; }
+  .e-steps li { grid-template-columns: var(--sp-500) 1fr; }
+  .e-steps .basis { grid-column: 2; justify-self: start; }
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="#"><b>m</b>Ocena</a><p class="who">Pokaz dla jury</p></div></header>
+<main class="e-wrap">
+  <div>
+    <p class="e-kick">Cyfrowy asystent ocen okresowych w służbie cywilnej</p>
+    <h1 class="e-h1">Ten asystent nie pisze oceny.</h1>
+  </div>
+  <p class="e-lead">Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie. mOcena prowadzi go przez cały cykl: zbiera fakty, kiedy się dzieją, i pilnuje każdego terminu z przepisu. Punkty stawia człowiek.</p>
+  <div class="e-cta">
+    <a class="btn primary" href="v1-step.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg>Rozpocznij pokaz</a>
+    <p>5 kroków na ocenie Piotra Wójcika, około 3 minut. Każdy krok sam przełącza konto i datę.</p>
+  </div>
+  <section aria-labelledby="h-st">
+    <h2 id="h-st" class="vh">Kroki pokazu</h2>
+    <ol class="e-steps"><li><span class="n">1</span><span><b>Kryteria na początku cyklu</b><small>9 grudnia 2024 · Marek, oceniający</small></span><span class="basis mini"><span class="pg" aria-hidden="true">§</span><span class="art">5 ust. 1 rozporządzenia</span><span class="ver">reguły 2016-470/1</span></span></li><li><span class="n">2</span><span><b>Notatka o zmianie zadań</b><small>11 marca 2026 · Marek, oceniający</small></span><span class="basis mini"><span class="art">art. 81 ust. 6 ustawy</span><span class="ver">reguły 2016-470/1</span></span></li><li><span class="n">3</span><span><b>Nieobecność przesuwa termin</b><small>10 listopada 2026 · Joanna, kadry</small></span><span class="basis mini"><span class="art">art. 81 ust. 8 ustawy</span><span class="ver">reguły 2016-470/1</span></span></li><li><span class="n">4</span><span><b>Jedna „1” przesądza o wyniku</b><small>21 listopada 2026 · Marek, oceniający</small></span><span class="basis mini"><span class="pg" aria-hidden="true">§</span><span class="art">11 ust. 1 pkt 4 rozporządzenia</span><span class="ver">reguły 2016-470/1</span></span></li><li><span class="n">5</span><span><b>Zapoznanie i 7 dni na sprzeciw</b><small>22 listopada 2026 · Piotr, oceniany</small></span><span class="basis mini"><span class="art">art. 83 ust. 1 ustawy</span><span class="ver">reguły 2016-470/1</span></span></li></ol>
+  </section>
+  <p class="e-foot">Działa na regułach, bez modelu językowego. Osoby i zdarzenia są fikcyjne.</p>
+</main>
+</body>
+</html>

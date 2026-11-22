@@ -55,8 +55,8 @@ Ocena okresowa w służbie cywilnej powstaje raz na 24 miesiące, na papierze i 
 | S-03 | timeline-and-absences        | kadry wpisują nieobecność i zmianę oceniającego, a wszyscy widzą oś czasu z regułami | S-01, S-06    | US-03, FR-010, FR-011, FR-014, FR-033, FR-034 | in-progress |
 | S-06 | hr-overview-and-print        | kadry widzą stan cykli i stopnie obowiązkowe, a arkusz da się pobrać i wydrukować    | S-02          | FR-026, FR-027, FR-029, FR-031             | in-progress |
 | S-07 | design-parity                | każdy ekran wygląda jak przyjęte makiety, na telefonie i komputerze                 | S-01–S-06     | MS-01                                      | in-progress |
-| S-08 | guided-demo-tour             | juror przechodzi cały proces sam, prowadzony krok po kroku przez przewodnik pokazu  | S-07          | MS-02, US-01–US-05                         | proposed |
-| S-09 | review-polish                | juror nie trafia na niejasny tekst, pusty obszar ani ślepy zaułek                   | S-07          | MS-03                                      | proposed |
+| S-08 | guided-demo-tour             | juror przechodzi cały proces sam, prowadzony krok po kroku przez przewodnik pokazu  | S-07          | MS-02, US-01–US-05                         | planning |
+| S-09 | review-polish                | juror nie trafia na niejasny tekst, pusty obszar ani ślepy zaułek                   | S-07          | MS-03                                      | planning |
 | S-10 | live-demo-check              | pokaz przechodzi automatycznie dwa razy z rzędu na żywej stronie                    | S-08, S-09    | MS-04                                      | proposed |
 | S-11 | jury-materials               | juror dostaje nagranie, PDF, README i opis zgłoszenia zgodne z działającą wersją    | S-10          | MS-05                                      | proposed |
 
@@ -196,9 +196,9 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Parallel with:** S-09
 - **Blockers:** —
 - **Unknowns:**
-  - Który wariant wyglądu przewodnika (pasek, karta boczna, oś dwóch lat)? — Owner: user. Block: yes.
-- **Risk:** Najważniejsza zmiana dla jurora, który nie zna procesu; nowy ekran, więc najpierw warianty do oceny okiem (decyzja 13c).
-- **Status:** blocked
+  - ~~Który wariant wyglądu przewodnika?~~ Rozstrzygnięte: wejście V3, krok V2 (decyzja 13h).
+- **Risk:** Najważniejsza zmiana dla jurora, który nie zna procesu.
+- **Status:** planning
 
 ### S-09: Dopracowanie po przeglądzie
 
@@ -210,7 +210,7 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Zakres wynika z przeglądu na żywej stronie (22.11); bez niego poprawki byłyby zgadywaniem.
-- **Status:** proposed
+- **Status:** planning
 
 ### S-10: Sprawdzenie pokazu na żywej stronie
 
