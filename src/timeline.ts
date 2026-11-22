@@ -58,7 +58,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
     for (const m of details.merged) {
       const late = m.parts.some((p) => rows.some((r) => r.id === p.id && recordedAfterApproval(r.id, r.recorded_on)));
       const sentences: string[] = [];
-      if (m.parts.length > 1) sentences.push(`${m.parts.length === 2 ? "Dwa wpisy liczą się" : `Wpisy (${m.parts.length}) liczą się`} jako jedna nieobecność, bo dzielą je tylko dni wolne.`);
+      if (m.parts.length > 1) sentences.push(`${m.parts.length === 2 ? "Dwa wpisy liczą się" : m.parts.length < 5 ? `${m.parts.length} wpisy liczą się` : `${m.parts.length} wpisów liczy się`} jako jedna nieobecność, bo dzielą je tylko dni wolne.`);
       if (late) sentences.push("Ocena jest już zatwierdzona, jej termin się nie zmienia.");
       else if (details.kind === "after_negative") sentences.push("Nie przedłuża terminu ponownej oceny.");
       else if (m.counted) sentences.push(`Nieobecność dłużej niż miesiąc: termin oceny przedłuża się o ${m.days} dni.`);
@@ -66,7 +66,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
       else sentences.push("Nie dłużej niż miesiąc: termin bez zmian.");
       entries.push({
         date: m.from,
-        title: `Nieobecność ${formatRange(m.from, m.to)} (${m.days} dni)`,
+        title: `Nieobecność ${formatRange(m.from, m.to)} (${m.days === 1 ? "1 dzień" : `${m.days} dni`})`,
         detail: sentences.join(" "),
         basis: [EXTENDS],
         kind: "fact",
@@ -91,7 +91,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
       const name = (id: string) => personById(id)?.name ?? id;
       entries.push({
         date: e.date,
-        title: `Zmiana oceniającego: ${name(x.from_id)} → ${name(x.to_id)}. Kryteria bez zmian`,
+        title: `Zmiana oceniającego: ${name(x.from_id)} → ${name(x.to_id)}`,
         detail: `Nowy oceniający ocenia na podstawie wcześniej wybranych kryteriów.`,
         basis: [rules.appraiserChange.basis],
         kind: "fact",
@@ -119,7 +119,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
     } else if (e.type === "part1_submitted") {
       entries.push({ date: e.date, title: "Część I przekazana ocenianemu", detail: "Kryteria oceny i oczekiwania wobec pracownika.", basis: x.criteriaBasis ?? [], kind: "fact" });
     } else if (e.type === "part1_confirmed") {
-      entries.push({ date: e.date, title: "Część I: potwierdzenie zapoznania z kryteriami", basis: [], kind: "fact" });
+      entries.push({ date: e.date, title: "Potwierdzenie części I przez ocenianego", basis: [], kind: "fact" });
     } else if (e.type === "invitation_sent") {
       entries.push({ date: e.date, title: invitationHeadline({ ...x, id: e.id, sentOn: e.date, confirmedOn: null }), basis: [], kind: "fact" });
     } else if (e.type === "invitation_confirmed") {
@@ -130,7 +130,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
       const fiction = e.type === "acknowledgement_fiction";
       entries.push({
         date: fiction ? (x.deliveredOn ?? e.date) : e.date,
-        title: fiction ? "Uznanie oceny za doręczoną" : "Zapoznanie z oceną",
+        title: fiction ? "Fikcja zapoznania z oceną" : "Zapoznanie z oceną",
         basis: [rules.deadlines.objectionDays.basis],
         kind: "fact",
       });

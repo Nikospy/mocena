@@ -4,7 +4,7 @@ import type { Note } from "./repo";
 export type CriterionWarning = "recent_only" | "extreme_without_facts";
 
 export const WARNING_TEXT: Record<CriterionWarning, string> = {
-  extreme_without_facts: "Ocena skrajna, a przy tym kryterium nie masz żadnej notatki.",
+  extreme_without_facts: "Ocena cząstkowa 1 albo 9, a przy tym kryterium nie masz żadnej notatki. Na jakich faktach ją opierasz?",
   recent_only: "Wszystkie notatki przy tym kryterium są z ostatniego miesiąca. Co działo się wcześniej w okresie oceny?",
 };
 

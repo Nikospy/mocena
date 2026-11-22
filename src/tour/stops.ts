@@ -36,17 +36,17 @@ const BODY: Record<TourStopId, Body> = {
     lead: "Marek zaczyna dwuletni cykl oceny Piotra. System sam dobrał arkusz i podpowiada kryteria dodatkowe, każde z powodem. Wybór należy do Marka.",
     look: [
       { text: "Termin oceny z przepisem.", selector: ".rule" },
-      { text: "Podpowiedzi kryteriów: ramka przerywana, powód, można odrzucić.", selector: ".hint" },
-      { text: "Karta rozmowy rozpoczynającej z tematami z przepisu.", selector: 'a[href$="/cards/opening"]' },
+      { text: "Podpowiedzi kryteriów: przerywana ramka i powód. Nic nie jest zaznaczone z góry.", selector: ".hint" },
+      { text: "Karta rozmowy o kryteriach z tematami z przepisu.", selector: 'a[href$="/cards/opening"]' },
     ],
-    tryIt: "Zaznacz „Orientacja na klienta/interesanta” i „Myślenie analityczne”, potem przekaż Piotrowi.",
+    tryIt: "Zaznacz „Orientacja na klienta/interesanta” i „Myślenie analityczne”, potem kliknij „Potwierdzam rozmowę i przekazuję część I”.",
     basis: basis(d.criteriaTalkDays.basis),
     screen: (c) => `/cycles/${c}/part1`,
   },
   "1b": {
     title: "Piotr potwierdza kryteria",
     short: "notatka",
-    lead: "Piotr zna kryteria i oczekiwania, zanim zacznie się okres oceny. Potwierdza je jednym kliknięciem.",
+    lead: "Piotr zna kryteria i oczekiwania na początku okresu oceny, a nie dopiero przy ocenie. Potwierdza je jednym kliknięciem.",
     look: [
       { text: "Przycisk potwierdzenia.", selector: 'form[action$="/part1/confirm"] button' },
       { text: "Po potwierdzeniu miejscowość, data i nazwisko wpisują się same, a kryteria się blokują.", selector: ".sheet" },
@@ -58,7 +58,7 @@ const BODY: Record<TourStopId, Body> = {
     short: "nieobecność",
     lead: "Marek zapisuje fakt w dniu, w którym się zdarzył, a nie po dwóch latach z pamięci. Asystent nie ocenia notatki. Zauważa tylko słowo „przejął” i pyta, czy to stała zmiana zadań.",
     look: [
-      { text: "Po wpisaniu »przejął« pole »Zmiana zadań pracownika« zaznacza się samo jako podpowiedź; można je odznaczyć.", selector: ".hint" },
+      { text: "Po wpisaniu słowa „przejął” pole „Zmiana zadań pracownika” zaznacza się samo jako podpowiedź. Można je odznaczyć.", selector: ".hint" },
       { text: "Po zapisie pytanie „To stała zmiana zadań?”, a po „Tak” karta rozmowy i forma rozwoju." },
       { text: "Przy nazwisku Piotra nie ma punktów ani etykiet." },
     ],
@@ -81,13 +81,13 @@ const BODY: Record<TourStopId, Body> = {
   "4": {
     title: "Jedna „1” przesądza o wyniku",
     short: "zapoznanie",
-    lead: "Formularz oceny wypełnia się w ostatnim tygodniu, ale notatki są z 24 miesięcy. Punkty stawia Marek. System liczy wynik według przepisu i pilnuje braków.",
+    lead: "Ocenę wystawia się w ostatnim tygodniu, ale notatki są z 24 miesięcy. Oceny cząstkowe stawia Marek. System liczy wynik według przepisu i pilnuje braków.",
     look: [
       { text: "Notatki i pola wyboru przy kryteriach.", selector: ".crit-notes .note-list" },
       { text: "Ostrzeżenie, gdy fakty do kryterium są tylko z ostatniego miesiąca.", selector: ".st.warn" },
-      { text: "Po „1” przy Rzetelności wynik jest negatywny mimo średniej powyżej 4, a zatwierdzenie czeka na uzasadnienie i wnioski do programu rozwoju.", selector: "#assessment-result" },
+      { text: "Po „1” przy Rzetelności wynik jest negatywny mimo średniej powyżej 4, a zatwierdzenie czeka na uzasadnienie i wnioski do indywidualnego programu rozwoju zawodowego.", selector: "#assessment-result" },
     ],
-    tryIt: "Postaw „1” przy Rzetelności i kliknij „Wstaw do uzasadnienia”.",
+    tryIt: "Postaw „1” przy Rzetelności, zaznacz notatki i kliknij „Wstaw do uzasadnienia”.",
     note: "„1” stawiamy na pokaz, żeby było widać regułę.",
     basis: basis("§ 11 ust. 1 pkt 4"),
     screen: (c) => `/cycles/${c}/assessment`,
@@ -95,10 +95,10 @@ const BODY: Record<TourStopId, Body> = {
   "5": {
     title: "Zapoznanie i 7 dni na sprzeciw",
     short: "kadry",
-    lead: "Piotr czyta ocenę z uzasadnieniem złożonym z notatek i potwierdza zapoznanie. Od tej chwili biegnie termin na sprzeciw.",
+    lead: "Piotr czyta ocenę. Uzasadnienie napisał Marek i wstawił do niego fakty z notatek. Piotr potwierdza zapoznanie. Od tej chwili system liczy 7 dni na sprzeciw.",
     look: [
       { text: "Przycisk potwierdzenia zapoznania.", selector: 'form[action$="/assessment/acknowledge"] button' },
-      { text: "Termin sprzeciwu z przepisem; gdy wypada w dzień wolny, przesuwa się na dzień roboczy.", selector: ".rule" },
+      { text: "Termin sprzeciwu z przepisem; gdy wypada w dzień wolny, przechodzi na następny dzień roboczy.", selector: ".rule" },
     ],
     tryIt: "Potwierdź zapoznanie.",
     basis: basis(d.objectionDays.basis),

@@ -193,7 +193,7 @@ describe("przewodnik: układ i dostępność", () => {
     expect(a).toBeGreaterThan(-1);
     expect(b).toBeGreaterThan(a);
     expect(text.indexOf("<header", a)).toBeGreaterThan(b);
-    expect(text).toContain("Po wpisaniu »przejął« pole »Zmiana zadań pracownika« zaznacza się samo jako podpowiedź; można je odznaczyć.");
+    expect(text).toContain("Po wpisaniu słowa „przejął” pole „Zmiana zadań pracownika” zaznacza się samo jako podpowiedź. Można je odznaczyć.");
 
     const plain = await html(app, "/account");
     expect(plain.text).toMatch(/<aside[^>]*aria-label="Pokaz"/);

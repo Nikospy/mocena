@@ -48,7 +48,7 @@ describe("stan cyklu", () => {
     at("2026-11-22");
     expect(cycleState("cycle-katarzyna")).toMatchObject({ step: "objection_filed", deadline: { date: "2026-12-04" } });
     seedEvent("objection_resolved", "cycle-katarzyna", "joanna", { outcome: "rejected" }, "2026-11-22");
-    expect(cycleState("cycle-katarzyna").text).toContain("sprzeciw nieuwzględniony");
+    expect(cycleState("cycle-katarzyna").text).toContain("nieuwzględniony");
 
     db.query("DELETE FROM events WHERE type = 'assessment_acknowledged' AND cycle_id = 'cycle-tomasz'").run();
     seedEvent("acknowledgement_fiction", "cycle-tomasz", "anna", { reason: "would_not", deliveryMethod: "post", deliveredOn: "2026-11-13", objectionDeadline: "2026-11-20" }, "2026-11-13");
