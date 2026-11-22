@@ -119,7 +119,14 @@ export function BlockerList(props: { blockers: Blocker[] }) {
           <ul>
             {props.blockers.map((b) => (
               <li>
-                {b.message} <LegalBasis basis={b.basis} />
+                {b.items ? (
+                  <details class="miss-d">
+                    <summary>{b.message} <LegalBasis basis={b.basis} /></summary>
+                    <ul>{b.items.map((n) => <li>{n}</li>)}</ul>
+                  </details>
+                ) : (
+                  <>{b.message} <LegalBasis basis={b.basis} /></>
+                )}
               </li>
             ))}
           </ul>
@@ -195,11 +202,15 @@ export type AssessmentViewProps = {
 function Header(p: { person: Person; sheet: string; period: string }) {
   return (
     <section class="card hdr" aria-label="Cykl oceny">
-      <p class="voice src">Ocena okresowa · arkusz {p.sheet}</p>
-      <h1>{p.person.name}</h1>
-      <p class="cap">
-        {p.person.position_title ?? ""} · {p.period}
-      </p>
+      <div class="hdr-top">
+        <div class="hdr-id">
+          <p class="cap">Ocena okresowa · arkusz {p.sheet}</p>
+          <h1>{p.person.name}</h1>
+          <p class="cap">
+            {p.person.position_title ?? ""} · {p.period}
+          </p>
+        </div>
+      </div>
     </section>
   );
 }
@@ -370,7 +381,7 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
         {st.objectionDeadline ? <ObjectionClock deadline={st.objectionDeadline} today={p.today} mine={mine} /> : null}
         {p.canAcknowledge ? (
           <form method="post" action={`/cycles/${p.cycleId}/assessment/acknowledge`} class="decide">
-            <p class="cap">Potwierdzenie zapoznania z oceną: {rules.approval.acknowledgement.basis}</p>
+            <p class="cap">Potwierdzenie zapoznania z oceną: <LegalBasis basis={rules.approval.acknowledgement.basis} /></p>
             <button type="submit" class="btn primary full">Potwierdzam zapoznanie z oceną</button>
           </form>
         ) : null}

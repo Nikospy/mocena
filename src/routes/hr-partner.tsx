@@ -1,5 +1,6 @@
 import { Hono, type Context } from "hono";
 import { card } from "../content";
+import { assessmentWindowReached } from "../assessment/phase";
 import { registerCycleLinks } from "../cycle-links";
 import { cycleById, type Cycle } from "../cycles";
 import { recordEvent } from "../events";
@@ -25,8 +26,9 @@ import { AppreciationView } from "../views/appreciation";
 import { BeforeMeetingView } from "../views/before-meeting";
 import { TaskChangeCardView, TaskChangeNoView, TaskChangeQuestionView } from "../views/task-change";
 
+/** Odnośniki pojawiają się w oknie przed terminem oceny, jak sprawa „Wystaw ocenę” (`assessmentWindowReached`). */
 registerCycleLinks((cycle, person) =>
-  cycle.appraiser_id === person.id
+  cycle.appraiser_id === person.id && assessmentWindowReached(cycle)
     ? [
         { label: "Przed rozmową z pracownikiem", href: `/cycles/${cycle.id}/before-meeting` },
         { label: "Docenienie", href: `/cycles/${cycle.id}/appreciation` },

@@ -850,3 +850,20 @@ body.tour-on .nav { display: none; }
 .skip-link { position: absolute; inset-inline-start: var(--sp-100); inset-block-start: var(--sp-100); z-index: 100; padding: var(--sp-100) var(--sp-200); background: var(--surface); color: var(--primary); border-radius: var(--r-300); font-weight: var(--w-semibold, 600); transform: translateY(-200%); }
 .skip-link:focus, .skip-link:focus-visible { transform: none; }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: none; box-shadow: var(--focus); }
+
+/* review-polish-2-1 */
+/* nagłówek oceny jak .hdr w makiecie: jeden blok, bez pustych odstępów */
+.hdr:has(> .hdr-top:only-child) { gap: 0; }
+/* lista braków: jedna linia z pigułką, nazwy kryteriów rozwijane */
+.miss-d > summary { cursor: pointer; }
+.miss-d ul { margin-block-start: var(--sp-100); }
+.miss .basis, .miss .basis .art { white-space: nowrap; }
+/* kolumna ocen cząstkowych u ocenianego: cyfry w jednej kolumnie, wyrównane do końca */
+.sheet > h2 { padding-block: var(--sp-300) var(--sp-100); padding-inline: var(--sp-300); }
+.scorebox:has(> .big) { align-items: flex-end; min-inline-size: 12ch; }
+.scorebox > .big { min-inline-size: 2ch; text-align: end; font-variant-numeric: tabular-nums; }
+.scorebox:has(> .big) .lvl { text-align: end; }
+/* odnośniki cyklu w nagłówku zawijają się, nic nie jest ucięte */
+.hdr-top .hdr-links { display: flex; flex-wrap: wrap; justify-content: flex-end; }
+.hdr-top.many .hdr-links { justify-content: flex-start; }
+@media (max-width: 640px) { .hdr-top .hdr-links { justify-content: flex-start; } }

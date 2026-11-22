@@ -22,7 +22,8 @@ describe("approvalBlockers", () => {
 
   test("brak oceny i ocena spoza cyklu albo skali", () => {
     const missing = run(draft({ scores: { rzetelnosc: 7, komunikacja: 7 } }));
-    expect(missing[0].message).toBe("Brakuje oceny cząstkowej: Współpraca");
+    expect(missing[0].message).toBe("Brakuje ocen cząstkowych: 1");
+    expect(missing[0].items).toEqual(["Współpraca"]);
     expect(missing[0].basis).toBe("§ 11 ust. 1");
     expect(fields(run(draft({ scores: { rzetelnosc: 7, komunikacja: 7, wspolpraca: 4 } })))).toEqual(["score[wspolpraca]"]);
     expect(fields(run(draft({ scores: { rzetelnosc: 7, komunikacja: 7, wspolpraca: 7, negocjowanie: 5 } })))).toEqual(["score[negocjowanie]"]);
