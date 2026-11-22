@@ -1,7 +1,7 @@
 ---
 change_id: guided-demo-tour
 title: Przewodnik pokazu dla jurora
-status: planning
+status: implementing
 created: 2026-11-22
 updated: 2026-11-22
 archived_at: null

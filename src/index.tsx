@@ -17,6 +17,9 @@ import appraiser from "./routes/appraiser";
 import "./reminders";
 import hrPartner from "./routes/hr-partner";
 import admin from "./routes/admin";
+import tour from "./routes/tour";
+import { tourContext } from "./tour/context";
+import { TourEntry } from "./views/tour-entry";
 import { Layout, formatDate } from "./views/layout";
 import { LegalBasis } from "./views/components";
 
@@ -63,9 +66,11 @@ function AccountScreen(props: { error?: string }) {
   );
 }
 
+app.use("*", tourContext);
+
 app.get("/", (c) => {
   const person = currentPerson(c);
-  if (!person) return c.redirect("/account");
+  if (!person) return c.html(<TourEntry />);
   const tasks = homeTasks(person);
   return c.html(
     <Layout title="Start" person={person} today={today()}>
@@ -156,5 +161,6 @@ app.route("/", timeline);
 app.route("/", appraiser);
 app.route("/", hrPartner);
 app.route("/", admin);
+app.route("/", tour);
 
 export default app;
