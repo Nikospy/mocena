@@ -176,6 +176,7 @@ app.post("/notes/:id/feedback", async (c) => {
   if (g instanceof Response) return g;
   const text = str((await c.req.parseBody()).text).trim();
   if (!text) return c.html(<FeedbackFormView {...g} today={today()} text="" error="Wpisz tekst dla pracownika." />, 422);
+  if (text.length > 2000) return c.html(<FeedbackFormView {...g} today={today()} text={text} error="Informacja zwrotna może mieć najwyżej 2000 znaków." />, 422);
   sendFeedback({ noteId: g.note.id, authorId: g.viewer.id, text });
   return c.redirect("/notes?sent=1", 303);
 });
