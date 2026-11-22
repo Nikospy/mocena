@@ -106,6 +106,10 @@
       "teamNone": "O {loc} nie masz jeszcze żadnej notatki.",
       "teamOld": "O {loc} nie masz żadnej notatki od {n} miesięcy.",
       "teamFallback": "Nie masz żadnej notatki o osobie: {name}.",
+      "afterHours": "Od zmiany zadań w Twoich notatkach wraca praca po godzinach.",
+      "afterHoursAsk": "Czy zakres zadań jest do udźwignięcia?",
+      "afterHoursLead": "Notatki, o których mowa:",
+      "afterHoursCard": "Karta rozmowy o podziale zadań",
       "reminder": "Od {date} brak zapisanej informacji zwrotnej dla {gen}."
     }
   }

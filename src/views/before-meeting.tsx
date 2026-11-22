@@ -1,9 +1,39 @@
 import type { Card } from "../content";
 import type { Person } from "../people";
-import type { BeforeMeetingSummary, Item } from "../hr-partner/partner";
+import type { AfterHours, BeforeMeetingSummary, Item } from "../hr-partner/partner";
 import { NoteItem } from "./components/note-item";
 import { Layout, formatDate } from "./layout";
 import { TaskChangeForm } from "./task-change";
+
+function tx(card: Card, key: string): string {
+  const t = card.texts?.[key];
+  if (!t) throw new Error(`Karta „${card.title}” nie ma tekstu „${key}”`);
+  return t;
+}
+
+/** Pytanie o pracę po godzinach: własne wpisy przełożonego po zmianie zadań, bez etykiety przy nazwisku. */
+function AfterHoursSection(props: { card: Card; info: AfterHours }) {
+  return (
+    <section class="card q-hero" aria-label="Pytanie o pracę po godzinach">
+      <h2>{tx(props.card, "afterHours")}</h2>
+      <p>{tx(props.card, "afterHoursAsk")}</p>
+      <p class="cap">
+        {tx(props.card, "afterHoursLead")}{" "}
+        {props.info.notes.map((n, i) => (
+          <>
+            {i > 0 ? ", " : ""}
+            <a href={`#note-${n.id}`}>z {formatDate(n.date)}</a>
+          </>
+        ))}
+      </p>
+      {props.info.cardHref ? (
+        <div class="btns">
+          <a class="btn" href={props.info.cardHref}>{tx(props.card, "afterHoursCard")}</a>
+        </div>
+      ) : null}
+    </section>
+  );
+}
 
 /** To samo pytanie przy kilku pozycjach pada raz, pod listą; przy jednej pozycji stoi przy niej. */
 function Items(props: { items: Item[]; label: string }) {
@@ -48,10 +78,11 @@ export function BeforeMeetingView(props: {
           <h3>Notatki sprzed zmiany zadań</h3>
           {s.before.length ? <ul class="note-list">{s.before.map((n) => <NoteItem note={n} />)}</ul> : <p class="cap">Brak notatek sprzed zmiany.</p>}
           <h3>Notatki po zmianie zadań</h3>
-          <ul class="note-list">{s.after.map((n) => <NoteItem note={n} />)}</ul>
+          <ul class="note-list">{s.after.map((n) => <NoteItem note={n} id={`note-${n.id}`} />)}</ul>
           {s.bothSides.length ? <Items items={s.bothSides} label="Pytania o kryteria" /> : null}
         </section>
       ) : null}
+      {s.afterHours ? <AfterHoursSection card={props.card} info={s.afterHours} /> : null}
       {s.pendingQuestion ? (
         <section class="card q-hero">
           <h2>{s.pendingQuestion.prompt}</h2>
@@ -69,12 +100,6 @@ export function BeforeMeetingView(props: {
         <h2>Informacja zwrotna</h2>
         <Items items={[s.feedback]} label="Informacja zwrotna" />
       </section>
-      {s.team.length ? (
-        <section class="card b-sec">
-          <h2>Zespół</h2>
-          <Items items={s.team} label="Zespół" />
-        </section>
-      ) : null}
       <div class="btns"><a class="btn" href={`/cycles/${props.cycleId}/part1`}>Wróć do cyklu</a></div>
     </Layout>
   );

@@ -1,5 +1,8 @@
 import data from "../content/cards.json";
 
+/** Nazwa licencji kodu. Wartość tymczasowa: autor ustala licencję przed oddaniem; zmiana tylko tutaj. */
+export const CODE_LICENSE = "do ustalenia przez autora";
+
 export type Card = {
   title: string;
   purpose: string;

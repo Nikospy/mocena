@@ -6,7 +6,7 @@ import type { Child } from "hono/jsx";
 export const RATING_LABEL = { good: "dobrze", needs_improvement: "do poprawy" } as const;
 
 /** Notatka z datą, kryterium, oceną przełożonego i znacznikiem zmiany zadań. `insert` dodaje pole wyboru dla „Wstaw”. */
-export function NoteItem(props: { note: Note; showCriterion?: boolean; insert?: string; actions?: Child }) {
+export function NoteItem(props: { note: Note; showCriterion?: boolean; insert?: string; actions?: Child; id?: string }) {
   const n = props.note;
   const name = criterion(n.criterion_id).name;
   const body = (
@@ -21,7 +21,7 @@ export function NoteItem(props: { note: Note; showCriterion?: boolean; insert?: 
     </>
   );
   return (
-    <li class="note-item">
+    <li class="note-item" id={props.id}>
       {props.insert !== undefined ? (
         <label class="cb">
           <input type="checkbox" data-insert={props.insert} aria-label={`Wybierz notatkę z ${formatDate(n.date)}`} />
