@@ -58,7 +58,7 @@ const BODY: Record<TourStopId, Body> = {
     short: "nieobecność",
     lead: "Marek zapisuje fakt w dniu, w którym się zdarzył, a nie po dwóch latach z pamięci. Asystent nie ocenia notatki. Zauważa tylko słowo „przejął” i pyta, czy to stała zmiana zadań.",
     look: [
-      { text: "Pole „Zmiana zadań pracownika” zaznaczone jako podpowiedź, do odznaczenia.", selector: ".hint" },
+      { text: "Po wpisaniu »przejął« pole »Zmiana zadań pracownika« zaznacza się samo jako podpowiedź; można je odznaczyć.", selector: ".hint" },
       { text: "Po zapisie pytanie „To stała zmiana zadań?”, a po „Tak” karta rozmowy i forma rozwoju." },
       { text: "Przy nazwisku Piotra nie ma punktów ani etykiet." },
     ],

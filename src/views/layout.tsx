@@ -40,6 +40,7 @@ export function Layout(props: { title: string; person: Person | null; today: str
       <Head title={props.title} printCss />
       <body class={tourStop ? "tour-on" : undefined}>
         <a class="skip-link" href="#main">Przejdź do treści</a>
+        {tourStop ? <a class="skip-link" href="#tour-guide" data-skip-guide>Przejdź do przewodnika</a> : null}
         <header class="top">
           <div class="top-in">
             <a class="brand" href="/">
@@ -62,16 +63,19 @@ export function Layout(props: { title: string; person: Person | null; today: str
           </div>
         </header>
         {props.today && !tourStop ? (
-          <form method="post" action="/demo/date" class="demo-bar">
-            <b>Pokaz</b>
-            <label>
-              <span>Przesuń datę systemową</span>
-              <input type="date" name="date" value={props.today} min={props.today} required aria-label="Nowa data systemowa" />
-            </label>
-            <button class="btn text" type="submit">
-              Przesuń datę
-            </button>
-          </form>
+          <aside aria-label="Pokaz" class="demo-aside">
+            <form method="post" action="/demo/date" class="demo-bar">
+              <b>Pokaz</b>
+              <span class="demo-today">Dziś: {formatDateLong(props.today)}</span>
+              <label>
+                <span>Przesuń datę systemową</span>
+                <input type="date" name="date" value={props.today} min={props.today} required aria-label="Nowa data systemowa" />
+              </label>
+              <button class="btn text" type="submit">
+                Przesuń datę
+              </button>
+            </form>
+          </aside>
         ) : null}
         <main class="wrap" id="main">{props.children}</main>
         {tourStop ? (

@@ -881,3 +881,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .hr-card > td[data-label]::before { content: attr(data-label); display: block; color: var(--text-3); font-weight: var(--w-bold); }
   .hr-card > td[data-label="Oceniający"], .hr-card > td[data-label="Arkusz"] { display: none; }
 }
+/* review-polish-2-3 */
+.gp-b h2, .gm-t, .e-h1 { text-wrap: balance; }
+.gp-f .btn.primary, .gm-bar .btn.primary { white-space: nowrap; font-size: var(--f-c1); line-height: var(--lh-c1); padding-inline: var(--sp-150); }
+.gp-f .btn.primary > span { white-space: nowrap; }
+.gpanel:focus, .gmob:focus { outline: none; }
+.demo-today { color: var(--text-2); }
+.e-done { inline-size: 100%; margin-inline: auto; }
+.e-more .btn.text { padding-inline: 0; justify-content: flex-start; }
+.e-more .btn.text:hover { background: none; text-decoration: underline; }

@@ -131,3 +131,21 @@ describe("przewodnik pokazu", () => {
     expect(text).not.toContain("pracownik\"");
   });
 });
+
+describe("przewodnik: układ i dostępność", () => {
+  test("link do przewodnika stoi zaraz po „Przejdź do treści”, a pasek pokazu ma datę słownie", async () => {
+    const { app } = createTestApp();
+    const cookie = cookies(await post(app, "/tour/2"));
+    const { text } = await html(app, "/people/piotr/notes/new", cookie);
+    const a = text.indexOf("Przejdź do treści");
+    const b = text.indexOf("Przejdź do przewodnika");
+    expect(a).toBeGreaterThan(-1);
+    expect(b).toBeGreaterThan(a);
+    expect(text.indexOf("<header", a)).toBeGreaterThan(b);
+    expect(text).toContain("Po wpisaniu »przejął« pole »Zmiana zadań pracownika« zaznacza się samo jako podpowiedź; można je odznaczyć.");
+
+    const plain = await html(app, "/account");
+    expect(plain.text).toMatch(/<aside[^>]*aria-label="Pokaz"/);
+    expect(plain.text).toMatch(/Dziś: \d{1,2} \p{L}+ \d{4}/u);
+  });
+});

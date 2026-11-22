@@ -9,6 +9,12 @@
     if (!first) first = el;
   });
   if (first) first.scrollIntoView({ block: "center", behavior: "smooth" });
+  var h1 = document.querySelector("main h1");
+  if (h1) { h1.setAttribute("tabindex", "-1"); h1.focus({ preventScroll: true }); }
+
+  var skip = document.querySelector("[data-skip-guide]");
+  var desk = document.getElementById("tour-guide");
+  if (skip && desk && getComputedStyle(desk).display === "none") skip.setAttribute("href", "#tour-guide-m");
 
   var details = document.querySelector("[data-gmob]");
   if (details) {
