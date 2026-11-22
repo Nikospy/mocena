@@ -371,11 +371,11 @@ Każde ma domyślne rozstrzygnięcie, z którym implementacja idzie dalej.
 
 #### Automated
 
-- [ ] 1.1 Testy reguły stopnia przechodzą: `bun test src/engine/grades.test.ts`
-- [ ] 1.2 Testy stanu cyklu i widoczności przechodzą: `bun test src/hr/cycle-state.test.ts`
-- [ ] 1.3 Dane pokazowe wgrywają się bez błędu: `bun run seed`
-- [ ] 1.4 Testy ekranu kadr, arkusza, druku i historii przechodzą: `bun test src/routes/hr.test.ts src/routes/sheet.test.ts src/routes/history.test.ts`
-- [ ] 1.5 Test przejścia z `/hr` do arkuszy wgranych osób przechodzi: `bun test src/routes/hr-sheets.test.ts`
+- [x] 1.1 Testy reguły stopnia przechodzą: `bun test src/engine/grades.test.ts` — 66a9b37
+- [x] 1.2 Testy stanu cyklu i widoczności przechodzą: `bun test src/hr/cycle-state.test.ts` — 66a9b37
+- [x] 1.3 Dane pokazowe wgrywają się bez błędu: `bun run seed` — 66a9b37
+- [x] 1.4 Testy ekranu kadr, arkusza, druku i historii przechodzą: `bun test src/routes/hr.test.ts src/routes/sheet.test.ts src/routes/history.test.ts` — 66a9b37
+- [x] 1.5 Test przejścia z `/hr` do arkuszy wgranych osób przechodzi: `bun test src/routes/hr-sheets.test.ts` — 66a9b37
 
 #### Manual
 
@@ -387,8 +387,8 @@ Każde ma domyślne rozstrzygnięcie, z którym implementacja idzie dalej.
 
 #### Automated
 
-- [ ] 2.1 Testy przycisków, części III, statystyk i poprzednich ocen przechodzą: `bun test src/routes/hr-actions.test.ts`
-- [ ] 2.2 Cały zestaw testów przechodzi: `bun test`
+- [x] 2.1 Testy przycisków, części III, statystyk i poprzednich ocen przechodzą: `bun test src/routes/hr-actions.test.ts` — 5ae4c61
+- [x] 2.2 Cały zestaw testów przechodzi: `bun test` — 5ae4c61
 
 #### Manual
 
