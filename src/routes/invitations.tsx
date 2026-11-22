@@ -38,7 +38,7 @@ registerHomeTasks((person) => {
         title: invitationHeadline(i),
         href: `/cycles/${mine.id}/invitations/${i.id}`,
         detail: `${INVITATION_KINDS[i.kind].topics.length} tematy z przepisu (${INVITATION_KINDS[i.kind].basis}). Pełna lista w zaproszeniu.`,
-        action: "Zobacz zaproszenie",
+        action: "Otwórz zaproszenie",
         post: { label: "Potwierdzam termin", action: `/cycles/${mine.id}/invitations/${i.id}/confirm` },
         secondary: { label: "Pobierz do kalendarza", href: `/cycles/${mine.id}/invitations/${i.id}.ics` },
       });
@@ -57,7 +57,7 @@ registerHomeTasks((person) => {
           person: personById(person_id)?.name,
           detail: invitationStatus(i, cycle),
           href: `/cycles/${cycle.id}/invitations/${i.id}`,
-          action: "Zobacz zaproszenie",
+          action: "Otwórz zaproszenie",
           quiet: !!i.confirmedOn,
         });
       }

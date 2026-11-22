@@ -31,7 +31,7 @@ describe("1.1 strona główna ocenianego bez pustki", () => {
     const h = await html(app, "piotr", "/");
     expect(h).not.toContain("Brak spraw do załatwienia");
     const t = text(h);
-    expect(t).toContain("Twoja ocena");
+    expect(t).toContain("Ocena okresowa");
     expect(t).toContain("Ocena pozytywna, powyżej oczekiwań");
     expect(t).toContain("do 30.11.2026");
     expect(t).toContain("art. 83 ust. 1");
@@ -42,8 +42,8 @@ describe("1.1 strona główna ocenianego bez pustki", () => {
     const { app } = createTestApp({ today: "2024-12-09" });
     const h = await html(app, "ewa", "/");
     expect(h).not.toContain("Brak spraw do załatwienia");
-    expect(text(h)).toContain("Nic na Ciebie nie czeka");
-    expect(text(h)).toContain("Twój termin oceny:");
+    expect(text(h)).toContain("Teraz nie masz spraw do załatwienia");
+    expect(text(h)).toContain("Termin oceny:");
     expect(text(h)).toContain("do 20.11.2026");
   });
 });
@@ -203,14 +203,14 @@ describe("1.12 odnotowanie przyznania stopnia", () => {
 });
 
 describe("1.13 fikcja zapoznania do znalezienia", () => {
-  test("po zatwierdzeniu oceniający ma sprawę z przyciskiem „Stwierdź fikcję zapoznania”; wcześniej i dla kadr nie", async () => {
+  test("po zatwierdzeniu oceniający ma sprawę z przyciskiem „Wpisz fikcję zapoznania”; wcześniej i dla kadr nie", async () => {
     const { app } = createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } });
     const fiction = `href="/cycles/${PIOTR}/assessment/fiction"`;
     expect(await html(app, "marek", "/")).not.toContain(fiction);
     await approvePiotr(app);
     const home = await html(app, "marek", "/");
     expect(home).toContain(fiction);
-    expect(text(home)).toContain("Stwierdź fikcję zapoznania");
+    expect(text(home)).toContain("Wpisz fikcję zapoznania");
     expect((await call(app, "marek", `/cycles/${PIOTR}/assessment/fiction`)).status).toBe(200);
     // kadry tylko widzą wpis: nie ma dla nich przycisku, którego zapis by się nie udał
     expect(await html(app, "joanna", "/hr")).not.toContain("assessment/fiction");
@@ -251,7 +251,7 @@ describe("1.14 formy ról według osoby", () => {
     const { app } = createTestApp({ today: "2026-11-22", seedOptions: { afterStep1: true } });
     const t = text(await html(app, "anna", "/"));
     expect(t).not.toContain("Termin oceny Anna Kwiatkowska");
-    expect(t).toContain("Twój termin oceny: 16.12.2026");
+    expect(t).toContain("Termin oceny: 16.12.2026");
   });
 });
 

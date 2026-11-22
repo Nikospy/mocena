@@ -68,3 +68,12 @@ describe("formularze wracają po błędzie (422)", () => {
     expect(h).toContain('action="/cycles/cycle-katarzyna/objection-outcome"');
   });
 });
+
+test("GET /notes jako oceniany bez zespołu: strona odmowy zamiast pustej listy „Notatki o zespole”", async () => {
+  const { app } = createTestApp({ today: "2026-11-10", seedOptions: { afterStep1: true } });
+  const r = await call(app, "piotr", "/notes");
+  expect(r.status).toBe(403);
+  const h = await r.text();
+  expect(h).toContain("Notatki o zespole prowadzą oceniający i przełożeni.");
+  expect((await call(app, "marek", "/notes")).status).toBe(200);
+});

@@ -267,12 +267,12 @@ describe("lista spraw, odnośniki, etykiety", () => {
     expect(p()).not.toContain("Zapoznaj się z oceną");
     expect(await (await call(app, "piotr", `/cycles/${piotr}/assessment`)).text()).toContain("Ocena nie jest jeszcze zatwierdzona");
     await approvePiotr(app);
-    expect(m()).toContain("Czeka na potwierdzenie zapoznania: Piotr Wójcik");
+    expect(m()).toContain("Ocena czeka na zapoznanie: Piotr Wójcik");
     expect(p()).toContain("Zapoznaj się z oceną");
     const cycle = cycleById(piotr)!;
     expect(cycleLinks(cycle, personById("piotr")!).map((l) => l.label)).toContain("Ocena");
     await call(app, "piotr", `/cycles/${piotr}/assessment/acknowledge`, {});
-    expect(m()).not.toContain("Czeka na potwierdzenie zapoznania: Piotr Wójcik");
+    expect(m()).not.toContain("Ocena czeka na zapoznanie: Piotr Wójcik");
     expect(m().join()).toContain("Wyznacz kryteria oceny: Piotr Wójcik, do 30.11.2026 (§ 7 pkt 2)");
     expect(p()).not.toContain("Zapoznaj się z oceną");
   });
@@ -290,7 +290,7 @@ describe("lista spraw, odnośniki, etykiety", () => {
     const view = await (await call(app, "piotr", `/cycles/${piotr}/assessment`)).text();
     expect(outside(view)).not.toMatch(/Ocena (negatywna|pozytywna)|6,14/);
     const home = await (await call(app, "marek", "/")).text();
-    expect(home).toMatch(/<h2><a class="task-link" href="[^"]+">Czeka na potwierdzenie zapoznania: Piotr Wójcik<\/a><\/h2>/);
+    expect(home).toMatch(/<h2><a class="task-link" href="[^"]+">Ocena czeka na zapoznanie: Piotr Wójcik<\/a><\/h2>/);
     expect(home).toContain('href="/cycles/cycle-piotr/assessment"');
     expect(home).not.toMatch(/Ocena (negatywna|pozytywna)|6,14/);
     const part1 = await (await call(app, "marek", `/cycles/${piotr}/part1`)).text();
@@ -372,7 +372,7 @@ describe("fikcja zapoznania i wgląd kadr", () => {
     expect(html).toContain("pocztą");
     expect(html).toContain("30.11.2026");
     expect(html.slice(html.indexOf("<main"))).not.toContain("<button");
-    expect(html).not.toContain("Stwierdź fikcję");
+    expect(html).not.toContain("Wpisz fikcję");
     expect(html).not.toContain("Potwierdzam zapoznanie");
   });
 });

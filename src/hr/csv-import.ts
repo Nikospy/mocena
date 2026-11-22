@@ -3,7 +3,7 @@
 import { getDb } from "../db";
 import { OUTCOME_LABEL, supervisorCandidates, validateForm, emptyForm, type PersonForm } from "./people";
 
-export const EXPORT_HEADER = ["Osoba", "Stanowisko", "Komórka", "Oceniający", "Stan procesu", "Termin oceny", "Termin sprzeciwu", "Data ostatniej oceny", "Wynik ostatniej oceny"];
+export const EXPORT_HEADER = ["Osoba", "Stanowisko", "Komórka", "Oceniający", "Stan cyklu", "Termin oceny", "Termin sprzeciwu", "Data ostatniej oceny", "Wynik ostatniej oceny"];
 const REQUIRED = ["Osoba", "Stanowisko", "Komórka", "Oceniający"];
 
 /** CSV z separatorem `;` (albo `,`), cudzysłowami i BOM; zdejmuje apostrof chroniący przed formułą, który dodaje eksport. */

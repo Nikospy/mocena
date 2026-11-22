@@ -1,9 +1,9 @@
-import { CORRECTABLE_FIELDS, type CorrectableField, type CorrectionErrors, type SheetCorrection } from "../assessment/corrections";
+import { CORRECTABLE_FIELDS, inSentence, type CorrectableField, type CorrectionErrors, type SheetCorrection } from "../assessment/corrections";
 import type { Person } from "../people";
 import { ErrorSummary, FieldError, PageHeader, invalid } from "./components";
 import { Layout, formatDate } from "./layout";
 
-const show = (field: CorrectableField, v: string) => (v ? (CORRECTABLE_FIELDS[field].kind === "date" ? formatDate(v) : v) : "—");
+const show = (field: CorrectableField, v: string) => (v ? (CORRECTABLE_FIELDS[field].kind === "date" ? formatDate(v) : inSentence(v)) : "—");
 
 export function CorrectionListView(props: { viewer: Person; today: string; cycles: { id: string; personName: string; approvedOn: string }[] }) {
   return (

@@ -53,7 +53,7 @@ export function overviewData(viewer: Person) {
     today: today(),
     links: [
       ...cycleLinks(c, viewer),
-      ...(assessmentState(c.id).snapshot ? [{ label: "Pobierz ocenę (JSON)", href: `/cycles/${c.id}/assessment/export.json` }] : []),
+      ...(assessmentState(c.id).snapshot ? [{ label: "Pobierz ocenę do systemu kadrowego (plik JSON)", href: `/cycles/${c.id}/assessment/export.json` }] : []),
     ],
   }));
   // Najpierw cykle wymagające działania, zamknięte (zapoznanie, fikcja, rozpatrzony sprzeciw) na końcu; w grupie od najbliższego terminu.

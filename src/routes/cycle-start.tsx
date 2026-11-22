@@ -24,7 +24,7 @@ import { errorPage } from "../views/error-page";
 const isParty = (c: Cycle, p: Person) => actsAsAppraiser(c.appraiser_id, p.id) || c.person_id === p.id;
 
 registerCycleLinks((cycle, person) =>
-  isParty(cycle, person) ? [{ label: "Karta rozmowy rozpoczynającej", href: `/cycles/${cycle.id}/cards/opening` }] : [],
+  isParty(cycle, person) ? [{ label: "Karta rozmowy o kryteriach", href: `/cycles/${cycle.id}/cards/opening` }] : [],
 );
 
 registerCycleLinks((cycle, person) =>

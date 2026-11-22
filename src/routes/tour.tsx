@@ -36,25 +36,25 @@ app.post("/tour/extra/:id", (c) => {
   let path: string;
   if (id === "ewa-timeline") {
     const stop = stopById("5b");
-    if (!stop) return errorPage(c, "Nie ma takiego kroku pokazu.", 404);
+    if (!stop) return errorPage(c, "Nie ma takiego kroku pokazu.", 404, <a href="/tour">Wróć do pokazu</a>);
     applyTourStop(db, stop);
     const ewa = cycleIdOf("ewa");
-    if (!ewa) return errorPage(c, "Nie ma takiego kroku pokazu.", 404);
+    if (!ewa) return errorPage(c, "Nie ma takiego kroku pokazu.", 404, <a href="/tour">Wróć do pokazu</a>);
     personId = "joanna";
     path = `/cycles/${ewa}/timeline`;
   } else if (id === "fiction") {
     const stop = stopById("5");
-    if (!stop) return errorPage(c, "Nie ma takiego kroku pokazu.", 404);
+    if (!stop) return errorPage(c, "Nie ma takiego kroku pokazu.", 404, <a href="/tour">Wróć do pokazu</a>);
     applyTourStop(db, stop);
     const piotr = cycleIdOf("piotr");
-    if (!piotr) return errorPage(c, "Nie ma takiego kroku pokazu.", 404);
+    if (!piotr) return errorPage(c, "Nie ma takiego kroku pokazu.", 404, <a href="/tour">Wróć do pokazu</a>);
     personId = "marek";
     path = `/cycles/${piotr}/assessment/fiction`;
   } else if (id === "sources") {
     personId = "admin";
     path = "/admin/suggestion-sources";
   } else {
-    return errorPage(c, "Nie ma takiego kroku pokazu.", 404);
+    return errorPage(c, "Nie ma takiego kroku pokazu.", 404, <a href="/tour">Wróć do pokazu</a>);
   }
   deleteCookie(c, TOUR_COOKIE, { path: "/" });
   setCookie(c, PERSON_COOKIE, personId, COOKIE_OPTS);
@@ -64,7 +64,7 @@ app.post("/tour/extra/:id", (c) => {
 app.post("/tour/:stop", (c) => {
   const id = c.req.param("stop");
   const stop = isTourStopId(id) ? stopById(id) : null;
-  if (!stop) return errorPage(c, "Nie ma takiego kroku pokazu.", 404);
+  if (!stop) return errorPage(c, "Nie ma takiego kroku pokazu.", 404, <a href="/tour">Wróć do pokazu</a>);
   applyTourStop(getDb(), stop);
   setCookie(c, PERSON_COOKIE, stop.personId, COOKIE_OPTS);
   setCookie(c, TOUR_COOKIE, stop.id, COOKIE_OPTS);

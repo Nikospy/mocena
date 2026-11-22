@@ -3,7 +3,6 @@ import { openCycle, type Cycle } from "./cycles";
 import { addDays, criteriaTalkDeadline } from "./engine/deadlines";
 import { rules } from "./engine/rules";
 import { visibleEvents, type AppEvent } from "./events";
-import { nameForm } from "./hr-partner/partner";
 import type { Person } from "./people";
 import { personById } from "./people";
 
@@ -104,6 +103,9 @@ export function daysBetween(from: string, to: string): number {
   return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86400000);
 }
 
+/** Data w formacie aplikacji (dd.mm.rrrr), jak `formatDate` w widokach. */
+const fullDate = (iso: string): string => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}`;
+
 export const shortDate = (iso: string): string => `${Number(iso.slice(8, 10))}.${Number(iso.slice(5, 7))}`;
 
 export function invitationHeadline(i: Invitation): string {
@@ -111,11 +113,10 @@ export function invitationHeadline(i: Invitation): string {
   return `${INVITATION_KINDS[i.kind].invitationTitle}: ${d}.${m}.${y}, ${i.time}, ${i.place}`;
 }
 
-/** „Wysłane 9.12, czeka na potwierdzenie” albo „Potwierdzone przez Piotra 9.12”. */
-export function invitationStatus(i: Invitation, cycle: Cycle): string {
-  if (!i.confirmedOn) return `Wysłane ${shortDate(i.sentOn)}, czeka na potwierdzenie`;
-  const name = personById(cycle.person_id)?.name ?? "";
-  return `Potwierdzone przez ${nameForm(name, "gen") ?? name} ${shortDate(i.confirmedOn)}`;
+/** „Wysłano 09.12.2024. Czeka na potwierdzenie ocenianego.” albo „Potwierdzone przez ocenianego 10.12.2024.” (bez imienia: „przez” wymaga biernika, którego katalog form nie ma). */
+export function invitationStatus(i: Invitation, _cycle: Cycle): string {
+  if (!i.confirmedOn) return `Wysłano ${fullDate(i.sentOn)}. Czeka na potwierdzenie ocenianego.`;
+  return `Potwierdzone przez ocenianego ${fullDate(i.confirmedOn)}.`;
 }
 
 /**

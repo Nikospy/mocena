@@ -333,7 +333,7 @@ app.post("/cycles/:id/assessment/fiction", async (c) => {
     startNextCycle(g.cycle, g.person.id, state.approvedOn, values.deliveredOn, state.snapshot.result.outcome);
     return true;
   })();
-  if (!ok) return render(c, g, { status: 409, errors: { _: "Ocena nie czeka już na potwierdzenie zapoznania." } });
+  if (!ok) return render(c, g, { status: 409, errors: { _: "Ocena nie czeka na potwierdzenie zapoznania." } });
   return c.redirect(`/cycles/${g.cycle.id}/assessment`, 303);
 });
 

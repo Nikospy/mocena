@@ -145,6 +145,8 @@ app.get("/notes", (c) => {
     const needsCriteria = cycle && ["not_started", "draft"].includes(part1Status(cycle.id).state);
     groups.push({ person, notes: own, canWrite, cycleAction: needsCriteria ? "Wyznacz kryteria" : undefined, cycleHref: cycle && cycle.appraiser_id === viewer.id ? `/cycles/${cycle.id}` : undefined });
   }
+  // Oceniany bez zespołu i bez własnych notatek nie ma tu czego oglądać: strona odmowy z wyjściem do jego spraw.
+  if (groups.length === 0 && viewer.role !== "appraiser") return errorPage(c, "Notatki o zespole prowadzą oceniający i przełożeni. Twoje sprawy są na liście spraw.", 403);
   const latest = (g: NoteGroup) => g.notes[0]?.date ?? "";
   groups.sort((a, b) => latest(b).localeCompare(latest(a)) || a.person.name.localeCompare(b.person.name, "pl"));
   return c.html(<NotesListView viewer={viewer} today={today()} groups={groups} saved={c.req.query("saved") !== undefined} sent={c.req.query("sent") !== undefined} />);

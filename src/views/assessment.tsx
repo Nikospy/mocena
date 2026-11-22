@@ -403,7 +403,7 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
         ) : null}
         {p.canFiction ? (
           <div class="decide">
-            <a class="btn full" href={`/cycles/${p.cycleId}/assessment/fiction`}>Stwierdź fikcję zapoznania</a>
+            <a class="btn full" href={`/cycles/${p.cycleId}/assessment/fiction`}>Wpisz fikcję zapoznania</a>
           </div>
         ) : null}
         <a class="btn o-export" href={`/cycles/${p.cycleId}/assessment/export.json`} download>Pobierz ocenę jako plik danych (JSON)</a>
