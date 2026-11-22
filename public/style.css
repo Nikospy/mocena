@@ -139,9 +139,11 @@ h1 { font-size: var(--f-h4); line-height: var(--lh-h4); font-weight: var(--w-bol
 @media (min-width: 900px) { h1 { font-size: var(--f-h2); line-height: var(--lh-h2); } }
 h2 { font-size: var(--f-h5); line-height: var(--lh-h5); font-weight: var(--w-bold); }
 h3 { font-size: var(--f-p); line-height: var(--lh-p); font-weight: var(--w-bold); }
-p { max-inline-size: 66ch; }
+p, blockquote, dd, :is(ul, ol):not([class]) > li, :is(.topics, .b-ol, .points, .why, .reason, .outcomes, .plain-list, .g-look, .tl-list) > li { max-inline-size: 66ch; }
 .cap { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
 .cap b { color: var(--text); }
+/* objaśnienie pod nagłówkiem sekcji i przy polu wyboru to treść, nie metadane */
+.list-h .cap, .hint > .cap, .rule > .cap, .cb small { font-size: var(--f-p); line-height: var(--lh-p); }
 .big { font-size: var(--f-h5); line-height: var(--lh-h5); font-weight: var(--w-bold); font-variant-numeric: tabular-nums; }
 .lbl { display: block; font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); color: var(--text-2); margin-block-end: var(--sp-100); }
 
@@ -616,6 +618,7 @@ p { max-inline-size: 66ch; }
 .acc-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); margin-block: var(--sp-200); }
 .acc { inline-size: 100%; block-size: 100%; display: grid; align-content: start; justify-items: start; gap: var(--sp-50); text-align: start; font: inherit; color: var(--text); cursor: pointer; }
 .acc > * + * { margin-block-start: 0; }
+.acc .cap { font-size: var(--f-p); line-height: var(--lh-p); }
 .acc:hover { border-color: var(--primary); }
 .acc:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .acc-role { margin-block-start: var(--sp-100); color: var(--primary); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); }
@@ -675,7 +678,7 @@ p { max-inline-size: 66ch; }
 /* 1.7 rozwijanie jak w makietach (chevron, bez surowego trójkąta); oczekiwanie tylko przy zaznaczonym kryterium */
 details.disc { margin-block-start: var(--sp-50); }
 details.disc > summary { list-style: none; display: inline-flex; align-items: center; gap: var(--sp-100); min-block-size: var(--hit); padding-inline: var(--sp-100);
-  margin-inline-start: calc(var(--sp-100) * -1); border-radius: var(--ctl-r); font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); cursor: pointer; }
+  margin-inline-start: calc(var(--sp-100) * -1); border-radius: var(--ctl-r); color: var(--text-2); cursor: pointer; }
 details.disc > summary::-webkit-details-marker { display: none; }
 details.disc > summary .ico { color: var(--primary); }
 details.disc[open] > summary .ico { transform: rotate(180deg); }
