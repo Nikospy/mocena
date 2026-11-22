@@ -27,7 +27,7 @@ import { tourContext } from "./tour/context";
 import { TourEntry } from "./views/tour-entry";
 import { Layout, formatDate } from "./views/layout";
 import { NotFoundPage, ServerErrorPage } from "./views/error-page";
-import { LegalBasis } from "./views/components";
+import { LegalBasis, PageHeader } from "./views/components";
 
 const ROLE_LABEL: Record<string, string> = { appraiser: "oceniający", employee: "pracownik", hr: "kadry", admin: "administrator" };
 
@@ -46,10 +46,7 @@ function AccountScreen(props: { error?: string }) {
   return (
     <Layout title="Wybór konta" person={null} today={today()}>
       <section class="account-list">
-        <div class="list-h">
-          <h1>Wybierz konto pokazowe</h1>
-          <p class="cap">Każde konto pokazuje ekrany jednej osoby w cyklu oceny.</p>
-        </div>
+        <PageHeader title="Wybierz konto pokazowe" lead="Każde konto pokazuje ekrany jednej osoby w cyklu oceny." />
         {props.error ? <p class="st bad" role="alert">{props.error}</p> : null}
         <form method="post" action="/account">
           <ul class="acc-grid">
@@ -81,9 +78,7 @@ app.get("/", (c) => {
   return c.html(
     <Layout title="Start" person={person} today={today()}>
       <section>
-        <div class="list-h">
-          <h1>Sprawy do załatwienia</h1>
-        </div>
+        <PageHeader title="Sprawy do załatwienia" />
         {tasks.length === 0 ? (
           <p class="card">Brak spraw do załatwienia.</p>
         ) : (
@@ -155,8 +150,8 @@ app.post("/demo/date", async (c) => {
     const person = currentPerson(c);
     return c.html(
       <Layout title="Data systemowa" person={person} today={today()}>
+        <PageHeader title="Nie zmieniono daty" />
         <section class="card">
-          <h1>Nie zmieniono daty</h1>
           <p class="req" role="alert">Data systemowa może tylko przesuwać się do przodu: podaj datę późniejszą niż bieżąca.</p>
           <a class="btn text" href="/">Wróć na stronę główną</a>
         </section>

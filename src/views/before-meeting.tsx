@@ -1,4 +1,5 @@
 import type { Card } from "../content";
+import { PageHeader } from "./components";
 import type { Person } from "../people";
 import type { BeforeMeetingSummary, Item } from "../hr-partner/partner";
 import { NoteItem } from "./components/note-item";
@@ -36,11 +37,7 @@ export function BeforeMeetingView(props: {
   const s = props.summary;
   return (
     <Layout title="Przed rozmową z pracownikiem" person={props.viewer} today={props.today}>
-      <section class="card hdr">
-        <p class="voice src">Przygotowanie do rozmowy · z Twoich notatek</p>
-        <h1>Przed rozmową z {props.titleName}</h1>
-        <p class="cap">{props.card.purpose}</p>
-      </section>
+      <PageHeader context="Przygotowanie do rozmowy · z Twoich notatek" title={<>Przed rozmową z {props.titleName}</>} lead={props.card.purpose} />
       {s.boundary ? (
         <section class="card b-sec">
           <h2>Zmiana zadań</h2>

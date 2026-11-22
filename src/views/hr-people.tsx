@@ -1,6 +1,6 @@
 import { GRADES, LEVELS, OUTCOME_LABEL, SHEETS, suggestSheet, type FormErrors, type PersonForm, type PersonRow, type Sort } from "../hr/people";
 import type { Person } from "../people";
-import { LegalBasis } from "./components";
+import { LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
 const SORTS: { id: Sort; label: string }[] = [
@@ -13,10 +13,7 @@ const SHEET_LABEL: Record<string, string> = { A: "A: kierownik urzędu", B: "B: 
 export function PeopleListView(props: { viewer: Person; today: string; rows: PersonRow[]; q: string; sort: Sort; saved?: string }) {
   return (
     <Layout title="Pracownicy" person={props.viewer} today={props.today}>
-      <section class="card hdr slim">
-        <h1>Pracownicy</h1>
-        <p class="cap">Dane, z których system liczy arkusz i termin oceny. Termin pochodzi z przepisów, nie z oceny osoby.</p>
-      </section>
+      <PageHeader title="Pracownicy" lead="Dane, z których system liczy arkusz i termin oceny. Termin pochodzi z przepisów, nie z oceny osoby." />
       {props.saved ? (
         <div class="st ok" role="status">
           <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
@@ -133,8 +130,8 @@ export function PersonFormView(props: {
   const suggested = suggestSheet(v.position_title);
   return (
     <Layout title={props.title} person={props.viewer} today={props.today}>
+      <PageHeader title={props.title} />
       <section class="card form-card">
-        <h1>{props.title}</h1>
         {e.form ? <p class="st bad" role="alert">{e.form}</p> : null}
         <form method="post" action={props.action} class="abs-form">
           <div>

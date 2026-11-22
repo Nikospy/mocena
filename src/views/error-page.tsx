@@ -1,11 +1,11 @@
 import { Layout } from "./layout";
+import { PageHeader } from "./components";
 
 export function NotFoundPage() {
   return (
     <Layout title="Nie ma takiej strony" person={null} today={null}>
-      <section class="card">
-        <h1>Nie ma takiej strony</h1>
-        <p>Adres jest nieprawidłowy albo strona została przeniesiona.</p>
+      <PageHeader title="Nie ma takiej strony" lead="Adres jest nieprawidłowy albo strona została przeniesiona." />
+      <section>
         <div class="btns">
           <a class="btn primary" href="/">Strona główna</a>
           <a class="btn" href="/tour">Pokaz dla jury</a>
@@ -18,9 +18,8 @@ export function NotFoundPage() {
 export function ServerErrorPage() {
   return (
     <Layout title="Coś poszło nie tak" person={null} today={null}>
-      <section class="card">
-        <h1>Coś poszło nie tak</h1>
-        <p>Dane są bezpieczne. Spróbuj jeszcze raz albo zacznij pokaz od początku.</p>
+      <PageHeader title="Coś poszło nie tak" lead="Dane są bezpieczne. Spróbuj jeszcze raz albo zacznij pokaz od początku." />
+      <section>
         <div class="btns">
           <a class="btn primary" href="/">Spróbuj jeszcze raz</a>
           <form method="post" action="/tour/1">

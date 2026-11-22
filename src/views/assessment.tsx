@@ -5,7 +5,7 @@ import type { Blocker, GradeRequestOption } from "../engine/approval";
 import { rules, rulesVersion } from "../engine/rules";
 import { criterion, POINTS, type AssessmentResult } from "../engine/scoring";
 import type { Person } from "../people";
-import { ConfirmationBlock, LegalBasis, RulesVersion } from "./components";
+import { ConfirmationBlock, LegalBasis, RulesVersion, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 import type { JSX } from "hono/jsx/jsx-runtime";
 
@@ -164,8 +164,8 @@ export function ObjectionClock(props: { deadline: string; today: string; mine: b
 export function AssessmentMessage(props: { viewer: Person; person: Person; today: string; text: string; status?: number; action?: { label: string; href: string } }) {
   return (
     <Layout title="Ocena" person={props.viewer} today={props.today}>
+      <PageHeader title={<>Ocena okresowa: {props.person.name}</>} />
       <section class="card">
-        <h1>Ocena okresowa: {props.person.name}</h1>
         <p class="st info">{props.text}</p>
         <div class="btns">
           {props.action ? <a class="btn primary" href={props.action.href}>{props.action.label}</a> : null}
@@ -201,17 +201,10 @@ export type AssessmentViewProps = {
 
 function Header(p: { person: Person; sheet: string; period: string }) {
   return (
-    <section class="card hdr" aria-label="Cykl oceny">
-      <div class="hdr-top">
-        <div class="hdr-id">
-          <p class="cap">Ocena okresowa · arkusz {p.sheet}</p>
-          <h1>{p.person.name}</h1>
-          <p class="cap">
-            {p.person.position_title ?? ""} · {p.period}
-          </p>
-        </div>
-      </div>
-    </section>
+    <PageHeader
+      context={<>{p.person.position_title ?? ""} · arkusz {p.sheet} · {p.period}</>}
+      title={<>Ocena okresowa: {p.person.name}</>}
+    />
   );
 }
 

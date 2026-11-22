@@ -1,4 +1,5 @@
 import { CRITERIA } from "../engine/scoring";
+import { PageHeader } from "./components";
 import type { Person } from "../people";
 import type { NoteSuggestion } from "../suggestions";
 import { Layout, formatDateLong } from "./layout";
@@ -34,7 +35,7 @@ export function NoteFormView(props: {
   return (
     <Layout title="Nowa notatka" person={props.viewer} today={props.today}>
       <section class="enter">
-        <h1 class="n-title">Nowa notatka: {props.subject.name}</h1>
+        <PageHeader title={<>Nowa notatka: {props.subject.name}</>} />
         <form method="post" action={`/people/${props.subject.id}/notes`} class="n-form" id="note-form">
           <div class="who-block">
             <div class="who-row">

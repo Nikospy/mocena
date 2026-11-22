@@ -320,13 +320,6 @@ p { max-inline-size: 66ch; }
 
 /* ================= 6. Obiekty produktu ================= */
 
-/* nagłówek sprawy: kto, jaki dokument, etap cyklu */
-.hdr { display: grid; gap: var(--sp-300); }
-.hdr > * + * { margin-block-start: 0; }
-.hdr-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: var(--sp-200); }
-.hdr-id > * + * { margin-block-start: var(--sp-50); }
-.hdr-links { display: grid; justify-items: end; margin-inline-end: calc(var(--sp-200) * -1); margin-block-start: calc(var(--sp-100) * -1); }
-@media (max-width: 640px) { .hdr-top { grid-template-columns: 1fr; } .hdr-links { justify-items: start; margin-inline: calc(var(--sp-200) * -1) 0; } }
 
 /* pasek etapów cyklu: Kryteria → Okres oceny → Rozmowa → Ocena → Zapoznanie */
 .steps5 { display: grid; grid-template-columns: repeat(5, 1fr); list-style: none; inline-size: 100%; max-inline-size: 640px; }
@@ -484,7 +477,6 @@ p { max-inline-size: 66ch; }
 /* ================= 7. Układy ekranów ================= */
 
 /* --- notatka (telefon) --- */
-.n-title { margin-block: var(--sp-100) var(--sp-200); }
 .n-form { display: flex; flex-direction: column; gap: var(--sp-300); }
 .n-form > .who-block { display: grid; gap: var(--sp-100); }
 .who-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: var(--sp-100); }
@@ -530,10 +522,6 @@ p { max-inline-size: 66ch; }
 .after-ok .st { padding: var(--sp-200); }
 
 /* --- oś czasu (komputer) --- */
-.hdr.slim { gap: var(--sp-200); padding-block: var(--sp-200); }
-@media (min-width: 1000px) {
-  .hdr.slim { grid-template-columns: minmax(0, 1fr) minmax(0, 560px) auto; align-items: center; gap: var(--sp-400); }
-}
 .t-grid { display: grid; gap: var(--sp-300); align-items: start; margin-block-start: var(--sp-300); }
 .t-main, .t-side { display: grid; gap: var(--sp-300); min-inline-size: 0; }
 @media (min-width: 1000px) { .t-grid { grid-template-columns: minmax(0, 1fr) var(--side-w); } }
@@ -694,16 +682,13 @@ p { max-inline-size: 66ch; }
 .acc:hover { border-color: var(--primary); }
 .acc:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .acc-role { margin-block-start: var(--sp-100); padding: var(--sp-50) var(--sp-150); border-radius: var(--pill-r); background: var(--cobalt-20); color: var(--primary); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); }
-.hdr-id .cap { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
 .list-h h2 { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
 .term-date { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-150); }
 .hint .crit { background: var(--white); }
 .topics { padding-inline-start: var(--sp-300); display: grid; gap: var(--sp-100); }
 .p1-form > * + * { margin-block-start: var(--sp-300); }
-.hdr-top.many { grid-template-columns: 1fr; }
-.hdr-top.many .hdr-links { display: flex; flex-wrap: wrap; justify-content: flex-start; margin-inline: calc(var(--sp-200) * -1) 0; margin-block-start: 0; }
 /* design-b */
-.hdr > * + *, .b-sec > * + *, .rule > .b-ol { margin-block-start: var(--sp-150); }
+.b-sec > * + *, .rule > .b-ol { margin-block-start: var(--sp-150); }
 .b-sec h3 { margin-block-start: var(--sp-300); }
 .b-ol { margin: 0; padding-inline-start: var(--sp-300); display: grid; gap: var(--sp-100); color: var(--rule-ink); }
 .b-later { margin-block-start: var(--sp-100); }
@@ -719,7 +704,6 @@ p { max-inline-size: 66ch; }
 .n-form ~ .again, .n-state .again, .enter > .again { margin-block-start: var(--sp-200); }
 /* lista notatek o zespole: karta osoby, notatki jako małe karty */
 .notes-team, .sources { display: grid; gap: var(--sp-300); }
-.notes-team > .n-title, .sources > .n-title { margin-block-end: 0; }
 .pn-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-150); }
 .pn-head .btn .ico, .person-notes .btn .ico { inline-size: var(--sp-250); block-size: var(--sp-250); }
 .note-meta-c { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-50) var(--sp-100); font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
@@ -768,11 +752,6 @@ details.disc > ul { padding-inline-start: var(--sp-250); display: grid; gap: var
 details.disc > .area { margin-block-start: var(--sp-50); }
 .crit:has(input[name="additional"]:not(:checked)) .exp-field { display: none; }
 /* 1.8 odnośniki cyklu na telefonie: jeden rząd chipów przewijany w poziomie; przycisk potwierdzenia części I przyklejony */
-@media (max-width: 640px) {
-  .hdr .hdr-links, .hdr-top.many .hdr-links { display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: var(--sp-100); overflow-x: auto; margin-inline: 0; margin-block-start: 0; padding-block-end: var(--sp-50); }
-  .hdr .hdr-links .btn { flex: none; min-block-size: var(--sp-500); padding-inline: var(--sp-150); font-size: var(--f-c1); line-height: var(--lh-c1); white-space: nowrap;
-    border: 1px solid var(--cobalt-30); border-radius: var(--pill-r); background: var(--secondary); }
-}
 @media (min-width: 900px) { .part1-confirm { inset-block-end: var(--sp-200); } }
 /* 1.9 pytanie o zmianę zadań: cytat notatki, skutki odpowiedzi, przyciski na całą szerokość na telefonie */
 .note-quote { margin: 0; padding: var(--sp-150) var(--sp-200); border-inline-start: var(--sp-50) solid var(--cobalt-30); border-radius: var(--ctl-r); background: var(--grey-10); }
@@ -907,8 +886,6 @@ body.tour-on .nav { display: none; }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: none; box-shadow: var(--focus); }
 
 /* review-polish-2-1 */
-/* nagłówek oceny jak .hdr w makiecie: jeden blok, bez pustych odstępów */
-.hdr:has(> .hdr-top:only-child) { gap: 0; }
 /* lista braków: jedna linia z pigułką, nazwy kryteriów rozwijane */
 .miss-d > summary { cursor: pointer; }
 .miss-d ul { margin-block-start: var(--sp-100); }
@@ -918,10 +895,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .scorebox:has(> .big) { align-items: flex-end; min-inline-size: 12ch; }
 .scorebox > .big { min-inline-size: 2ch; text-align: end; font-variant-numeric: tabular-nums; }
 .scorebox:has(> .big) .lvl { text-align: end; }
-/* odnośniki cyklu w nagłówku zawijają się, nic nie jest ucięte */
-.hdr-top .hdr-links { display: flex; flex-wrap: wrap; justify-content: flex-end; }
-.hdr-top.many .hdr-links { justify-content: flex-start; }
-@media (max-width: 640px) { .hdr-top .hdr-links { justify-content: flex-start; } }
 /* review-polish-2-2 */
 .hr-table th[scope="col"]:nth-child(4), .hr-table th[scope="col"]:nth-child(5) { min-inline-size: 12rem; }
 .hr-state, .hr-due { min-inline-size: 12rem; }
@@ -966,4 +939,3 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 
 /* deadline-change: wybór jednego przypadku wygląda jak radio */
 .dc-cases .box { border-radius: 50%; }
-.dc-letter .hdr.slim { grid-template-columns: minmax(0, 1fr); align-items: start; }

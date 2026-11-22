@@ -5,7 +5,7 @@ import { rules } from "../engine/rules";
 import { criterion } from "../engine/scoring";
 import type { SheetData } from "../hr/sheet-data";
 import type { Person } from "../people";
-import { ConfirmationBlock, LegalBasis } from "./components";
+import { ConfirmationBlock, LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
 const DASH = "—";
@@ -114,25 +114,27 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
   return (
     <Layout title="Arkusz oceny" person={props.viewer} today={props.today}>
       <article class="sheet-doc">
-        <header class="card hdr slim">
-          <h1>Arkusz oceny okresowej {d.sheet ? `(arkusz ${d.sheet})` : ""}</h1>
-          <p class="cap">{d.officeName}</p>
-          <div class="no-print">
-            <PrintButton />
-            <a class="btn link-chip" href={only1 ? sheetHref : `${sheetHref}?part=1`}>
-              {only1 ? "Cały arkusz" : "Tylko część I"}
-            </a>
-            {props.links.length ? (
-              <p class="hr-links">
-                {props.links.map((l) => (
-                  <a class="btn link-chip" href={l.href}>
-                    {l.label}
-                  </a>
-                ))}
-              </p>
-            ) : null}
-          </div>
-        </header>
+        <PageHeader
+          context={d.officeName}
+          title={<>Arkusz oceny okresowej {d.sheet ? `(arkusz ${d.sheet})` : ""}</>}
+          extra={
+            <div class="no-print">
+              <PrintButton />
+            </div>
+          }
+          links={
+            <>
+              <a class="no-print" href={only1 ? sheetHref : `${sheetHref}?part=1`}>
+                {only1 ? "Cały arkusz" : "Tylko część I"}
+              </a>
+              {props.links.map((l) => (
+                <a class="no-print" href={l.href}>
+                  {l.label}
+                </a>
+              ))}
+            </>
+          }
+        />
 
         <section class="card sheet-part">
           <h2>Część I</h2>

@@ -1,7 +1,7 @@
 import { INVITATION_KINDS, daysBetween, invitationHeadline, invitationStatus, type Invitation, type InvitationErrors, type InvitationInput, type InvitationKind } from "../invitations";
 import type { Cycle } from "../cycles";
 import type { Person } from "../people";
-import { LegalBasis } from "./components";
+import { LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate, formatDateLong } from "./layout";
 
 /** Blok na karcie rozmowy: stan zaproszenia i przycisk dla oceniającego. */
@@ -44,12 +44,7 @@ export function InvitationFormView(props: {
   const late = props.limit && /^\d{4}-\d{2}-\d{2}$/.test(v.date) && v.date > props.limit;
   return (
     <Layout title={`${k.invitationTitle}: ${props.personName}`} person={props.viewer} today={props.today}>
-      <section class="card hdr slim">
-        <div class="hdr-id">
-          <p class="cap">{k.title}</p>
-          <h1>Zaproś na rozmowę: {props.personName}</h1>
-        </div>
-      </section>
+      <PageHeader context={k.title} title={<>Zaproś na rozmowę: {props.personName}</>} />
       {props.limit ? (
         <p class="st info" role="status">
           <span>
@@ -115,15 +110,11 @@ export function InvitationView(props: { viewer: Person; today: string; cycle: Cy
   const isEmployee = props.viewer.id === props.cycle.person_id;
   return (
     <Layout title={k.invitationTitle} person={props.viewer} today={props.today}>
-      <section class="card hdr">
-        <p class="cap">{props.personName}</p>
-        <h1>{invitationHeadline(i)}</h1>
-        <p class="cap">{formatDateLong(i.date)}</p>
-        {i.note ? <p>{i.note}</p> : null}
-        <p class={`st ${i.confirmedOn ? "ok" : "info"}`} role="status">
-          <b>{invitationStatus(i, props.cycle)}</b>
-        </p>
-      </section>
+      <PageHeader context={props.personName} title={invitationHeadline(i)} lead={formatDateLong(i.date)} />
+      {i.note ? <p>{i.note}</p> : null}
+      <p class={`st ${i.confirmedOn ? "ok" : "info"}`} role="status">
+        <b>{invitationStatus(i, props.cycle)}</b>
+      </p>
       <section class="rule">
         <p class="voice rule-v"><span class="pg" aria-hidden="true">§</span><span><b>Tematy rozmowy</b> · z przepisu</span></p>
         <ol class="b-ol">{k.topics.map((t) => <li>{t}</li>)}</ol>

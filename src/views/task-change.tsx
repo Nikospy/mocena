@@ -2,7 +2,7 @@ import type { Card } from "../content";
 import type { DevelopmentForm } from "../office-settings";
 import type { Note } from "../notes/repo";
 import type { Person } from "../people";
-import { LegalBasis } from "./components";
+import { LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 import { criterion } from "../engine/scoring";
 import { WarnIco } from "./assessment";
@@ -22,9 +22,8 @@ export function TaskChangeQuestionView(props: { viewer: Person; today: string; n
   const { ifYes, ifNo } = props.card.texts ?? {};
   return (
     <Layout title="To stała zmiana zadań?" person={props.viewer} today={props.today}>
+      <PageHeader context={<>Notatka z {formatDate(n.date)}</>} title="To stała zmiana zadań?" />
       <section class="card q-hero">
-        <p class="voice src">Notatka z {formatDate(n.date)}</p>
-        <h1>To stała zmiana zadań?</h1>
         <p>W tej notatce zaznaczono zmianę zadań {props.subjectGenitive}.</p>
         <blockquote class="note-quote">
           <p class="note-text">{n.text}</p>
@@ -46,11 +45,7 @@ export function TaskChangeCardView(props: { viewer: Person; today: string; note:
   const { card, form } = props;
   return (
     <Layout title={card.title} person={props.viewer} today={props.today}>
-      <section class="card hdr">
-        <p class="voice src">Karta rozmowy</p>
-        <h1>{card.title}</h1>
-        <p class="cap">{card.purpose}</p>
-      </section>
+      <PageHeader context="Karta rozmowy" title={card.title} lead={card.purpose} />
       {card.legal ? (
         <section class="rule">
           <p class="voice rule-v"><span class="pg" aria-hidden="true">§</span><span><b>Co mówi przepis</b></span></p>
@@ -82,9 +77,8 @@ export function TaskChangeCardView(props: { viewer: Person; today: string; note:
 export function TaskChangeNoView(props: { viewer: Person; today: string; card: Card }) {
   return (
     <Layout title="Zmiana zadań" person={props.viewer} today={props.today}>
-      <section class="card q-hero">
-        <h1>Dziękujemy</h1>
-        <p>{props.card.texts?.no}</p>
+      <PageHeader title="Dziękujemy" lead={props.card.texts?.no} />
+      <section>
         <div class="btns"><a class="btn" href="/notes">Moje notatki</a></div>
       </section>
     </Layout>

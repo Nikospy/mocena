@@ -253,7 +253,7 @@ describe("lista spraw, odnośniki, etykiety", () => {
     expect(edit).toContain('id="assessment-result"');
     expect(outside(edit)).not.toMatch(/Ocena (negatywna|pozytywna)|średnia|6,14/);
     const header = /<h1>[^<]*<\/h1>/.exec(edit)![0];
-    expect(header).toBe("<h1>Piotr Wójcik</h1>");
+    expect(header).toBe("<h1>Ocena okresowa: Piotr Wójcik</h1>");
     await approvePiotr(app);
     const view = await (await call(app, "piotr", `/cycles/${piotr}/assessment`)).text();
     expect(outside(view)).not.toMatch(/Ocena (negatywna|pozytywna)|6,14/);
@@ -383,7 +383,7 @@ describe("S-04: notatki w formularzu oceny", () => {
     const app = fresh();
     const html = await (await call(app, "marek", `/cycles/${piotr}/assessment`)).text();
     expect(html).toContain("04.08.2025: Interesant dzwonił");
-    expect(html).toContain("<h1>Piotr Wójcik</h1>");
+    expect(html).toContain("<h1>Ocena okresowa: Piotr Wójcik</h1>");
     expect(html).toContain('data-target="developmentConclusions"');
     expect(html.match(/Wszystkie notatki przy tym kryterium są z ostatniego miesiąca/g)).toHaveLength(1);
     const think = html.slice(html.indexOf('data-crit="myslenie-analityczne"'));

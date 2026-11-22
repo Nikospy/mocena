@@ -1,7 +1,7 @@
 import { DC, type Blocked, type RequestState } from "../deadline-change";
 import type { AppEvent } from "../events";
 import type { Person } from "../people";
-import { LegalBasis } from "./components";
+import { LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate, formatDateLong } from "./layout";
 import { PrintButton, SheetField } from "./sheet";
 
@@ -56,8 +56,8 @@ export function ChangeFormView(props: {
   const off = props.blocked !== null;
   return (
     <Layout title={`Zmiana terminu oceny: ${props.personName}`} person={props.viewer} today={props.today}>
+      <PageHeader title={<>Zmień termin oceny: {props.personName}</>} />
       <section class="card form-card">
-        <h1>Zmień termin oceny: {props.personName}</h1>
         <p>
           Obecny termin: <b>{formatDateLong(props.currentDeadline)}</b>
         </p>
@@ -148,8 +148,8 @@ export function RequestFormView(props: {
   const off = props.blocked !== null || pending !== null;
   return (
     <Layout title="Wniosek o zmianę terminu oceny" person={props.viewer} today={props.today}>
+      <PageHeader title="Wniosek o zmianę terminu oceny" />
       <section class="card form-card">
-        <h1>Wniosek o zmianę terminu oceny</h1>
         <p>
           Obecny termin: <b>{formatDateLong(props.currentDeadline)}</b>
         </p>
@@ -221,14 +221,18 @@ export function LetterView(props: {
   return (
     <Layout title="Pismo o zmianie terminu oceny" person={props.viewer} today={props.today}>
       <article class="sheet-doc dc-letter">
-        <header class="card hdr slim no-print">
-          <h1>Pismo o zmianie terminu oceny</h1>
-          <PrintButton />
-          <p class="hr-links">
-            <a class="btn link-chip" href={`/cycles/${props.cycleId}/timeline`}>Oś czasu</a>
-            <a class="btn link-chip" href={`/cycles/${props.cycleId}/sheet`}>Arkusz</a>
-          </p>
-        </header>
+        <div class="no-print">
+          <PageHeader
+            title="Pismo o zmianie terminu oceny"
+            extra={<PrintButton />}
+            links={
+              <>
+                <a href={`/cycles/${props.cycleId}/timeline`}>Oś czasu</a>
+                <a href={`/cycles/${props.cycleId}/sheet`}>Arkusz</a>
+              </>
+            }
+          />
+        </div>
         <section class="card sheet-part">
           <SheetField label="Urząd">{props.officeName}</SheetField>
           <p class="dc-place">

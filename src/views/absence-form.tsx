@@ -1,4 +1,5 @@
 import type { Absence } from "../cycles";
+import { PageHeader } from "./components";
 import type { Person } from "../people";
 import { Layout, formatDate, formatDateLong } from "./layout";
 
@@ -17,9 +18,8 @@ export function AbsenceFormView(props: {
   const e = props.errors ?? {};
   return (
     <Layout title={`Nieobecność: ${props.personName}`} person={props.viewer} today={props.today}>
+      <PageHeader title={<>Wpisz nieobecność: {props.personName}</>} lead="System zapisuje tylko daty. Rodzaju nieobecności nie podajesz." />
       <section class="card form-card">
-        <h1>Wpisz nieobecność: {props.personName}</h1>
-        <p class="cap">System zapisuje tylko daty. Rodzaju nieobecności nie podajesz.</p>
         <form method="post" action={`/cycles/${props.cycleId}/absences`} class="abs-form">
           <div class="dates">
             <div>
