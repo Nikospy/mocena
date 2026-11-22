@@ -12,7 +12,6 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/` | `marek` | fokus · Tab × 1 | `home-tab-1` |
 | `/` | `marek` | fokus · Tab × 3 | `home-tab-3` |
 | `/` | `marek` | fokus · Tab × 6 | `home-tab-6` |
-| `/` | `marek` | najechanie · akcja główna | `hover-primary` |
 | `/` | `piotr` | oczekujące potwierdzenie | `home-piotr` |
 | `/` | `joanna` | sprawy kadr | `home-hr` |
 | `/` | `admin` | sprawy administratora | `home-admin` |
@@ -75,6 +74,12 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/cycles/:id/assessment` | `anna` | formularz czynnego zastępcy | `assessment-substitute` |
 | `/cycles/:id/assessment` | `admin` | 403 · odmowa | `assessment-403` |
 | `/cycles/:id/assessment` | `marek` | 404 · brak zasobu | `assessment-404` |
+| `/cycles/:id/assessment` | `piotr` | blokada · brak potwierdzenia części I | `assessment-no-part1-piotr` |
+| `/cycles/:id/assessment` | `joanna` | blokada · brak potwierdzenia części I | `assessment-no-part1-joanna` |
+| `/cycles/:id/assessment` | `anna` | ocena po wniesieniu sprzeciwu | `assessment-objection-filed-anna` |
+| `/cycles/:id/assessment` | `joanna` | ocena po wniesieniu sprzeciwu | `assessment-objection-filed-joanna` |
+| `/cycles/:id/assessment` | `anna` | ocena po rozstrzygnięciu sprzeciwu | `assessment-objection-resolved-anna` |
+| `/cycles/:id/assessment` | `joanna` | ocena po rozstrzygnięciu sprzeciwu | `assessment-objection-resolved-joanna` |
 | `/cycles/:id/assessment/export.json` | `marek` | 404 · ocena przed zatwierdzeniem | `assessment-export-not-approved` |
 | `/cycles/:id/assessment/export.json` | `marek` | zatwierdzona ocena · plik JSON | `assessment-export-approved-marek` |
 | `/cycles/:id/assessment/export.json` | `piotr` | zatwierdzona ocena · plik JSON | `assessment-export-approved-piotr` |
@@ -103,6 +108,8 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/hr` | `joanna` | fokus · Tab × 6 | `hr-tab-6` |
 | `/hr` | `joanna` | najechanie · odnośnik | `hover-link` |
 | `/hr` | `piotr` | 403 · odmowa | `hr-403` |
+| `/hr` | `joanna` | 422 · brak rozstrzygnięcia sprzeciwu | `objection-error` |
+| `/hr` | `joanna` | stan cykli po rozstrzygnięciu sprzeciwu | `hr-objection-resolved` |
 | `/office/statistics` | `dyrektor-urzedu` | statystyki na początku pokazu | `office-statistics-initial` |
 | `/office/statistics` | `dyrektor-urzedu` | statystyki po zapoznaniu z oceną | `office-statistics-final` |
 | `/office/statistics` | `joanna` | 403 · odmowa | `office-statistics-403` |
@@ -266,6 +273,8 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/cycles/:id/deadline-change` | `marek` | zatwierdzona ocena | `deadline-decision-blocked` |
 | `/cycles/:id/deadline-change` | `piotr` | 403 · odmowa | `deadline-change-403` |
 | `/cycles/:id/deadline-change` | `marek` | 404 · brak zasobu | `deadline-change-404` |
+| `/cycles/:id/deadline-change` | `marek` | od ostatniej oceny nie minęło 6 miesięcy | `deadline-decision-too-early` |
+| `/cycles/:id/deadline-change` | `marek` | zamknięty cykl | `deadline-decision-closed` |
 | `/cycles/:id/deadline-change/request` | `piotr` | pusty wniosek | `deadline-request` |
 | `/cycles/:id/deadline-change/request` | `piotr` | 422 · brak uzasadnienia | `deadline-request-error` |
 | `/cycles/:id/deadline-change/request` | `piotr` | wniosek wysłany | `deadline-request-pending` |
@@ -274,17 +283,21 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/cycles/:id/deadline-change/request` | `piotr` | zatwierdzona ocena | `deadline-request-blocked` |
 | `/cycles/:id/deadline-change/request` | `joanna` | 403 · odmowa | `deadline-request-403` |
 | `/cycles/:id/deadline-change/request` | `marek` | 404 · brak zasobu | `deadline-request-404` |
+| `/cycles/:id/deadline-change/request` | `piotr` | od ostatniej oceny nie minęło 6 miesięcy | `deadline-request-too-early` |
+| `/cycles/:id/deadline-change/request` | `piotr` | zamknięty cykl | `deadline-request-closed` |
 | `/cycles/:id/deadline-change/:eventId/letter` | `marek` | pismo po zmianie terminu | `deadline-letter-marek` |
 | `/cycles/:id/deadline-change/:eventId/letter` | `piotr` | pismo po zmianie terminu | `deadline-letter-piotr` |
 | `/cycles/:id/deadline-change/:eventId/letter` | `joanna` | pismo po zmianie terminu | `deadline-letter-joanna` |
 | `/cycles/:id/deadline-change/:eventId/letter` | `admin` | 403 · odmowa | `deadline-letter-403` |
 | `/cycles/:id/deadline-change/:eventId/letter` | `marek` | 404 · brak zasobu | `deadline-letter-404` |
 | `/cycles/:id/invitations/new` | `marek` | nowe · rozmowa o kryteriach | `invitation-opening` |
+| `/cycles/:id/invitations/new` | `marek` | najechanie · przycisk główny | `hover-primary` |
 | `/cycles/:id/invitations/new` | `marek` | nowe · rozmowa oceniająca | `invitation-assessment` |
 | `/cycles/:id/invitations/new` | `marek` | 422 · brak terminu i miejsca | `invitation-error` |
 | `/cycles/:id/invitations/new` | `marek` | poprzednie zaproszenie w formularzu | `invitation-prefilled` |
 | `/cycles/:id/invitations/new` | `piotr` | 403 · odmowa | `invitation-new-403` |
 | `/cycles/:id/invitations/new` | `marek` | 404 · brak zasobu | `invitation-new-404` |
+| `/cycles/:id/invitations/new` | `marek` | 404 · nieznany typ rozmowy | `invitation-kind-404` |
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `marek` | wysłane | `invitation-sent-marek` |
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `piotr` | wysłane | `invitation-sent-piotr` |
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `marek` | potwierdzone | `invitation-confirmed-marek` |

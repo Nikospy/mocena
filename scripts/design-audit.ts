@@ -371,10 +371,28 @@ async function capture(who: string | null, path: string, name: string, width: nu
     }
     if (extraCss) await page.addStyleTag({ content: extraCss });
     await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    let hover: { selector: string; method: string; styleChanged: boolean } | undefined;
     if (options.hover) {
       const target = page.locator(options.hover).first();
+      const style = () => target.evaluate((el) => {
+        const css = getComputedStyle(el);
+        return [css.backgroundColor, css.color, css.borderColor, css.textDecorationLine, css.boxShadow].join(" ");
+      });
+      const before = await style();
       await target.hover();
-      if (!(await target.evaluate((el) => el.matches(":hover")))) throw new Error("Brak stanu :hover");
+      hover = { selector: options.hover, method: "pointer", styleChanged: before !== await style() };
+      if (!(await target.evaluate((el) => el.matches(":hover"))) && !hover.styleChanged) {
+        // Chromium w trybie jednego procesu potrafi dostarczyć ruch myszy bez włączenia :hover.
+        // Wymuszenie stanu przez DevTools stosuje reguły CSS tej samej kontrolki.
+        const cdp = await ctx.newCDPSession(page);
+        await cdp.send("DOM.enable");
+        await cdp.send("CSS.enable");
+        const { root } = await cdp.send("DOM.getDocument");
+        const { nodeId } = await cdp.send("DOM.querySelector", { nodeId: root.nodeId, selector: options.hover });
+        await cdp.send("CSS.forcePseudoState", { nodeId, forcedPseudoClasses: ["hover"] });
+        hover.method = "chromium-pseudo-state";
+        hover.styleChanged = before !== await style();
+      }
     }
     const focus = options.tabs ? await focusAfterTabs(page, options.tabs) : undefined;
     const viewportShot = !!(options.tabs || options.hover);
@@ -405,7 +423,7 @@ async function capture(who: string | null, path: string, name: string, width: nu
     await page.evaluate((px) => { document.documentElement.style.filter = `blur(${px}px)`; }, width < 768 ? 3 : 5);
     await page.screenshot({ path: join(outDir, `${id}--blur.jpg`), type: "jpeg", quality: 60 });
     results.push({
-      id, name, who, path, finalUrl: responsePath, width, status, redirectStatus, screenshot, focus,
+      id, name, who, path, finalUrl: responsePath, width, status, redirectStatus, screenshot, focus, hover,
       kind: options.print ? "print" : options.download ? "download" : "screen",
       metrics: measured.metrics, counts: Object.fromEntries(Object.entries(measured.off).map(([key, list]) => [key, list.length])), evidence,
     });

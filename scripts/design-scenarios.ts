@@ -71,7 +71,6 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await roles("/about", "about", [null, M, P, H, A, D], { check: "Wdrożenie i dane" });
   await shot(M, "/", "home-marek");
   await keyboard(M, "/", "home");
-  await shot(M, "/", "hover-primary", { hover: "main .btn.primary" });
   await shot(H, "/", "home-hr");
   await shot(A, "/", "home-admin");
   await shot(D, "/", "home-director", { check: "Terminowość w urzędzie" });
@@ -95,9 +94,14 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await shot(P, part1, "part1-piotr-wait");
   await shot(H, part1, "part1-hr-edit");
   await shot(M, assessment, "assessment-no-part1", { check: "bez potwierdzonej części I" });
+  await roles(assessment, "assessment-no-part1", [P, H], { check: "bez potwierdzonej części I" });
+  await shot(M, deadline, "deadline-decision-too-early", { check: "nie minęło jeszcze 6 miesięcy" });
+  await shot(P, request, "deadline-request-too-early", { check: "nie minęło jeszcze 6 miesięcy" });
   await shot(M, opening, "card-opening");
   await shot(P, opening, "card-opening-piotr");
   await shot(M, invitationOpening, "invitation-opening");
+  await shot(M, invitationOpening, "hover-primary", { hover: "main button.btn.primary" });
+  await shot(M, invitations + "/new?kind=unknown", "invitation-kind-404", { status: 404 });
   await invalid(M, invitationOpening, "invitation-error", invitations);
   const invitation = await post(M, invitations, { kind: "opening", date: "2024-12-10", time: "10:30", place: "Pokój 214" });
   await shot(M, invitationOpening, "invitation-prefilled");
@@ -205,6 +209,8 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await shot(P, next + "/deadline-change/request", "deadline-request-after-negative");
   await shot(M, next + "/deadline-change", "deadline-decision-after-negative");
   await shot(M, fiction, "fiction-blocked", { status: 409 });
+  await shot(M, deadline, "deadline-decision-closed", { check: "Cykl jest zamknięty" });
+  await shot(P, request, "deadline-request-closed", { check: "Cykl jest zamknięty" });
   await shot(M, cycle + "/sheet", "sheet");
   await shot(H, "/cycles/cycle-office-head/sheet", "sheet-a", { check: "arkusz A" });
   await shot(H, "/cycles/cycle-tomasz/sheet", "sheet-b", { check: "arkusz B" });
@@ -214,6 +220,12 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await roles(history, "history", [M, P, H]);
 
   await shot(H, "/hr", "hr");
+  const objectionCycle = "/cycles/cycle-katarzyna";
+  const objection = objectionCycle + "/objection-outcome";
+  await roles(objectionCycle + "/assessment", "assessment-objection-filed", [S, H]);
+  await invalid(H, "/hr", "objection-error", objection, { omitSubmitter: true });
+  await shot(H, await post(H, objection, { outcome: "rejected" }), "hr-objection-resolved", { check: "Sprzeciw rozpatrzony" });
+  await roles(objectionCycle + "/assessment", "assessment-objection-resolved", [S, H]);
   await shot(D, "/office/statistics", "office-statistics-final");
   await keyboard(H, "/hr", "hr");
   await shot(H, "/hr", "hover-link", { hover: "a.brand" });
