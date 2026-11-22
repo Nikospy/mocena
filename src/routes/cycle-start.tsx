@@ -111,6 +111,15 @@ function sheetOf(cycle: Cycle) {
 
 function renderPart1(c: Context, cx: Ctx, extra: { errors?: string[]; input?: Part1Input; status?: 200 | 422 | 409; saved?: boolean } = {}) {
   const { cycle, person } = cx;
+  // Bez rodzaju stanowiska nie da się dobrać arkusza: 422 ze zdaniem i odnośnikiem do kartoteki dla kadr, nie 500.
+  if (!personById(cycle.person_id)?.position_kind) {
+    return errorPage(
+      c,
+      "Nie wybrano arkusza: w danych pracownika nie ma rodzaju stanowiska. Uzupełnij dane pracownika.",
+      422,
+      person.role === "hr" ? <a href={`/hr/people/${cycle.person_id}/edit`}>Edytuj dane pracownika</a> : undefined,
+    );
+  }
   const status = part1Status(cycle.id);
   const locked = isPart1Locked(cycle.id);
   const submitted = visibleEvents(cycle.id).find((e) => e.type === "part1_submitted");

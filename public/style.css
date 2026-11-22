@@ -582,6 +582,8 @@ p, blockquote, dd, :is(ul, ol):not([class]) > li, :is(.topics, .b-ol, .points, .
 .tl-old { color: var(--rule-quiet); text-decoration: line-through; text-decoration-thickness: 2px; }
 .tl-new { font-weight: var(--w-bold); color: var(--rule-ink); }
 .abs-form { display: grid; gap: var(--sp-200); }
+/* Karta „Nowy termin oceny”: odnośnik do osi czasu o pełnym celu kliknięcia (--hit = 48 px). */
+.abs-sum a { display: inline-flex; align-items: center; min-block-size: var(--hit); }
 
 /* ui-fixes */
 /* Arkusz na telefonie: szerokie tabele przewijają się w sobie, nie rozpychają strony (druk bez zmian). */
