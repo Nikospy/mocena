@@ -867,3 +867,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .hdr-top .hdr-links { display: flex; flex-wrap: wrap; justify-content: flex-end; }
 .hdr-top.many .hdr-links { justify-content: flex-start; }
 @media (max-width: 640px) { .hdr-top .hdr-links { justify-content: flex-start; } }
+/* review-polish-2-2 */
+.hr-table th[scope="col"]:nth-child(4), .hr-table th[scope="col"]:nth-child(5) { min-inline-size: 12rem; }
+.hr-state, .hr-due { min-inline-size: 12rem; }
+.hr-more > summary { min-block-size: var(--sp-400); }
+.date-field { min-block-size: var(--hit); resize: none; max-inline-size: 16rem; }
+@media (max-width: 40rem) {
+  .hr-scroll { overflow-x: visible; }
+  .hr-table, .hr-table tbody, .hr-table tr, .hr-table th, .hr-table td { display: block; min-inline-size: 0; inline-size: 100%; }
+  .hr-table thead { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+  .hr-card { padding: var(--sp-150); margin-block-end: var(--sp-150); border: 1px solid var(--grey-40); border-radius: var(--r-200); background: var(--white); }
+  .hr-table .hr-card > th, .hr-table .hr-card > td { padding: var(--sp-50) 0; border-block-end: 0; min-inline-size: 0; }
+  .hr-card > td[data-label]::before { content: attr(data-label); display: block; color: var(--text-3); font-weight: var(--w-bold); }
+  .hr-card > td[data-label="Oceniający"], .hr-card > td[data-label="Arkusz"] { display: none; }
+}
