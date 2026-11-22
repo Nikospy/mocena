@@ -23,8 +23,8 @@ Zgoda na start budowy: wiadomość autora 22.11 ok. 00:30 („Okej, będziemy ru
 
 ## Aktywna praca
 
-Na main i w sieci: F-01, S-01–S-06 oraz poprawki wyglądu czterech grup ekranów (S-07). Joby Caissy (22.11 ok. 01:50, `--candidate-only`, scala król po obejrzeniu zrzutów): `guided-demo-tour` (S-08, przewodnik: wejście V3, krok V2) i `review-polish` (S-09, usterki z przeglądu). Pliki rozdzielone: S-08 ma `layout.tsx`, `index.tsx` i `src/tour/*`, S-09 resztę widoków.
+Na main, w sieci i na GitHubie (22.11 ok. 02:55): F-01, S-01–S-13 zbudowane. Przewodnik pokazu działa, automat pokazu (zwykły i przewodnik) 2x zielony na żywej stronie. openbot (VM 109) ma starego Herdra 0.9.5 i Caissę: serwer Herdra w terminalu `openbot/herdr-srv`, workspace w2, pane króla `w2:p1`, modele `/tmp/models-openbot.json` (arbiter zapasowy Codex `gpt-6.1-sol`, bo omp na openbot nie ma zAI); repo wysyła `debian.ts wyslij <repo> --host=openbot --apply`, wynik ściąga `git fetch openbot caissa/<id>/integration`. Limit Caissy: 3 joby na maszynę. W toku (subagenci): druga runda przeglądu wyglądu i dostępności, skrypt nagrania pokazu.
 
 ## Następny ruch
 
-Po obu jobach: scalić, przejść przewodnik w Chromium przy 360 i 1440 px, wdrożyć, push (decyzja 13g). Potem S-10 (automat pokazu 2x na żywej stronie), S-11 (nagranie, PDF, README, teksty zgłoszenia). Granica nowych funkcji 07:00, oddanie 11:00, push najpóźniej 10:30.
+Raport drugiej rundy podzielić po plikach na 3–6 jobów (Mac i openbot), scalić, przejść przewodnik przy 360 i 1440 px, pokazać autorowi zrzuty. Potem nagranie, zrzuty do prezentacji i PDF, teksty formularza, przegląd autora, archiwizacja, push najpóźniej 10:30.
