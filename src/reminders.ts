@@ -33,6 +33,7 @@ registerHomeTasks((person) => {
       title: own ? `Twój termin oceny: ${formatDate(d.deadline)}` : `Termin oceny ${name}: ${formatDate(d.deadline)}`,
       href: `/cycles/${c.id}/timeline`,
       detail: `${d.basis.join("; ")}. Przypomnienie na ${window} dni przed terminem: ${label}.`,
+      due: d.deadline,
     });
   }
   return tasks;
