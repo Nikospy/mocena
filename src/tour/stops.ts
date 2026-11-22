@@ -35,7 +35,7 @@ const BODY: Record<TourStopId, Body> = {
     short: "Piotr potwierdza",
     lead: "Marek zaczyna dwuletni cykl oceny Piotra. System sam dobrał arkusz i podpowiada kryteria dodatkowe, każde z powodem. Wybór należy do Marka.",
     look: [
-      { text: "Termin rozmowy o kryteriach z przepisem.", selector: ".rule" },
+      { text: "Termin oceny z przepisem.", selector: ".rule" },
       { text: "Podpowiedzi kryteriów: ramka przerywana, powód, można odrzucić.", selector: ".hint" },
       { text: "Karta rozmowy rozpoczynającej z tematami z przepisu.", selector: 'a[href$="/cards/opening"]' },
     ],
@@ -63,7 +63,6 @@ const BODY: Record<TourStopId, Body> = {
       { text: "Przy nazwisku Piotra nie ma punktów ani etykiet." },
     ],
     tryIt: "Wpisz „Piotr przejął kolejkę wniosków po odejściu kolegi”, wybierz kryterium Rzetelność i zapisz.",
-    basis: basis("§ 9 ust. 1"),
     screen: () => "/people/piotr/notes/new",
   },
   "3": {
@@ -84,7 +83,7 @@ const BODY: Record<TourStopId, Body> = {
     short: "zapoznanie",
     lead: "Formularz oceny wypełnia się w ostatnim tygodniu, ale notatki są z 24 miesięcy. Punkty stawia Marek. System liczy wynik według przepisu i pilnuje braków.",
     look: [
-      { text: "Notatki przy kryteriach, podzielone na sprzed zmiany zadań i po niej.", selector: ".crit" },
+      { text: "Notatki i pola wyboru przy kryteriach.", selector: ".crit-notes .note-list" },
       { text: "Ostrzeżenie, gdy fakty do kryterium są tylko z ostatniego miesiąca.", selector: ".st.warn" },
       { text: "Po „1” przy Rzetelności wynik jest negatywny mimo średniej powyżej 4, a zatwierdzenie czeka na uzasadnienie i wnioski do programu rozwoju.", selector: "#assessment-result" },
     ],
@@ -140,8 +139,7 @@ export function personGenitive(personId: string): string {
 
 /** Adres ekranu przystanku; cykl Piotra z bazy (może być zamknięty w 5b). */
 export function stopScreenPath(stop: StopContent): string {
-  const row = getDb().query("SELECT id FROM cycles WHERE person_id = 'piotr' ORDER BY period_start DESC LIMIT 1").get() as { id: string } | null;
-  return stop.screen(row?.id ?? "cycle-piotr");
+  return stop.screen("cycle-piotr");
 }
 
 /** Identyfikator cyklu osoby (np. Ewy) albo null, gdy cyklu nie ma. */

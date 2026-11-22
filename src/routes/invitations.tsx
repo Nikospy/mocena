@@ -1,8 +1,8 @@
 import { Hono, type Context } from "hono";
-import { cycleById, openCycle, type Cycle } from "../cycles";
+import { visibleCycleById, openCycle, type Cycle } from "../cycles";
 import { registerCycleLinks } from "../cycle-links";
 import { getDb } from "../db";
-import { recordEvent } from "../events";
+import { recordEvent, visibleEvents } from "../events";
 import { registerHomeTasks, type HomeTask } from "../home-tasks";
 import { buildIcs } from "../ics";
 import {
@@ -81,7 +81,7 @@ type Ctx = { viewer: Person; cycle: Cycle };
 function guard(c: Context, access: "send" | "party"): Response | Ctx {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  const cycle = cycleById(c.req.param("id") ?? "");
+  const cycle = visibleCycleById(c.req.param("id") ?? "");
   if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
   if (access === "send") {
     if (!canInvite(viewer, cycle)) return c.text("Zaproszenie wysyła oceniający otwartego cyklu.", 403);
@@ -91,6 +91,10 @@ function guard(c: Context, access: "send" | "party"): Response | Ctx {
 
 function renderForm(c: Context, cx: Ctx, values: InvitationInput, errors: InvitationErrors = {}, status: 200 | 422 = 200) {
   const limit = values.kind === "opening" ? criteriaTalkLimit(cx.cycle) : null;
+  const started = visibleEvents(cx.cycle.id).findLast((event) => event.type === "cycle_started");
+  const limitRule = started?.payload.previousOutcome === "negative"
+    ? rules.deadlines.criteriaTalkAfterNegativeDays
+    : rules.deadlines.criteriaTalkDays;
   return c.html(
     <InvitationFormView
       viewer={cx.viewer}
@@ -100,7 +104,7 @@ function renderForm(c: Context, cx: Ctx, values: InvitationInput, errors: Invita
       values={values}
       errors={errors}
       limit={limit}
-      limitBasis={rules.deadlines.criteriaTalkDays.basis}
+      limitBasis={limitRule.basis}
     />,
     status,
   );

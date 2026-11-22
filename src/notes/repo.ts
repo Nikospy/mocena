@@ -1,5 +1,5 @@
 import { activeSubstitution, actsAsAppraiser } from "../substitutions";
-import { recordEvent } from "../events";
+import { recordEvent, visibleEvents } from "../events";
 import { getDb } from "../db";
 import { openCycle } from "../cycles";
 import { today } from "../settings";
@@ -21,18 +21,30 @@ export function canWriteNoteAbout(viewerId: string, subjectId: string): boolean 
   return !!row && actsAsAppraiser(row.supervisor_id, viewerId);
 }
 
+/** W samodzielnym pokazie przykładowe fakty pojawiają się po potwierdzeniu części I. */
+function visibleNotes(notes: Note[]): Note[] {
+  const events = visibleEvents("cycle-piotr");
+  const seeded = events.find((event) => event.type === "demo_notes_seeded");
+  if (!seeded || events.some((event) => event.type === "part1_confirmed")) return notes;
+  const pending = new Set<number>(seeded.payload.noteIds);
+  return notes.filter((note) => !pending.has(note.id));
+}
+
 export function noteById(id: number): Note | null {
-  return (getDb().query("SELECT * FROM notes WHERE id = ? AND date <= ?").get(id, today()) as Note | null) ?? null;
+  const note = getDb().query("SELECT * FROM notes WHERE id = ? AND date <= ?").get(id, today()) as Note | null;
+  return note ? visibleNotes([note])[0] ?? null : null;
 }
 
 export function notesAbout(subjectId: string, opts: { authorId: string; from?: string }): Note[] {
-  return getDb()
+  const notes = getDb()
     .query("SELECT * FROM notes WHERE subject_id = ? AND author_id = ? AND date >= ? AND date <= ? ORDER BY date, id")
     .all(subjectId, opts.authorId, opts.from ?? "", today()) as Note[];
+  return visibleNotes(notes);
 }
 
 export function notesByAuthor(authorId: string): Note[] {
-  return getDb().query("SELECT * FROM notes WHERE author_id = ? AND date <= ? ORDER BY date DESC, id DESC").all(authorId, today()) as Note[];
+  const notes = getDb().query("SELECT * FROM notes WHERE author_id = ? AND date <= ? ORDER BY date DESC, id DESC").all(authorId, today()) as Note[];
+  return visibleNotes(notes);
 }
 
 export function notesForCycle(cycleId: string, authorId: string): Note[] {

@@ -95,6 +95,11 @@ export function seedAssessments(): void {
   approve(k, MEETS, "2026-11-16", "2026-11-17");
   seedEvent("objection_filed", k.cycleId, "katarzyna", { to: "dyrektora generalnego urzędu" }, "2026-11-20");
 
+  // Kierownik urzędu: arkusz A z kryterium zarządzania strategicznego.
+  const head: Chain = { cycleId: "cycle-office-head", personId: "office-head", appraiserId: "office-head-supervisor", periodStart: "2025-10-01", part1On: "2025-10-15", confirmedOn: "2025-10-16" };
+  startCycle(head);
+  part1(head);
+
   // Anna: wniosek o zmianę terminu (jeden z powodów z art. 81 ust. 8 ustawy, bez danych o zdrowiu).
   const a: Chain = { cycleId: "cycle-anna", personId: "anna", appraiserId: "dyrektor-urzedu", periodStart: "2024-12-16", part1On: "2025-01-14", confirmedOn: "2025-01-15" };
   startCycle(a);
