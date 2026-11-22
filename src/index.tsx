@@ -27,6 +27,7 @@ import { tourContext } from "./tour/context";
 import { TourEntry } from "./views/tour-entry";
 import { Layout, formatDate } from "./views/layout";
 import { NotFoundPage, ServerErrorPage } from "./views/error-page";
+import { AboutPage } from "./views/about";
 import { LegalBasis } from "./views/components";
 
 const ROLE_LABEL: Record<string, string> = { appraiser: "oceniający", employee: "pracownik", hr: "kadry", admin: "administrator" };
@@ -123,6 +124,8 @@ app.get("/", (c) => {
 });
 
 app.get("/account", (c) => c.html(<AccountScreen />));
+
+app.get("/about", (c) => c.html(<AboutPage person={currentPerson(c)} today={today()} />));
 
 app.post("/account", async (c) => {
   const body = await c.req.parseBody();
