@@ -99,7 +99,7 @@ Testy: `src/routes/polish2-d.test.ts`: formularze zawierają datę słownie dla 
 
 #### Automated
 
-- [ ] 4.1 Testy fazy i cały zestaw: `bun test src/routes/polish2-d.test.ts`, `bun test`
+- [x] 4.1 Testy fazy i cały zestaw: `bun test src/routes/polish2-d.test.ts`, `bun test` — 65b38d9
 
 #### Manual
 
