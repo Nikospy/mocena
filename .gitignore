@@ -6,3 +6,7 @@
 node_modules/
 .wrangler/
 dist/
+
+# nagrania pokazu: tylko README
+docs/video/*
+!docs/video/README.md
