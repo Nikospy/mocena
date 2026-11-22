@@ -60,7 +60,7 @@ export function NoteFormView(props: {
           </div>
 
           <div class="n-fields">
-            <div role="radiogroup" aria-labelledby="l-krit" {...(e.criterion_id ? { "aria-describedby": "criterion_id-error" } : {})}>
+            <div role="radiogroup" aria-labelledby="l-krit" {...invalid("criterion_id", e)}>
               <span class="lbl" id="l-krit">Kryterium</span>
               <FieldError id="criterion_id" errors={e} />
               {props.groups.map((g, gi) => (
