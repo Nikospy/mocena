@@ -25,3 +25,8 @@
     timer = setTimeout(refresh, 250);
   });
 })();
+// Notatki pod kryterium: na telefonie zwinięte (ekran oceny krótszy), od 1000 px rozwinięte od razu.
+(function () {
+  if (!window.matchMedia || !window.matchMedia("(min-width: 1000px)").matches) return;
+  Array.prototype.forEach.call(document.querySelectorAll("details.crit-notes-d"), function (d) { d.open = true; });
+})();

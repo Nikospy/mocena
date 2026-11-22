@@ -73,7 +73,7 @@ describe("1.3 panel wyniku", () => {
     expect(t).toContain("Ocena negatywna");
     expect(t).toContain("Rzetelność: 1, znacznie poniżej oczekiwań");
     expect(t).toContain("§ 11 ust. 1 pkt 4");
-    expect(t).toContain("Średnia 6,14 — nie zmienia wyniku");
+    expect(t).toContain("Średnia 6,14 – nie zmienia wyniku");
     expect(t.match(/średnia/gi)).toHaveLength(1);
     expect(t).not.toContain("powyżej oczekiwań");
   });
