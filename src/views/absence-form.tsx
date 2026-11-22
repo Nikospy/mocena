@@ -66,7 +66,7 @@ export function AbsenceFormView(props: {
           </ul>
         )}
         <p>
-          <a href={`/cycles/${props.cycleId}/timeline`}>
+          <a class="btn text" href={`/cycles/${props.cycleId}/timeline`}>
             Oś czasu
           </a>
         </p>
