@@ -75,8 +75,22 @@ describe("krok 4 pokazu: ocena i blokady", () => {
     const app = fresh();
     const r = await call(app, "marek", `/cycles/${piotr}/assessment/approve`, form(PIOTR_IDS, { developmentConclusions: "Kurs." }, ["rzetelnosc"]));
     expect(r.status).toBe(422);
-    expect(await r.text()).toContain("§ 11 ust. 3");
+    const html = await r.text();
+    expect(html).toContain("§ 11 ust. 3");
+    // Podsumowanie błędów prowadzi do pola uzasadnienia; lista braków przy zatwierdzaniu zostaje.
+    expect(html).toContain("Oceny nie można jeszcze zatwierdzić");
+    expect(html).toContain('href="#justification"');
+    expect(html).toContain('id="justification-error"');
+    expect(html).toContain("Do zatwierdzenia brakuje");
     expect(events("assessment_approved")).toHaveLength(0);
+  });
+
+  test("zatwierdzenie bez ocen: odnośnik do kryteriów i do wniosków rozwojowych", async () => {
+    const app = fresh();
+    const html = await (await call(app, "marek", `/cycles/${piotr}/assessment/approve`, {})).text();
+    expect(html).toContain('href="#h-crits"');
+    expect(html).toContain('href="#developmentConclusions"');
+    expect(html).toContain('id="h-crits" tabindex="-1"');
   });
 
   test("komplet: 303, pełna migawka, podgląd z terminem z migawki", async () => {

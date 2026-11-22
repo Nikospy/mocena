@@ -70,19 +70,32 @@ function readDraft(body: Record<string, unknown>, sheet: string | null): Assessm
 }
 
 /** Błędy, które odrzucają zapis szkicu: ocena spoza cyklu albo spoza skali, zła data rozmowy. Braki ocen nie blokują zapisu szkicu. */
-function draftErrors(cycleId: string, d: AssessmentDraft): string[] {
-  const ids = new Set(cycleCriteria(cycleId).map((x) => x.id));
+function draftErrors(cycleId: string, d: AssessmentDraft): Record<string, string> {
+  const criteria = cycleCriteria(cycleId);
+  const ids = new Set(criteria.map((x) => x.id));
   const scale = POINTS as readonly number[];
-  const errors: string[] = [];
+  const errors: Record<string, string> = {};
   for (const [id, v] of Object.entries(d.scores)) {
-    if (!ids.has(id)) errors.push(`Ocena dotyczy kryterium spoza tego cyklu: ${id}`);
-    else if (!scale.includes(v)) errors.push("Ocena cząstkowa musi wynosić 1, 3, 5, 7 albo 9.");
+    if (!ids.has(id)) errors[`_out-${id}`] = `Ocena dotyczy kryterium spoza tego cyklu (${id}). Odśwież stronę i wystaw oceny jeszcze raz.`;
+    else if (!scale.includes(v)) errors[`score-${id}`] = `Wybierz ocenę cząstkową 1, 3, 5, 7 albo 9: ${criterion(id).name}.`;
   }
   if (d.interviewDate !== null && (!isIsoDate(d.interviewDate) || d.interviewDate > today())) {
-    errors.push("Data rozmowy oceniającej musi być datą nie późniejszą niż dzień dzisiejszy.");
+    errors.interviewDate = "Wybierz z kalendarza datę rozmowy oceniającej: dzisiejszą albo wcześniejszą.";
   }
-  if ((d.objectionRecipient?.length ?? 0) > 200) errors.push("Adresat sprzeciwu może mieć najwyżej 200 znaków.");
+  if ((d.objectionRecipient?.length ?? 0) > 200) errors.objectionRecipient = "Adresat sprzeciwu może mieć najwyżej 200 znaków. Skróć wpis.";
   return errors;
+}
+
+/** Braki przy zatwierdzaniu jako błędy formularza: klucz = id pola na ekranie oceny. */
+function blockerErrors(blockers: { field: string; message: string }[]): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const b of blockers) {
+    const m = /^score\[(.+)\]$/.exec(b.field);
+    const key = m ? `score-${m[1]}` : b.field === "scores" ? "h-crits" : b.field === "gradeRequest" ? "grade-request" : b.field;
+    const text = /[.?!]$/.test(b.message) ? b.message : `${b.message}.`;
+    out[out[key] ? `${key}-${Object.keys(out).length}` : key] = text;
+  }
+  return out;
 }
 
 function resultOf(ids: string[], scores: Record<string, number>) {
@@ -108,7 +121,7 @@ function screenData(cx: Ctx, draft: AssessmentDraft) {
   };
 }
 
-function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; errors?: string[]; draft?: AssessmentDraft } = {}) {
+function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; errors?: Record<string, string>; errorTitle?: string; draft?: AssessmentDraft } = {}) {
   const state = assessmentState(cx.cycle.id);
   const status = extra.status ?? 200;
   const base = { viewer: cx.person, person: cx.appraisee, today: today() };
@@ -142,6 +155,7 @@ function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; er
       sheet={cx.cycle.sheet ?? ""}
       periodFrom={assessmentPeriodFrom(cx.cycle.id, cx.cycle.period_start)}
       errors={extra.errors}
+      errorTitle={extra.errorTitle ?? (extra.errors && Object.keys(extra.errors).every((k) => k.startsWith("_")) ? "Nie zapisano" : undefined)}
       canAcknowledge={isAppraisee(cx) && state.stage === "approved"}
       canFiction={appraiser && state.stage === "approved"}
       shifted={state.stage === "draft" ? shiftedDeadlineSentence(cx.cycle.id) : null}
@@ -181,7 +195,7 @@ function writeGuard(c: Context): Ctx | Response | Promise<Response> {
   if (!isAppraiser(g)) return c.text("Tylko oceniający może zapisać ocenę.", 403);
   const stage = assessmentState(g.cycle.id).stage;
   if (stage === "no_part1") return render(c, g, { status: 409 });
-  if (stage !== "draft") return render(c, g, { status: 409, errors: [CLOSED] });
+  if (stage !== "draft") return render(c, g, { status: 409, errors: { _: CLOSED } });
   return g;
 }
 
@@ -190,13 +204,13 @@ app.post("/cycles/:id/assessment", async (c) => {
   if (!isCtx(g)) return g;
   const draft = readDraft(await c.req.parseBody(), g.cycle.sheet);
   const errors = draftErrors(g.cycle.id, draft);
-  if (errors.length) return render(c, g, { status: 422, errors, draft });
+  if (Object.keys(errors).length) return render(c, g, { status: 422, errors, draft });
   const ok = getDb().transaction(() => {
     if (assessmentState(g.cycle.id).stage !== "draft") return false;
     recordEvent("assessment_draft_saved", g.cycle.id, g.person.id, draft);
     return true;
   })();
-  if (!ok) return render(c, g, { status: 409, errors: [CLOSED] });
+  if (!ok) return render(c, g, { status: 409, errors: { _: CLOSED } });
   return c.redirect(`/cycles/${g.cycle.id}/assessment`, 303);
 });
 
@@ -205,7 +219,7 @@ app.post("/cycles/:id/assessment/approve", async (c) => {
   if (!isCtx(g)) return g;
   const draft = readDraft(await c.req.parseBody(), g.cycle.sheet);
   const errors = draftErrors(g.cycle.id, draft);
-  if (errors.length) return render(c, g, { status: 422, errors, draft });
+  if (Object.keys(errors).length) return render(c, g, { status: 422, errors, draft });
   const outcome = getDb().transaction((): "closed" | "blocked" | "ok" => {
     if (assessmentState(g.cycle.id).stage !== "draft") return "closed";
     recordEvent("assessment_draft_saved", g.cycle.id, g.person.id, draft);
@@ -214,8 +228,8 @@ app.post("/cycles/:id/assessment/approve", async (c) => {
     recordEvent("assessment_approved", g.cycle.id, g.person.id, buildAssessmentSnapshot(g.cycle.id, draft));
     return "ok";
   })();
-  if (outcome === "closed") return render(c, g, { status: 409, errors: [CLOSED] });
-  if (outcome === "blocked") return render(c, g, { status: 422, draft, errors: ["Oceny nie można jeszcze zatwierdzić."] });
+  if (outcome === "closed") return render(c, g, { status: 409, errors: { _: CLOSED } });
+  if (outcome === "blocked") return render(c, g, { status: 422, draft, errors: blockerErrors(screenData(g, draft).blockers), errorTitle: "Oceny nie można jeszcze zatwierdzić" });
   return c.redirect(`/cycles/${g.cycle.id}/assessment`, 303);
 });
 
@@ -235,7 +249,7 @@ app.post("/cycles/:id/assessment/acknowledge", (c) => {
     startNextCycle(g.cycle, g.person.id, state.approvedOn, today(), state.snapshot.result.outcome);
     return true;
   })();
-  if (!ok) return render(c, g, { status: 409, errors: ["Ocena nie czeka na potwierdzenie zapoznania."] });
+  if (!ok) return render(c, g, { status: 409, errors: { _: "Ocena nie czeka na potwierdzenie zapoznania." } });
   return c.redirect(`/cycles/${g.cycle.id}/assessment`, 303);
 });
 
@@ -266,7 +280,7 @@ function fictionGuard(c: Context): Ctx | Response | Promise<Response> {
   if (!isAppraiser(g)) return c.text("Tylko oceniający może stwierdzić fikcję zapoznania.", 403);
   const stage = assessmentState(g.cycle.id).stage;
   if (stage !== "approved") {
-    return render(c, g, { status: 409, errors: ["Fikcję zapoznania można stwierdzić tylko po zatwierdzeniu oceny, dopóki oceniany jej nie potwierdził."] });
+    return render(c, g, { status: 409, errors: { _: "Fikcję zapoznania można stwierdzić tylko po zatwierdzeniu oceny, dopóki oceniany jej nie potwierdził." } });
   }
   return g;
 }
@@ -318,7 +332,7 @@ app.post("/cycles/:id/assessment/fiction", async (c) => {
     startNextCycle(g.cycle, g.person.id, state.approvedOn, values.deliveredOn, state.snapshot.result.outcome);
     return true;
   })();
-  if (!ok) return render(c, g, { status: 409, errors: ["Ocena nie czeka już na potwierdzenie zapoznania."] });
+  if (!ok) return render(c, g, { status: 409, errors: { _: "Ocena nie czeka już na potwierdzenie zapoznania." } });
   return c.redirect(`/cycles/${g.cycle.id}/assessment`, 303);
 });
 

@@ -5,7 +5,7 @@ import type { Blocker, GradeRequestOption } from "../engine/approval";
 import { rules, rulesVersion } from "../engine/rules";
 import { criterion, POINTS, type AssessmentResult } from "../engine/scoring";
 import type { Person } from "../people";
-import { ConfirmationBlock, LegalBasis, RulesVersion, PageHeader } from "./components";
+import { ConfirmationBlock, ErrorSummary, FieldError, type FormErrors, LegalBasis, PageHeader, RulesVersion, invalid } from "./components";
 import { Layout, formatDate } from "./layout";
 import { romanGrade } from "../engine/grades";
 import type { JSX } from "hono/jsx/jsx-runtime";
@@ -196,7 +196,9 @@ export type AssessmentViewProps = {
   grade: number | null;
   sheet: string;
   periodFrom: string;
-  errors?: string[];
+  errors?: FormErrors;
+  /** Tytuł podsumowania błędów (np. „Oceny nie można jeszcze zatwierdzić”); bez niego liczba pól. */
+  errorTitle?: string;
   canAcknowledge?: boolean;
   canFiction?: boolean;
   /** Termin przesunięty przez nieobecność (silnik): zdanie i odnośnik do osi czasu. */
@@ -218,6 +220,7 @@ function EditForm(p: AssessmentViewProps) {
   const slots = p.slots ?? {};
   const d = p.draft;
   const justificationRequired = p.result?.justificationRequired ?? false;
+  const e = p.errors ?? {};
   return (
     <>
       {slots.beforeForm ?? null}
@@ -226,7 +229,7 @@ function EditForm(p: AssessmentViewProps) {
           <div class="o-main">
             <section aria-labelledby="h-crits">
               <div class="list-h">
-                <h2 id="h-crits">Kryteria i oceny cząstkowe</h2>
+                <h2 id="h-crits" tabindex={-1}>Kryteria i oceny cząstkowe</h2>
                 <p class="cap">1 znacznie poniżej · 3 poniżej · 5 na poziomie · 7 powyżej · 9 znacznie powyżej oczekiwań</p>
               </div>
               <div class="card sheet">
@@ -242,10 +245,11 @@ function EditForm(p: AssessmentViewProps) {
                           {c.expectation ? <p class="cap">Oczekiwanie: {c.expectation}</p> : null}
                         </div>
                         <div class="scorebox">
-                          <div class="score" role="radiogroup" aria-label={`Ocena cząstkowa: ${cr.name}`}>
+                          <FieldError id={`score-${c.id}`} errors={e} />
+                          <div class="score" role="radiogroup" aria-label={`Ocena cząstkowa: ${cr.name}`} {...invalid(`score-${c.id}`, e)}>
                             {POINTS.map((n) => (
                               <label>
-                                <input type="radio" name={`score[${c.id}]`} value={String(n)} checked={val === n} aria-label={String(n)} data-level={LEVELS.get(n) ?? ""} />
+                                <input type="radio" name={`score[${c.id}]`} id={n === POINTS[0] ? `score-${c.id}` : undefined} value={String(n)} checked={val === n} aria-label={String(n)} data-level={LEVELS.get(n) ?? ""} />
                                 <span>{n}</span>
                               </label>
                             ))}
@@ -264,7 +268,8 @@ function EditForm(p: AssessmentViewProps) {
               <label for="interviewDate">
                 <h2>Data rozmowy oceniającej</h2>
               </label>
-              <input class="area date-field" type="date" id="interviewDate" name="interviewDate" max={p.today} value={d.interviewDate ?? p.today} />
+              <FieldError id="interviewDate" errors={e} />
+              <input class="area date-field" type="date" id="interviewDate" name="interviewDate" max={p.today} value={d.interviewDate ?? p.today} {...invalid("interviewDate", e)} />
             </section>
 
             <section class="card tx-card">
@@ -276,7 +281,8 @@ function EditForm(p: AssessmentViewProps) {
               </label>
               <p class="cap">Ten tekst przeczyta pracownik.</p>
               {slots.justificationTools ?? null}
-              <textarea class="area" id="justification" name="justification" rows={5}>{d.justification}</textarea>
+              <FieldError id="justification" errors={e} />
+              <textarea class="area" id="justification" name="justification" rows={5} {...invalid("justification", e)}>{d.justification}</textarea>
             </section>
 
             <section class="card tx-card">
@@ -287,15 +293,17 @@ function EditForm(p: AssessmentViewProps) {
                 </h2>
               </label>
               {slots.conclusionsTools ?? null}
-              <textarea class="area" id="developmentConclusions" name="developmentConclusions" rows={4}>{d.developmentConclusions}</textarea>
+              <FieldError id="developmentConclusions" errors={e} />
+              <textarea class="area" id="developmentConclusions" name="developmentConclusions" rows={4} {...invalid("developmentConclusions", e)}>{d.developmentConclusions}</textarea>
               <p class="sign"><PersonIco />{p.viewer.name}</p>
             </section>
 
             {p.sheet === "A" ? (
               <section class="card tx-card">
                 <label class="lbl" for="objectionRecipient">Sprzeciw przysługuje do:</label>
+                <FieldError id="objectionRecipient" errors={e} />
                 <input class="area" id="objectionRecipient" name="objectionRecipient" type="text" maxlength={200}
-                  value={d.objectionRecipient ?? ""} aria-required="true" />
+                  value={d.objectionRecipient ?? ""} aria-required="true" {...invalid("objectionRecipient", e)} />
                 <p class="cap">Wpisz adresata przed zatwierdzeniem oceny.</p>
               </section>
             ) : null}
@@ -319,7 +327,8 @@ function EditForm(p: AssessmentViewProps) {
                     </div>
                     {p.grade !== null ? <p class="cap">Stopień docelowy: {romanGrade(p.grade + 1)}</p> : null}
                     <label class="lbl" for="gradeMotivation">Umotywowanie wniosku</label>
-                    <textarea class="area" id="gradeMotivation" name="gradeMotivation" rows={3}>{d.gradeRequest.motivation}</textarea>
+                    <FieldError id="gradeMotivation" errors={e} />
+                    <textarea class="area" id="gradeMotivation" name="gradeMotivation" rows={3} {...invalid("gradeMotivation", e)}>{d.gradeRequest.motivation}</textarea>
                   </>
                 )}
               </section>
@@ -438,11 +447,7 @@ export function AssessmentView(p: AssessmentViewProps) {
           </span>
         </p>
       ) : null}
-      {p.errors?.length ? (
-        <div class="st bad" role="alert">
-          <ul>{p.errors.map((e) => <li>{e}</li>)}</ul>
-        </div>
-      ) : null}
+      <ErrorSummary errors={p.errors} title={p.errorTitle} />
       {p.mode === "edit" || !snap ? <EditForm {...p} /> : <SnapshotView {...p} snapshot={snap} />}
     </Layout>
   );
