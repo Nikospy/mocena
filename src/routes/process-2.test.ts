@@ -103,3 +103,31 @@ describe("proces 2: część rozwojowa na karcie rozmowy oceniającej", () => {
     expect((await call(app, "piotr", "/cycles/cycle-piotr/cards/assessment-conversation")).status).toBe(403);
   });
 });
+
+describe("proces 2: termin i sprawa po rozstrzygnięciu „ponowne sporządzenie oceny”", () => {
+  test("kadry rozstrzygają sprzeciw Katarzyny; cykl ma termin 04.12.2026, a Anna ma sprawę na stronie głównej", async () => {
+    const { app } = createTestApp({ today: "2026-11-22" });
+    expect(await html(app, "anna", "/")).not.toContain("Ponowne sporządzenie oceny");
+    const r = await call(app, "joanna", "/cycles/cycle-katarzyna/objection-outcome", { outcome: "redone" });
+    expect(r.status).toBe(303);
+    const { cycleState } = await import("../hr/cycle-state");
+    const st = cycleState("cycle-katarzyna");
+    expect(st.deadline).toEqual({ date: "2026-12-04", basis: ["art. 83 ust. 3 ustawy"] });
+    expect(st.deadlineLabel).toBe("Ponowna ocena do");
+    const hr = await html(app, "joanna", "/hr");
+    expect(hr).toContain("Ponowna ocena do");
+    expect(hr).toContain("04.12.2026");
+    const home = await html(app, "anna", "/");
+    expect(home).toContain("Ponowne sporządzenie oceny");
+    expect(home).toContain("/cycles/cycle-katarzyna/sheet");
+    expect(home).toContain("04.12.2026");
+  });
+
+  test("inne rozstrzygnięcia nie dają terminu ani sprawy", async () => {
+    const { app } = createTestApp({ today: "2026-11-22" });
+    await call(app, "joanna", "/cycles/cycle-katarzyna/objection-outcome", { outcome: "rejected" });
+    const { cycleState } = await import("../hr/cycle-state");
+    expect(cycleState("cycle-katarzyna").deadline).toBeUndefined();
+    expect(await html(app, "anna", "/")).not.toContain("Ponowne sporządzenie oceny");
+  });
+});
