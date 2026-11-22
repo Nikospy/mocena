@@ -1,7 +1,7 @@
 ---
 change_id: review-polish
 title: Dopracowanie po przeglądzie na żywej stronie
-status: planning
+status: implementing
 created: 2026-11-22
 updated: 2026-11-22
 archived_at: null

@@ -163,8 +163,8 @@ Trasy przez `app.request()` z ciasteczkiem konta i datą ustawioną w `settings`
 
 #### Automated
 
-- [ ] 1.1 Testy pozycji P1 i tekstów przechodzą: `bun test src/routes/polish-p1.test.ts`
-- [ ] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run`
+- [x] 1.1 Testy pozycji P1 i tekstów przechodzą: `bun test src/routes/polish-p1.test.ts` — 9b729d7
+- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — 9b729d7
 
 #### Manual
 
@@ -174,8 +174,8 @@ Trasy przez `app.request()` z ciasteczkiem konta i datą ustawioną w `settings`
 
 #### Automated
 
-- [ ] 2.1 Testy pozycji P2 przechodzą: `bun test src/routes/polish-p2.test.ts`
-- [ ] 2.2 Cały zestaw testów przechodzi: `bun test`
+- [x] 2.1 Testy pozycji P2 przechodzą: `bun test src/routes/polish-p2.test.ts` — ee280d5
+- [x] 2.2 Cały zestaw testów przechodzi: `bun test` — ee280d5
 
 #### Manual
 
