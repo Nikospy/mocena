@@ -1180,7 +1180,7 @@ section[aria-labelledby="h-dev"] > h3 { margin-block-start: var(--sp-300); paddi
 .subs-src { color: var(--text-2); }
 
 /* cele kliknięcia odnośników w tekście tych ekranów: co najmniej 24 px wysokości */
-:is(.hr-table, .hr-obj-what, .person-danger, .hr-errsum, .people-none, .subs-side, .person-del, .hr-doc) a { display: inline-flex; align-items: center; min-block-size: var(--sp-300); }
+:is(.hr-table, .hr-obj-what, .person-danger, .hr-errsum, .people-none, .subs-side, .person-del, .hr-doc) a:not(.btn) { display: inline-flex; align-items: center; min-block-size: var(--sp-300); }
 .hr-table tbody th a { display: inline; padding-block: var(--sp-50); line-height: var(--lh-p); }
 
 .hr-errsum { max-inline-size: 48rem; }
@@ -1234,6 +1234,14 @@ section[aria-labelledby="h-dev"] > h3 { margin-block-start: var(--sp-300); paddi
 .hr-docpage ul { padding-inline-start: var(--sp-300); display: grid; gap: var(--sp-100); }
 .hr-docpage :is(p, li) { max-inline-size: 66ch; }
 .hr-docpage code { overflow-wrap: anywhere; }
+
+.person-blocked { max-inline-size: 48rem; }
+
+.hr-cycles thead th:nth-child(3) { inline-size: 24%; }
+.hr-cycles thead th:nth-child(5) { inline-size: 17%; }
+@media (max-width: 899px) {
+  .people-table .hr-card > td:is([data-label="Przełożony"], [data-label="Arkusz"])::before { content: attr(data-label) ": "; display: inline; font-size: var(--f-p); line-height: var(--lh-p); font-weight: var(--w-regular); color: var(--text-2); }
+}
 
 /* --- koniec sekcji hr-admin (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
 /* . */

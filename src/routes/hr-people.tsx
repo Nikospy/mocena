@@ -137,22 +137,22 @@ app.get("/hr/people/:id/delete", (c) => {
   return c.html(
     <Layout title="Usuwanie danych pracownika" person={g.viewer} today={today()}>
       <PageHeader
-        context={<a href={`/hr/people/${g.person.id}/edit`}>Dane pracownika: {g.person.name}</a>}
+        context="Pracownicy"
         title={blocked ? <>Danych pracownika {fullNameForm(g.person.name, "gen") ?? g.person.name} nie można usunąć</> : <>Usunąć dane pracownika {fullNameForm(g.person.name, "gen") ?? g.person.name}?</>}
         lead={blocked ? undefined : "Usuniesz kartotekę, oceny, notatki i pozostałe dane tej osoby. Tego działania nie można cofnąć."}
       />
       {blocked ? (
         <>
-          <div class="st bad" role="alert">
+          <div class="st bad person-blocked" role="alert">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.5v.01" /></svg>
             <div>{blocked}</div>
           </div>
-          <p><a href={`/hr/people/${g.person.id}/edit`}>Wróć do danych pracownika</a></p>
+          <p class="btns person-del"><a class="btn" href={`/hr/people/${g.person.id}/edit`}>Wróć do danych pracownika</a></p>
         </>
       ) : (
         <form method="post" action={`/hr/people/${g.person.id}/delete`} class="btns person-del">
           <button type="submit" name="confirmed" value="1" class="btn primary">Usuń dane pracownika</button>
-          <a class="btn text" href={`/hr/people/${g.person.id}/edit`}>Anuluj</a>
+          <a class="btn" href={`/hr/people/${g.person.id}/edit`}>Anuluj</a>
         </form>
       )}
     </Layout>,

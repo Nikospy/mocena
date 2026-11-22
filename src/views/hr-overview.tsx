@@ -191,7 +191,7 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
                     <span>Arkusz {r.sheet}</span>
                     <a href={`/cycles/${r.cycleId}/sheet?print=1`}>Drukuj / pobierz PDF</a>
                     {r.links.filter((l) => l.href.endsWith("/assessment/export.json")).map((l) => (
-                      <a href={l.href} download>Ocena do systemu kadrowego (JSON)</a>
+                      <a href={l.href} download>Ocena (plik JSON)</a>
                     ))}
                   </div>
                 ) : (

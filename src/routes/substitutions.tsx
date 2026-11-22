@@ -48,10 +48,10 @@ app.post("/hr/substitutions", async (c) => {
   const ids = appraisers().map((p) => p.id);
   if (!ids.includes(values.absent_id)) errors.absent_id = "Wybierz nieobecnego oceniającego z listy.";
   if (!appraisers().some((p) => p.id === values.substitute_id && p.has_account === 1)) errors.substitute_id = "Wybierz osobę zastępującą z listy (musi mieć konto).";
-  else if (values.substitute_id === values.absent_id) errors.substitute_id = "Zastępca musi być inną osobą niż nieobecny.";
-  if (!isIsoDate(values.date_from)) errors.date_from = "Podaj poprawną datę początku.";
-  if (!isIsoDate(values.date_to)) errors.date_to = "Podaj poprawną datę końca.";
-  else if (isIsoDate(values.date_from) && values.date_to < values.date_from) errors.date_to = "Koniec nie może być przed początkiem.";
+  else if (values.substitute_id === values.absent_id) errors.substitute_id = "Osoba zastępująca musi być kimś innym niż nieobecny oceniający.";
+  if (!isIsoDate(values.date_from)) errors.date_from = "Wpisz datę w polu „Od”.";
+  if (!isIsoDate(values.date_to)) errors.date_to = "Wpisz datę w polu „Do”.";
+  else if (isIsoDate(values.date_from) && values.date_to < values.date_from) errors.date_to = "Data „Do” musi być taka sama jak „Od” albo późniejsza.";
   else if (values.date_to < today()) errors.date_to = "Zastępstwo musi kończyć się dziś albo później.";
   if (Object.keys(errors).length > 0) return render(c, viewer, { values, errors, status: 422 });
   getDb().transaction(() => {
