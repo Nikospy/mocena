@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono, type NotFoundHandler } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { getDb } from "./db";
 import { runSeed } from "./seed";
@@ -21,6 +21,7 @@ import tour from "./routes/tour";
 import { tourContext } from "./tour/context";
 import { TourEntry } from "./views/tour-entry";
 import { Layout, formatDate } from "./views/layout";
+import { NotFoundPage, ServerErrorPage } from "./views/error-page";
 import { LegalBasis } from "./views/components";
 
 const ROLE_LABEL: Record<string, string> = { appraiser: "oceniający", employee: "pracownik", hr: "kadry", admin: "administrator" };
@@ -162,5 +163,13 @@ app.route("/", appraiser);
 app.route("/", hrPartner);
 app.route("/", admin);
 app.route("/", tour);
+
+export const notFoundHandler: NotFoundHandler = (c) => c.html(<NotFoundPage />, 404);
+app.notFound(notFoundHandler);
+
+app.onError((err, c) => {
+  console.error(err);
+  return c.html(<ServerErrorPage />, 500);
+});
 
 export default app;

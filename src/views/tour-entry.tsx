@@ -1,5 +1,6 @@
 import type { Child } from "hono/jsx";
 import { STOPS, personLabel } from "../tour/stops";
+import { Head } from "./head";
 import { formatDateLong } from "./layout";
 
 const PLAY = <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z" /></svg>;
@@ -8,14 +9,9 @@ const PLAY = <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8
 export function TourShell(props: { title: string; children?: Child }) {
   return (
     <html lang="pl">
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>{props.title} · mOcena</title>
-        <link rel="stylesheet" href="/rodzina.css" />
-        <link rel="stylesheet" href="/style.css" />
-      </head>
+      <Head title={props.title} />
       <body>
+        <a class="skip-link" href="#main">Przejdź do treści</a>
         <header class="top">
           <div class="top-in">
             <a class="brand" href="/tour">
@@ -24,7 +20,7 @@ export function TourShell(props: { title: string; children?: Child }) {
             <p class="who">Pokaz dla jury</p>
           </div>
         </header>
-        <main class="e-wrap">{props.children}</main>
+        <main class="e-wrap" id="main">{props.children}</main>
       </body>
     </html>
   );

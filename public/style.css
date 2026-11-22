@@ -845,3 +845,8 @@ body.tour-on .nav { display: none; }
 .gp-end { min-block-size: 0; padding: 0; font-size: var(--f-c1); line-height: var(--lh-c1); }
 .e-more li { display: grid; gap: var(--sp-50); justify-items: start; }
 .e-more form { margin: 0; }
+
+/* first-impression */
+.skip-link { position: absolute; inset-inline-start: var(--sp-100); inset-block-start: var(--sp-100); z-index: 100; padding: var(--sp-100) var(--sp-200); background: var(--surface); color: var(--primary); border-radius: var(--r-300); font-weight: var(--w-semibold, 600); transform: translateY(-200%); }
+.skip-link:focus, .skip-link:focus-visible { transform: none; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: none; box-shadow: var(--focus); }

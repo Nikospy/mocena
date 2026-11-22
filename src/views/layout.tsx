@@ -2,6 +2,7 @@ import type { Child } from "hono/jsx";
 import { roleLabel, type Person } from "../people";
 import { currentTour } from "../tour/context";
 import { stopById, stopScreenPath } from "../tour/stops";
+import { Head } from "./head";
 import { TourPanel } from "./tour-panel";
 
 export function formatDate(iso: string): string {
@@ -36,15 +37,9 @@ export function Layout(props: { title: string; person: Person | null; today: str
   const tourStop = tour.stop && !tour.path.startsWith("/tour") ? stopById(tour.stop) : null;
   return (
     <html lang="pl">
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>{props.title} · mOcena</title>
-        <link rel="stylesheet" href="/rodzina.css" />
-        <link rel="stylesheet" href="/style.css" />
-        <link rel="stylesheet" href="/print.css" media="print" />
-      </head>
+      <Head title={props.title} printCss />
       <body class={tourStop ? "tour-on" : undefined}>
+        <a class="skip-link" href="#main">Przejdź do treści</a>
         <header class="top">
           <div class="top-in">
             <a class="brand" href="/">
@@ -78,7 +73,7 @@ export function Layout(props: { title: string; person: Person | null; today: str
             </button>
           </form>
         ) : null}
-        <main class="wrap">{props.children}</main>
+        <main class="wrap" id="main">{props.children}</main>
         {tourStop ? (
           <>
             <TourPanel stop={tourStop} screenPath={stopScreenPath(tourStop)} onScreen={tour.path === stopScreenPath(tourStop)} dateLabel={formatDateLong(tourStop.date)} dateOf={formatDateLong} />
