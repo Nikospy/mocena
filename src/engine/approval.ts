@@ -3,7 +3,8 @@ import type { AssessmentDraft } from "../assessment/state";
 import { rules } from "./rules";
 import { computeAssessment, criterion, POINTS, type Outcome } from "./scoring";
 
-export type Blocker = { field: string; message: string; basis: string };
+/** `items`: nazwy kryteriów zebrane w jednej linii (np. „Brakuje ocen cząstkowych: 7”). */
+export type Blocker = { field: string; message: string; basis: string; items?: string[] };
 export type GradeRequestOption = "not_applicable" | "no_only" | "yes_or_no";
 
 const A = rules.approval;
@@ -30,15 +31,19 @@ export function approvalBlockers(input: { criteria: string[]; draft: AssessmentD
   const scale = POINTS as readonly number[];
 
   let complete = true;
+  const missing: string[] = [];
   for (const id of criteria) {
     const v = draft.scores[id];
     if (v === undefined) {
       complete = false;
-      out.push({ field: `score[${id}]`, message: `Brakuje oceny cząstkowej: ${nameOf(id)}`, basis: scoresBasis });
+      missing.push(nameOf(id));
     } else if (!scale.includes(v)) {
       complete = false;
       out.push({ field: `score[${id}]`, message: `Ocena cząstkowa za „${nameOf(id)}” musi wynosić 1, 3, 5, 7 albo 9`, basis: scoresBasis });
     }
+  }
+  if (missing.length) {
+    out.unshift({ field: "scores", message: `Brakuje ocen cząstkowych: ${missing.length}`, basis: scoresBasis, items: missing });
   }
   for (const id of Object.keys(draft.scores)) {
     if (!set.has(id)) {

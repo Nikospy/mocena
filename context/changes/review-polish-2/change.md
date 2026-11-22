@@ -1,7 +1,7 @@
 ---
 change_id: review-polish-2
 title: Druga runda dopracowania (wygląd i dostępność)
-status: planning
+status: implementing
 created: 2026-11-22
 updated: 2026-11-22
 archived_at: null

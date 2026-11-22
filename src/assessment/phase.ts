@@ -12,5 +12,10 @@ export function assessmentPhaseOpen(cycle: Cycle): boolean {
   const stage = assessmentState(cycle.id).stage;
   if (stage === "no_part1") return false;
   if (stage !== "draft") return true;
+  return assessmentWindowReached(cycle);
+}
+
+/** Okno przed terminem oceny (ostatnie dni ustawienia urzędu) albo po terminie; termin z silnika, z przesunięciami. */
+export function assessmentWindowReached(cycle: Cycle): boolean {
   return today() >= addDays(effectiveDeadline(cycle.id).date, -assessmentWindowDays().value);
 }

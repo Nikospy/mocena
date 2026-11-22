@@ -15,14 +15,15 @@ export function RulesVersion(props: { version: string; effectiveFrom?: string; h
 
 /** Dopisek z przepisem przy dacie albo wartości. */
 export function LegalBasis(props: { basis: string | string[] }) {
-  const text = Array.isArray(props.basis) ? props.basis.join(", ") : props.basis;
+  const list = (Array.isArray(props.basis) ? props.basis : [props.basis]).filter((b) => b.trim());
+  if (!list.length) return null;
+  const text = list.join(", ");
   return (
     <span class="basis">
       <span class="art">{text}</span>
     </span>
   );
 }
-
 export type ConfirmationBlockProps =
   | { kind: "confirmation"; name?: string; place?: string; date?: string }
   | { kind: "fiction"; name: string; reason: string; deliveryMethod: string; deliveredOn: string; date: string };
