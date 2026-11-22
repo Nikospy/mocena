@@ -83,4 +83,4 @@ Równolegle powstają S-08 (`guided-demo-tour`, pliki `src/tour/*`, `layout.tsx`
 
 #### Manual
 
-- [ ] 2.2 Oba przebiegi dwa razy z rzędu na żywej stronie
+- [x] 2.2 Oba przebiegi dwa razy z rzędu na żywej stronie — 07d192e
