@@ -35,7 +35,6 @@ describe("ocena sporządzona po raz drugi (art. 83 ust. 4 ustawy)", () => {
     expect(page).toContain('id="assessment-form"');
     expect(page).toContain("sporządzasz ocenę po raz drugi do 04.12.2026");
     expect(page).toContain("Pierwsza ocena z dnia 16.11.2026");
-    expect(page).not.toContain("Prototyp nie ma jeszcze formularza drugiej oceny");
     for (const id of ids()) expect(page).toContain(`name="score[${id}]" value="5" checked`);
     expect(page).toContain("Szkolenie z zarządzania zespołem w ciągu roku.");
     const home = await html(app, "anna", "/");

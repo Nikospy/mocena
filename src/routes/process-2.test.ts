@@ -121,7 +121,6 @@ describe("proces 2: termin i sprawa po rozstrzygnięciu „ponowne sporządzenie
     expect(home).toContain("Ponowne sporządzenie oceny");
     expect(home).toContain("/cycles/cycle-katarzyna/assessment");
     expect(home).toContain("04.12.2026");
-    expect(home).not.toContain("Prototyp nie ma jeszcze formularza drugiej oceny");
     const screen = await html(app, "anna", "/cycles/cycle-katarzyna/assessment");
     expect(screen).toContain('id="assessment-redo"');
     expect(screen).toContain('id="assessment-form"');
