@@ -1,3 +1,4 @@
+import { actsAsAppraiser } from "../substitutions";
 import { assessmentState, type AssessmentSnapshot } from "../assessment/state";
 import { cycleById, effectiveDeadline, type Cycle } from "../cycles";
 import { rulesVersion } from "../engine/rules";
@@ -59,7 +60,7 @@ export type SheetData = {
 
 /** Widzą: oceniany, oceniający cyklu, kadry. */
 export function canViewSheet(viewer: Person, cycle: Cycle): boolean {
-  return viewer.id === cycle.person_id || viewer.id === cycle.appraiser_id || viewer.role === "hr";
+  return viewer.id === cycle.person_id || actsAsAppraiser(cycle.appraiser_id, viewer.id) || viewer.role === "hr";
 }
 
 export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetData {

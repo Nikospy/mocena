@@ -1,3 +1,4 @@
+import { actsAsAppraiser } from "../substitutions";
 import { Hono, type Context } from "hono";
 import "../assessment/home";
 import { buildAssessmentSnapshot } from "../assessment/snapshot";
@@ -28,7 +29,7 @@ function guard(c: Context): Response | Ctx {
   return { cycle, person, appraisee };
 }
 
-const isAppraiser = (cx: Ctx) => cx.cycle.appraiser_id === cx.person.id;
+const isAppraiser = (cx: Ctx) => actsAsAppraiser(cx.cycle.appraiser_id, cx.person.id);
 const isAppraisee = (cx: Ctx) => cx.cycle.person_id === cx.person.id;
 
 const isCtx = (g: unknown): g is Ctx => typeof g === "object" && g !== null && "cycle" in g && "appraisee" in g;

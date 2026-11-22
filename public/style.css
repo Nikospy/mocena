@@ -899,3 +899,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .dc-place { text-align: end; }
 .dc-line { border-block-end: 1px solid var(--border-strong); min-block-size: var(--sp-500); padding-block-start: var(--sp-200); }
 .dc-letter .sheet-part h2 { margin-block-start: var(--sp-200); }
+/* S-17 hr-people */
+.due-pill { display: inline-flex; align-items: center; padding: var(--sp-50) var(--sp-150); border-radius: var(--pill-r); background: var(--cobalt-20); color: var(--primary); font-weight: var(--w-bold); font-variant-numeric: tabular-nums; }
+.due-pill.late { background: var(--orange-20); color: var(--orange-200); }
+.people-table td:nth-child(5) { min-inline-size: 0; }
+.people-tools > * + * { margin-block-start: var(--sp-200); }
+.people-tools .hr-links { align-items: center; }
+.people-tools .link-chip[aria-current="true"] { background: var(--primary); color: var(--on-primary); }
+.hr-tools .btn { text-decoration: none; }
+fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }

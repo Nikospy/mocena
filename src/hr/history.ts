@@ -1,3 +1,4 @@
+import { actsAsAppraiser } from "../substitutions";
 import { assessmentState, currentGradeNumber, type AssessmentSnapshot } from "../assessment/state";
 import { getDb } from "../db";
 import { mandatoryGrade, type MandatoryGrade } from "../engine/grades";
@@ -55,7 +56,7 @@ export function assessmentHistory(personId: string): HistoryEntry[] {
 /** Widzą: sama osoba, oceniający któregokolwiek jej cyklu, kadry. */
 export function canViewHistory(viewer: Person, personId: string): boolean {
   if (viewer.id === personId || viewer.role === "hr") return true;
-  return visibleCyclesOf(personId).some((c) => c.appraiser_id === viewer.id);
+  return visibleCyclesOf(personId).some((c) => actsAsAppraiser(c.appraiser_id, viewer.id));
 }
 
 /** Obowiązek stopnia z mocy prawa dla osoby, liczony wyłącznie z widocznych zdarzeń. */

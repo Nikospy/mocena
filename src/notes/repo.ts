@@ -1,3 +1,5 @@
+import { activeSubstitution, actsAsAppraiser } from "../substitutions";
+import { recordEvent } from "../events";
 import { getDb } from "../db";
 import { openCycle } from "../cycles";
 import { today } from "../settings";
@@ -14,9 +16,9 @@ export type FeedbackMessage = { id: number; note_id: number; author_id: string; 
 /** Zapis: oceniający otwartego cyklu osoby; bez cyklu — jej przełożony (`people.supervisor_id`). */
 export function canWriteNoteAbout(viewerId: string, subjectId: string): boolean {
   const cycle = openCycle(subjectId);
-  if (cycle) return cycle.appraiser_id === viewerId;
+  if (cycle) return actsAsAppraiser(cycle.appraiser_id, viewerId);
   const row = getDb().query("SELECT supervisor_id FROM people WHERE id = ?").get(subjectId) as { supervisor_id: string | null } | null;
-  return !!row && row.supervisor_id === viewerId;
+  return !!row && actsAsAppraiser(row.supervisor_id, viewerId);
 }
 
 export function noteById(id: number): Note | null {
@@ -62,7 +64,14 @@ export function addNote(n: {
       n.authorId, n.subjectId, openCycle(n.subjectId)?.id ?? null, n.criterionId, n.date, n.text, n.rating,
       n.taskChange ? 1 : 0, n.suggestion.taskChange === null ? null : n.suggestion.taskChange ? 1 : 0, n.suggestion.source, now,
     );
-  return getDb().query("SELECT * FROM notes WHERE id = ?").get(Number(res.lastInsertRowid)) as Note;
+  const note = getDb().query("SELECT * FROM notes WHERE id = ?").get(Number(res.lastInsertRowid)) as Note;
+  const cycle = openCycle(n.subjectId);
+  const supervisor = (getDb().query("SELECT supervisor_id FROM people WHERE id = ?").get(n.subjectId) as { supervisor_id: string | null } | null)?.supervisor_id;
+  const absentId = cycle ? cycle.appraiser_id : supervisor;
+  if (absentId && absentId !== n.authorId && activeSubstitution(absentId, n.authorId)) {
+    recordEvent("note_added_in_substitution", cycle?.id ?? null, n.authorId, { note_id: note.id, subject_id: n.subjectId, on_behalf_of: absentId });
+  }
+  return note;
 }
 
 export function sendFeedback(f: { noteId: number; authorId: string; text: string }): void {

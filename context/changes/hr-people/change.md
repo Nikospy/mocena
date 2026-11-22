@@ -1,7 +1,7 @@
 ---
 change_id: hr-people
 title: Dane i lista pracowników w kadrach
-status: planning
+status: implementing
 created: 2026-11-22
 updated: 2026-11-22
 archived_at: null

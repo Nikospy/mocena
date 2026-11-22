@@ -1,3 +1,4 @@
+import { actsAsAppraiser } from "../substitutions";
 import { assessmentState } from "../assessment/state";
 import { cycleById } from "../cycles";
 import { cycleCriteria } from "../cycles/part1";
@@ -14,7 +15,7 @@ import { criterionWarnings } from "./warnings";
 /** Sloty formularza oceny (S-02): notatki zalogowanego oceniającego przy kryteriach. Puste dla kogokolwiek innego. */
 export function assessmentSlots(p: { cycleId: string; viewer: Person }): Slots {
   const cycle = cycleById(p.cycleId);
-  if (!cycle || cycle.appraiser_id !== p.viewer.id) return {};
+  if (!cycle || !actsAsAppraiser(cycle.appraiser_id, p.viewer.id)) return {};
   const notes = notesForCycle(p.cycleId, p.viewer.id);
   const inCycle = new Set(cycleCriteria(p.cycleId).map((c) => c.id));
   const byCriterion = (id: string): Note[] => notes.filter((n) => n.criterion_id === id);

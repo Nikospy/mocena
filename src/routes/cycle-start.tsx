@@ -1,3 +1,4 @@
+import { actsAsAppraiser } from "../substitutions";
 import { Hono, type Context } from "hono";
 import { card } from "../content";
 import { cycleById, effectiveDeadline, openCycle, type Cycle } from "../cycles";
@@ -19,7 +20,7 @@ import { formatDate } from "../views/layout";
 import { activeInvitations, canInvite } from "../invitations";
 import { InvitationBlock } from "../views/invitation";
 
-const isParty = (c: Cycle, p: Person) => c.appraiser_id === p.id || c.person_id === p.id;
+const isParty = (c: Cycle, p: Person) => actsAsAppraiser(c.appraiser_id, p.id) || c.person_id === p.id;
 
 registerCycleLinks((cycle, person) =>
   isParty(cycle, person) ? [{ label: "Karta rozmowy rozpoczynającej", href: `/cycles/${cycle.id}/cards/opening` }] : [],
@@ -110,7 +111,7 @@ function renderPart1(c: Context, cx: Ctx, extra: { errors?: string[]; input?: Pa
   const locked = isPart1Locked(cycle.id);
   const submitted = visibleEvents(cycle.id).find((e) => e.type === "part1_submitted");
   const { sheet, basis } = submitted ? { sheet: submitted.payload.sheet as Sheet, basis: sheetOf(cycle).basis } : sheetOf(cycle);
-  const mode = cycle.appraiser_id === person.id && !locked ? "edit" : "read";
+  const mode = actsAsAppraiser(cycle.appraiser_id, person.id) && !locked ? "edit" : "read";
   const criteria = cycleCriteria(cycle.id);
   const duties: string[] = JSON.parse(personById(cycle.person_id)?.duty_types ?? "[]");
   const selected = extra.input?.additional ?? criteria.filter((x) => x.kind === "additional").map((x) => x.id);
@@ -145,7 +146,7 @@ function renderPart1(c: Context, cx: Ctx, extra: { errors?: string[]; input?: Pa
       links={cycleLinks(cycle, person)}
       errors={extra.errors}
       waiting={
-        cycle.appraiser_id === person.id && status.state === "submitted" && status.submittedOn
+        actsAsAppraiser(cycle.appraiser_id, person.id) && status.state === "submitted" && status.submittedOn
           ? { submittedOn: status.submittedOn, appraiseeGenitive: nameForm(appraisee, "gen") ?? appraisee }
           : undefined
       }
@@ -171,7 +172,7 @@ const LOCKED = "Część I jest już przekazana. Kryteriów i terminu nie można
 async function write(c: Context, submit: boolean) {
   const g = guard(c);
   if (g instanceof Response) return g;
-  if (g.cycle.appraiser_id !== g.person.id) return c.text("Tylko bieżący oceniający może wyznaczyć kryteria.", 403);
+  if (!actsAsAppraiser(g.cycle.appraiser_id, g.person.id)) return c.text("Tylko bieżący oceniający może wyznaczyć kryteria.", 403);
   if (isPart1Locked(g.cycle.id)) return renderPart1(c, g, { errors: [LOCKED], status: 409 });
   const input = readInput(await c.req.parseBody({ all: true }));
   const res = (submit ? submitPart1 : saveCriteria)(g.cycle.id, g.person.id, input);

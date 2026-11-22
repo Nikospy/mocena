@@ -11,6 +11,8 @@ export function AppraiserChangeFormView(props: {
   candidates: Person[];
   criteria: { id: string; name: string }[];
   error?: string;
+  /** Wstępnie wybrana osoba, np. nowy przełożony z edycji pracownika. */
+  selected?: string;
 }) {
   return (
     <Layout title={`Zmiana oceniającego: ${props.personName}`} person={props.viewer} today={props.today}>
@@ -23,7 +25,7 @@ export function AppraiserChangeFormView(props: {
             <select class="area" id="appraiser_id" name="appraiser_id" aria-invalid={props.error ? "true" : undefined}>
               <option value="">Wybierz osobę</option>
               {props.candidates.map((p) => (
-                <option value={p.id}>{p.name}</option>
+                <option value={p.id} selected={props.selected === p.id}>{p.name}</option>
               ))}
             </select>
             {props.error ? <p class="st bad" role="alert">{props.error}</p> : null}

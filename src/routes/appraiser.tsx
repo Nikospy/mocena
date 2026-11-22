@@ -43,6 +43,7 @@ function render(c: Context, cx: Ctx, error?: string, status: 200 | 422 = 200) {
       candidates={candidates(cx.cycle)}
       criteria={criteria}
       error={error}
+      selected={c.req.query("to")}
     />,
     status,
   );
