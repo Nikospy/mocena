@@ -591,3 +591,35 @@ h2, h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w
 .hr-actions .lbl, .hr-actions .btn { white-space: nowrap; }
 .hr-actions .lbl { margin-block-end: 0; color: var(--text-3); font-size: var(--f-c1); line-height: var(--lh-c1); }
 .hr-actions .btn { min-block-size: var(--sp-400); padding-inline: var(--sp-150); font-size: var(--f-c1); font-weight: var(--w-regular); justify-content: flex-start; text-align: start; }
+
+/* design-d */
+/* Linki-czynności jako małe przyciski drugorzędne. */
+.btn.link-chip { min-block-size: var(--sp-400); padding-inline: var(--sp-150); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-regular);
+  background: var(--secondary); color: var(--on-secondary); border: 1px solid var(--cobalt-30); border-radius: var(--pill-r); text-decoration: none; white-space: nowrap; }
+.hr-links { display: flex; flex-wrap: wrap; gap: var(--sp-50) var(--sp-100); }
+.hr-table td, .hr-table th { vertical-align: middle; }
+.hr-table tbody tr:last-child > * { border-block-end: 0; }
+.hr-table tbody th { font-size: var(--f-p); line-height: var(--lh-p); }
+/* Statystyki: kafelki bez nazwisk. */
+.hr-stats { grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr)); gap: var(--sp-150); }
+.stat { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: var(--sp-50); padding: var(--sp-150) var(--sp-200); border: 1px solid var(--line); border-radius: var(--ctl-r); background: var(--grey-10); }
+.stat-n { font-size: var(--f-h4); line-height: var(--lh-h4); color: var(--text); }
+.stat-label { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+/* Oś czasu: pionowa linia z kropkami; terminy w głosie reguły. */
+.tl-card .term-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--sp-200); }
+.tl-list { position: relative; padding-inline-start: var(--sp-400); }
+.tl-list::before { content: ""; position: absolute; inset-block: var(--sp-200); inset-inline-start: var(--sp-100); inline-size: 2px; background: var(--cobalt-30); }
+.tl-item { position: relative; border-block-start-color: var(--rule-divider); }
+.tl-item::before { content: ""; position: absolute; inset-inline-start: calc(-1 * var(--sp-400) + 3px); inset-block-start: calc(var(--sp-150) + 4px); inline-size: var(--sp-150); block-size: var(--sp-150);
+  border-radius: var(--pill-r); border: 2px solid var(--cobalt-100); background: var(--white); }
+.tl-item.deadline::before { background: var(--cobalt-100); }
+.tl-item.deadline time { color: var(--rule-ink); }
+.tl-item.fact time { color: var(--text); }
+/* Formularze i arkusz. */
+.abs-form input.area, .abs-form select.area { block-size: var(--hit); min-block-size: var(--hit); padding-block: 0; }
+.crit-keep > * + * { margin-block-start: var(--sp-100); }
+.crit-keep ul { list-style: disc; padding-inline-start: var(--sp-250); }
+.hist-list { display: grid; gap: var(--sp-200); }
+.sheet-doc { max-inline-size: 52rem; margin-inline: auto; }
+.sheet-doc .no-print > * + * { margin-block-start: var(--sp-150); }
+.tl-card + .btns, .tl-card + .st { margin-block-start: var(--sp-200); }

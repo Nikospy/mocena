@@ -74,13 +74,19 @@ export function StatsBlock(props: { stats: OfficeStats }) {
       <h2>Statystyki terminowości (widok dyrektora generalnego, bez nazwisk)</h2>
       <ul class="hr-stats plain-list">
         {(Object.keys(STEP_LABEL) as CycleStep[]).map((k) => (
-          <li>
-            {STEP_LABEL[k]}: {s.byStep[k] ?? 0}
+          <li class="stat">
+            <span class="stat-label">{STEP_LABEL[k]}<span class="vh">:</span></span> <b class="stat-n tnum">{s.byStep[k] ?? 0}</b>
           </li>
         ))}
-        <li>Oceny zatwierdzone w terminie: {s.onTime}</li>
-        <li>Oceny zatwierdzone po terminie: {s.late}</li>
-        <li>Cykle otwarte po terminie, bez oceny: {s.overdueOpen}</li>
+        <li class="stat">
+          <span class="stat-label">Oceny zatwierdzone w terminie<span class="vh">:</span></span> <b class="stat-n tnum">{s.onTime}</b>
+        </li>
+        <li class="stat">
+          <span class="stat-label">Oceny zatwierdzone po terminie<span class="vh">:</span></span> <b class="stat-n tnum">{s.late}</b>
+        </li>
+        <li class="stat">
+          <span class="stat-label">Cykle otwarte po terminie, bez oceny<span class="vh">:</span></span> <b class="stat-n tnum">{s.overdueOpen}</b>
+        </li>
       </ul>
     </section>
   );
@@ -133,7 +139,9 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
               <td>
                 <span class="hr-links">
                   {r.links.map((l) => (
-                    <a href={l.href}>{l.label}</a>
+                    <a class="btn link-chip" href={l.href}>
+                      {l.label}
+                    </a>
                   ))}
                 </span>
                 {r.state.step === "objection_filed" ? (
@@ -162,7 +170,7 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
 export function HrOverviewView(props: { viewer: Person; today: string; cards: ReminderProps[]; rows: StateRow[]; stats: OfficeStats }) {
   return (
     <Layout title="Stan cykli" person={props.viewer} today={props.today}>
-      <section class="hdr slim">
+      <section class="card hdr slim">
         <h1>Stan cykli</h1>
         <p class="cap">Najnowszy cykl każdej osoby, od najbliższego terminu.</p>
       </section>

@@ -62,9 +62,9 @@ describe("statystyki, część III, poprzednie oceny", () => {
     const h = await html(app, "joanna", "/hr");
     const block = h.slice(h.indexOf('id="statystyki"'));
     for (const name of ["Tomasz", "Kamiński", "Katarzyna", "Anna", "Piotr", "Ewa", "Maria"]) expect(block).not.toContain(name);
-    expect(block).toContain("Oceny zatwierdzone w terminie: 5");
-    expect(block).toContain("Oceny zatwierdzone po terminie: 0");
-    expect(block).toContain("Cykle otwarte po terminie, bez oceny: 0");
+    expect(block.replace(/<[^>]+>/g, "")).toContain("Oceny zatwierdzone w terminie: 5");
+    expect(block.replace(/<[^>]+>/g, "")).toContain("Oceny zatwierdzone po terminie: 0");
+    expect(block.replace(/<[^>]+>/g, "")).toContain("Cykle otwarte po terminie, bez oceny: 0");
   });
 
   test("poprzednie oceny Piotra i Ewy są widoczne od startu pokazu", async () => {

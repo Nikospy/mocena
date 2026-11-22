@@ -14,7 +14,7 @@ export function AppraiserChangeFormView(props: {
 }) {
   return (
     <Layout title={`Zmiana oceniającego: ${props.personName}`} person={props.viewer} today={props.today}>
-      <section class="card">
+      <section class="card form-card">
         <h1>Zmień oceniającego: {props.personName}</h1>
         <p class="cap">Obecny oceniający: {props.currentName}</p>
         <form method="post" action={`/cycles/${props.cycleId}/appraiser`} class="abs-form">
@@ -28,13 +28,15 @@ export function AppraiserChangeFormView(props: {
             </select>
             {props.error ? <p class="st bad" role="alert">{props.error}</p> : null}
           </div>
-          <p>Kryteria zostają bez zmian. Nowy oceniający ocenia na podstawie wcześniej wybranych kryteriów ({rules.appraiserChange.basis} rozporządzenia).</p>
-          <ul class="plain-list">
-            {props.criteria.map((c) => (
-              <li>{c.name}</li>
-            ))}
-          </ul>
-          <button class="btn primary" type="submit">
+          <div class="rule crit-keep">
+            <p>Kryteria zostają bez zmian. Nowy oceniający ocenia na podstawie wcześniej wybranych kryteriów ({rules.appraiserChange.basis} rozporządzenia).</p>
+            <ul class="plain-list">
+              {props.criteria.map((c) => (
+                <li>{c.name}</li>
+              ))}
+            </ul>
+          </div>
+          <button class="btn primary full" type="submit">
             Zapisz zmianę oceniającego
           </button>
         </form>
