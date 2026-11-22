@@ -1,0 +1,58 @@
+# Paczka „wygląd” (gałąź `final-visual`)
+
+Cel: ekrany pokazu mają wyglądać jak praca studia dla urzędu. Autor przejrzał 17 punktów przeglądu i przy każdym wybrał „Naprawić”. Decyzja autora: „wygląd A to tylko szkielet, można go zmieniać dowolnie, byle by to były zmiany na lepsze”. Zasady wspólne: `change.md` w tym katalogu.
+
+Wolno zmieniać: `public/style.css`, `public/rodzina.css` (tylko nowe tokeny ról), `public/tour.js`, `src/views/` (znaczniki i klasy), `scripts/design-audit.ts`, testy widoków. Tekstów interfejsu nie zmieniasz bez potrzeby (testy tras sprawdzają treść). Kolory, rozmiary i odstępy tylko z tokenów.
+
+## Pomiar
+
+`bun run scripts/design-audit.ts <katalog>` przechodzi 27 ekranów pokazu w 360 i 1440 px, zapisuje `metrics.json` i zrzuty (`<ekran>-<szerokość>.jpg`, zrzuty z zaznaczeniem `--<sprawdzenie>.jpg`, próba rozmycia `--blur.jpg`). Najpierw zrób pomiar stanu wyjściowego, potem pomiar po każdej grupie zmian. Zrzuty oglądaj (zmniejsz przez `magick … -resize 1100x`), liczby to połowa odbioru.
+
+## Punkty i progi (liczby z `metrics.json`, wszystkie ekrany, obie szerokości)
+
+Typografia
+- **T1** Treść (opisy kryteriów, notatki, objaśnienia, komórki tabel) ma 16 px i kolor `--text`. 14 px tylko dla metadanych (data, rodzaj, podpis pola). Próg: `under16Pct` mediana ≤ 30, żaden ekran > 50. Dziś: mediana 51–54, Część I 88–91.
+- **T2** Najwyżej 4 rozmiary pisma na ekranie: 14, 16, 20, 28 (telefon: nagłówek strony 24 zamiast 28). Stopnie 12, 18 i 48 wychodzą z ekranów. Próg: `sizeCount` ≤ 4.
+- **T3** Akapity, notatki i objaśnienia: `max-inline-size: 66ch`. Próg: `maxCpl` ≤ 80 przy 1440. Dziś do 142.
+
+Hierarchia
+- **H1** Jeden element w największym rozmiarze i jest nim `h1`. `h1` nazywa czynność i osobę („Ocena okresowa: Piotr Wójcik”), drobna linia kontekstu nad nim może zostać. Termin (dziś 48 px) i werdykt (28 px) schodzą do 20 px pogrubione. Próg: `biggestCount` = 1.
+- **H2** Jedna akcja główna na ekranie. Strona główna to lista spraw: cały wiersz jest odnośnikiem, bez wypełnionego przycisku; sprawy z terminem na górze. Próg: `primaryCount` ≤ 1 (dziś strona główna 5, notatki 3, wejście do pokazu 6).
+- **H3** Na telefonie `h1` zaczyna się najwyżej na 180 px (`h1Top`, 360 px). Dziś 217–320.
+
+Układ
+- **U1** Od ok. 1024 px ekrany cyklu (Część I, przed rozmową, karty rozmów, oś czasu, ocena) mają układ dwie trzecie plus jedna trzecia: po lewej treść, po prawej reguła, termin i akcja. Wzorem jest istniejący `.o-grid`.
+- **U3** Jeden wzór nagłówka strony na wszystkich ekranach: linia kontekstu, `h1`, jedno zdanie objaśnienia, pod spodem jeden rząd odnośników w jednej postaci (zwykłe odnośniki tekstowe). Dziś są trzy wzory (strona główna, ocena, kadry).
+
+Komponenty
+- **K1** Grupowanie odstępem. Notatka w karcie to wiersz z cienką linią, bez własnej ramki i tła. Ramka zostaje dla karty sekcji i dla głosu reguły. Próg: `maxBoxDepth` ≤ 1, `boxes` ≤ 10 na ekran (dziś ocena 20, przed rozmową 22, kadry 24).
+- **K2** Cień tylko dla nagłówka aplikacji i warstw nad treścią (menu, kalendarz, panel pokazu). Karty mają samą linię. Próg: `shadows` ≤ 2.
+- **K3** Pigułka tylko dla stanu. Podstawa prawna to zwykły tekst z krótkim oznaczeniem („art. 81 ust. 7 ustawy”), dłuższe objaśnienie idzie do zdania obok, nie do pigułki. Odnośniki wyglądają jak odnośniki. Próg: `pillLinks` = 0.
+- **K4** Telefon: notatki pod kryterium w formularzu oceny są zwinięte (`details`) z licznikiem, żeby ekran oceny miał najwyżej 4 ekrany przewijania przy 360 px (`screens`). Przepływu nie zmieniasz.
+- **K5** Tabela kadr: w wierszu jeden odnośnik (nazwisko prowadzi do cyklu), kolumna „Odnośniki” znika, rozstrzygnięcie sprzeciwu przenosi się na ekran oceny tego cyklu (ten sam formularz i ta sama trasa `POST /cycles/:id/objection-outcome`).
+- **K6** Pasek pokazu: jedna dyskretna linia („Pokaz · dziś 21 listopada 2026 · Zmień datę”), pole daty rozwija się po kliknięciu (`details`), na telefonie zwinięty. Nie wygląda jak część usługi.
+
+Prawo i dostępność
+- **L2** Brak przewijania w poziomie przy 360 i 320 px (`overflowPx` = 0). Dodaj do skryptu szerokość 320.
+- **L3** Żaden cel kliknięcia poniżej 24 px (`under24` = 0).
+- **L4** Każdy ekran ma jeden widoczny `h1` (`h1Count` = 1; dziś arkusz przy 1440 ma 0).
+- Bez zmian muszą zostać: kontrast (`contrastFails` = 0), etykiety pól (`unlabeled` = 0).
+
+Z zewnętrznego audytu
+- W trybie pokazu (`/tour`, kolejne kroki) wokół nagłówka pojawia się czarna ramka: `public/tour.js` ustawia fokus na `h1`. Odtwórz na zrzucie w trybie pokazu i usuń ramkę (fokus zostaje dla czytników).
+- Panel pokazu na komputerze zasłania tabelę kadr. Treść ma się mieścić obok panelu albo panel ma się zwijać.
+- Stopka aplikacji z dwoma odnośnikami: „Wdrożenie i dane” (`/about`, trasa dojdzie z gałęzi `final-delivery`) i „Kod źródłowy” (`https://github.com/Nikospy/mocena`).
+
+## Kolejność
+
+1. Tokeny ról i skala pisma (T1, T2), szerokość tekstu (T3), cienie (K2).
+2. Nagłówek strony i hierarchia (H1, U3), akcja główna i strona główna (H2).
+3. Ramki i notatki (K1), pigułki i podstawy prawne (K3).
+4. Układ szerokiego ekranu (U1), pasek pokazu i telefon (K6, H3, K4).
+5. Kadry (K5), drobne (L2, L3, L4), tryb pokazu, stopka.
+
+Po każdej grupie: pomiar, obejrzenie zrzutów, `bun test`, commit.
+
+## Raport końcowy
+
+Tabela „przed → po” dla progów wyżej (mediana i najgorszy ekran), lista commitów, lista punktów niezrobionych z powodem oraz ścieżki sześciu zrzutów „po” do pokazania autorowi: strona główna, Część I, ocena, przed rozmową, kadry (każdy 1440) i ocena 360. Ostatnia linia: `GOTOWE: final-visual <skrót commita>`.
