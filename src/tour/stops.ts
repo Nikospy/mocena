@@ -110,7 +110,7 @@ const BODY: Record<TourStopId, Body> = {
     lead: "Joanna widzi stan wszystkich cykli w urzędzie. System przypomina o obowiązku urzędu: Tomaszowi należy się kolejny stopień służbowy z mocy prawa.",
     look: [
       { text: "Karta stopnia Tomasza z terminem i przepisem.", selector: ".card.rule" },
-      { text: "Stan cykli z terminami.", selector: "#statystyki" },
+      { text: "Piotr ma nowy cykl. Kryteria do 30.11.2026 (§ 7 pkt 2), ponowna ocena 23.05.2027.", selector: ".hr-table" },
       { text: "„Drukuj / pobierz PDF” przy arkuszu." },
     ],
     basis: basis(d.mandatoryGradeDays.basis),

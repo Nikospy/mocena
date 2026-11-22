@@ -1,6 +1,6 @@
 export const SITE_DESCRIPTION =
   "Asystent ocen okresowych w służbie cywilnej. Nie pisze oceny: zbiera fakty przez dwa lata i pilnuje terminów z przepisów. Prototyp na HackNation 2026.";
-export const SITE_TITLE = "mOcena: ten asystent nie pisze oceny";
+export const SITE_TITLE = "Prowadzi ocenę okresową od pierwszej notatki do arkusza · mOcena";
 
 /** Wspólna zawartość <head>: podstawy, podgląd linku, ikona i arkusze stylów. */
 export function Head(props: { title: string; printCss?: boolean }) {

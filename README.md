@@ -59,7 +59,17 @@ bun test
 
 ## Wdrożenie
 
-**W urzędzie (lokalnie, bez chmury).** Aplikacja działa na jednym komputerze urzędu: `bun install` i `bun run dev`, dane w jednym pliku bazy SQLite (`mocena.sqlite`, ścieżkę można zmienić zmienną `MOCENA_DB`). Bez serwera bazy, bez chmury i bez płatnych usług. `bun run seed` służy tylko do danych pokazowych. Co urząd dodaje przy wdrożeniu (logowanie i konta, retencja, administrator danych) oraz jak chronione są dane, opisuje w aplikacji strona „Wdrożenie i dane” (`/about`).
+**W urzędzie (lokalny prototyp).** Uruchom na komputerze urzędu:
+
+```sh
+bun install
+bun run init -- --office "Nazwa urzędu" --city "Miejscowość" --hr "Imię Nazwisko"
+bun run dev
+```
+
+Otwórz `http://localhost:3000/account`, wybierz konto kadr i przejdź do „Pracownicy” → „Dodaj pracownika”. Najpierw dodaj osobę kierującą zespołem. Możesz ją wpisać bez otwierania jej cyklu. Następnie wybieraj ją jako przełożonego kolejnych pracowników.
+
+Dane trafiają do jednego pliku SQLite (`mocena.sqlite`). W razie potrzeby ustaw `MOCENA_DB` na ten sam plik dla `init` i `dev`. `bun run seed` służy do pokazu w osobnej bazie. Do pracy na rzeczywistych danych urząd podłącza logowanie i ustala zasady retencji. Szczegóły opisuje strona „Wdrożenie i dane” (`/about`).
 
 **Wdrożenie pokazowe (chmura, tylko na czas zawodów).**
 

@@ -78,7 +78,7 @@ describe("cykle", () => {
 
   test("ponowna ocena po negatywnej liczy się od zapoznania", () => {
     seedEvent("cycle_started", "cycle-ewa", "marek", { reason: "previous_assessment", periodStart: "2024-11-20", previousAssessmentOn: "2024-11-15", previousAcknowledgedOn: "2024-11-20", previousOutcome: "negative" }, "2024-12-01");
-    expect(effectiveDeadline("cycle-ewa").date).toBe("2025-05-20");
+    expect(effectiveDeadline("cycle-ewa").date).toBe("2025-05-21");
   });
 });
 

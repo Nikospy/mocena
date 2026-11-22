@@ -18,7 +18,8 @@ export function AppraiserChangeFormView(props: {
   return (
     <Layout title={`Zmiana oceniającego: ${props.personName}`} person={props.viewer} today={props.today}>
       <PageHeader title={<>Zmień oceniającego: {props.personName}</>} lead={<>Obecny oceniający: {props.currentName}</>} />
-      <section class="card form-card">
+      <div class="o-grid">
+      <section class="card form-card ct-form">
         <form method="post" action={`/cycles/${props.cycleId}/appraiser`} class="abs-form">
           <div>
             <label class="lbl" for="appraiser_id">Nowy oceniający</label>
@@ -30,19 +31,25 @@ export function AppraiserChangeFormView(props: {
             </select>
             {props.error ? <p class="st bad" role="alert">{props.error}</p> : null}
           </div>
-          <div class="rule crit-keep">
-            <p>Kryteria zostają bez zmian. Nowy oceniający ocenia na podstawie wcześniej wybranych kryteriów ({rules.appraiserChange.basis} rozporządzenia).</p>
-            <ul class="plain-list">
-              {props.criteria.map((c) => (
-                <li>{c.name}</li>
-              ))}
-            </ul>
-          </div>
-          <button class="btn primary full" type="submit">
-            Zapisz zmianę oceniającego
-          </button>
+          <p class="ct-actions">
+            <button class="btn primary" type="submit">
+              Zapisz zmianę oceniającego
+            </button>
+          </p>
         </form>
       </section>
+      <aside class="side">
+        <section class="rule crit-keep" aria-labelledby="h-keep">
+          <h2 id="h-keep">Kryteria zostają bez zmian</h2>
+          <p>Nowy oceniający ocenia na podstawie wcześniej wybranych kryteriów ({rules.appraiserChange.basis} rozporządzenia).</p>
+          <ul>
+            {props.criteria.map((c) => (
+              <li>{c.name}</li>
+            ))}
+          </ul>
+        </section>
+      </aside>
+      </div>
     </Layout>
   );
 }

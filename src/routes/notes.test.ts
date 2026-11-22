@@ -33,8 +33,19 @@ describe("zapis notatki", () => {
 
     const bad = await call(app, "marek", "/people/piotr/notes", { criterion_id: "wspolpraca", text: "  " });
     expect(bad.status).toBe(422);
-    expect(await bad.text()).toContain("Wpisz, co się wydarzyło.");
+    expect(await bad.text()).toContain("Wpisz, co się stało.");
     expect(count(db)).toBe(before);
+
+    // Błędy: podsumowanie z odnośnikami do pól, komunikat przy polu, pola zachowują wartości.
+    const both = await (await call(app, "marek", "/people/piotr/notes", { text: "", rating: "good", date: "2026-03-10" })).text();
+    expect(both).toContain("Popraw 2 pola");
+    expect(both).toContain('href="#text"');
+    expect(both).toContain('href="#criterion_id"');
+    expect(both).toContain('id="criterion_id"');
+    expect(both).toContain('id="text-error"');
+    expect(both).toMatch(/<textarea id="text" name="text" rows="5" aria-invalid="true" aria-describedby="text-error text-privacy">/);
+    expect(both).toContain('value="2026-03-10"');
+    expect(both).toMatch(/value="good" checked/);
 
     const ok = await call(app, "marek", "/people/piotr/notes", { criterion_id: "wspolpraca", text: STEP2, rating: "good" });
     expect(ok.status).toBe(303);
@@ -87,7 +98,8 @@ describe("zasada 7: przy nazwisku nic poza nazwiskiem", () => {
   test("lista notatek i formularz notatki", async () => {
     const { app } = createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } });
     const list = await (await call(app, "marek", "/notes")).text();
-    const headings = [...list.matchAll(/<h2>([^<]*)<\/h2>/g)].map((m) => m[1]);
+    // Osoby z notatkami mają nagłówek karty, osoby bez notatek stoją w zwartej liście (nazwisko w <b>).
+    const headings = [...list.matchAll(/<h2>([^<]*)<\/h2>|<div class="pn-who"><b>([^<]*)<\/b>/g)].map((m) => m[1] ?? m[2]);
     expect(headings).toContain("Piotr Wójcik");
     expect(headings).toContain("Maria Dąbrowska");
     for (const h of headings) expect(h).toMatch(/^[^\d:()]+$/);
@@ -125,7 +137,7 @@ describe("faza 3", () => {
     const base = { criterion_id: "rzetelnosc", text: "Fakt." };
     const late = await call(app, "marek", "/people/piotr/notes", { ...base, date: "2026-11-22" });
     expect(late.status).toBe(422);
-    expect(await late.text()).toContain("Data nie może być późniejsza niż dziś.");
+    expect(await late.text()).toContain("Wybierz dzisiejszą albo wcześniejszą datę.");
     expect((await call(app, "marek", "/people/piotr/notes", { ...base, date: "2026-11-10" })).status).toBe(303);
     expect(db.query("SELECT date, created_at FROM notes ORDER BY id DESC LIMIT 1").get()).toEqual({ date: "2026-11-10", created_at: "2026-11-21" });
   });

@@ -130,4 +130,12 @@ describe("arkusz /cycles/:id/sheet", () => {
     expect([...order].sort((a, b) => a - b)).toEqual(order);
     expect(h.toLowerCase()).not.toContain("podpis");
   });
+
+  test("uzasadnienie z cytatami z notatek zachowuje podział wierszy na arkuszu", async () => {
+    db.query(
+      "UPDATE events SET payload = json_set(payload, '$.justification', ?) WHERE type = 'assessment_approved' AND cycle_id = 'cycle-piotr'",
+    ).run("11.02.2025: odpowiedź po terminie.\n26.08.2026: druga odpowiedź po terminie.");
+    const h = await html(app, "piotr", "/cycles/cycle-piotr/sheet");
+    expect(h).toMatch(/11\.02\.2025: odpowiedź po terminie\.<br ?\/?>26\.08\.2026: druga odpowiedź po terminie\./);
+  });
 });

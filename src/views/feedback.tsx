@@ -9,7 +9,12 @@ export function FeedbackView(props: { viewer: Person; today: string; messages: (
     <Layout title="Informacja zwrotna" person={props.viewer} today={props.today}>
       <section class="n-state">
         <PageHeader title="Informacja zwrotna" />
-        {props.messages.length === 0 ? <p class="cap">Nie masz jeszcze informacji zwrotnej.</p> : null}
+        {props.messages.length === 0 ? (
+          <div class="nl-empty">
+            <p><b>Nie masz jeszcze informacji zwrotnej.</b></p>
+            <p>Gdy przełożony ją przekaże, zobaczysz ją tutaj.</p>
+          </div>
+        ) : null}
         {props.messages.map((m) => (
           <article class="card fb-msg">
             <p class="note-text">{m.text}</p>

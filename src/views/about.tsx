@@ -1,6 +1,7 @@
 import rulesJson from "../../rules/regulation-2016-470.json";
 import { CODE_LICENSE } from "../content";
 import type { Person } from "../people";
+import { OFFICE_INIT_COMMAND } from "../settings";
 import { PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
@@ -13,13 +14,16 @@ export function AboutPage(props: { person: Person | null; today: string }) {
 
         <section aria-labelledby="a-run">
           <h2 id="a-run">Uruchomienie u siebie</h2>
-          <p>
-            <code>bun install &amp;&amp; bun run seed &amp;&amp; bun run dev</code>
-          </p>
+          <ol>
+            <li><code>bun install</code></li>
+            <li><code>{OFFICE_INIT_COMMAND}</code></li>
+            <li><code>bun run dev</code></li>
+          </ol>
+          <p>Wybierz konto kadr na <a href="/account">ekranie kont</a>. W zakładce „Pracownicy” użyj przycisku „Dodaj pracownika”.</p>
           <ul>
             <li>Wystarczy darmowe środowisko Bun: bez serwera bazy, bez dodatkowego sprzętu, bez płatnych licencji i usług.</li>
             <li>Dane trzyma jeden plik bazy SQLite na komputerze. Aplikacja uruchomiona lokalnie nie wysyła danych do żadnej usługi zewnętrznej.</li>
-            <li><code>bun run seed</code> wgrywa dane pokazowe; bez niego baza jest pusta.</li>
+            <li><code>bun run seed</code> służy wyłącznie do pokazu w osobnej bazie.</li>
             <li>Wersja w internecie (Cloudflare Workers) działa tylko na czas zawodów. W urzędzie aplikacja działa lokalnie, bez chmury.</li>
           </ul>
         </section>

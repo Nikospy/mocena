@@ -1,6 +1,7 @@
 // Stany danych przewodnika pokazu: przed każdym przystankiem baza jest budowana od zera funkcjami domenowymi i seedami.
 import { buildAssessmentSnapshot } from "../assessment/snapshot";
-import type { AssessmentDraft } from "../assessment/state";
+import { assessmentState, type AssessmentDraft } from "../assessment/state";
+import { cycleById, startNextCycle } from "../cycles";
 import { cycleCriteria, savePart1 } from "../cycles/part1";
 import { setDb, type Db } from "../db";
 import { objectionDeadline } from "../engine/deadlines";
@@ -74,7 +75,7 @@ function approvePiotr(db: Db): void {
     .all(APPROVED_ON) as { date: string; text: string }[];
   const draft: AssessmentDraft = {
     scores,
-    justification: notes.map((n) => formatNoteForInsert(n, "Rzetelność")).join("\n"),
+    justification: notes.map(formatNoteForInsert).join("\n"),
     developmentConclusions: "Rozmowa o priorytetach i podziale kolejki wniosków oraz szkolenie z planowania pracy w ciągu roku.",
     interviewDate: APPROVED_ON,
     gradeRequest: { attached: false, motivation: "" },
@@ -93,6 +94,9 @@ function acknowledgePiotr(db: Db): void {
     { place, date: ACKNOWLEDGED_ON, name, objectionDeadline: objectionDeadline(ACKNOWLEDGED_ON) },
     ACKNOWLEDGED_ON,
   );
+  const cycle = cycleById(CYCLE)!;
+  const assessment = assessmentState(CYCLE).snapshot!;
+  startNextCycle(cycle, "piotr", APPROVED_ON, ACKNOWLEDGED_ON, assessment.result.outcome);
 }
 
 function build(db: Db, id: TourStopId): void {
@@ -109,8 +113,6 @@ function build(db: Db, id: TourStopId): void {
   recordPiotrAbsences(db);
   if (id === "4") return;
   approvePiotr(db);
-  if (id === "5") return;
-  acknowledgePiotr(db);
 }
 
 /** Czyści bazę widza i buduje stan sprzed przystanku; datę ustawia wprost (z pominięciem reguły „tylko do przodu”). */
@@ -120,5 +122,6 @@ export function applyTourStop(db: Db, stop: TourStop): void {
     clearAllTables(db);
     build(db, stop.id);
     db.query("INSERT INTO settings (key, value) VALUES ('demo_date', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").run(stop.date);
+    if (stop.id === "5b") acknowledgePiotr(db);
   })();
 }

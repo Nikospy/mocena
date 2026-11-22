@@ -23,7 +23,7 @@ function nameOf(id: string): string {
   }
 }
 
-export function approvalBlockers(input: { criteria: string[]; draft: AssessmentDraft; appointed: boolean; grade: number | null }): Blocker[] {
+export function approvalBlockers(input: { criteria: string[]; draft: AssessmentDraft; appointed: boolean; grade: number | null; sheet?: string | null }): Blocker[] {
   const { criteria, draft, appointed, grade } = input;
   const out: Blocker[] = [];
   const scoresBasis = "§ 11 ust. 1";
@@ -63,6 +63,9 @@ export function approvalBlockers(input: { criteria: string[]; draft: AssessmentD
   }
   if (outcome?.justificationRequired && !draft.justification.trim()) {
     out.push({ field: "justification", message: "Przy ocenie negatywnej uzasadnienie jest wymagane", basis: A.justification.basis });
+  }
+  if (input.sheet === "A" && !draft.objectionRecipient?.trim()) {
+    out.push({ field: "objectionRecipient", message: "Wpisz, do kogo przysługuje sprzeciw.", basis: "załącznik nr 2 do rozporządzenia" });
   }
   if (draft.gradeRequest.attached) {
     const opt = gradeRequestOptions({ appointed, grade, outcome: outcome?.outcome ?? null });

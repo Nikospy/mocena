@@ -1,5 +1,6 @@
 import type { Child } from "hono/jsx";
 import { DEMO_DIRECTOR_GENERAL_ID, roleLabel, type Person } from "../people";
+import { isDemoMode } from "../settings";
 import { currentTour } from "../tour/context";
 import { stopById, stopScreenPath } from "../tour/stops";
 import { Head } from "./head";
@@ -71,7 +72,7 @@ export function navFor(person: Person): NavItem[] {
     ];
   if (person.role === "admin")
     return [
-      { label: "Podpowiedzi", href: "/admin/suggestion-sources", icon: ICON.sources },
+      { label: "Źródła podpowiedzi", href: "/admin/suggestion-sources", icon: ICON.sources },
       { label: "Pracownicy", href: "/hr/people", icon: ICON.people, section: under("/hr/people/") },
     ];
   if (person.role === "appraiser")
@@ -161,7 +162,8 @@ function DemoBar(props: { today: string; withTour: boolean }) {
 export function Layout(props: { title: string; person: Person | null; today: string | null; children?: Child }) {
   const { person } = props;
   const tour = currentTour();
-  const tourStop = tour.stop && !tour.path.startsWith("/tour") ? stopById(tour.stop) : null;
+  const demo = isDemoMode();
+  const tourStop = demo && tour.stop && !tour.path.startsWith("/tour") ? stopById(tour.stop) : null;
   const nav = person ? navFor(person) : [];
   return (
     <html lang="pl">
@@ -169,7 +171,7 @@ export function Layout(props: { title: string; person: Person | null; today: str
       <body class={tourStop ? "tour-on" : undefined}>
         <a class="skip-link" href="#main">Przejdź do treści</a>
         {tourStop ? <a class="skip-link" href="#tour-guide" data-skip-guide>Przejdź do przewodnika</a> : null}
-        {props.today && !tourStop ? <DemoBar today={props.today} withTour={!!person} /> : null}
+        {demo && props.today && !tourStop ? <DemoBar today={props.today} withTour={!!person} /> : null}
         <header class="top">
           <div class="top-in">
             <a class="brand" href="/">

@@ -1,6 +1,6 @@
 import { GRADES, LEVELS, OUTCOME_LABEL, SHEETS, suggestSheet, type FormErrors, type PersonForm, type PersonRow, type Sort } from "../hr/people";
 import type { Person } from "../people";
-import { LegalBasis, PageHeader } from "./components";
+import { ErrorSummary as SharedErrorSummary, LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
 const SORTS: { id: Sort; label: string }[] = [
@@ -115,26 +115,10 @@ function FieldError(props: { id: string; text?: string }) {
 /** Atrybuty pola z błędem: aria-invalid i powiązanie z komunikatem pod polem. */
 const invalid = (id: string, text?: string) => (text ? { "aria-invalid": "true", "aria-describedby": `${id}-err` } : {});
 
-/** Podsumowanie błędów nad formularzem: każdy błąd jest odnośnikiem do pola. */
-export function ErrorSummary(props: { errors: Record<string, string | undefined>; labels?: Record<string, string> }) {
-  const list = Object.entries(props.errors).filter(([k, v]) => v && k !== "form");
-  if (list.length === 0 && !props.errors.form) return null;
-  return (
-    <div class="st bad hr-errsum" role="alert" aria-labelledby="h-errsum" tabindex={-1}>
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.5v.01" /></svg>
-      <div>
-        <h2 id="h-errsum">Popraw dane w formularzu</h2>
-        {props.errors.form ? <p>{props.errors.form}</p> : null}
-        {list.length ? (
-          <ul>
-            {list.map(([k, v]) => (
-              <li><a href={`#${k}`}>{props.labels?.[k] ? `${props.labels[k]}: ` : ""}{v}</a></li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
-    </div>
-  );
+/** Podsumowanie błędów nad formularzem: wspólny komponent z fundamentu; błąd całego formularza (`form`) idzie jako zdanie bez odnośnika. */
+export function ErrorSummary(props: { errors: Record<string, string | undefined> }) {
+  const { form, ...fields } = props.errors;
+  return <SharedErrorSummary errors={form ? { _form: form, ...fields } : fields} />;
 }
 
 function Check(props: { name: string; checked: boolean; label: string; hint?: string }) {
@@ -162,6 +146,7 @@ export function PersonFormView(props: {
   values: PersonForm;
   errors: FormErrors;
   supervisors: Person[];
+  canSkipCycle?: boolean;
   /** Osoba ma już cykl: data zatrudnienia nie otwiera nowego. */
   hasCycle: boolean;
   hasOpenCycle: boolean;
@@ -228,6 +213,9 @@ export function PersonFormView(props: {
             <FieldError id="supervisor_id" text={e.supervisor_id} />
           </div>
           <Check name="is_appraiser" checked={v.is_appraiser} label="Kieruje pracownikami i może być przełożonym" />
+          {props.canSkipCycle ? (
+            <p class="hr-hint">Aby dodać osobę kierującą zespołem bez otwierania jej oceny, zaznacz pole powyżej. Zostaw puste pola przełożonego, daty zatrudnienia i ostatniej oceny.</p>
+          ) : null}
         </section>
 
         <section class="card person-sec" aria-labelledby="h-p-grade">

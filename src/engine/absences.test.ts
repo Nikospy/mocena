@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
 import { assessmentDeadline, isLongerThanMonth, mergeAbsences, type AbsenceInput } from "./absences";
-import { periodEndAfterNegative } from "./deadlines";
 
 const abs = (from: string, to: string, excused = true): AbsenceInput => ({ from, to, excused });
 const regular = (periodStart: string) => ({ kind: "regular" as const, periodStart, previousAcknowledgedOn: null });
@@ -99,10 +98,10 @@ describe("assessmentDeadline", () => {
     expect(assessmentDeadline(regular("2024-11-27"), [abs("2024-11-01", "2024-11-26")]).extensionDays).toBe(0);
   });
 
-  test("ponowna ocena po negatywnej: termin z periodEndAfterNegative, bez przedłużenia", () => {
+  test("ponowna ocena po negatywnej: termin po 6 miesiącach, bez przedłużenia", () => {
     const cycle = { kind: "after_negative" as const, periodStart: "2026-01-10", previousAcknowledgedOn: "2026-01-10" };
     const r = assessmentDeadline(cycle, [abs("2026-02-01", "2026-04-30")]);
-    expect(r.base).toBe(periodEndAfterNegative("2026-01-10"));
+    expect(r.base).toBe("2026-07-11");
     expect(r.deadline).toBe(r.base);
     expect(r.extensionDays).toBe(0);
     expect(r.merged[0].counted).toBe(false);

@@ -78,7 +78,7 @@ test("zestawienie rozdziela terminy, a lista pracowników pomija konto techniczn
   expect(tomasz.slice(5, 7)).toEqual(["12.11.2026", "19.11.2026"]);
   expect(await html(app, "joanna", "/hr/people")).not.toContain("/hr/people/admin/edit");
   const accounts = await (await app.request("/account")).text();
-  expect(accounts).toMatch(/value="tomasz"><b>Tomasz Kamiński<\/b><span class="cap">Naczelnik wydziału<\/span><span class="acc-role">oceniany<\/span>/);
+  expect(accounts).toMatch(/value="tomasz"><span class="acc-main"><b>Tomasz Kamiński<\/b><span class="cap">Naczelnik wydziału · oceniany<\/span>/);
 });
 
 test("tylko uprawnione konto pobiera jedną zatwierdzoną ocenę", async () => {

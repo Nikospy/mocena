@@ -11,12 +11,12 @@ function mean2(n: number): string {
 }
 
 export function HistoryList(props: { entries: Entry[] }) {
-  if (props.entries.length === 0) return <p>Brak ocen w systemie</p>;
+  if (props.entries.length === 0) return <p>Nie ma jeszcze zatwierdzonych ocen.</p>;
   return (
-    <ul class="plain-list hist-list">
+    <ul class="ct-rows">
       {props.entries.map((h) => {
         return (
-          <li class="card">
+          <li>
             <h2>Ocena z {formatDate(h.approvedOn)}</h2>
             <p>
               Arkusz {h.sheet} · {h.outcome === "positive" ? "pozytywna" : "negatywna"} · {h.overallLevel} · średnia {mean2(h.mean)}
@@ -29,7 +29,7 @@ export function HistoryList(props: { entries: Entry[] }) {
                 : "Zapoznanie jeszcze niepotwierdzone"}
               {" · "}<RulesVersion version={h.rulesVersion.version} effectiveFrom={h.rulesVersion.effectiveFrom} />
             </p>
-            {h.canOpenSheet ? <a href={`/cycles/${h.cycleId}/sheet`}>Arkusz</a> : null}
+            {h.canOpenSheet ? <p><a href={`/cycles/${h.cycleId}/sheet`}>Arkusz</a></p> : null}
           </li>
         );
       })}
@@ -40,15 +40,15 @@ export function HistoryList(props: { entries: Entry[] }) {
 export function HistoryView(props: { viewer: Person; today: string; person: Person; entries: Entry[]; previous?: PreviousAssessment[] }) {
   const previous = props.previous ?? [];
   return (
-    <Layout title="Historia ocen" person={props.viewer} today={props.today}>
-      <PageHeader context={props.person.name} title="Historia ocen" />
+    <Layout title={`Historia ocen: ${props.person.name}`} person={props.viewer} today={props.today}>
+      <PageHeader title={<>Historia ocen: {props.person.name}</>} />
       {props.entries.length > 0 || previous.length === 0 ? <HistoryList entries={props.entries} /> : null}
       {previous.length > 0 ? (
-        <section aria-labelledby="h-prev">
-          <h2 id="h-prev">Ocena sprzed systemu</h2>
-          <ul class="plain-list hist-list">
+        <section class="ct-prev" aria-labelledby="h-prev">
+          <h2 id="h-prev">Oceny sprzed systemu</h2>
+          <ul class="ct-rows">
             {previous.map((p) => (
-              <li class="card">
+              <li>
                 <h3>Ocena z {formatDate(p.on)}</h3>
                 <p>
                   {OUTCOME_LABEL[p.outcome]}

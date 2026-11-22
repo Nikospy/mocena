@@ -13,10 +13,10 @@ export type TourPanelProps = {
 };
 
 function nextHint(p: TourPanelProps): string {
-  if (p.stop.next === "done") return "Otworzy podsumowanie pokazu";
+  if (p.stop.next === "done") return "Następny krok: podsumowanie pokazu";
   const n = stopById(p.stop.next);
   if (!n) return "";
-  return `Przełączy na konto ${personGenitive(n.personId)} i datę ${p.dateOf(n.date)}`;
+  return `Następny krok: konto ${personGenitive(n.personId)}, ${p.dateOf(n.date)}`;
 }
 
 function Head(props: TourPanelProps) {
@@ -29,11 +29,9 @@ function Head(props: TourPanelProps) {
           <button class="btn text gp-end" type="submit">Zakończ pokaz</button>
         </form>
       </div>
-      <ol class="g-dots" aria-label="Kroki pokazu">
+      <ol class="g-dots" aria-hidden="true">
         {[1, 2, 3, 4, 5].map((n) => (
-          <li class={n < stop.step ? "done" : n === stop.step ? "cur" : ""}>
-            <span class="vh">Krok {n}</span>
-          </li>
+          <li class={n < stop.step ? "done" : n === stop.step ? "cur" : ""} />
         ))}
       </ol>
       <div class="acct">
