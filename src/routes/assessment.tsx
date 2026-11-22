@@ -12,6 +12,7 @@ import { objectionDeadline } from "../engine/deadlines";
 import { computeAssessment, criterion, POINTS } from "../engine/scoring";
 import { recordEvent } from "../events";
 import { shiftedDeadlineSentence } from "../deadline-shift";
+import { officeSettings } from "../office-settings";
 import { currentPerson, personById, type Person } from "../people";
 import { setting, today } from "../settings";
 import { AssessmentMessage, AssessmentView, BlockerList, ResultPanel } from "../views/assessment";
@@ -50,7 +51,7 @@ function str(v: unknown): string {
   return typeof v === "string" ? v : "";
 }
 
-function readDraft(body: Record<string, unknown>): AssessmentDraft {
+function readDraft(body: Record<string, unknown>, sheet: string | null): AssessmentDraft {
   const scores: Record<string, number> = {};
   for (const [k, v] of Object.entries(body)) {
     const m = /^score\[(.+)\]$/.exec(k);
@@ -61,6 +62,7 @@ function readDraft(body: Record<string, unknown>): AssessmentDraft {
     scores,
     justification: str(body.justification),
     developmentConclusions: str(body.developmentConclusions),
+    ...(sheet === "A" ? { objectionRecipient: str(body.objectionRecipient).trim() } : {}),
     interviewDate: date === "" ? null : date,
     gradeRequest: { attached: str(body.gradeRequestAttached) === "1", motivation: str(body.gradeMotivation) },
   };
@@ -78,6 +80,7 @@ function draftErrors(cycleId: string, d: AssessmentDraft): string[] {
   if (d.interviewDate !== null && (!isIsoDate(d.interviewDate) || d.interviewDate > today())) {
     errors.push("Data rozmowy oceniającej musi być datą nie późniejszą niż dzień dzisiejszy.");
   }
+  if ((d.objectionRecipient?.length ?? 0) > 200) errors.push("Adresat sprzeciwu może mieć najwyżej 200 znaków.");
   return errors;
 }
 
@@ -99,7 +102,7 @@ function screenData(cx: Ctx, draft: AssessmentDraft) {
     criteria,
     grade,
     result,
-    blockers: approvalBlockers({ criteria: ids, draft, appointed, grade }),
+    blockers: approvalBlockers({ criteria: ids, draft, appointed, grade, sheet: cx.cycle.sheet }),
     gradeOption: gradeRequestOptions({ appointed, grade, outcome: result?.outcome ?? null }),
   };
 }
@@ -115,7 +118,10 @@ function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; er
   if (state.stage === "draft" && !appraiser) {
     return c.html(<AssessmentMessage {...base} text="Ocena nie jest jeszcze zatwierdzona." />, status);
   }
-  const draft = extra.draft ?? state.draft ?? emptyDraft();
+  const saved = extra.draft ?? state.draft ?? emptyDraft();
+  const draft = cx.cycle.sheet === "A" && saved.objectionRecipient === undefined
+    ? { ...saved, objectionRecipient: officeSettings().sheetAObjectionRecipient.value.trim() }
+    : saved;
   const d = screenData(cx, state.snapshot ? { ...draft, scores: state.snapshot.scores } : draft);
   return c.html(
     <AssessmentView
@@ -181,7 +187,7 @@ function writeGuard(c: Context): Ctx | Response | Promise<Response> {
 app.post("/cycles/:id/assessment", async (c) => {
   const g = writeGuard(c);
   if (!isCtx(g)) return g;
-  const draft = readDraft(await c.req.parseBody());
+  const draft = readDraft(await c.req.parseBody(), g.cycle.sheet);
   const errors = draftErrors(g.cycle.id, draft);
   if (errors.length) return render(c, g, { status: 422, errors, draft });
   const ok = getDb().transaction(() => {
@@ -196,19 +202,13 @@ app.post("/cycles/:id/assessment", async (c) => {
 app.post("/cycles/:id/assessment/approve", async (c) => {
   const g = writeGuard(c);
   if (!isCtx(g)) return g;
-  const draft = readDraft(await c.req.parseBody());
+  const draft = readDraft(await c.req.parseBody(), g.cycle.sheet);
   const errors = draftErrors(g.cycle.id, draft);
   if (errors.length) return render(c, g, { status: 422, errors, draft });
   const outcome = getDb().transaction((): "closed" | "blocked" | "ok" => {
     if (assessmentState(g.cycle.id).stage !== "draft") return "closed";
     recordEvent("assessment_draft_saved", g.cycle.id, g.person.id, draft);
-    const ids = cycleCriteria(g.cycle.id).map((x) => x.id);
-    const blockers = approvalBlockers({
-      criteria: ids,
-      draft,
-      appointed: !!g.appraisee.appointed,
-      grade: currentGradeNumber(g.cycle.person_id).grade,
-    });
+    const { blockers } = screenData(g, draft);
     if (blockers.length) return "blocked";
     recordEvent("assessment_approved", g.cycle.id, g.person.id, buildAssessmentSnapshot(g.cycle.id, draft));
     return "ok";
@@ -242,7 +242,7 @@ app.post("/cycles/:id/assessment/preview", async (c) => {
   const g = guard(c);
   if (!isCtx(g)) return g;
   if (!isAppraiser(g)) return c.text("Tylko oceniający może zobaczyć podgląd wyniku.", 403);
-  const draft = readDraft(await c.req.parseBody());
+  const draft = readDraft(await c.req.parseBody(), g.cycle.sheet);
   const d = screenData(g, draft);
   return c.html(
     <div>

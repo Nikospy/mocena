@@ -1,6 +1,7 @@
 {
   "label": "ustawienie urzędu",
   "note": "Ta tabela jest ustawieniem urzędu: nie pochodzi z przepisów ani z materiałów organizatora. Urząd może ją zmienić u siebie.",
+  "sheetAObjectionRecipient": { "value": "", "label": "ustawienie urzędu" },
   "dutyTypes": [
     {
       "id": "client-service",

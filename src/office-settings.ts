@@ -6,6 +6,7 @@ export type DevelopmentForm = { id: string; name: string; description: string; c
 export type OfficeSettings = {
   label: string;
   note: string;
+  sheetAObjectionRecipient: { value: string; label: string };
   dutyTypes: DutyType[];
   dutyToCriterion: Record<string, string>;
   taskChangeWords: string[];

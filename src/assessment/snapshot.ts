@@ -21,6 +21,7 @@ export function buildAssessmentSnapshot(cycleId: string, draft: AssessmentDraft,
     scores: draft.scores,
     justification: draft.justification,
     developmentConclusions: draft.developmentConclusions,
+    ...(cycle.sheet === "A" && draft.objectionRecipient ? { objectionRecipient: draft.objectionRecipient } : {}),
     interviewDate: draft.interviewDate ?? date,
     gradeRequest: {
       attached,

@@ -289,9 +289,14 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
               </div>
               <section class="rule sheet-notice" id="pouczenie">
                 <h3>Pouczenie</h3>
-                <p>
-                  Od oceny przysługuje sprzeciw do {p2.objectionTo} w terminie 7 dni od dnia zapoznania się z oceną (art. 83 ust. 1 ustawy).
-                </p>
+                {d.sheet === "A" ? (
+                  <>
+                    <SheetField label="Sprzeciw przysługuje do:">{p2.objectionTo}</SheetField>
+                    <p>Na wniesienie sprzeciwu jest 7 dni od dnia zapoznania się z oceną (art. 83 ust. 1 ustawy).</p>
+                  </>
+                ) : (
+                  <p>Od oceny przysługuje sprzeciw do {p2.objectionTo} w terminie 7 dni od dnia zapoznania się z oceną (art. 83 ust. 1 ustawy).</p>
+                )}
               </section>
             </section>
           </>

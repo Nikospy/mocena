@@ -1,4 +1,4 @@
-import type { AssessmentDraft, AssessmentSnapshot, AssessmentStateData } from "../assessment/state";
+import { objectionRecipientFor, type AssessmentDraft, type AssessmentSnapshot, type AssessmentStateData } from "../assessment/state";
 import { verdictText } from "../assessment/verdict";
 import type { CycleCriterion } from "../cycles/part1";
 import type { Blocker, GradeRequestOption } from "../engine/approval";
@@ -136,16 +136,17 @@ export function BlockerList(props: { blockers: Blocker[] }) {
   );
 }
 
-export function ObjectionClock(props: { deadline: string; today: string; mine: boolean }) {
+export function ObjectionClock(props: { deadline: string; today: string; mine: boolean; recipient: string | null }) {
   const left = daysBetween(props.today, props.deadline);
   const basis = rules.deadlines.objectionDays.basis;
   const who = props.mine ? "możesz złożyć" : "oceniany może złożyć";
+  const addressee = props.recipient ? ` do ${props.recipient}` : "";
   let text: string;
   if (left > 0) {
     const days = left === 1 ? "1 dzień" : `${left} dni`;
-    text = `Sprzeciw do dyrektora generalnego urzędu ${who} do ${formatDate(props.deadline)}. Zostało: ${days}.`;
+    text = `Sprzeciw${addressee} ${who} do ${formatDate(props.deadline)}. Zostało: ${days}.`;
   } else if (left === 0) {
-    text = `Dziś jest ostatni dzień na sprzeciw do dyrektora generalnego urzędu (${formatDate(props.deadline)}).`;
+    text = `Dziś jest ostatni dzień na sprzeciw${addressee} (${formatDate(props.deadline)}).`;
   } else {
     text = `Termin na sprzeciw minął ${formatDate(props.deadline)}.`;
   }
@@ -285,6 +286,15 @@ function EditForm(p: AssessmentViewProps) {
               <p class="sign"><PersonIco />{p.viewer.name}</p>
             </section>
 
+            {p.sheet === "A" ? (
+              <section class="card tx-card">
+                <label class="lbl" for="objectionRecipient">Sprzeciw przysługuje do:</label>
+                <input class="area" id="objectionRecipient" name="objectionRecipient" type="text" maxlength={200}
+                  value={d.objectionRecipient ?? ""} aria-required="true" />
+                <p class="cap">Wpisz adresata przed zatwierdzeniem oceny.</p>
+              </section>
+            ) : null}
+
             {p.gradeOption === "not_applicable" ? null : (
               <section class="card tx-card" id="grade-request">
                 <h2>Wniosek o następny stopień służbowy</h2>
@@ -333,6 +343,7 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
   const s = p.snapshot;
   const st = p.state;
   const mine = p.viewer.id === p.person.id;
+  const recipient = objectionRecipientFor(s.sheet, s.objectionRecipient);
   return (
     <div class="o-grid">
       <div class="o-main">
@@ -372,7 +383,8 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
       <aside class="side first" aria-label="Wynik i potwierdzenia">
         <ResultPanel result={s.result} scores={s.criteria} cycleId={p.cycleId} version={s.rulesVersion.version} />
         <a class="btn" href={`/cycles/${p.cycleId}/assessment/export.json`} download>Pobierz ocenę (JSON)</a>
-        {st.objectionDeadline ? <ObjectionClock deadline={st.objectionDeadline} today={p.today} mine={mine} /> : null}
+        {s.sheet === "A" && recipient && !st.objectionDeadline ? <p class="cap">Sprzeciw przysługuje do: {recipient}</p> : null}
+        {st.objectionDeadline ? <ObjectionClock deadline={st.objectionDeadline} today={p.today} mine={mine} recipient={recipient} /> : null}
         {p.canAcknowledge ? (
           <form method="post" action={`/cycles/${p.cycleId}/assessment/acknowledge`} class="decide">
             <p class="cap">Potwierdzenie zapoznania z oceną: <LegalBasis basis={rules.approval.acknowledgement.basis} /></p>
