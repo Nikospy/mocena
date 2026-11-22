@@ -141,7 +141,7 @@ p, li { text-wrap: pretty; }
 
 /* ================= 3. Pismo (role) =================
    Cztery stopnie na całą usługę: 28 nagłówek strony (telefon 24) · 20 sekcja, termin, werdykt · 16 treść · 14 metadane
-   (data, rodzaj, podpis pola). Hierarchia niżej: grubość i położenie, nie nowy rozmiar. Tekst ciągły do 66 znaków. */
+   (data, rodzaj, opis pola). Hierarchia niżej: grubość i położenie, nie nowy rozmiar. Tekst ciągły do 66 znaków. */
 h1 { font-size: var(--f-h4); line-height: var(--lh-h4); font-weight: var(--w-bold); }
 @media (min-width: 640px) { h1 { font-size: var(--f-h2); line-height: var(--lh-h2); } }
 h2 { font-size: var(--f-h5); line-height: var(--lh-h5); font-weight: var(--w-bold); }
@@ -677,7 +677,7 @@ p, blockquote, dd, :is(ul, ol):not([class]) > li, :is(.topics, .b-ol, .points, .
 .verdict-box .reason { padding-inline-start: 0; }
 .avg-line { padding-block-start: var(--sp-200); border-block-start: 1px solid var(--rule-divider); color: var(--rule-ink); font-size: var(--f-h5); line-height: var(--lh-h5); }
 .avg-line b { font-weight: var(--w-bold); }
-/* 1.4 podpis wybranego poziomu tuż pod rzędem cyfr, bez pustego marginesu */
+/* 1.4 opis wybranego poziomu tuż pod rzędem cyfr, bez pustego marginesu */
 .scorebox .lvl { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
 .scorebox .lvl:empty { display: none; }
 /* 1.5 ocena u ocenianego na wąskim ekranie: wynik, termin sprzeciwu i przycisk zapoznania przed listą kryteriów */
@@ -924,7 +924,7 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
   .side .actionbar::before { display: none; }
 }
 .card.sheet > .list-h:first-child { padding-block-start: var(--sp-300); margin-block-end: 0; }
-/* telefon: podpis tylko przy bieżącym etapie (pozostałe zostają dla czytników) */
+/* telefon: etykieta tylko przy bieżącym etapie (pozostałe zostają dla czytników) */
 @media (max-width: 639px) {
   .steps5 li:not(.cur) > span:last-child { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .steps5 li.cur > span:last-child { white-space: nowrap; }
