@@ -31,9 +31,19 @@ export type AssessmentSnapshot = {
   confirmation: { place: string; date: string; name: string };
 };
 
+/** Adresat sprzeciwu w dopełniaczu, do zdań „sprzeciw do …”: arkusz A z pola oceniającego, pozostałe z reguł. Jedyne źródło tej formy. */
 export function objectionRecipientFor(sheet: string | null, recipient?: string): string | null {
-  return sheet === "A" ? recipient?.trim() || null : rules.deadlines.objectionDays.to;
+  return sheet === "A" ? recipient?.trim() || null : rules.deadlines.objectionDays.toGenitive;
 }
+
+export const OBJECTION_OUTCOME_TEXT = {
+  changed: "uwzględniony, zmiana oceny",
+  redone: "uwzględniony, ponowne sporządzenie oceny",
+  rejected: "nieuwzględniony",
+} as const;
+
+/** Wniesiony sprzeciw i jego rozstrzygnięcie (zdarzenia `objection_filed`, `objection_resolved`). */
+export type ObjectionFacts = { filedOn: string; resolvedOn: string | null; outcome: keyof typeof OBJECTION_OUTCOME_TEXT | null };
 
 export type Acknowledgement = { place: string; date: string; name: string; objectionDeadline: string };
 export type Fiction = { reason: "could_not" | "would_not"; deliveryMethod: "in_person" | "post" | "email"; deliveredOn: string; objectionDeadline: string };
@@ -49,6 +59,7 @@ export type AssessmentStateData = {
   acknowledgement: (Acknowledgement & { eventDate: string }) | null;
   fiction: (Fiction & { eventDate: string }) | null;
   objectionDeadline: string | null;
+  objection: ObjectionFacts | null;
 };
 
 const ROMAN: Record<string, number> = { I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6, VII: 7, VIII: 8, IX: 9 };
@@ -77,6 +88,7 @@ export function assessmentState(cycleId: string): AssessmentStateData {
     acknowledgement: null,
     fiction: null,
     objectionDeadline: null,
+    objection: null,
   };
   if (!ev.some((e) => e.type === "part1_confirmed")) return empty;
   const drafts = ev.filter((e) => e.type === "assessment_draft_saved");
@@ -100,5 +112,8 @@ export function assessmentState(cycleId: string): AssessmentStateData {
     s.fiction = { ...closing.payload, eventDate: closing.date };
     s.objectionDeadline = closing.payload.objectionDeadline;
   }
+  const filed = ev.filter((e) => e.type === "objection_filed").pop();
+  const resolved = ev.filter((e) => e.type === "objection_resolved").pop();
+  if (filed) s.objection = { filedOn: filed.date, resolvedOn: resolved?.date ?? null, outcome: resolved?.payload.outcome ?? null };
   return s;
 }

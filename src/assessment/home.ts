@@ -1,3 +1,4 @@
+import { objectionFactsText } from "../views/assessment";
 import { cycleDeadlineDetails, openCycle, previousCycleOf } from "../cycles";
 import { registerCycleLinks } from "../cycle-links";
 import { getDb } from "../db";
@@ -59,11 +60,13 @@ registerHomeTasks((person) => {
       const { verdict, level } = verdictText(st.snapshot.result);
       const recipient = objectionRecipientFor(st.snapshot.sheet, st.snapshot.objectionRecipient);
       const addressee = recipient ? ` do ${recipient}` : "";
-      const open = st.objectionDeadline >= today();
+      const open = !st.objection && st.objectionDeadline >= today();
       tasks.push({
         title: "Ocena okresowa",
         person: level ? `${verdict}, ${level}` : verdict,
-        detail: open ? `Sprzeciw${addressee} możesz złożyć w ustawowym terminie.` : `Termin sprzeciwu minął ${formatDate(st.objectionDeadline)}.`,
+        detail: st.objection
+          ? objectionFactsText(st.objection, recipient)
+          : open ? `Sprzeciw${addressee} możesz złożyć w ustawowym terminie.` : `Termin sprzeciwu minął ${formatDate(st.objectionDeadline)}.`,
         due: open ? st.objectionDeadline : undefined,
         basis: open ? rules.deadlines.objectionDays.basis : undefined,
         action: "Otwórz ocenę",

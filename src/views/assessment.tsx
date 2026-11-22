@@ -1,4 +1,5 @@
-import { objectionRecipientFor, type AssessmentDraft, type AssessmentSnapshot, type AssessmentStateData } from "../assessment/state";
+import { OBJECTION_OUTCOME_TEXT, objectionRecipientFor, type ObjectionFacts, type AssessmentDraft, type AssessmentSnapshot, type AssessmentStateData } from "../assessment/state";
+import { objectionReviewDeadline } from "../engine/deadlines";
 import { verdictText } from "../assessment/verdict";
 import type { CycleCriterion } from "../cycles/part1";
 import type { Blocker, GradeRequestOption } from "../engine/approval";
@@ -139,13 +140,23 @@ export function BlockerList(props: { blockers: Blocker[] }) {
   );
 }
 
-export function ObjectionClock(props: { deadline: string; today: string; mine: boolean; recipient: string | null }) {
+/** Po wniesieniu sprzeciwu zegar sprzeciwu nie ma już znaczenia: zdanie mówi stan faktyczny. */
+export function objectionFactsText(o: ObjectionFacts, recipient: string | null): string {
+  const addressee = recipient ? ` do ${recipient}` : "";
+  if (o.resolvedOn) return `Sprzeciw${addressee} wniesiony ${formatDate(o.filedOn)}, rozpatrzony ${formatDate(o.resolvedOn)}: ${o.outcome ? OBJECTION_OUTCOME_TEXT[o.outcome] : "rozstrzygnięty"}.`;
+  return `Sprzeciw${addressee} wniesiony ${formatDate(o.filedOn)}. Rozpatrzenie do ${formatDate(objectionReviewDeadline(o.filedOn))}.`;
+}
+
+export function ObjectionClock(props: { deadline: string; today: string; mine: boolean; recipient: string | null; gender: "f" | "m" | null; objection: ObjectionFacts | null }) {
   const left = daysBetween(props.today, props.deadline);
-  const basis = rules.deadlines.objectionDays.basis;
-  const who = props.mine ? "możesz złożyć" : "oceniany może złożyć";
+  const o = props.objection;
+  const basis = o ? (o.resolvedOn ? rules.deadlines.objectionDays.basis : rules.deadlines.objectionReviewDays.basis) : rules.deadlines.objectionDays.basis;
+  const who = props.mine ? "możesz złożyć" : `${props.gender === "f" ? "oceniana" : "oceniany"} może złożyć`;
   const addressee = props.recipient ? ` do ${props.recipient}` : "";
   let text: string;
-  if (left > 0) {
+  if (o) {
+    text = objectionFactsText(o, props.recipient);
+  } else if (left > 0) {
     const days = left === 1 ? "1 dzień" : `${left} dni`;
     text = `Sprzeciw${addressee} ${who} do ${formatDate(props.deadline)}. Zostało: ${days}.`;
   } else if (left === 0) {
@@ -154,7 +165,7 @@ export function ObjectionClock(props: { deadline: string; today: string; mine: b
     text = `Termin na sprzeciw minął ${formatDate(props.deadline)}.`;
   }
   return (
-    <div class={`st ${left >= 0 ? "info" : "warn"}`} id="objection-clock">
+    <div class={`st ${o || left >= 0 ? "info" : "warn"}`} id="objection-clock">
       <div>
         <b>{text}</b>
         <small>
@@ -396,7 +407,7 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
       <aside class="side first" aria-label="Wynik i potwierdzenia">
         <ResultPanel result={s.result} scores={s.criteria} cycleId={p.cycleId} version={s.rulesVersion.version} />
         {s.sheet === "A" && recipient && !st.objectionDeadline ? <p class="cap">Sprzeciw przysługuje do: {recipient}</p> : null}
-        {st.objectionDeadline ? <ObjectionClock deadline={st.objectionDeadline} today={p.today} mine={mine} recipient={recipient} /> : null}
+        {st.objectionDeadline ? <ObjectionClock deadline={st.objectionDeadline} today={p.today} mine={mine} recipient={recipient} gender={p.person.gender} objection={st.objection} /> : null}
         {p.canAcknowledge ? (
           <form method="post" action={`/cycles/${p.cycleId}/assessment/acknowledge`} class="decide">
             <p class="cap">Potwierdzenie zapoznania z oceną: <LegalBasis basis={rules.approval.acknowledgement.basis} /></p>
