@@ -582,3 +582,12 @@ h2, h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w
 .tl-old { color: var(--rule-quiet); text-decoration: line-through; text-decoration-thickness: 2px; }
 .tl-new { font-weight: var(--w-bold); color: var(--rule-ink); }
 .abs-form { display: grid; gap: var(--sp-200); }
+
+/* ui-fixes */
+/* Arkusz na telefonie: szerokie tabele przewijają się w sobie, nie rozpychają strony (druk bez zmian). */
+@media screen and (max-width: 520px) { .sheet-matrix { display: block; overflow-x: auto; } }
+/* Rozstrzygnięcie sprzeciwu: mały przycisk drugorzędny, wyrównany do lewej, pod etykietą. */
+.hr-actions { flex-direction: column; align-items: flex-start; margin-block-start: var(--sp-100); }
+.hr-actions .lbl, .hr-actions .btn { white-space: nowrap; }
+.hr-actions .lbl { margin-block-end: 0; color: var(--text-3); font-size: var(--f-c1); line-height: var(--lh-c1); }
+.hr-actions .btn { min-block-size: var(--sp-400); padding-inline: var(--sp-150); font-size: var(--f-c1); font-weight: var(--w-regular); justify-content: flex-start; text-align: start; }

@@ -138,13 +138,14 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
                 </span>
                 {r.state.step === "objection_filed" ? (
                   <form method="post" action={`/cycles/${r.cycleId}/objection-outcome`} class="hr-actions">
-                    <button class="btn text" type="submit" name="outcome" value="changed">
+                    <span class="lbl">Rozstrzygnięcie sprzeciwu:</span>
+                    <button class="btn" type="submit" name="outcome" value="changed">
                       Uwzględniony: zmiana oceny
                     </button>
-                    <button class="btn text" type="submit" name="outcome" value="redone">
+                    <button class="btn" type="submit" name="outcome" value="redone">
                       Uwzględniony: ponowne sporządzenie oceny
                     </button>
-                    <button class="btn text" type="submit" name="outcome" value="rejected">
+                    <button class="btn" type="submit" name="outcome" value="rejected">
                       Nieuwzględniony
                     </button>
                   </form>
