@@ -1,7 +1,7 @@
 ---
 change_id: first-impression
 title: Pierwsze wrażenie: podgląd linku, ikona, strony błędów, dostępność
-status: planning
+status: implementing
 created: 2026-11-22
 updated: 2026-11-22
 archived_at: null
