@@ -90,6 +90,7 @@ describe("arkusz /cycles/:id/sheet", () => {
     expect(footerRule).not.toMatch(/position\s*:\s*fixed/i);
     expect(footerRule).toMatch(/position\s*:\s*static/i);
     expect(css).not.toMatch(/position\s*:\s*fixed/i);
+    expect(css).toMatch(/\.demo\b/);
     expect(css).toMatch(/\.sheet-matrix\s*\{[^}]*display\s*:\s*table/s);
     expect(css).toMatch(/\.sheet-matrix\s*\{[^}]*overflow\s*:\s*visible/s);
     expect(css.toLowerCase()).not.toContain("podpis");

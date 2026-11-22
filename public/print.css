@@ -10,7 +10,7 @@
   }
 }
 
-header.top, nav, .nav, .date-switch, .demo-aside, .skip-link, .gpanel, .gmob, .no-print, button, form, input, select, textarea {
+header.top, nav, .nav, .date-switch, .demo, .demo-aside, .skip-link, .gpanel, .gmob, .no-print, button, form, input, select, textarea {
   display: none !important;
 }
 [data-look]::before, [data-look]::after { display: none !important; }
