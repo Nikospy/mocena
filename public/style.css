@@ -565,3 +565,14 @@ h2, h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w
 .note-text { overflow-wrap: anywhere; }
 .crit-notes { display: grid; gap: var(--sp-150); margin-block-start: var(--sp-200); }
 .insert-tools { display: grid; gap: var(--sp-150); margin-block-end: var(--sp-200); }
+/* S-03 timeline-and-absences */
+.tl-card > * + * { margin-block-start: var(--sp-200); }
+.tl-list { list-style: none; padding: 0; margin: 0; }
+.tl-item { display: grid; gap: var(--sp-50); padding-block: var(--sp-150); border-block-start: 1px solid var(--rule-divider); }
+.tl-item:first-child { border-block-start: 0; }
+@media (min-width: 640px) { .tl-item { grid-template-columns: 9rem minmax(0, 1fr); gap: var(--sp-200); } }
+.tl-item time { font-weight: var(--w-bold); font-variant-numeric: tabular-nums; color: var(--rule-ink); }
+.tl-body { display: grid; gap: var(--sp-50); justify-items: start; min-inline-size: 0; }
+.tl-old { color: var(--rule-quiet); text-decoration: line-through; text-decoration-thickness: 2px; }
+.tl-new { font-weight: var(--w-bold); color: var(--rule-ink); }
+.abs-form { display: grid; gap: var(--sp-200); }

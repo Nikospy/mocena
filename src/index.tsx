@@ -11,6 +11,8 @@ import hr from "./routes/hr";
 import sheet from "./routes/sheet";
 import history from "./routes/history";
 import notes from "./routes/notes";
+import absences from "./routes/absences";
+import timeline from "./routes/timeline";
 import { Layout } from "./views/layout";
 
 const app = new Hono();
@@ -112,5 +114,7 @@ app.route("/", hr);
 app.route("/", sheet);
 app.route("/", history);
 app.route("/", notes);
+app.route("/", absences);
+app.route("/", timeline);
 
 export default app;

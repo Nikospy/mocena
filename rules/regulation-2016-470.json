@@ -140,7 +140,18 @@
       "value": 30,
       "basis": "art. 89 ust. 2 ustawy",
       "from": "dzień zapoznania się z oceną"
+    },
+    "longAbsenceOverMonths": {
+      "value": 1,
+      "basis": "art. 81 ust. 7 ustawy"
+    },
+    "deadlineCounting": {
+      "basis": "art. 110–115 Kodeksu cywilnego; koniec w sobotę albo dzień wolny przechodzi na następny dzień roboczy"
     }
+  },
+  "appraiserChange": {
+    "basis": "§ 9 ust. 3",
+    "rule": "oceny dokonuje się na podstawie wcześniej wybranych kryteriów"
   },
   "criteria": [
     {

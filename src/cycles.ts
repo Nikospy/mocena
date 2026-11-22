@@ -1,7 +1,7 @@
 import { getDb } from "./db";
 import { visibleEvents } from "./events";
-import { nextAssessmentDeadline, periodEndAfterNegative } from "./engine/deadlines";
-import { rules } from "./engine/rules";
+import { assessmentDeadline, type CycleKind } from "./engine/absences";
+import { rules, rulesVersion } from "./engine/rules";
 import { today } from "./settings";
 
 export type Cycle = { id: string; person_id: string; appraiser_id: string; period_start: string; sheet: string | null };
@@ -10,18 +10,44 @@ export function cycleById(id: string): Cycle | null {
   return (getDb().query("SELECT * FROM cycles WHERE id = ?").get(id) as Cycle | null) ?? null;
 }
 
-export function effectiveDeadline(cycleId: string, opts: { asOf?: string } = {}): { date: string; basis: string[] } {
+export type Absence = { id: number; person_id: string; date_from: string; date_to: string; excused: number; recorded_on: string; recorded_by: string };
+
+/** Nieobecności z `recorded_on` nie późniejszym niż `asOf` (domyślnie `today()`), ta sama granica co `visibleEvents`. */
+export function visibleAbsences(personId: string, opts: { asOf?: string } = {}): Absence[] {
+  return getDb()
+    .query("SELECT * FROM absences WHERE person_id = ? AND recorded_on <= ? ORDER BY date_from, id")
+    .all(personId, opts.asOf ?? today()) as Absence[];
+}
+
+export type CycleDeadlineDetails = ReturnType<typeof assessmentDeadline> & {
+  kind: CycleKind;
+  basis: string[];
+  rules: ReturnType<typeof rulesVersion>;
+};
+
+/** Jedyne źródło terminu otwartego cyklu: termin bazowy, nieobecności widoczne w `asOf`, podstawy prawne. */
+export function cycleDeadlineDetails(cycleId: string, opts: { asOf?: string } = {}): CycleDeadlineDetails {
   const cycle = cycleById(cycleId);
   if (!cycle) throw new Error(`Brak cyklu ${cycleId}`);
-  const started = visibleEvents(cycleId, opts).filter((e) => e.type === "cycle_started").pop();
-  const p = started?.payload;
-  if (p?.previousOutcome === "negative" && p.previousAcknowledgedOn) {
-    return {
-      date: periodEndAfterNegative(p.previousAcknowledgedOn),
-      basis: [rules.deadlines.reassessmentAfterNegativeMonths.basis],
-    };
-  }
-  return { date: nextAssessmentDeadline(cycle.period_start, 0), basis: [rules.deadlines.assessmentEveryMonths.basis] };
+  const p = visibleEvents(cycleId, opts).filter((e) => e.type === "cycle_started").pop()?.payload;
+  const kind: CycleKind = p?.previousOutcome === "negative" && p.previousAcknowledgedOn ? "after_negative" : "regular";
+  const absences = visibleAbsences(cycle.person_id, opts).map((a) => ({ id: a.id, from: a.date_from, to: a.date_to, excused: a.excused === 1 }));
+  const r = assessmentDeadline({ kind, periodStart: cycle.period_start, previousAcknowledgedOn: p?.previousAcknowledgedOn ?? null }, absences);
+  const D = rules.deadlines;
+  const basis =
+    kind === "after_negative"
+      ? [D.reassessmentAfterNegativeMonths.basis]
+      : [
+          D.assessmentEveryMonths.basis,
+          ...(r.extensionDays > 0 ? [`${D.longAbsenceOverMonths.basis}: termin przedłużony o czas usprawiedliwionej nieobecności dłuższej niż miesiąc`] : []),
+          ...(r.movedToWorkingDay ? ["art. 115 Kodeksu cywilnego"] : []),
+        ];
+  return { ...r, kind, basis, rules: rulesVersion() };
+}
+
+export function effectiveDeadline(cycleId: string, opts: { asOf?: string } = {}): { date: string; basis: string[] } {
+  const d = cycleDeadlineDetails(cycleId, opts);
+  return { date: d.deadline, basis: d.basis };
 }
 
 /** Widoczny cykl (od daty `cycle_started`) bez widocznego potwierdzenia zapoznania ani fikcji; najpóźniejszy `period_start`. */

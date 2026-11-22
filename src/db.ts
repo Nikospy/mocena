@@ -36,13 +36,17 @@ CREATE TABLE IF NOT EXISTS feedback_messages (
   id INTEGER PRIMARY KEY AUTOINCREMENT, note_id INTEGER NOT NULL, author_id TEXT NOT NULL,
   recipient_id TEXT NOT NULL, sent_on TEXT NOT NULL, text TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS absences (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, person_id TEXT NOT NULL, date_from TEXT NOT NULL, date_to TEXT NOT NULL,
+  excused INTEGER NOT NULL DEFAULT 1, recorded_on TEXT NOT NULL, recorded_by TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS absences_person ON absences (person_id, recorded_on);
 `);
 }
 
 export function setDb(d: Database): void {
   db = d;
 }
-
 export function getDb(): Database {
   if (!db) {
     db = new Database(process.env.MOCENA_DB ?? "mocena.sqlite", { create: true });
