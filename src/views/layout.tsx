@@ -72,7 +72,7 @@ export function navFor(person: Person): NavItem[] {
     ];
   if (person.role === "admin")
     return [
-      { label: "Podpowiedzi", href: "/admin/suggestion-sources", icon: ICON.sources },
+      { label: "Źródła podpowiedzi", href: "/admin/suggestion-sources", icon: ICON.sources },
       { label: "Pracownicy", href: "/hr/people", icon: ICON.people, section: under("/hr/people/") },
     ];
   if (person.role === "appraiser")

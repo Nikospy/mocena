@@ -37,10 +37,33 @@ function accounts() {
     Pick<Person, "id" | "name" | "role" | "position_title" | "gender">[];
 }
 
+/** Konta z pokazu dla jury idą pierwsze, w kolejności kroków; reszta alfabetycznie. */
+const TOUR_ACCOUNTS = ["marek", "piotr", "joanna"];
+
+const CHEVRON_R = (
+  <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M9 6l6 6-6 6" />
+  </svg>
+);
+
+function AccountRow(props: { a: ReturnType<typeof accounts>[number] }) {
+  const { a } = props;
+  const role = roleLabel(a);
+  const title = a.position_title && a.position_title !== role ? a.position_title : null;
+  return (
+    <li>
+      <button class="acc" type="submit" name="person_id" value={a.id}>
+        <span class="acc-main"><b>{a.name}</b><span class="cap">{title ? `${title} · ${role}` : role}</span></span>
+        {CHEVRON_R}
+      </button>
+    </li>
+  );
+}
+
 function AccountScreen(props: { error?: string }) {
   const demo = isDemoMode();
-  const people = accounts();
-  if (!demo && people.length === 0) {
+  const all = accounts();
+  if (!demo && all.length === 0) {
     return (
       <Layout title="Pierwsze uruchomienie" person={null} today={today()}>
         <PageHeader title="Pierwsze uruchomienie" />
@@ -52,32 +75,46 @@ function AccountScreen(props: { error?: string }) {
       </Layout>
     );
   }
+  const tourAccounts = demo ? TOUR_ACCOUNTS.map((id) => all.find((a) => a.id === id)).filter((a) => !!a) : [];
+  const others = demo ? all.filter((a) => !TOUR_ACCOUNTS.includes(a.id)) : all;
   return (
-    <Layout title="Wybór konta" person={null} today={today()}>
+    <Layout title={demo ? "Wybierz konto pokazowe" : "Wybierz konto"} person={null} today={today()}>
       <section class="account-list">
-        <PageHeader title={demo ? "Wybierz konto pokazowe" : "Wybierz konto"} lead={demo ? "Każde konto pokazuje ekrany jednej osoby w cyklu oceny." : undefined} />
+        <PageHeader
+          context={demo ? "Pokaz dla jury" : undefined}
+          title={demo ? "Wybierz konto pokazowe" : "Wybierz konto"}
+          lead={demo ? "Każde konto pokazuje ekrany jednej osoby w cyklu oceny. Konto zmienisz w każdej chwili w menu przy nazwisku." : undefined}
+        />
         {props.error ? <p class="st bad" role="alert">{props.error}</p> : null}
-        <form method="post" action="/account">
-          <ul class="acc-grid">
-            {people.map((a) => (
-              <li>
-                <button class="card acc" type="submit" name="person_id" value={a.id}>
-                  <b>{a.name}</b>
-                  <span class="cap">{a.position_title ?? roleLabel(a)}</span>
-                  <span class="acc-role">{roleLabel(a)}</span>
-                </button>
-              </li>
-            ))}
+        <form method="post" action="/account" class="acc-form">
+          {demo ? <h2 class="acc-h" id="acc-tour">Osoby z pokazu</h2> : null}
+          {demo ? (
+            <ul class="acc-grid" aria-labelledby="acc-tour">
+              {tourAccounts.map((a) => <AccountRow a={a} />)}
+            </ul>
+          ) : null}
+          {demo ? <h2 class="acc-h" id="acc-other">Pozostałe konta</h2> : null}
+          <ul class="acc-grid" aria-labelledby={demo ? "acc-other" : undefined}>
+            {others.map((a) => <AccountRow a={a} />)}
           </ul>
         </form>
         {demo ? (
-          <form method="post" action="/demo/restart" class="again">
-            <button class="btn text" type="submit">Zacznij pokaz od nowa</button>
+          <form method="post" action="/demo/restart" class="acc-again">
+            <button class="btn text" type="submit">Wgraj dane pokazowe od nowa</button>
+            <p class="cap">Usuwa zmiany wprowadzone w pokazie i wraca do tej listy.</p>
           </form>
         ) : null}
       </section>
     </Layout>
   );
+}
+
+/** Pusty stan strony głównej: jedno zdanie i jedna akcja właściwa dla roli. */
+function emptyAction(person: Person): { href: string; label: string } | null {
+  if (person.role === "hr") return { href: "/hr", label: "Otwórz stan cykli" };
+  if (person.role === "admin") return { href: "/admin/suggestion-sources", label: "Otwórz źródła podpowiedzi" };
+  if (person.role === "appraiser") return { href: "/notes", label: "Otwórz notatki o zespole" };
+  return { href: `/people/${person.id}/history`, label: "Otwórz historię ocen" };
 }
 
 /** Sprawy z terminem na górze (od najbliższego), potem pozostałe w kolejności dostawców. */
@@ -107,11 +144,17 @@ app.get("/", (c) => {
   const options = homeOptions(person);
   const now = today();
   return c.html(
-    <Layout title="Start" person={person} today={today()}>
-      <section>
-        <PageHeader title="Sprawy do załatwienia" />
+    <Layout title="Sprawy do załatwienia" person={person} today={today()}>
+      <section class="home">
+        <PageHeader context={person.position_title ?? roleLabel(person)} title="Sprawy do załatwienia" />
         {tasks.length === 0 ? (
-          <p class="empty">Brak spraw do załatwienia.</p>
+          <div class="home-empty">
+            <p>Nie masz teraz spraw do załatwienia.</p>
+            {(() => {
+              const a = emptyAction(person);
+              return a ? <a href={a.href}>{a.label}{CHEVRON_R}</a> : null;
+            })()}
+          </div>
         ) : (
           <ul class="tasks">
             {sortTasks(tasks).map((t) => {
@@ -146,9 +189,9 @@ app.get("/", (c) => {
                         </span>
                       </p>
                     ) : null}
-                    <span class="task-go" aria-hidden="true">
-                      {t.action ?? "Otwórz"}
-                      <svg class="ico s" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></svg>
+                    <span class={t.action ? "task-go" : "task-go bare"} aria-hidden="true">
+                      {t.action ?? null}
+                      {CHEVRON_R}
                     </span>
                   </div>
                 </li>
@@ -158,9 +201,9 @@ app.get("/", (c) => {
         )}
       </section>
       {options.length ? (
-        <section aria-labelledby="h-options">
+        <section class="home-options" aria-labelledby="h-options">
           <h2 id="h-options">Twoje możliwości</h2>
-          <ul class="tasks">
+          <ul class="tasks quiet">
             {options.map((t) => (
               <li class="task">
                 <div class="task-main">
@@ -172,10 +215,7 @@ app.get("/", (c) => {
                   {t.detail ? <p class="task-detail">{t.detail}</p> : null}
                 </div>
                 <div class="task-side">
-                  <span class="task-go" aria-hidden="true">
-                    {t.action ?? "Otwórz"}
-                    <svg class="ico s" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></svg>
-                  </span>
+                  <span class="task-go bare" aria-hidden="true">{CHEVRON_R}</span>
                 </div>
               </li>
             ))}
@@ -194,7 +234,7 @@ app.post("/account", async (c) => {
   const body = await c.req.parseBody();
   const id = typeof body.person_id === "string" ? body.person_id : "";
   const p = personById(id);
-  if (!p || !p.has_account) return c.html(<AccountScreen error="Nie ma takiego konta." />, 422);
+  if (!p || !p.has_account) return c.html(<AccountScreen error="Nie ma takiego konta. Wybierz osobę z listy." />, 422);
   setCookie(c, PERSON_COOKIE, p.id, { path: "/", httpOnly: true, sameSite: "Lax" });
   return c.redirect("/", 303);
 });

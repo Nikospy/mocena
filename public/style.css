@@ -113,8 +113,8 @@ p, li { text-wrap: pretty; }
 
 /* komputer: dwa rzędy – znak z opisem i konto, pod spodem nawigacja usługi */
 @media (min-width: 900px) {
-  .top-in { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "brand user" "nav nav"; column-gap: var(--sp-400); padding-block: var(--sp-50) 0; }
-  .brand { grid-area: brand; align-self: center; justify-self: start; }
+  .top-in { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "brand user" "nav nav"; column-gap: var(--sp-400); row-gap: 0; padding-block: var(--sp-100) 0; }
+  .brand { grid-area: brand; align-self: center; justify-self: start; min-block-size: var(--sp-500); }
   .brand-desc { display: block; }
   .user { grid-area: user; align-self: center; }
   .user summary { padding-inline: var(--sp-100) var(--sp-150); }
@@ -143,7 +143,7 @@ p, li { text-wrap: pretty; }
    Cztery stopnie na całą usługę: 28 nagłówek strony (telefon 24) · 20 sekcja, termin, werdykt · 16 treść · 14 metadane
    (data, rodzaj, podpis pola). Hierarchia niżej: grubość i położenie, nie nowy rozmiar. Tekst ciągły do 66 znaków. */
 h1 { font-size: var(--f-h4); line-height: var(--lh-h4); font-weight: var(--w-bold); }
-@media (min-width: 900px) { h1 { font-size: var(--f-h2); line-height: var(--lh-h2); } }
+@media (min-width: 640px) { h1 { font-size: var(--f-h2); line-height: var(--lh-h2); } }
 h2 { font-size: var(--f-h5); line-height: var(--lh-h5); font-weight: var(--w-bold); }
 h3 { font-size: var(--f-p); line-height: var(--lh-p); font-weight: var(--w-bold); }
 p, blockquote, dd, :is(ul, ol):not([class]) > li, :is(.topics, .b-ol, .points, .why, .reason, .outcomes, .plain-list, .g-look, .tl-list) > li { max-inline-size: 66ch; }
@@ -1134,6 +1134,124 @@ section[aria-labelledby="h-dev"] > h3 { margin-block-start: var(--sp-300); paddi
 /* === screens: home-tour === */
 /* Strona główna, wybór konta, wejście i koniec pokazu, panel przewodnika, powłoka, strony 403 i 404. */
 /* Reguły tej grupy dopisuj bezpośrednio pod tą linią. */
+/* fokus z tour.js na h1 zostaje dla czytników ekranu, bez czarnej ramki na ekranie */
+main h1[tabindex="-1"]:focus, main h1[tabindex="-1"]:focus-visible { outline: none; box-shadow: none; }
+
+/* strona główna: wiersz bez nazwy czynności kończy sama strzałka; pusty stan to jedno zdanie i jedna akcja */
+.task-go.bare { color: var(--text-2); }
+.home-empty { display: grid; gap: var(--sp-100); justify-items: start; background: var(--surface); border: 1px solid var(--card-line); border-radius: var(--card-r); padding: var(--sp-300); }
+@media (max-width: 640px) {
+  .task:has(.task-go.bare) { padding-inline-end: var(--sp-600); }
+  .task-go.bare { position: absolute; inset-inline-end: var(--sp-200); inset-block-start: 50%; transform: translateY(-50%); }
+  .tasks.quiet .task:has(.task-go.bare) { padding-inline-end: var(--sp-400); }
+  .tasks.quiet .task-go.bare { inset-inline-end: 0; }
+}
+/* lista spraw w szerokości czytania: tytuł i termin w jednym spojrzeniu */
+.home, .home-options { max-inline-size: 880px; }
+/* „Twoje możliwości”: drugorzędne wobec spraw – niżej, bez powierzchni karty, same linie podziału */
+.home-options { margin-block-start: var(--sp-600); }
+.home-options > h2 { margin-block-end: var(--sp-100); }
+.tasks.quiet { background: none; border: 0; border-block-end: 1px solid var(--line); border-radius: 0; }
+.tasks.quiet .task { padding-inline: 0; border-block-start: 1px solid var(--line); }
+.tasks.quiet .task-link { color: var(--primary); }
+@media (hover: hover) and (pointer: fine) { .tasks.quiet .task:hover { background: none; } }
+.home-empty a, .err-back a { display: inline-flex; align-items: center; gap: var(--sp-50); min-block-size: var(--hit); font-weight: var(--w-bold); }
+
+/* wybór konta: lista na jednej powierzchni, cały wiersz to przycisk; rola zwykłym tekstem */
+.account-list { max-inline-size: 720px; }
+.acc-form { display: grid; }
+.acc-h { margin-block: var(--sp-300) var(--sp-150); }
+.acc-form > .acc-h:first-child { margin-block-start: 0; }
+.account-list .acc-grid { list-style: none; margin: 0; padding: 0; display: block; background: var(--surface); border: 1px solid var(--card-line); border-radius: var(--card-r); overflow: clip; }
+.acc-grid > li + li { border-block-start: 1px solid var(--line); }
+.account-list .acc { all: unset; box-sizing: border-box; inline-size: 100%; min-block-size: var(--sp-800); display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center;
+  gap: var(--sp-200); padding: var(--sp-150) var(--sp-300); cursor: pointer; color: var(--text); }
+.acc-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--sp-100); min-inline-size: 0; }
+.acc-main b { flex: 1 0 100%; font-size: var(--f-p); line-height: var(--lh-p); }
+.account-list .acc .cap { font-size: var(--f-p); line-height: var(--lh-p); color: var(--text-2); }
+.account-list .acc > .ico { color: var(--primary); }
+.account-list .acc:focus-visible { box-shadow: inset 0 0 0 2px var(--grey-500); outline: none; }
+@media (hover: hover) and (pointer: fine) { .account-list .acc:hover { background: var(--cobalt-10); } .account-list .acc:hover b { text-decoration: underline; text-underline-offset: .2em; } }
+.acc-again { display: grid; justify-items: start; gap: 0; margin-block-start: var(--sp-300); }
+.acc-again .btn.text { padding-inline: 0; }
+@media (hover: hover) and (pointer: fine) { .acc-again .btn.text:not(:disabled):hover { background: none; text-decoration: underline; } }
+@media (max-width: 599px) { .account-list .acc { padding-inline: var(--sp-200); } }
+
+/* strony błędów i odmowy: nagłówek, jedno zdanie, odnośnik powrotu */
+.err { max-inline-size: 720px; }
+.err-back { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--sp-300); }
+.err-back form { margin: 0; }
+.err-back .btn.text { padding-inline: 0; }
+
+/* wejście do pokazu: jedna kolumna na lewej krawędzi znaku, jedna akcja główna, oś pięciu chwil pod spodem */
+.e-wrap { padding: var(--sp-600) var(--gutter) var(--sp-600); gap: var(--sp-600); }
+.e-head { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-200); align-items: start; max-inline-size: 760px; }
+.e-ctx { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); font-weight: var(--w-bold); }
+.e-h1 { color: var(--text); max-inline-size: 30ch; }
+.e-lead { max-inline-size: 62ch; }
+.e-cta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-150) var(--sp-400); margin-block-start: var(--sp-100); }
+.e-cta form { margin: 0; }
+.e-cta a { display: inline-flex; align-items: center; min-block-size: var(--hit); font-weight: var(--w-bold); }
+.e-note { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+.axis-card .sub { font-size: var(--f-p); line-height: var(--lh-p); max-inline-size: 66ch; }
+.e-wrap > .e-foot { margin-block-start: calc(var(--sp-300) * -1); }
+@media (max-width: 899px) {
+  .e-wrap { padding-block: var(--sp-400); gap: var(--sp-400); }
+  .e-head { gap: var(--sp-150); }
+  .e-cta { gap: var(--sp-50); }
+  .e-wrap > .e-foot { margin-block-start: calc(var(--sp-200) * -1); }
+}
+@media (max-width: 639px) { .e-cta form, .e-cta .btn { inline-size: 100%; } }
+@media (min-width: 640px) { .e-cta form, .e-cta .btn { inline-size: auto; } }
+@media (min-width: 900px) and (max-width: 1199px) {
+  .labs { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--sp-400); }
+}
+.e-mob .memo { font-size: var(--f-c1); line-height: var(--lh-c1); }
+
+/* kropki osi i numery chwil to odnośniki do kroków, nie akcja główna: obrys zamiast wypełnienia */
+.t-dot, .labs .n { box-sizing: border-box; background: var(--white); color: var(--primary); border: 2px solid var(--primary); }
+@media (hover: hover) and (pointer: fine) { .t-dot:hover { background: var(--cobalt-10); } }
+.skip-link { border-radius: var(--r-100); }
+
+/* koniec pokazu: sekcje oddziela linia i odstęp, bez kart */
+.e-done { gap: var(--sp-400); max-inline-size: 720px; margin-inline: 0; }
+.e-done .e-card { background: none; border: 0; border-radius: 0; padding: var(--sp-300) 0 0; border-block-start: 1px solid var(--line); gap: var(--sp-200); }
+.e-done > .e-h1 + .e-card { border-block-start: 0; padding-block-start: 0; }
+.e-more { gap: var(--sp-300); }
+.e-more li { gap: 0; }
+.e-more li > span, .e-seen li > span:last-child { max-inline-size: 66ch; }
+.e-actions { gap: var(--sp-150) var(--sp-200); }
+@media (max-width: 599px) { .e-actions form, .e-actions .btn { inline-size: 100%; } }
+
+/* panel przewodnika (komputer) */
+.gp-h .row { min-block-size: var(--hit); }
+.gp-end { min-block-size: var(--hit); padding-inline: var(--sp-100); margin-inline-end: calc(var(--sp-100) * -1); font-size: var(--f-c1); line-height: var(--lh-c1); }
+.gp-b > .basis { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+.gp-b > .btn.text { justify-self: start; padding-inline: 0; }
+.gp-f { align-items: center; }
+.gp-f .btn.text { padding-inline: var(--sp-100); }
+.gp-f small { text-align: start; }
+
+/* panel przewodnika (telefon): tytuł kroku stoi w pasku, rozwinięta treść go nie powtarza */
+.gmob .gp-b > h2 { display: none; }
+.gmob summary { grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: var(--sp-150); min-block-size: var(--hit); }
+.gmob summary > span { grid-column: 1; }
+.gmob summary::after { content: ""; grid-column: 2; grid-row: 1 / span 2; inline-size: var(--sp-100); block-size: var(--sp-100); border-inline-end: 2px solid var(--text-2); border-block-start: 2px solid var(--text-2); transform: rotate(-45deg); margin-inline-end: var(--sp-100); }
+.gmob details[open] summary::after { transform: rotate(135deg); }
+.gmob details[open] summary { border-block-end: 1px solid var(--line); }
+/* przyciski przewodnika należą do warstwy pokazu, nie do usługi: ta sama postać przycisku, kolor atramentu zamiast kobaltu,
+   żeby na ekranie kroku była jedna kobaltowa akcja główna – ta, którą juror ma kliknąć w usłudze */
+.gpanel .btn.primary, .gm-bar .btn.primary { background: var(--grey-400); border-color: var(--grey-400); color: var(--white); }
+.gpanel .btn.primary:not(:disabled):active, .gm-bar .btn.primary:not(:disabled):active { background: var(--grey-300); border-color: var(--grey-300); }
+@media (hover: hover) and (pointer: fine) { .gpanel .btn.primary:hover, .gm-bar .btn.primary:hover { background: var(--grey-300); border-color: var(--grey-300); } }
+.gp-h .row b { color: var(--text); }
+.g-dots li.cur { background: var(--grey-400); }
+.g-dots li.done { background: var(--grey-80); }
+@media (min-width: 640px) and (max-width: 899px) { .e-h1 { font-size: var(--f-h2); line-height: var(--lh-h2); } }
+/* 900–1199 px z przewodnikiem: węższy panel i znak bez opisu, żeby treść ekranu miała miejsce */
+@media (min-width: 900px) and (max-width: 1199px) { :root { --panel-w: 320px; } body.tour-on .brand-desc { display: none; } }
+body.tour-on { padding-block-end: 140px; }
+@media (min-width: 900px) { body.tour-on { padding-block-end: 0; } }
 
 /* --- koniec sekcji home-tour (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
 /* . */
