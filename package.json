@@ -4,6 +4,7 @@
     "dev": "bun run --hot src/local.tsx",
     "seed": "bun run src/seed-cli.ts",
     "demo-check": "bun run scripts/demo-check.ts",
+    "pitch": "echo docs/pitch/index.html",
     "deploy": "wrangler deploy",
     "test": "bun test"
   },

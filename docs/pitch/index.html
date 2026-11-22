@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mOcena: prezentacja dla jury</title>
+<link rel="stylesheet" href="../../public/rodzina.css">
+<link rel="stylesheet" href="../../public/style.css">
+<style>
+/* Prezentacja: tylko tokeny z rodzina.css. Slajd ma proporcje 16:9. */
+body { padding: var(--sp-300); }
+.deck { display: grid; gap: var(--sp-300); justify-items: center; }
+.slide {
+  inline-size: 100%; max-inline-size: calc(var(--sp-800) * 18); aspect-ratio: 16 / 9; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-200); box-shadow: var(--elev-1);
+  padding: var(--sp-500) var(--sp-600); display: grid; grid-template-rows: auto 1fr auto; gap: var(--sp-200);
+}
+.slide > header { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-200); color: var(--text-3); font-size: var(--f-c1); line-height: var(--lh-c1); }
+.slide > header b { color: var(--primary); font-weight: var(--w-bold); }
+.slide > footer { color: var(--text-3); font-size: var(--f-c2); line-height: var(--lh-c2); }
+.slide h1 { font-size: var(--f-h1); line-height: var(--lh-h1); font-weight: var(--w-bold); color: var(--cobalt-300); }
+.slide h2 { font-size: var(--f-h2); line-height: var(--lh-h2); font-weight: var(--w-bold); color: var(--cobalt-300); }
+.slide h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w-bold); }
+.slide p, .slide li { font-size: var(--f-p); line-height: var(--lh-p); color: var(--text-2); }
+.slide .lead { font-size: var(--f-h5); line-height: var(--lh-h5); color: var(--text); }
+.body { display: grid; gap: var(--sp-300); align-content: start; min-block-size: 0; }
+.body.two { grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: stretch; }
+.body.three { grid-template-columns: repeat(3, minmax(0, 1fr)); align-content: stretch; }
+.body.step { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: stretch; }
+.stack > * + * { margin-block-start: var(--sp-150); }
+ul.plain { list-style: none; }
+ul.plain li { padding-inline-start: var(--sp-300); position: relative; }
+ul.plain li::before { content: ""; position: absolute; inset-inline-start: 0; inset-block-start: var(--sp-100); inline-size: var(--sp-100); block-size: var(--sp-100); border-radius: var(--r-500); background: var(--primary); }
+ul.no li::before { background: var(--red-100); }
+.provs { display: flex; flex-wrap: wrap; gap: var(--sp-100); }
+.prov { background: var(--cobalt-20); color: var(--cobalt-200); border: 1px solid var(--cobalt-30); border-radius: var(--r-500); padding: var(--sp-50) var(--sp-150); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); }
+.when { color: var(--primary); font-weight: var(--w-bold); font-size: var(--f-c1); line-height: var(--lh-c1); }
+figure.frame { display: grid; grid-template-rows: 1fr auto; gap: var(--sp-100); min-block-size: 0; margin: 0; }
+figure.frame .shot { position: relative; min-block-size: 0; overflow: hidden; background: var(--cobalt-10); border: 2px dashed var(--cobalt-40); border-radius: var(--r-150); display: grid; place-items: center; }
+figure.frame img { inline-size: 100%; block-size: 100%; object-fit: cover; object-position: top; display: block; }
+figure.frame .ph { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: var(--sp-200); color: var(--cobalt-200); font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w-bold); z-index: 0; }
+figure.frame img { position: relative; z-index: 1; }
+figure.frame figcaption { color: var(--text-3); font-size: var(--f-c1); line-height: var(--lh-c1); }
+.big { font-size: var(--f-h1); line-height: var(--lh-h1); font-weight: var(--w-bold); color: var(--primary); overflow-wrap: anywhere; }
+.num { font-size: var(--f-h1); line-height: var(--lh-h1); font-weight: var(--w-bold); color: var(--primary); }
+.slide .card, .slide .rule, .slide .hint { align-self: start; }
+.diagram { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
+.diagram .node { background: var(--cobalt-10); border: 1px solid var(--cobalt-40); border-radius: var(--r-100); padding: var(--sp-100) var(--sp-150); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); color: var(--cobalt-200); }
+.diagram .arrow { color: var(--text-3); }
+
+@media (max-width: 900px) {
+  .slide { aspect-ratio: auto; padding: var(--sp-300); }
+  .body.two, .body.three, .body.step { grid-template-columns: minmax(0, 1fr); }
+  figure.frame .shot { min-block-size: calc(var(--sp-800) * 3); }
+}
+
+/* Druk: A4 poziomo, każdy slajd na osobnej stronie. */
+@page { size: A4 landscape; margin: 0; }
+@media print {
+  html, body { background: var(--white); }
+  body { padding: 0; }
+  .deck { display: block; }
+  .slide {
+    inline-size: 100%; max-inline-size: none; block-size: 100vh; aspect-ratio: auto; border: 0; border-radius: 0; box-shadow: none;
+    break-after: page; break-inside: avoid; padding: var(--sp-400) var(--sp-600);
+  }
+  .slide:last-child { break-after: auto; }
+}
+</style>
+</head>
+<body>
+<main class="deck">
+
+<!-- 1. Tytuł i teza -->
+<section class="slide" id="s1">
+  <header><b>mOcena</b><span>HackNation 2026, zadanie KPRM</span></header>
+  <div class="body" style="align-content:center">
+    <h1>Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie.</h1>
+    <p class="lead">mOcena to przewodnik po procesie oceny okresowej i notatki o faktach zbierane przez cały cykl. Asystent pilnuje terminów, przepisów i pamięci o faktach. Ocenę stawia człowiek.</p>
+    <div class="provs"><span class="prov">Prototyp cyfrowego asystenta ocen okresowych w służbie cywilnej</span><span class="prov">Bez modelu językowego</span><span class="prov">Dane tylko u widza</span></div>
+  </div>
+  <footer>Dane pokazowe są fikcyjne.</footer>
+</section>
+
+<!-- 2. Problem -->
+<section class="slide" id="s2">
+  <header><b>2 · Problem</b><span>mOcena</span></header>
+  <div class="body two">
+    <div class="stack">
+      <h2>Ocena co 24 miesiące, na papierze, z pamięci</h2>
+      <ul class="plain">
+        <li>Przełożony ocenia podwładnego raz na 24 miesiące, na arkuszu A, B albo C.</li>
+        <li>Między rozmową rozpoczynającą a oceniającą nic się nie zapisuje, więc ocena powstaje z pamięci o ostatnich tygodniach.</li>
+        <li>Uwagę zabierają terminy i poprawność formularza: wybór kryteriów, oczekiwania, informacja zwrotna, wnioski rozwojowe.</li>
+      </ul>
+    </div>
+    <div class="stack">
+      <p class="num">123 tys.</p>
+      <p class="lead">osób ocenianych w ok. 1743 urzędach.</p>
+      <p>Błędny termin albo brak potwierdzenia zostaje na biurku konkretnej osoby, bez śladu.</p>
+      <div class="provs"><span class="prov">art. 81 ust. 4 ustawy: okres oceny 24 miesiące</span></div>
+    </div>
+  </div>
+  <footer>Źródło: wymagania produktu (PRD) i decyzje autora.</footer>
+</section>
+
+<!-- 3. Dla kogo -->
+<section class="slide" id="s3">
+  <header><b>3 · Dla kogo</b><span>mOcena</span></header>
+  <div class="body">
+    <h2>Trzy role, trzy konta, jedna ocena</h2>
+    <div class="body three">
+      <div class="card"><h3>Oceniający</h3><p>Marek Zieliński, naczelnik wydziału. Ocenia raz na dwa lata, obok bieżącej pracy. Potrzebuje notatki w pół minuty z telefonu i faktów ułożonych przy kryteriach przed rozmową.</p></div>
+      <div class="card"><h3>Oceniany</h3><p>Piotr Wójcik, starszy specjalista. Na własnym koncie, na telefonie, potwierdza kryteria i zapoznanie z oceną oraz czyta informację zwrotną.</p></div>
+      <div class="card"><h3>Kadry</h3><p>Joanna Mazur. Wpisuje daty nieobecności zamiast interpretować reguły i widzi stan wszystkich ocen na jednym ekranie.</p></div>
+    </div>
+  </div>
+  <footer>Osoby i zdarzenia pokazowe są fikcyjne.</footer>
+</section>
+
+<!-- 4. Zasada -->
+<section class="slide" id="s4">
+  <header><b>4 · Zasada</b><span>mOcena</span></header>
+  <div class="body two" style="align-content:center">
+    <div class="stack">
+      <h2>Asystent, nie autor oceny</h2>
+      <p class="lead">Punkty stawia człowiek. Treść arkusza pochodzi od przełożonego, a uzasadnienie składa się z jego notatek.</p>
+      <p>Trudności z oceną dotyczą wyboru kryteriów, rozmów, uzasadnienia i terminów. Żadna nie polega na tym, że brakuje tekstu oceny.</p>
+    </div>
+    <div class="stack">
+      <h3>Asystent robi</h3>
+      <ul class="plain"><li>liczy terminy i średnią według przepisu</li><li>układa notatki przy kryteriach z całych 24 miesięcy</li><li>przypomina o rozmowie, informacji zwrotnej i stopniu służbowym</li><li>pokazuje przepis przy każdej regule</li></ul>
+      <h3>Człowiek robi</h3>
+      <ul class="plain"><li>pisze notatki i zaznacza zmianę zadań</li><li>wybiera kryteria i stawia oceny cząstkowe</li><li>klika potwierdzenie na własnym koncie</li></ul>
+    </div>
+  </div>
+  <footer>Nic nie zapisuje się bez kliknięcia człowieka.</footer>
+</section>
+
+<!-- 5. Krok 1 -->
+<section class="slide" id="s5">
+  <header><b>5 · Krok 1 z 5</b><span>grudzień 2024</span></header>
+  <div class="body step">
+    <div class="stack">
+      <p class="when">Marek zaczyna cykl Piotra, Piotr potwierdza część I</p>
+      <h2>Arkusz i kryteria dobiera przepis</h2>
+      <ul class="plain">
+        <li>System dobiera arkusz C i podpowiada kryteria dodatkowe, każde ze zdaniem „dlaczego”.</li>
+        <li>Marek wybiera 2 kryteria i wpisuje oczekiwanie, a potem otwiera kartę rozmowy rozpoczynającej.</li>
+        <li>Przy potwierdzeniu Piotra miejscowość, data i nazwisko wpisują się same, a kryteria się blokują.</li>
+      </ul>
+      <div class="provs"><span class="prov">§ 3 ust. 4: arkusz C</span><span class="prov">§ 5 ust. 1: cztery tematy rozmowy</span><span class="prov">§ 7 pkt 1: 30 dni</span></div>
+    </div>
+    <figure class="frame">
+      <div class="shot"><span class="ph">Ekran: część I, kryteria i potwierdzenie</span><img src="shots/step1-start.png" alt="Ekran części I z wybranymi kryteriami" onerror="this.hidden=true"></div>
+      <figcaption>Ekran „Część I”: kryteria obowiązkowe i dodatkowe z uzasadnieniem podpowiedzi.</figcaption>
+    </figure>
+  </div>
+  <footer>Dane pokazowe: Piotr Wójcik, poprzednia ocena 27.11.2024.</footer>
+</section>
+
+<!-- 6. Krok 2 -->
+<section class="slide" id="s6">
+  <header><b>6 · Krok 2 z 5</b><span>marzec 2026</span></header>
+  <div class="body step">
+    <div class="stack">
+      <p class="when">Marek zapisuje notatkę z telefonu</p>
+      <h2>Partner pyta, nie ocenia</h2>
+      <ul class="plain">
+        <li>Notatka o przejęciu kolejki wniosków, pole „Zmiana zadań pracownika” wstępnie zaznaczone z listy słów.</li>
+        <li>Partner pyta: „To stała zmiana zadań?”. Po „tak” pokazuje kartę rozmowy i formę rozwoju z katalogu.</li>
+        <li>Druga notatka bez zaznaczenia: nic się nie dzieje. Brak punktów i etykiet.</li>
+      </ul>
+      <div class="provs"><span class="prov">Pole zaznacza i odznacza człowiek</span><span class="prov">Katalog form rozwoju: ustawienie urzędu</span></div>
+    </div>
+    <figure class="frame">
+      <div class="shot"><span class="ph">Ekran: pytanie partnera po notatce</span><img src="shots/step2-question.png" alt="Ekran pytania partnera po notatce" onerror="this.hidden=true"></div>
+      <figcaption>Ekran „To stała zmiana zadań?” na telefonie, po zapisaniu notatki.</figcaption>
+    </figure>
+  </div>
+  <footer>System nie rozumie treści notatki: pole wypełnia przełożony, lista słów tylko je podpowiada.</footer>
+</section>
+
+<!-- 7. Krok 3 -->
+<section class="slide" id="s7">
+  <header><b>7 · Krok 3 z 5</b><span>listopad 2026</span></header>
+  <div class="body step">
+    <div class="stack">
+      <p class="when">Joanna wpisuje dwie nieobecności Piotra</p>
+      <h2>Termin przesuwa reguła, kadry tylko wpisują daty</h2>
+      <ul class="plain">
+        <li>05.10–16.10.2026 i 19.10–06.11.2026, obie usprawiedliwione. Dzieli je tylko weekend, więc liczą się jako jedna.</li>
+        <li>Oś czasu pokazuje jedną ciągłą nieobecność, próg „dłużej niż miesiąc”, nowy termin oceny, regułę i wersję pliku reguł.</li>
+      </ul>
+      <div class="provs"><span class="prov">art. 81 ust. 7 ustawy</span><span class="prov">art. 110–115 Kodeksu cywilnego</span></div>
+    </div>
+    <figure class="frame">
+      <div class="shot"><span class="ph">Ekran: oś czasu cyklu Piotra</span><img src="shots/step3-timeline.png" alt="Oś czasu z połączoną nieobecnością" onerror="this.hidden=true"></div>
+      <figcaption>Ekran „Oś czasu”: nieobecność, reguła i nowy termin na jednej osi.</figcaption>
+    </figure>
+  </div>
+  <footer>Ciszy w środku osi nikt nie zamienia na ocenę.</footer>
+</section>
+
+<!-- 8. Krok 4 -->
+<section class="slide" id="s8">
+  <header><b>8 · Krok 4 z 5</b><span>21.11.2026</span></header>
+  <div class="body step">
+    <div class="stack">
+      <p class="when">Marek przed rozmową oceniającą i przy formularzu</p>
+      <h2>Fakty z dwóch lat przy kryteriach</h2>
+      <ul class="plain">
+        <li>Ekran „Przed rozmową z Piotrem”: notatki z 24 miesięcy, podział na sprzed zmiany zadań i po niej, kryteria bez notatek.</li>
+        <li>Ocena cząstkowa „1” daje wynik negatywny mimo średniej powyżej 4. Uzasadnienie staje się obowiązkowe i składa się z notatek.</li>
+        <li>Zatwierdzenie bez wniosków do programu rozwoju jest zablokowane.</li>
+      </ul>
+      <div class="provs"><span class="prov">§ 10: tematy rozmowy oceniającej</span><span class="prov">§ 11 ust. 1 pkt 3–4</span><span class="prov">§ 11 ust. 3</span><span class="prov">art. 81 ust. 5 ustawy</span></div>
+    </div>
+    <figure class="frame">
+      <div class="shot"><span class="ph">Ekran: formularz oceny z regułą wyniku</span><img src="shots/step4-assessment.png" alt="Formularz oceny z wynikiem negatywnym" onerror="this.hidden=true"></div>
+      <figcaption>Ekran „Ocena”: ocena „1” postawiona na pokaz, żeby było widać regułę.</figcaption>
+    </figure>
+  </div>
+  <footer>Ocenę „1” stawia człowiek przy „Rzetelności”. System pokazuje tylko, co z niej wynika.</footer>
+</section>
+
+<!-- 9. Krok 5 -->
+<section class="slide" id="s9">
+  <header><b>9 · Krok 5 z 5</b><span>22.11.2026</span></header>
+  <div class="body step">
+    <div class="stack">
+      <p class="when">Piotr potwierdza zapoznanie, potem ekran kadr</p>
+      <h2>Zegar sprzeciwu i obowiązek, który nie ucieka</h2>
+      <ul class="plain">
+        <li>Po potwierdzeniu zaczyna biec 7 dni na sprzeciw do dyrektora generalnego urzędu; tu wypada 30.11.2026.</li>
+        <li>Ekran kadr pokazuje obowiązkowy stopień Tomasza: dwie oceny od ostatniego stopnia i 30 dni.</li>
+        <li>Stany uproszczone są nazwane, a przycisk „Drukuj / pobierz PDF” daje arkusz w kolejności wzoru.</li>
+      </ul>
+      <div class="provs"><span class="prov">art. 83 ust. 1 ustawy: 7 dni</span><span class="prov">art. 89 ust. 2 ustawy: 30 dni</span><span class="prov">§ 12: zapoznanie z oceną</span></div>
+    </div>
+    <figure class="frame">
+      <div class="shot"><span class="ph">Ekran: kadry, stan wszystkich ocen</span><img src="shots/step5-hr.png" alt="Ekran kadr ze stanem ocen" onerror="this.hidden=true"></div>
+      <figcaption>Ekran „Kadry”: stany cykli, stopień obowiązkowy i wydruk.</figcaption>
+    </figure>
+  </div>
+  <footer>Kliknięcie to potwierdzenie w systemie. Moc prawną daje dziś wydruk z własnoręcznym potwierdzeniem; urząd może podłączyć własny mechanizm.</footer>
+</section>
+
+<!-- 10. Trzy głosy -->
+<section class="slide" id="s10">
+  <header><b>10 · Trzy głosy</b><span>mOcena</span></header>
+  <div class="body">
+    <h2>Zawsze widać, kto mówi: człowiek, reguła, podpowiedź</h2>
+    <div class="body three">
+      <div class="card"><h3>Człowiek</h3><p>Biała karta z sygnaturą autora. Notatka, ocena i potwierdzenie pochodzą od osoby, nigdy od systemu.</p><p class="sign">Marek Zieliński, 21.11.2026</p></div>
+      <div class="rule"><h3>Reguła</h3><p>Niebieska powierzchnia z ciągłą obwódką i pigułką przepisu. Termin, wynik i próg zawsze ze wskazaniem, skąd wynikają.</p><p class="sign">§ 11 ust. 1 pkt 4</p></div>
+      <div class="hint"><h3>Podpowiedź</h3><p>Obwódka przerywana i widoczne odrzucenie. Można ją zignorować jednym kliknięciem i nic się wtedy nie zapisuje.</p></div>
+    </div>
+  </div>
+  <footer>Znak „§” stoi tylko przy paragrafie rozporządzenia, przy artykule ustawy go nie ma.</footer>
+</section>
+
+<!-- 11. Pod spodem -->
+<section class="slide" id="s11">
+  <header><b>11 · Pod spodem</b><span>mOcena</span></header>
+  <div class="body two">
+    <div class="stack">
+      <h2>Przepisy w pliku z wersją, silnik, testy</h2>
+      <ul class="plain">
+        <li><b>Reguły:</b> jeden plik JSON z wersją (2016-470/1) i datą obowiązywania. Każda ocena zachowuje wersję reguł, w której powstała.</li>
+        <li><b>Silnik:</b> czyste funkcje na datach i liczbach: terminy, nieobecności, arkusze, średnia i wynik.</li>
+        <li><b>Testy:</b> 215 testów w zestawie <code>bun test</code>, w tym silnika i tras.</li>
+        <li><b>Dane tylko u widza:</b> baza w pliku, w demo własna dla każdego widza. Nic nie wychodzi poza komputer.</li>
+      </ul>
+    </div>
+    <div class="stack">
+      <h3>Wymienne miejsce na model uruchomiony w urzędzie</h3>
+      <p>Prototyp działa na regułach. Podpowiedzi przechodzą przez jeden adapter, który urząd może zastąpić modelem uruchomionym u siebie. Administrator widzi ekran „Skąd biorą się podpowiedzi”.</p>
+      <div class="diagram"><span class="node">Notatka</span><span class="arrow">→</span><span class="node">Adapter podpowiedzi</span><span class="arrow">→</span><span class="node">Reguły (dziś)</span><span class="arrow">albo</span><span class="node">Model urzędu (później)</span></div>
+      <p>Model nigdy nie proponuje punktów, nie pisze o pracowniku, nie porównuje pracowników.</p>
+    </div>
+  </div>
+  <footer>Bun, Hono, SQLite w jednym pliku, bez płatnych licencji.</footer>
+</section>
+
+<!-- 12. Czego nie robimy -->
+<section class="slide" id="s12">
+  <header><b>12 · Granice</b><span>mOcena</span></header>
+  <div class="body two">
+    <div class="stack">
+      <h2>Czego świadomie nie robimy</h2>
+      <ul class="plain no">
+        <li>Nie piszemy oceny ani zdań o pracowniku.</li>
+        <li>Nie proponujemy punktów i nie porównujemy pracowników.</li>
+        <li>Nie ma etykiet ani wskaźników przy nazwisku.</li>
+        <li>Nie używamy modelu językowego w prototypie.</li>
+      </ul>
+    </div>
+    <div class="stack">
+      <h3>Dlaczego</h3>
+      <p>Model piszący o człowieku może dopisać fakt, którego nie było. Ocena pracownika to w AI Act obszar wysokiego ryzyka, a dane wysyłane poza urząd wymagają anonimizacji.</p>
+      <p>Etykieta przy nazwisku to profilowanie pracownika. Serię zwolnień lekarskich traktujemy jak dane o zdrowiu, więc nie ma jej analizy.</p>
+    </div>
+  </div>
+  <footer>Sygnały pochodzą tylko z wpisów przełożonego.</footer>
+</section>
+
+<!-- 13. Co dalej -->
+<section class="slide" id="s13">
+  <header><b>13 · Co dalej</b><span>wdrożenie</span></header>
+  <div class="body two">
+    <div class="stack">
+      <h2>Poza prototypem, w drodze do wdrożenia</h2>
+      <ul class="plain">
+        <li>Integracja z systemem kadrowym zamiast danych wgranych z góry.</li>
+        <li>Wysyłka e-maili i integracja z elektronicznym systemem zarządzania dokumentacją.</li>
+        <li>Potwierdzenie z mocą prawną: urząd podpina własny mechanizm w miejscu kliknięcia.</li>
+        <li>Pełny obieg sprzeciwu i decyzji o stopniu służbowym.</li>
+      </ul>
+    </div>
+    <div class="stack">
+      <p class="num">15 / 12 / 3</p>
+      <p class="lead">z 30 czynności z listy organizatora: 15 działa, 12 jest uproszczonych, 3 są poza prototypem.</p>
+      <p>Poza prototypem: edycja danych pracownika, zastępstwa i usuwanie danych.</p>
+      <p>Model uruchomiony w urzędzie włącza się przez adapter, bez zmian w ekranach.</p>
+    </div>
+  </div>
+  <footer>Źródło: decyzje autora i PRD, sekcja „Non-Goals”.</footer>
+</section>
+
+<!-- 14. Zobacz na żywo -->
+<section class="slide" id="s14">
+  <header><b>14 · Zobacz na żywo</b><span>mOcena</span></header>
+  <div class="body" style="align-content:center">
+    <h2>Kliknij „Rozpocznij pokaz”: 5 kroków, ok. 3 minut</h2>
+    <p class="big">https://mocena.pietkiewicz-mikolaj.workers.dev</p>
+    <p class="lead">Każdy widz ma własne dane pokazowe. Kod i dokumentacja są w repozytorium projektu.</p>
+  </div>
+  <footer>Dziękujemy. Prezentację zapiszesz jako PDF z przeglądarki: Drukuj → Zapisz jako PDF, A4 poziomo.</footer>
+</section>
+
+</main>
+</body>
+</html>
