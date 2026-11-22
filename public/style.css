@@ -1170,6 +1170,7 @@ input.area, select.area, .area.line { block-size: var(--hit); min-block-size: va
 .tok:has([aria-invalid="true"]) { border-color: var(--red-100); box-shadow: inset 0 0 0 1px var(--red-100); }
 .hero-field:has(textarea[aria-invalid="true"]) { border: 2px solid var(--red-100); padding: calc(var(--sp-300) - 1px); }
 .hero-field .field-err { margin-block-start: var(--sp-100); }
+.p1-errs { display: grid; gap: var(--sp-50); margin-block-end: var(--sp-200); border-inline-start: var(--sp-50) solid var(--red-100); padding-inline-start: var(--sp-200); }
 
 /* Formularz notatki i informacji zwrotnej: pola w jednym rytmie, przycisk w przepływie na komputerze, przyklejony tylko na telefonie */
 .nf-date .area { block-size: var(--hit); min-block-size: var(--hit); padding-block: 0; max-inline-size: var(--side-w); }

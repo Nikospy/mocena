@@ -108,7 +108,7 @@ function sheetOf(cycle: Cycle) {
   return sheetForPosition(kind);
 }
 
-function renderPart1(c: Context, cx: Ctx, extra: { errors?: string[]; input?: Part1Input; status?: 200 | 422 | 409 } = {}) {
+function renderPart1(c: Context, cx: Ctx, extra: { errors?: string[]; input?: Part1Input; status?: 200 | 422 | 409; saved?: boolean } = {}) {
   const { cycle, person } = cx;
   const status = part1Status(cycle.id);
   const locked = isPart1Locked(cycle.id);
@@ -148,6 +148,7 @@ function renderPart1(c: Context, cx: Ctx, extra: { errors?: string[]; input?: Pa
       confirmation={confirmed ? { name: confirmed.payload.appraiseeName, place: confirmed.payload.place, date: confirmed.date } : undefined}
       links={cycleLinks(cycle, person)}
       errors={extra.errors}
+      saved={extra.saved}
       waiting={
         actsAsAppraiser(cycle.appraiser_id, person.id) && status.state === "submitted" && status.submittedOn
           ? { submittedOn: status.submittedOn, appraiseeGenitive: nameForm(appraisee, "gen") ?? appraisee }
@@ -167,7 +168,7 @@ app.get("/cycles/:id", (c) => {
 app.get("/cycles/:id/part1", (c) => {
   const g = guard(c, { hrRead: true });
   if (g instanceof Response) return g;
-  return renderPart1(c, g);
+  return renderPart1(c, g, { saved: c.req.query("saved") !== undefined });
 });
 
 const LOCKED = "Część I jest już przekazana. Kryteriów i terminu nie można zmienić.";
@@ -180,7 +181,7 @@ async function write(c: Context, submit: boolean) {
   const input = readInput(await c.req.parseBody({ all: true }));
   const res = (submit ? submitPart1 : saveCriteria)(g.cycle.id, g.person.id, input);
   if (!res.ok) return renderPart1(c, g, { errors: res.errors, input, status: 422 });
-  return c.redirect(`/cycles/${g.cycle.id}/part1`, 303);
+  return c.redirect(`/cycles/${g.cycle.id}/part1${submit ? "" : "?saved=1"}`, 303);
 }
 
 app.post("/cycles/:id/part1/criteria", (c) => write(c, false));

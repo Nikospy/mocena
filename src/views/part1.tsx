@@ -5,7 +5,7 @@ import type { Person } from "../people";
 import type { Card } from "../content";
 import { officeSettings } from "../office-settings";
 import { criterion } from "../engine/scoring";
-import { ConfirmationBlock, LegalBasis, PageHeader } from "./components";
+import { ConfirmationBlock, ErrorSummary, LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
 export type Part1ViewProps = {
@@ -29,6 +29,8 @@ export type Part1ViewProps = {
   links: CycleLink[];
   errors?: string[];
   notice?: string;
+  /** Sukces po zapisie kryteriów (bez przekazania). */
+  saved?: boolean;
   /** Oceniający widzi, że przekazana część I czeka na ocenianego: data przekazania i osoba w dopełniaczu. */
   waiting?: { submittedOn: string; appraiseeGenitive: string };
 };
@@ -130,11 +132,14 @@ export function Part1View(p: Part1ViewProps) {
 
       {p.notice ? <p class="st info">{p.notice}</p> : null}
       {p.waiting ? <p class="st info">Przekazano {formatDate(p.waiting.submittedOn)}. Czeka na potwierdzenie {p.waiting.appraiseeGenitive}.</p> : null}
-      {p.errors?.length ? (
-        <div class="st bad" role="alert">
-          <ul>{p.errors.map((e) => <li>{e}</li>)}</ul>
-        </div>
+      {p.saved && !p.errors?.length ? (
+        <div class="st ok" role="status"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg><div><b>Zapisano szkic części I</b><small>Ocenianemu przekażesz ją przyciskiem „Potwierdzam rozmowę i przekazuję część I”.</small></div></div>
       ) : null}
+      <ErrorSummary
+        errors={Object.fromEntries((p.errors ?? []).map((m, i) => [edit ? `e${i}` : `_${i}`, m]))}
+        title={edit ? "Popraw wybór kryteriów dodatkowych" : "Nie zapisano"}
+        fields={Object.fromEntries((p.errors ?? []).map((_, i) => [`e${i}`, "p1-extra-h"]))}
+      />
 
       {edit ? (
         <form class="p1-form" method="post" action={`/cycles/${p.cycleId}/part1/criteria`}>
@@ -145,7 +150,8 @@ export function Part1View(p: Part1ViewProps) {
                 {p.mandatory.map((m) => <CriterionRow id={m.id} kind="obowiązkowe" expectation={exp(m.id)} editable />)}
               </section>
               <section class="p1-extra">
-                <div class="list-h"><h2>Kryteria dodatkowe (do 3) <LegalBasis basis="§ 5 ust. 2" /></h2></div>
+                <div class="list-h"><h2 id="p1-extra-h" tabindex={-1}>Kryteria dodatkowe (do 3) <LegalBasis basis="§ 5 ust. 2" /></h2></div>
+                {p.errors?.length ? <div class="p1-errs">{p.errors.map((m) => <p class="field-err"><span class="vh">Błąd: </span>{m}</p>)}</div> : null}
                 {p.suggestions.length ? (
                   <div class="hint">
                     <p class="voice hint-v">Podpowiedź · ustawienie urzędu</p>
