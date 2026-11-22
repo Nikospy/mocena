@@ -71,7 +71,7 @@ export const canRequestChange = (viewer: Person, cycle: Cycle): boolean =>
   viewer.id === cycle.person_id && deadlineChangeBlocked(cycle) === null && pendingRequest(cycle.id) === null;
 
 export function newDeadlineError(date: string): string | null {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date))) return "Podaj poprawną datę nowego terminu";
-  if (date <= today()) return "Nowy termin musi być późniejszy niż dzisiejsza data";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date))) return "Wybierz nowy termin z kalendarza.";
+  if (date <= today()) return "Wybierz nowy termin późniejszy niż dzisiejsza data.";
   return null;
 }

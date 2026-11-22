@@ -62,11 +62,11 @@ app.post("/cycles/:id/deadline-change", async (c) => {
   const pending = pendingRequest(cycle.id);
   const errors: ChangeFormErrors = {};
   const kase = deadlineCase(Number(values.case));
-  if (!kase) errors.case = "Wybierz przypadek z art. 81 ust. 8 ustawy";
-  else if (kase.n === 4 && !pending) errors.case = "Przypadek z pkt 4 wymaga wniosku ocenianego";
+  if (!kase) errors.case = "Wybierz przypadek z art. 81 ust. 8 ustawy.";
+  else if (kase.n === 4 && !pending) errors.case = "Przypadek z pkt 4 wymaga wniosku ocenianego. Wybierz inny przypadek.";
   const dateErr = newDeadlineError(values.newDate);
   if (dateErr) errors.newDate = dateErr;
-  if (!values.reason) errors.reason = "Podaj uzasadnienie zmiany terminu";
+  if (!values.reason) errors.reason = "Podaj uzasadnienie zmiany terminu.";
   if (Object.keys(errors).length) return renderChange(c, g, values, errors, 422);
 
   const id = recordEvent("deadline_changed", cycle.id, viewer.id, {
@@ -86,7 +86,7 @@ app.post("/cycles/:id/deadline-change/reject", async (c) => {
   const pending = pendingRequest(cycle.id);
   if (!pending) return c.text("Nie ma wniosku do rozpatrzenia.", 409);
   const reason = str((await c.req.parseBody()).reason);
-  if (!reason) return renderChange(c, g, { case: "4", newDate: "", reason: "" }, { reason: "Podaj powód odrzucenia wniosku" }, 422);
+  if (!reason) return renderChange(c, g, { case: "4", newDate: "", reason: "" }, { "reject-reason": "Podaj powód odrzucenia wniosku." }, 422);
   recordEvent("deadline_change_rejected", cycle.id, viewer.id, { requestId: pending.id, reason });
   return c.redirect("/", 303);
 });
@@ -123,7 +123,7 @@ app.post("/cycles/:id/deadline-change/request", async (c) => {
   const body = await c.req.parseBody();
   const values = { reason: str(body.reason), requestedDate: str(body.requestedDate) };
   const errors: { reason?: string; requestedDate?: string } = {};
-  if (!values.reason) errors.reason = "Podaj uzasadnienie wniosku";
+  if (!values.reason) errors.reason = "Podaj uzasadnienie wniosku.";
   if (values.requestedDate) {
     const e = newDeadlineError(values.requestedDate);
     if (e) errors.requestedDate = e;
