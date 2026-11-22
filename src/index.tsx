@@ -198,10 +198,7 @@ app.get("/", (c) => {
                   {t.detail ? <p class="task-detail">{t.detail}</p> : null}
                 </div>
                 <div class="task-side">
-                  <span class={t.action ? "task-go" : "task-go bare"} aria-hidden="true">
-                    {t.action ?? null}
-                    {CHEVRON_R}
-                  </span>
+                  <span class="task-go bare" aria-hidden="true">{CHEVRON_R}</span>
                 </div>
               </li>
             ))}
