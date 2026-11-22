@@ -58,6 +58,9 @@ registerHomeTasks((person) => {
         person: personById(cycle.person_id)?.name,
         due,
         basis,
+        detail: negative && started.previousAcknowledgedOn
+          ? `Termin ponownej oceny: ${formatDate(effectiveDeadline(cycle.id).date)} (${rules.deadlines.reassessmentAfterNegativeMonths.basis}).`
+          : undefined,
         action: "Wyznacz kryteria",
         href: `/cycles/${cycle.id}/part1`,
       });

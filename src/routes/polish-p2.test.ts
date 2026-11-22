@@ -61,7 +61,10 @@ describe("2.7 sortowanie /hr", () => {
     const h = await html(app, "joanna", "/hr");
     const at = (name: string) => h.indexOf(`<th scope="row">${name}</th>`);
     const open = ["Anna Kwiatkowska", "Ewa Nowak", "Katarzyna Lewandowska"].map(at);
-    const closed = ["Piotr Wójcik", "Tomasz Kamiński"].map(at);
+    const closed = [
+      h.lastIndexOf('<th scope="row">Piotr Wójcik</th>'),
+      at("Tomasz Kamiński"),
+    ];
     expect([...open, ...closed].every((i) => i > 0)).toBe(true);
     expect(Math.max(...open)).toBeLessThan(Math.min(...closed));
   });

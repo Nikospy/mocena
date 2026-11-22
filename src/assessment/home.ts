@@ -1,4 +1,4 @@
-import { cycleDeadlineDetails, openCycle } from "../cycles";
+import { cycleDeadlineDetails, openCycle, previousCycleOf } from "../cycles";
 import { registerCycleLinks } from "../cycle-links";
 import { getDb } from "../db";
 import { rules } from "../engine/rules";
@@ -51,8 +51,10 @@ registerHomeTasks((person) => {
   // Własny, najnowszy cykl: wynik po zapoznaniu albo najbliższy termin, żeby strona nie była pusta.
   const mine = visibleCyclesOf(person.id)[0];
   if (mine) {
-    const st = assessmentState(mine.id);
-    const href = `/cycles/${mine.id}/assessment`;
+    const latest = assessmentState(mine.id);
+    const previous = !latest.snapshot ? previousCycleOf(mine.id) : null;
+    const st = previous ? assessmentState(previous.id) : latest;
+    const href = `/cycles/${previous?.id ?? mine.id}/assessment`;
     if ((st.stage === "acknowledged" || st.stage === "fiction") && st.snapshot && st.objectionDeadline) {
       const { verdict, level } = verdictText(st.snapshot.result);
       const to = st.snapshot.sheet === "A" ? "kierownika urzędu" : "dyrektora generalnego urzędu";

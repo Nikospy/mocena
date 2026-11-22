@@ -3,7 +3,7 @@ import { Hono, type Context } from "hono";
 import "../assessment/home";
 import { buildAssessmentSnapshot } from "../assessment/snapshot";
 import { assessmentState, currentGradeNumber, type AssessmentDraft } from "../assessment/state";
-import { cycleById, type Cycle } from "../cycles";
+import { cycleById, startNextCycle, type Cycle } from "../cycles";
 import { assessmentSlots } from "../notes/assessment-slots";
 import { cycleCriteria } from "../cycles/part1";
 import { getDb } from "../db";
@@ -210,13 +210,15 @@ app.post("/cycles/:id/assessment/acknowledge", (c) => {
   if (!isCtx(g)) return g;
   if (!isAppraisee(g)) return c.text("Tylko oceniany może potwierdzić zapoznanie z oceną.", 403);
   const ok = getDb().transaction(() => {
-    if (assessmentState(g.cycle.id).stage !== "approved") return false;
+    const state = assessmentState(g.cycle.id);
+    if (state.stage !== "approved" || !state.approvedOn || !state.snapshot) return false;
     recordEvent("assessment_acknowledged", g.cycle.id, g.person.id, {
       place: setting("office_city") ?? "",
       date: today(),
       name: g.person.name,
       objectionDeadline: objectionDeadline(today()),
     });
+    startNextCycle(g.cycle, g.person.id, state.approvedOn, today(), state.snapshot.result.outcome);
     return true;
   })();
   if (!ok) return render(c, g, { status: 409, errors: ["Ocena nie czeka na potwierdzenie zapoznania."] });
@@ -290,13 +292,15 @@ app.post("/cycles/:id/assessment/fiction", async (c) => {
   if (!METHODS.includes(values.deliveryMethod) || !dateOk) errors.push("Wpisz, jak i kiedy doręczono kopię arkusza");
   if (errors.length) return fictionScreen(c, g, { status: 422, errors, values });
   const ok = getDb().transaction(() => {
-    if (assessmentState(g.cycle.id).stage !== "approved") return false;
+    const state = assessmentState(g.cycle.id);
+    if (state.stage !== "approved" || !state.approvedOn || !state.snapshot) return false;
     recordEvent("acknowledgement_fiction", g.cycle.id, g.person.id, {
       reason: values.reason,
       deliveryMethod: values.deliveryMethod,
       deliveredOn: values.deliveredOn,
       objectionDeadline: objectionDeadline(today()),
     });
+    startNextCycle(g.cycle, g.person.id, state.approvedOn, values.deliveredOn, state.snapshot.result.outcome);
     return true;
   })();
   if (!ok) return render(c, g, { status: 409, errors: ["Ocena nie czeka już na potwierdzenie zapoznania."] });

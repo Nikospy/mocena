@@ -1,5 +1,5 @@
 import { getDb } from "./db";
-import { visibleEvents } from "./events";
+import { recordEvent, visibleEvents } from "./events";
 import { addDays, toWorkingDay } from "./engine/deadlines";
 import { assessmentDeadline, type CycleKind } from "./engine/absences";
 import { rules, rulesVersion } from "./engine/rules";
@@ -73,4 +73,25 @@ export function openCycle(personId: string): Cycle | null {
     return c;
   }
   return null;
+}
+
+/** Wywoływane w tej samej transakcji co zamknięcie poprzedniego cyklu. */
+export function startNextCycle(previous: Cycle, actorId: string, assessedOn: string, acquaintedOn: string, outcome: "positive" | "negative"): void {
+  const id = crypto.randomUUID();
+  const periodStart = outcome === "negative" ? acquaintedOn : assessedOn;
+  getDb().query("INSERT INTO cycles (id, person_id, appraiser_id, period_start) VALUES (?, ?, ?, ?)")
+    .run(id, previous.person_id, previous.appraiser_id, periodStart);
+  recordEvent("cycle_started", id, actorId, {
+    reason: "previous_assessment",
+    periodStart,
+    previousAssessmentOn: assessedOn,
+    previousAcknowledgedOn: acquaintedOn,
+    previousOutcome: outcome,
+    previousCycleId: previous.id,
+  });
+}
+
+export function previousCycleOf(cycleId: string): Cycle | null {
+  const id = visibleEvents(cycleId).find((event) => event.type === "cycle_started")?.payload.previousCycleId;
+  return typeof id === "string" ? cycleById(id) : null;
 }

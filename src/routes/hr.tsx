@@ -8,7 +8,7 @@ import { fullNameForm } from "../hr-partner/partner";
 import { mandatoryGradeOf } from "../hr/history";
 import { latestCycles } from "../hr/latest-cycles";
 import { officeStats } from "../hr/stats";
-import { cycleById } from "../cycles";
+import { cycleById, previousCycleOf } from "../cycles";
 import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
 import { HrOverviewView, type StateRow } from "../views/hr-overview";
@@ -17,7 +17,11 @@ const app = new Hono();
 
 const CLOSED_STEPS = new Set<CycleStep>(["acknowledged", "fiction", "objection_resolved"]);
 export function overviewData(viewer: Person) {
-  const rows: StateRow[] = latestCycles().map((c) => ({
+  const cycles = latestCycles().flatMap((cycle) => {
+    const previous = previousCycleOf(cycle.id);
+    return previous ? [cycle, previous] : [cycle];
+  });
+  const rows: StateRow[] = cycles.map((c) => ({
     cycleId: c.id,
     personName: personById(c.person_id)?.name ?? c.person_id,
     appraiserName: personById(c.appraiser_id)?.name ?? c.appraiser_id,
