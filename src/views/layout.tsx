@@ -8,6 +8,11 @@ const ROLES: Record<Person["role"], string> = {
   admin: "administrator",
 };
 
+export function formatDate(iso: string): string {
+  const [y, m, d] = iso.split("-");
+  return `${d}.${m}.${y}`;
+}
+
 const MONTHS = [
   "stycznia",
   "lutego",

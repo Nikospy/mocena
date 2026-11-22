@@ -61,9 +61,10 @@ const stateDir = mkdtempSync(join(tmpdir(), "mocena-smoke-"));
 const port = await freePort();
 const base = `http://127.0.0.1:${port}`;
 let output = "";
+const wranglerBin = join(import.meta.dir, "..", "node_modules", ".bin", "wrangler");
 const child = spawn(
-  "bunx",
-  ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1", "--persist-to", stateDir],
+  wranglerBin,
+  ["dev", "--port", String(port), "--ip", "127.0.0.1", "--persist-to", stateDir],
   { detached: true, stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, CI: "1", WRANGLER_SEND_METRICS: "false" } },
 );
 child.stdout.on("data", (d) => (output += d));
@@ -100,6 +101,11 @@ try {
     await Bun.sleep(500);
   }
   report("wrangler dev odpowiada", ready, exited ? "proces zakończył się" : "przekroczono czas");
+  if (!ready) {
+    console.log(`--- koniec wyjścia wranglera ---\n${output.slice(-3000)}`);
+    cleanup();
+    process.exit(1);
+  }
 
   if (ready) {
     const a = new Jar();
@@ -145,7 +151,7 @@ try {
 } catch (e) {
   report("skrypt", false, String(e));
 } finally {
-  if (failed) console.log(`--- wyjście wranglera ---\n${output}`);
+  if (failed) console.log(`--- wyjście wranglera ---\n${output.slice(-3000)}`);
   cleanup();
 }
 
