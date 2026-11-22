@@ -41,10 +41,10 @@ const PART1_INPUT = {
 function clearAllTables(db: Db): void {
   // Ta sama lista tabel co w POST /demo/restart (src/index.tsx).
   const tables = db
-    .query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '\\_cf\\_%' ESCAPE '\\'")
+    .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '\\_cf\\_%' ESCAPE '\\'")
     .all() as { name: string }[];
-  for (const t of tables) db.exec(`DELETE FROM "${t.name}"`);
-  db.exec("DELETE FROM sqlite_sequence");
+  for (const t of tables) db.prepare(`DELETE FROM "${t.name}"`).run();
+  db.prepare("DELETE FROM sqlite_sequence").run();
 }
 
 function answerTaskChange(db: Db): void {
