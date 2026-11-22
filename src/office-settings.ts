@@ -12,6 +12,8 @@ export type OfficeSettings = {
   afterHoursWords: string[];
   recentFactsWindowMonths: number;
   assessmentReminderDays?: { value: number; label: string };
+  /** Lista komórek organizacyjnych urzędu (wybór w kartotece kadr i przy imporcie CSV). */
+  organizationalUnits?: string[];
   appreciationReminderDays: number;
   teamSilenceMonths: number;
   developmentForms: DevelopmentForm[];

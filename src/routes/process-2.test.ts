@@ -187,3 +187,68 @@ describe("proces 2: wersja przepisów na stronie administratora", () => {
     expect((await call(app, "joanna", "/admin/rules")).status).toBe(403);
   });
 });
+
+describe("proces 2: import pracowników z CSV i komórka z listy", () => {
+  const CSV = [
+    "﻿Osoba;Stanowisko;Komórka;Oceniający;Stan procesu;Termin oceny;Termin sprzeciwu;Data ostatniej oceny;Wynik ostatniej oceny",
+    "Jan Nowicki;Specjalista;Wydział Kadr i Szkoleń;Marek Zieliński;;;;10.03.2025;pozytywna",
+    "Piotr Wójcik;Starszy specjalista;Wydział Organizacyjny;Marek Zieliński;Okres oceny;27.11.2026;;27.11.2024;pozytywna",
+    "Ola Bez;Referent;Wydział Nieistniejący;Marek Zieliński;;;;10.03.2025;pozytywna",
+    'Adam Cudzy;"Specjalista; ds. kadr";Wydział Organizacyjny;Ktoś Obcy;;;;10.03.2025;pozytywna',
+  ].join("\r\n");
+  const count = (db: ReturnType<typeof createTestApp>["db"]) => (db.query("SELECT COUNT(*) AS n FROM people").get() as { n: number }).n;
+
+  test("podgląd niczego nie zapisuje; zapis po kliknięciu tworzy tylko poprawne wiersze z cyklem", async () => {
+    const { app, db } = createTestApp({ today: "2026-11-22" });
+    expect(await html(app, "joanna", "/hr/people")).toContain('href="/hr/people/import"');
+    const before = count(db);
+    const preview = await call(app, "joanna", "/hr/people/import", { csv: CSV });
+    expect(preview.status).toBe(200);
+    const h = await preview.text();
+    expect(h).toContain("Wiersz 2: Jan Nowicki");
+    expect(h).toContain("Osoba jest już w kartotece");
+    expect(h).toContain("Wybierz komórkę organizacyjną z listy.");
+    expect(h).toContain("Oceniający „Ktoś Obcy” nie ma w systemie konta oceniającego.");
+    expect(h).toContain("Zapisz osoby do zapisu: 1");
+    expect(count(db)).toBe(before);
+
+    const r = await call(app, "joanna", "/hr/people/import", { csv: CSV, confirm: "1" });
+    expect(r.status).toBe(303);
+    expect(r.headers.get("location")).toBe("/hr/people/import?imported=1");
+    expect(count(db)).toBe(before + 1);
+    const jan = db.query("SELECT id, unit, supervisor_id FROM people WHERE name = 'Jan Nowicki'").get() as { id: string; unit: string; supervisor_id: string };
+    expect(jan).toMatchObject({ unit: "Wydział Kadr i Szkoleń", supervisor_id: "marek" });
+    expect(db.query("SELECT period_start FROM cycles WHERE person_id = ?").get(jan.id)).toEqual({ period_start: "2025-03-10" });
+    expect(await html(app, "joanna", "/hr/people/import?imported=1")).toContain("Zapisano osoby: 1");
+  });
+
+  test("eksport wczytany z powrotem: wszystkie osoby pominięte, nic się nie zapisuje", async () => {
+    const { app, db } = createTestApp({ today: "2026-11-22" });
+    const csv = await (await call(app, "joanna", "/hr/export.csv")).text();
+    const before = count(db);
+    const h = await html(app, "joanna", "/hr/people/import");
+    expect(h).toContain('name="csv"');
+    const preview = await (await call(app, "joanna", "/hr/people/import", { csv })).text();
+    expect(preview).toContain("Nie ma wierszy do zapisu.");
+    await call(app, "joanna", "/hr/people/import", { csv, confirm: "1" });
+    expect(count(db)).toBe(before);
+  });
+
+  test("zły nagłówek: 422 z opisem; pracownik bez uprawnień kadr: 403", async () => {
+    const { app } = createTestApp({ today: "2026-11-22" });
+    const r = await call(app, "joanna", "/hr/people/import", { csv: "Imię;Nazwisko\nJan;Nowak" });
+    expect(r.status).toBe(422);
+    expect(await r.text()).toContain("brakuje kolumn: Osoba, Stanowisko, Komórka, Oceniający");
+    expect((await call(app, "piotr", "/hr/people/import")).status).toBe(403);
+  });
+
+  test("komórka organizacyjna w formularzu to lista; spoza listy 422", async () => {
+    const { app } = createTestApp({ today: "2026-11-22" });
+    const form = await html(app, "joanna", "/hr/people/new");
+    expect(form).toContain('<select class="area" id="unit" name="unit"');
+    expect(form).toContain("Wydział Kadr i Szkoleń");
+    const r = await call(app, "joanna", "/hr/people", { name: "Jan Kowalski", position_title: "Specjalista", unit: "Wydział Wymyślony", supervisor_id: "marek", prev_on: "2024-03-10", prev_outcome: "positive" });
+    expect(r.status).toBe(422);
+    expect(await r.text()).toContain("Wybierz komórkę organizacyjną z listy.");
+  });
+});

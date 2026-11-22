@@ -1,7 +1,9 @@
 import { Hono, type Context } from "hono";
 import { openCycle } from "../cycles";
 import { visibleCyclesOf } from "../hr/history";
-import { createPerson, deleteEmployee, employeeDeletionBlock, emptyForm, formFromPerson, listPeople, readForm, supervisorCandidates, updatePerson, validateForm, type FormErrors, type PersonForm, type Sort } from "../hr/people";
+import { EXPORT_HEADER, planImport } from "../hr/csv-import";
+import { ImportView } from "../views/hr-import";
+import { createPerson, deleteEmployee, employeeDeletionBlock, emptyForm, formFromPerson, listPeople, readForm, supervisorCandidates, unitOptions, updatePerson, validateForm, type FormErrors, type PersonForm, type Sort } from "../hr/people";
 import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
 import { Layout } from "../views/layout";
@@ -38,6 +40,7 @@ function renderForm(c: Context, viewer: Person, o: { title: string; action: stri
       values={o.values}
       errors={o.errors ?? {}}
       supervisors={supervisorCandidates(o.person?.id)}
+      units={unitOptions()}
       hasCycle={hasCycle}
       hasOpenCycle={o.person ? openCycle(o.person.id) !== null : false}
       personId={o.person?.id}
@@ -45,6 +48,32 @@ function renderForm(c: Context, viewer: Person, o: { title: string; action: stri
     o.status ?? 200,
   );
 }
+
+app.get("/hr/people/import", (c) => {
+  const viewer = hrGuard(c);
+  if (viewer instanceof Response) return viewer;
+  const n = c.req.query("imported");
+  return c.html(<ImportView viewer={viewer} today={today()} csv="" header={EXPORT_HEADER} imported={n !== undefined ? Number(n) || 0 : undefined} />);
+});
+
+app.post("/hr/people/import", async (c) => {
+  const viewer = hrGuard(c);
+  if (viewer instanceof Response) return viewer;
+  const body = await c.req.parseBody();
+  const file = body.file instanceof File && body.file.size > 0 ? await body.file.text() : "";
+  const csv = file || (typeof body.csv === "string" ? body.csv : "");
+  const plan = planImport(csv);
+  if (body.confirm === "1" && !plan.error) {
+    let n = 0;
+    for (const r of plan.rows) {
+      if (r.status !== "ok" || !r.form) continue;
+      createPerson(r.form, viewer.id);
+      n++;
+    }
+    return c.redirect(`/hr/people/import?imported=${n}`, 303);
+  }
+  return c.html(<ImportView viewer={viewer} today={today()} csv={csv} header={EXPORT_HEADER} plan={plan} />, plan.error ? 422 : 200);
+});
 
 app.get("/hr/people/new", (c) => {
   const viewer = hrGuard(c);
