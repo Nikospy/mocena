@@ -59,5 +59,6 @@
     "zastępstw"
   ],
   "recentFactsWindowMonths": 1,
+  "assessmentReminderDays": { "value": 30, "label": "ustawienie urzędu" },
   "noteSettingsNote": "taskChangeWords i recentFactsWindowMonths: ustawienie urzędu, nie pochodzi z przepisów. Słowa to rdzenie szukane jako podciąg tekstu notatki (małe litery)."
 }

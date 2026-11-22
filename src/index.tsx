@@ -14,6 +14,7 @@ import notes from "./routes/notes";
 import absences from "./routes/absences";
 import timeline from "./routes/timeline";
 import appraiser from "./routes/appraiser";
+import "./reminders";
 import { Layout } from "./views/layout";
 
 const app = new Hono();

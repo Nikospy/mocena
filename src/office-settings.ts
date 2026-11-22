@@ -9,6 +9,7 @@ export type OfficeSettings = {
   dutyToCriterion: Record<string, string>;
   taskChangeWords: string[];
   recentFactsWindowMonths: number;
+  assessmentReminderDays?: { value: number; label: string };
 };
 
 let checked = false;

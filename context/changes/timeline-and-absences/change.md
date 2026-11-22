@@ -1,7 +1,7 @@
 ---
 change_id: timeline-and-absences
 title: Oś czasu, nieobecności i zmiana oceniającego
-status: planned
+status: implementing
 created: 2026-11-21
 updated: 2026-11-22
 archived_at: null

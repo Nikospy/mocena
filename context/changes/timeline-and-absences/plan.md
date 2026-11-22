@@ -389,7 +389,7 @@ Ręcznie: krok 3 pokazu i oś Ewy z wersji 5-minutowej, na komputerze i telefoni
 
 #### Automated
 
-- [ ] 3.1 Przypomnienie o terminie pojawia się 30 dni przed terminem
+- [x] 3.1 Przypomnienie o terminie pojawia się 30 dni przed terminem
 
 #### Manual
 
