@@ -78,6 +78,13 @@ function Basis(props: { d: { date: string; basis: string[] } }) {
   );
 }
 
+/** Tekst z polem wielowierszowym: każdy wiersz (np. cytat z notatki z datą) zostaje osobnym wierszem na ekranie i w druku. */
+function Lines(props: { text: string | null }) {
+  if (!props.text) return null;
+  const lines = props.text.split(/\r?\n/).filter((l) => l.trim());
+  return <>{lines.map((l, i) => (i === 0 ? <>{l}</> : <><br />{l}</>))}</>;
+}
+
 function mean2(n: number): string {
   return n.toFixed(2).replace(".", ",");
 }
@@ -125,17 +132,13 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
         <PageHeader
           context={d.officeName}
           title={<>Arkusz oceny okresowej {d.sheet ? `(arkusz ${d.sheet})` : ""}</>}
-          extra={
-            <div class="no-print">
-              <PrintButton />
-            </div>
-          }
+          aside={<PrintButton />}
           links={
             <>
               <a class="no-print" href={only1 ? sheetHref : `${sheetHref}?part=1`}>
                 {only1 ? "Cały arkusz" : "Tylko część I"}
               </a>
-              {props.links.map((l) => (
+              {props.links.filter((l) => !/\/(sheet|part1)$/.test(l.href)).map((l) => (
                 <a class="no-print" href={l.href}>
                   {l.label}
                 </a>
@@ -144,6 +147,7 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
           }
         />
 
+        <div class="ct-paper">
         <section class="card sheet-part">
           <h2>Część I</h2>
           <SheetField label="Urząd">{d.officeName}</SheetField>
@@ -251,8 +255,8 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
 
             <section class="card sheet-part">
               <h2>Część II (ciąg dalszy)</h2>
-              <SheetField label="Uzasadnienie przyznanej oceny">{p2.justification}</SheetField>
-              <SheetField label="Wnioski do indywidualnego programu rozwoju zawodowego">{p2.developmentConclusions}</SheetField>
+              <SheetField label="Uzasadnienie przyznanej oceny">{p2.justification ? <Lines text={p2.justification} /> : null}</SheetField>
+              <SheetField label="Wnioski do indywidualnego programu rozwoju zawodowego">{p2.developmentConclusions ? <Lines text={p2.developmentConclusions} /> : null}</SheetField>
               {p2.previous === null ? null : (
                 <SheetField label="Dane poprzedniej oceny">
                   {p2.previous === "none"
@@ -338,6 +342,7 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
           </section>
         )}
         <SheetFooter d={d} />
+        </div>
         {props.autoPrint ? <script src="/auto-print.js" defer></script> : null}
       </article>
     </Layout>

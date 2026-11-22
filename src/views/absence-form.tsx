@@ -18,8 +18,10 @@ export function AbsenceFormView(props: {
   const e = props.errors ?? {};
   return (
     <Layout title={`Nieobecność: ${props.personName}`} person={props.viewer} today={props.today}>
-      <PageHeader title={<>Wpisz nieobecność: {props.personName}</>} lead="System zapisuje tylko daty. Rodzaju nieobecności nie podajesz." />
-      <section class="card form-card">
+      <PageHeader title={<>Wpisz nieobecność: {props.personName}</>} lead="System zapisuje tylko daty. Rodzaju nieobecności nie podajesz." links={<a href={`/cycles/${props.cycleId}/timeline`}>Oś czasu</a>} />
+      <div class="o-grid">
+      <div class="o-main">
+      <section class="card form-card ct-form">
         <form method="post" action={`/cycles/${props.cycleId}/absences`} class="abs-form">
           <div class="dates">
             <div>
@@ -44,15 +46,18 @@ export function AbsenceFormView(props: {
             </span>
             <span class="cbt">Nieobecność usprawiedliwiona</span>
           </label>
-          <button class="btn primary full" type="submit">
-            Zapisz nieobecność
-          </button>
+          <p class="ct-actions">
+            <button class="btn primary" type="submit">
+              Zapisz nieobecność
+            </button>
+          </p>
         </form>
       </section>
-      <section class="card" aria-labelledby="h-abs">
-        <h2 id="h-abs">Wpisane nieobecności</h2>
+      </div>
+      <aside class="side ct-side" aria-labelledby="h-abs">
+        <h2 id="h-abs" class="ct-side-h">Wpisane nieobecności</h2>
         {props.absences.length === 0 ? (
-          <p class="cap">Nie wpisano jeszcze żadnej nieobecności.</p>
+          <p>Nie wpisano jeszcze żadnej nieobecności.</p>
         ) : (
           <ul class="plain-list">
             {props.absences.map((a) => (
@@ -60,17 +65,13 @@ export function AbsenceFormView(props: {
                 <span class="d">
                   {formatDate(a.date_from)}–{formatDate(a.date_to)}
                 </span>
-                <span class="cap">{a.excused === 1 ? "usprawiedliwiona" : "nieusprawiedliwiona"}</span>
+                <span>{a.excused === 1 ? "usprawiedliwiona" : "nieusprawiedliwiona"}</span>
               </li>
             ))}
           </ul>
         )}
-        <p>
-          <a class="btn text" href={`/cycles/${props.cycleId}/timeline`}>
-            Oś czasu
-          </a>
-        </p>
-      </section>
+      </aside>
+      </div>
       <script src="/date-words.js" defer></script>
     </Layout>
   );

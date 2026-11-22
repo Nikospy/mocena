@@ -1031,6 +1031,87 @@ section[aria-labelledby="h-dev"] > h3 { margin-block-start: var(--sp-300); paddi
 /* === screens: cycle-time === */
 /* Oś czasu, nieobecności, zmiana terminu, zmiana oceniającego, arkusz na ekranie, historia ocen, zaproszenia. */
 /* Reguły tej grupy dopisuj bezpośrednio pod tą linią. */
+/* Wspólne dla grupy: kolumna boczna bez ramki, komunikat zapisu jako zdanie, akcje formularza w przepływie. */
+.ct-side { display: grid; gap: var(--sp-200); align-content: start; }
+.ct-side > * { margin: 0; }
+.ct-side-h { font-size: var(--f-p); line-height: var(--lh-p); }
+.ct-notice { max-inline-size: 66ch; padding-inline-start: var(--sp-200); border-inline-start: 4px solid var(--green-100); font-weight: var(--w-bold); }
+.ct-notice + .o-grid, .page-h + .st + .o-grid, .ct-states + .o-grid, .st + .o-grid { margin-block-start: var(--sp-300); }
+.ct-states { display: grid; gap: var(--sp-150); }
+.ct-states:empty { display: none; }
+.ct-actions { display: grid; justify-items: start; gap: var(--sp-100); margin-block-start: var(--sp-100); }
+.ct-actions .btn { min-inline-size: 12rem; }
+.ct-form .abs-form > div, .ct-form fieldset { min-inline-size: 0; }
+.ct-form fieldset { border: 0; display: grid; gap: var(--sp-50); }
+.ct-form .area { max-inline-size: 40rem; }
+.ct-form .cap, .ct-form .cb small { font-size: var(--f-p); line-height: var(--lh-p); }
+@media (min-width: 521px) { .ct-form .dates { grid-template-columns: repeat(2, minmax(0, 20rem)); gap: var(--sp-200); } }
+@media (max-width: 520px) { .ct-actions, .ct-actions .btn { inline-size: 100%; justify-items: stretch; } }
+.o-grid > .side > * { margin: 0; }
+.side .rule ul { padding-inline-start: var(--sp-250); display: grid; gap: var(--sp-50); }
+.side .st { margin: 0; }
+
+/* Oś czasu: lista na karcie, legenda i akcja w kolumnie bocznej. */
+.tl-card h2 { margin-block-end: var(--sp-100); }
+.tl-detail { color: var(--text-2); }
+.tl-card .tl-list > li { max-inline-size: none; }
+.tl-card .tl-body > * { max-inline-size: 66ch; }
+.ct-legend { list-style: none; display: grid; gap: var(--sp-100); }
+.ct-legend li { display: flex; align-items: center; gap: var(--sp-150); }
+.ct-legend i { flex: none; inline-size: var(--sp-150); block-size: var(--sp-150); border-radius: var(--pill-r); border: 2px solid var(--cobalt-100); background: var(--white); }
+.ct-legend i.r { background: var(--cobalt-100); }
+
+/* Wniosek ocenianego w kolumnie decyzji. */
+.ct-request h2 { font-size: var(--f-p); line-height: var(--lh-p); }
+
+/* Historia ocen: wiersze na jednej powierzchni. */
+.ct-rows { list-style: none; background: var(--surface); border: 1px solid var(--card-line); border-radius: var(--card-r); max-inline-size: 52rem; }
+.ct-rows > li { display: grid; gap: var(--sp-100); padding: var(--sp-250) var(--sp-300); }
+.ct-rows > li + li { border-block-start: 1px solid var(--line); }
+.ct-rows h2, .ct-rows h3 { font-size: var(--f-p); line-height: var(--lh-p); }
+.ct-rows p { margin: 0; }
+.ct-rows .cap { font-size: var(--f-p); line-height: var(--lh-p); }
+.ct-rows a { display: inline-flex; align-items: center; min-block-size: var(--hit); font-weight: var(--w-bold); }
+.ct-prev { margin-block-start: var(--sp-400); display: grid; gap: var(--sp-200); }
+
+/* Korekta arkusza: obecne wartości i historia w kolumnie bocznej. */
+.ct-lead-2 { max-inline-size: 66ch; margin-block-end: var(--sp-300); }
+.ct-rows > li > a { font-weight: var(--w-bold); }
+.ct-dl { display: grid; gap: var(--sp-150); }
+.ct-dl dt { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+.ct-dl dd { font-weight: var(--w-bold); overflow-wrap: anywhere; }
+.ct-hist { list-style: none; display: grid; }
+.ct-hist > li { padding-block: var(--sp-150); border-block-start: 1px solid var(--line); }
+.ct-hist p { color: var(--text-2); }
+.ct-paper .sheet-part .plain-list .sheet-field p { font-weight: var(--w-regular); }
+
+/* Zaproszenie: stan, wiadomość, akcje. */
+.ct-inv { gap: var(--sp-300); }
+.ct-inv section > * + * { margin-block-start: var(--sp-100); }
+
+/* Arkusz i pismo na ekranie: jedna kartka papieru, części oddzielone linią; druk ma własny arkusz (print.css). */
+@media screen {
+  .sheet-doc { margin-inline: 0; }
+  .sheet-doc .page-h-aside .sheet-actions { display: grid; gap: var(--sp-100); justify-items: start; }
+  .ct-paper { background: var(--surface); border: 1px solid var(--card-line); border-radius: var(--card-r); padding: var(--sp-300); }
+  .ct-paper > .sheet-part { background: none; border: 0; border-radius: 0; padding: 0; }
+  .ct-paper > .sheet-part + .sheet-part { margin-block-start: var(--sp-400); padding-block-start: var(--sp-400); border-block-start: 1px solid var(--line); }
+  .ct-paper > .sheet-part > * + * { margin-block-start: var(--sp-200); }
+  .ct-paper .sheet-part h3 { margin-block-start: var(--sp-300); }
+  .ct-paper .sheet-part ul:not([class]) { padding-inline-start: var(--sp-250); }
+  .ct-paper .sheet-matrix { font-size: var(--f-p); line-height: var(--lh-p); }
+  .ct-paper .sheet-matrix th, .ct-paper .sheet-matrix td { border-inline: 0; border-block: 1px solid var(--line); padding: var(--sp-150) var(--sp-100); }
+  .ct-paper .sheet-matrix thead th { border-block-end: 2px solid var(--border-strong); vertical-align: bottom; }
+  .ct-paper .sheet-matrix small { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+  .ct-paper .sheet-matrix td { font-weight: var(--w-bold); }
+  .ct-paper .sign, .ct-paper .sheet-part > .cap { font-size: var(--f-p); line-height: var(--lh-p); }
+  .ct-paper .sheet-notice { background: none; border: 0; border-radius: 0; border-inline-start: 4px solid var(--rule-line); padding: 0 0 0 var(--sp-200); }
+  .ct-paper .print-footer { max-inline-size: 66ch; margin-block-start: var(--sp-400); padding-block-start: var(--sp-200); border-block-start: 1px solid var(--line); }
+  .ct-paper .sheet-part > p { max-inline-size: 66ch; }
+  .ct-paper .sheet-part > .cap { max-inline-size: 54ch; }
+  .ct-paper .lbl { font-size: var(--f-p); line-height: var(--lh-p); font-weight: var(--w-regular); color: var(--text-2); }
+}
+@media screen and (min-width: 768px) { .ct-paper { padding: var(--sp-500) var(--sp-600); } }
 
 /* --- koniec sekcji cycle-time (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
 /* . */
