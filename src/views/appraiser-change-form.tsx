@@ -1,5 +1,5 @@
 import type { Person } from "../people";
-import { PageHeader } from "./components";
+import { ErrorSummary, FieldError, PageHeader, invalid } from "./components";
 import { rules } from "../engine/rules";
 import { Layout } from "./layout";
 
@@ -21,15 +21,16 @@ export function AppraiserChangeFormView(props: {
       <div class="o-grid">
       <section class="card form-card ct-form">
         <form method="post" action={`/cycles/${props.cycleId}/appraiser`} class="abs-form">
-          <div>
+          <ErrorSummary errors={{ appraiser_id: props.error }} />
+          <div class="field">
             <label class="lbl" for="appraiser_id">Nowy oceniający</label>
-            <select class="area" id="appraiser_id" name="appraiser_id" aria-invalid={props.error ? "true" : undefined}>
+            <FieldError id="appraiser_id" message={props.error} />
+            <select class="area" id="appraiser_id" name="appraiser_id" {...invalid("appraiser_id", { appraiser_id: props.error })}>
               <option value="">Wybierz osobę</option>
               {props.candidates.map((p) => (
                 <option value={p.id} selected={props.selected === p.id}>{p.name}</option>
               ))}
             </select>
-            {props.error ? <p class="st bad" role="alert">{props.error}</p> : null}
           </div>
           <p class="ct-actions">
             <button class="btn primary" type="submit">

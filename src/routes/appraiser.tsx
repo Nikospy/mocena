@@ -62,7 +62,7 @@ app.post("/cycles/:id/appraiser", async (c) => {
   if (!isOpen(cycle)) return c.text("Cykl jest zamknięty, oceniającego nie zmienia się.", 409);
   const body = await c.req.parseBody();
   const to = typeof body.appraiser_id === "string" ? body.appraiser_id : "";
-  if (!candidates(cycle).some((p) => p.id === to)) return render(c, g, "Wybierz nowego oceniającego z listy", 422);
+  if (!candidates(cycle).some((p) => p.id === to)) return render(c, g, "Wybierz nowego oceniającego z listy.", 422);
   getDb().transaction(() => {
     recordEvent("appraiser_changed", cycle.id, viewer.id, { from_id: cycle.appraiser_id, to_id: to });
     getDb().query("UPDATE cycles SET appraiser_id = ? WHERE id = ?").run(to, cycle.id);
