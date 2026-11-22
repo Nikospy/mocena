@@ -180,3 +180,20 @@ test("kadry, CSV i statystyki pokazują drugą ocenę aż do zapoznania", async 
     expect(await html(app, "dyrektor-urzedu", "/office/statistics")).not.toContain("Ponowne sporządzenie oceny lub zapoznanie z nią");
   }
 });
+
+test("notatka przypisana do następnego cyklu pozostaje po przesunięciu jego początku", async () => {
+  const { cycleById, openCycle, startNextCycle } = await import("../cycles");
+  const { notesForCycle } = await import("../notes/repo");
+  const app = await redone();
+  startNextCycle(cycleById("cycle-katarzyna")!, "katarzyna", "2026-11-16", "2026-11-17", "positive");
+  const next = openCycle("katarzyna")!;
+  const note = "Notatka przypisana do rozpoczętego cyklu.";
+  expect((await call(app, "anna", "/people/katarzyna/notes", { criterion_id: "rzetelnosc", date: "2026-11-18", text: note })).status).toBe(303);
+  expect(notesForCycle(next.id, "anna").map((n) => n.text)).toContain(note);
+  expect((await call(app, "anna", `${CYCLE}/assessment/approve`, form([7, 5, 5, 5, 5]))).status).toBe(303);
+  setToday("2026-11-24");
+  expect((await call(app, "katarzyna", `${CYCLE}/assessment/acknowledge`, {})).status).toBe(303);
+  expect(openCycle("katarzyna")).toMatchObject({ id: next.id, period_start: "2026-11-22" });
+  expect(notesForCycle(next.id, "anna").map((n) => n.text)).toContain(note);
+  expect(notesForCycle(next.id, "marek").map((n) => n.text)).not.toContain(note);
+});
