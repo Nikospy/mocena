@@ -22,6 +22,15 @@ export function actsAsAppraiser(appraiserId: string | null | undefined, actorId:
   return appraiserId === actorId || activeSubstitution(appraiserId, actorId) !== null;
 }
 
+/** Osoby, których cykle prowadzi dziś osoba: własne jako oceniający i nieobecnych, za których ma zastępstwo. Cykl i tak sprawdzasz `actsAsAppraiser`. */
+export function personsAppraisedBy(actorId: string): string[] {
+  const appraisers = [actorId, ...activeSubstitutionsOf(actorId).map((s) => s.absent_id)];
+  const rows = getDb()
+    .query(`SELECT DISTINCT person_id FROM cycles WHERE appraiser_id IN (${appraisers.map(() => "?").join(", ")})`)
+    .all(...appraisers) as { person_id: string }[];
+  return rows.map((r) => r.person_id);
+}
+
 /** Zastępstwa, które trwają dziś albo jeszcze się nie zaczęły, od najwcześniejszego. */
 export function currentAndFutureSubstitutions(): Substitution[] {
   return getDb().query("SELECT * FROM substitutions WHERE date_to >= ? ORDER BY date_from, id").all(today()) as Substitution[];

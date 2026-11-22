@@ -1,3 +1,4 @@
+import { actsAsAppraiser } from "../substitutions";
 import { errorPage } from "../views/error-page";
 import { Hono, type Context } from "hono";
 import { card } from "../content";
@@ -28,7 +29,7 @@ import { TaskChangeCardView, TaskChangeNoView, TaskChangeQuestionView } from "..
 
 /** Odnośniki pojawiają się w oknie przed terminem oceny, jak sprawa „Wystaw ocenę” (`assessmentWindowReached`). */
 registerCycleLinks((cycle, person) =>
-  cycle.appraiser_id === person.id && assessmentWindowReached(cycle)
+  actsAsAppraiser(cycle.appraiser_id, person.id) && assessmentWindowReached(cycle)
     ? [
         { label: "Przed rozmową z pracownikiem", href: `/cycles/${cycle.id}/before-meeting` },
         { label: "Docenienie", href: `/cycles/${cycle.id}/appreciation` },
@@ -116,7 +117,7 @@ function cycleGuard(c: Context): { viewer: Person; cycle: Cycle; subject: Person
   const cycle = visibleCycleById(c.req.param("id") ?? "");
   const subject = cycle ? personById(cycle.person_id) : null;
   if (!cycle || !subject) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
-  if (cycle.appraiser_id !== viewer.id) return errorPage(c, "Ten ekran widzi oceniający tego cyklu.", 403);
+  if (!actsAsAppraiser(cycle.appraiser_id, viewer.id)) return errorPage(c, "Ten ekran widzi oceniający tego cyklu.", 403);
   return { viewer, cycle, subject };
 }
 
