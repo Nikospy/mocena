@@ -37,6 +37,39 @@ const ctx = await browser.newContext({
 const page = await ctx.newPage();
 page.setDefaultTimeout(5000);
 
+// Nakładka kursora wstrzykiwana do każdej strony (bez zmian w kodzie aplikacji).
+await ctx.addInitScript(() => {
+  const mount = () => {
+    if (document.getElementById("rec-cursor")) return;
+    const c = document.createElement("div");
+    c.id = "rec-cursor";
+    c.style.cssText = "position:fixed;z-index:2147483647;pointer-events:none;width:22px;height:22px;border-radius:50%;background:rgba(220,20,60,.45);border:2px solid #dc143c;transform:translate(-50%,-50%);left:-50px;top:-50px;transition:transform .12s";
+    document.documentElement.appendChild(c);
+    document.addEventListener("mousemove", (e) => { c.style.left = e.clientX + "px"; c.style.top = e.clientY + "px"; }, true);
+    document.addEventListener("mousedown", () => { c.style.transform = "translate(-50%,-50%) scale(.6)"; }, true);
+    document.addEventListener("mouseup", () => { c.style.transform = "translate(-50%,-50%) scale(1)"; }, true);
+  };
+  if (document.documentElement) mount();
+  else document.addEventListener("DOMContentLoaded", mount);
+});
+
+async function glideClick(loc: any) {
+  await loc.scrollIntoViewIfNeeded();
+  const box = await loc.boundingBox();
+  if (box) await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 25 });
+  await wait(250);
+  await loc.click();
+}
+
+async function fillAbsence(from: string, to: string) {
+  await page.locator("#from").fill(from);
+  await page.locator("#to").fill(to);
+  await wait(600);
+  await glideClick(page.getByRole("button", { name: "Zapisz nieobecność" }));
+  await page.waitForLoadState("load");
+  await wait(1200);
+}
+
 async function step(name: string, fn: () => Promise<void>) {
   try { await fn(); } catch (e) { console.warn(`[pominięto] ${name}: ${String(e).split("\n")[0]}`); }
 }
@@ -67,6 +100,25 @@ async function tryAction(id: string) {
       await l.scrollIntoViewIfNeeded();
       await l.click();
       await wait(800);
+    });
+  } else if (id === "2") {
+    await step("notatka z przejęciem kolejki", async () => {
+      await glideClick(page.locator("#text"));
+      await page.keyboard.type("Piotr przejął kolejkę wniosków po odejściu kolegi", { delay: 70 });
+      await wait(1500); // widać samo zaznaczenie pola „Zmiana zadań pracownika”
+      await glideClick(page.locator("label.chip", { hasText: "Rzetelność" }).first());
+      await wait(600);
+      await glideClick(page.getByRole("button", { name: "Zapisz notatkę" }));
+      await page.waitForLoadState("load");
+      await wait(1500);
+    });
+  } else if (id === "3") {
+    await step("dwie nieobecności i oś czasu", async () => {
+      await fillAbsence("2026-10-05", "2026-10-16");
+      await fillAbsence("2026-10-19", "2026-11-06");
+      await glideClick(page.getByRole("link", { name: "Oś czasu" }).first());
+      await page.waitForLoadState("load");
+      await wait(2000);
     });
   } else if (id === "5") {
     await step("potwierdzenie zapoznania", async () => {
