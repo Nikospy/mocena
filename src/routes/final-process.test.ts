@@ -14,7 +14,14 @@ test("samodzielny pokaz pokazuje tylko widoczne dane i prowadzi do części I", 
   expect(notes).not.toContain("Pismo do gminy poszło");
   expect((await call(app, "anna", "/cycles/cycle-anna/part1")).status).toBe(404);
   await call(app, "marek", "/demo/date", { date: "2025-02-11" });
-  expect(await html(app, "marek", "/notes")).toContain("Pismo do gminy poszło");
+  expect(await html(app, "marek", "/notes")).not.toContain("Pismo do gminy poszło");
+  expect((await call(app, "marek", "/people/piotr/notes", { criterion_id: "rzetelnosc", text: "Fakt dodany na żywo." })).status).toBe(303);
+  expect(await html(app, "marek", "/notes")).toContain("Fakt dodany na żywo.");
+  expect((await call(app, "marek", "/cycles/cycle-piotr/part1/submit", {})).status).toBe(303);
+  expect((await call(app, "piotr", "/cycles/cycle-piotr/part1/confirm", {})).status).toBe(303);
+  const after = await html(app, "marek", "/notes");
+  expect(after).toContain("Pismo do gminy poszło");
+  expect(after).not.toContain("Odpowiedź na pismo gminy była tak ogólna");
   const invite = await html(app, "marek", "/cycles/cycle-piotr/invitations/new?kind=opening");
   expect(invite).toContain("Termin rozmowy o kryteriach minął 27.12.2024.");
   expect(invite).not.toMatch(/-\d+ dni/);
