@@ -61,6 +61,7 @@ Ocena okresowa w służbie cywilnej powstaje raz na 24 miesiące, na papierze i 
 | S-11 | jury-materials               | juror dostaje nagranie, PDF, README i opis zgłoszenia zgodne z działającą wersją    | S-10          | MS-05                                      | in-progress |
 | S-12 | first-impression             | link do mOceny ma podgląd i ikonę, błędy wyglądają jak aplikacja, klawiatura działa | S-08          | MS-01                                      | in-progress |
 | S-13 | live-speed                   | pierwsze wejście i każdy krok przewodnika ładują się szybko                         | S-08          | MS-04                                      | in-progress |
+| S-14 | review-polish-2              | juror nie trafia na usterki z drugiego przeglądu (wygląd, dostępność, daty)          | S-09–S-13     | MS-01, MS-03                               | in-progress |
 
 ## Streams
 
