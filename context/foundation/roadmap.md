@@ -62,6 +62,9 @@ Ocena okresowa w służbie cywilnej powstaje raz na 24 miesiące, na papierze i 
 | S-12 | first-impression             | link do mOceny ma podgląd i ikonę, błędy wyglądają jak aplikacja, klawiatura działa | S-08          | MS-01                                      | in-progress |
 | S-13 | live-speed                   | pierwsze wejście i każdy krok przewodnika ładują się szybko                         | S-08          | MS-04                                      | in-progress |
 | S-14 | review-polish-2              | juror nie trafia na usterki z drugiego przeglądu (wygląd, dostępność, daty)          | S-09–S-13     | MS-01, MS-03                               | in-progress |
+| S-15 | deadline-change              | oceniający zmienia termin z pismem, oceniany wnioskuje o zmianę, oceniający rozpatruje | S-14          | 13i, FR-012                                | planning |
+| S-16 | interview-invitations        | oceniający zaprasza na obie rozmowy, oceniany potwierdza termin i pobiera kalendarz  | S-14          | 13i                                        | planning |
+| S-17 | hr-people                    | kadry wyszukują, dodają i edytują pracowników, ustawiają zastępstwa, pobierają CSV   | S-14          | 13i                                        | planning |
 
 ## Streams
 
