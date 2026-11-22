@@ -11,7 +11,7 @@ function mean2(n: number): string {
 export function HistoryList(props: { entries: Entry[] }) {
   if (props.entries.length === 0) return <p>Brak ocen w systemie</p>;
   return (
-    <ul class="plain-list">
+    <ul class="plain-list hist-list">
       {props.entries.map((h) => {
         return (
           <li class="card">
@@ -27,7 +27,7 @@ export function HistoryList(props: { entries: Entry[] }) {
                 : "Zapoznanie jeszcze niepotwierdzone"}
               {" · "}wersja reguł {h.rulesVersion.version} z {formatDate(h.rulesVersion.effectiveFrom)}
             </p>
-            {h.canOpenSheet ? <a href={`/cycles/${h.cycleId}/sheet`}>Arkusz</a> : null}
+            {h.canOpenSheet ? <a class="btn link-chip" href={`/cycles/${h.cycleId}/sheet`}>Arkusz</a> : null}
           </li>
         );
       })}
@@ -38,7 +38,7 @@ export function HistoryList(props: { entries: Entry[] }) {
 export function HistoryView(props: { viewer: Person; today: string; person: Person; entries: Entry[] }) {
   return (
     <Layout title="Historia ocen" person={props.viewer} today={props.today}>
-      <section class="hdr slim">
+      <section class="card hdr slim">
         <h1>Historia ocen</h1>
         <p class="cap">Osoba: {props.person.name}</p>
       </section>

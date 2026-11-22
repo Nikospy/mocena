@@ -17,7 +17,7 @@ export function AbsenceFormView(props: {
   const e = props.errors ?? {};
   return (
     <Layout title={`Nieobecność: ${props.personName}`} person={props.viewer} today={props.today}>
-      <section class="card">
+      <section class="card form-card">
         <h1>Wpisz nieobecność: {props.personName}</h1>
         <p class="cap">System zapisuje tylko daty. Rodzaju nieobecności nie podajesz.</p>
         <form method="post" action={`/cycles/${props.cycleId}/absences`} class="abs-form">
@@ -40,9 +40,9 @@ export function AbsenceFormView(props: {
                 <path d="M5 12.5l4.5 4.5L19 7.5" />
               </svg>
             </span>
-            <span>Nieobecność usprawiedliwiona</span>
+            <span class="cbt">Nieobecność usprawiedliwiona</span>
           </label>
-          <button class="btn primary" type="submit">
+          <button class="btn primary full" type="submit">
             Zapisz nieobecność
           </button>
         </form>
@@ -54,14 +54,17 @@ export function AbsenceFormView(props: {
         ) : (
           <ul class="plain-list">
             {props.absences.map((a) => (
-              <li>
-                {formatDate(a.date_from)}–{formatDate(a.date_to)}, {a.excused === 1 ? "usprawiedliwiona" : "nieusprawiedliwiona"}
+              <li class="abs-row">
+                <span class="d">
+                  {formatDate(a.date_from)}–{formatDate(a.date_to)}
+                </span>
+                <span class="cap">{a.excused === 1 ? "usprawiedliwiona" : "nieusprawiedliwiona"}</span>
               </li>
             ))}
           </ul>
         )}
         <p>
-          <a class="btn text" href={`/cycles/${props.cycleId}/timeline`}>
+          <a class="btn link-chip" href={`/cycles/${props.cycleId}/timeline`}>
             Oś czasu
           </a>
         </p>

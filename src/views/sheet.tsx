@@ -28,7 +28,7 @@ export function PrintButton(props: { part1Href?: string }) {
           Drukuj / pobierz PDF
         </button>
         {props.part1Href ? (
-          <a class="btn text" href={props.part1Href}>
+          <a class="btn" href={props.part1Href}>
             Drukuj część I
           </a>
         ) : null}
@@ -119,20 +119,22 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
   return (
     <Layout title="Arkusz oceny" person={props.viewer} today={props.today}>
       <article class="sheet-doc">
-        <header class="hdr slim">
+        <header class="card hdr slim">
           <h1>Arkusz oceny okresowej {d.sheet ? `(arkusz ${d.sheet})` : ""}</h1>
           <p class="cap">{d.officeName}</p>
           <div class="no-print">
             <PrintButton part1Href={only1 ? undefined : `${sheetHref}?part=1`} />
             {only1 ? (
-              <a class="btn text" href={sheetHref}>
+              <a class="btn link-chip" href={sheetHref}>
                 Cały arkusz
               </a>
             ) : null}
             {props.links.length ? (
-              <p class="cap">
+              <p class="hr-links">
                 {props.links.map((l) => (
-                  <a href={l.href}>{l.label} </a>
+                  <a class="btn link-chip" href={l.href}>
+                    {l.label}
+                  </a>
                 ))}
               </p>
             ) : null}

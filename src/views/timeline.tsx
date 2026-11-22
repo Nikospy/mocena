@@ -27,8 +27,19 @@ export function TimelineView(props: {
         </p>
       ) : null}
       <section class="rule tl-card" aria-labelledby="h-tl">
-        <h2 id="h-tl">Co z tego wynika</h2>
-        <p class="cap">Daty wyliczone z przepisu albo wpisane przez człowieka.</p>
+        <div class="term-top">
+          <div class="voice rule-v">
+            <span class="pg" aria-hidden="true">§</span>
+            <div>
+              <h2 id="h-tl">Co z tego wynika</h2>
+              <p class="cap">Daty wyliczone z przepisu albo wpisane przez człowieka.</p>
+            </div>
+          </div>
+          <div class="legend" aria-hidden="true">
+            <span><i></i>wpisał człowiek</span>
+            <span><i class="r"></i>wyliczone z przepisu</span>
+          </div>
+        </div>
         <ol class="tl-list">
           {props.entries.map((e) => (
             <li class={`tl-item ${e.kind}`}>
@@ -49,7 +60,7 @@ export function TimelineView(props: {
         <p class="cap">{props.rulesText}</p>
       </section>
       {props.canAddAbsence ? (
-        <p>
+        <p class="btns">
           <a class="btn primary" href={`/cycles/${props.cycleId}/absences`}>
             Wpisz kolejną nieobecność
           </a>
