@@ -2,7 +2,7 @@ import type { Card } from "../content";
 import type { Person } from "../people";
 import type { BeforeMeetingSummary, Item } from "../hr-partner/partner";
 import { NoteItem } from "./components/note-item";
-import { Layout } from "./layout";
+import { Layout, formatDate } from "./layout";
 import { TaskChangeForm } from "./task-change";
 
 function Items(props: { items: Item[]; label: string }) {
@@ -49,7 +49,7 @@ export function BeforeMeetingView(props: {
       {s.pendingQuestion ? (
         <section class="card q-hero">
           <h2>{s.pendingQuestion.prompt}</h2>
-          <p class="cap">Zaznaczyłeś zmianę zadań przy jednej z notatek, ale nie odpowiedziałeś na to pytanie.</p>
+          <p class="cap">W notatce z {formatDate(s.pendingQuestion.note.date)} zaznaczono zmianę zadań, a pytanie czeka na odpowiedź.</p>
           <TaskChangeForm note={s.pendingQuestion.note} />
         </section>
       ) : null}

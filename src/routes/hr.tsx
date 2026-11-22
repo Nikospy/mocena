@@ -2,8 +2,9 @@ import { Hono } from "hono";
 import "../hr/links";
 import { cycleLinks } from "../cycle-links";
 import { getDb } from "../db";
-import { recordEvent, visibleEvents } from "../events";
+import { recordEvent, visibleEvents, visibleEventsOfType } from "../events";
 import { cycleState } from "../hr/cycle-state";
+import { fullNameForm } from "../hr-partner/partner";
 import { mandatoryGradeOf } from "../hr/history";
 import { latestCycles } from "../hr/latest-cycles";
 import { officeStats } from "../hr/stats";
@@ -38,7 +39,15 @@ app.get("/hr", (c) => {
   if (!viewer) return c.redirect("/account");
   if (viewer.role !== "hr") return c.text("Ten ekran widzą kadry.", 403);
   const { rows, cards, stats } = overviewData(viewer);
-  return c.html(<HrOverviewView viewer={viewer} today={today()} cards={cards} rows={rows} stats={stats} />);
+  // Komunikat po „Odnotuj przyznanie stopnia”: tylko gdy taki wpis naprawdę istnieje.
+  const awardedId = c.req.query("awarded");
+  const awardedPerson = awardedId ? personById(awardedId) : null;
+  const awardedEvent = awardedPerson ? visibleEventsOfType("mandatory_grade_awarded").filter((e) => e.payload.personId === awardedPerson.id).pop() : undefined;
+  const awarded =
+    awardedPerson && awardedEvent
+      ? { dative: fullNameForm(awardedPerson.name, "dat") ?? awardedPerson.name, date: awardedEvent.date }
+      : undefined;
+  return c.html(<HrOverviewView viewer={viewer} today={today()} cards={cards} rows={rows} stats={stats} awarded={awarded} />);
 });
 
 const OUTCOMES = ["changed", "redone", "rejected"];
@@ -52,7 +61,7 @@ app.post("/hr/grades/:personId", (c) => {
   const grade = mandatoryGradeOf(person.id);
   if (!grade || grade.toGrade === null) return c.text("Nie ma obowiązku przyznania stopnia albo został już odnotowany.", 409);
   recordEvent("mandatory_grade_awarded", grade.cycleId, viewer.id, { personId: person.id, fromGrade: grade.fromGrade, toGrade: grade.toGrade, basis: grade.basis });
-  return c.redirect("/hr", 303);
+  return c.redirect(`/hr?awarded=${person.id}`, 303);
 });
 
 app.post("/cycles/:id/objection-outcome", async (c) => {

@@ -69,7 +69,9 @@
     ],
     "texts": {
       "formIntro": "Forma rozwoju do rozważenia. Możesz ją przenieść do wniosków rozwojowych oceny albo wybrać inną.",
-      "no": "Zapisano odpowiedź „Nie”. Pytanie nie wróci."
+      "no": "Zapisano odpowiedź „Nie”. Pytanie nie wróci.",
+      "ifYes": "Po „Tak” pojawi się karta rozmowy po zmianie zadań i propozycja formy rozwoju z katalogu urzędu.",
+      "ifNo": "Po „Nie” nic się nie zmienia, a pytanie nie wróci."
     }
   },
   "appreciation": {
@@ -88,23 +90,23 @@
     ],
     "texts": {
       "avoid": "Czego unikać: porównań z innymi pracownikami i docenienia razem z uwagą krytyczną w jednym zdaniu.",
-      "noNotes": "Nie masz zapisanych notatek o dobrych faktach od tej daty. Zastanów się, co ostatnio zauważyłeś, i dopisz notatkę."
+      "noNotes": "Brak zapisanych notatek o dobrych faktach od tej daty. Dopisz notatkę, gdy coś zauważysz."
     }
   },
   "beforeMeeting": {
     "title": "Przed rozmową z pracownikiem",
     "purpose": "Zestawienie z Twoich własnych notatek i dat. Niczego nie ocenia; podpowiada, o co zapytać.",
     "texts": {
-      "boundary": "Zaznaczyłeś zmianę zadań w notatce z {date}.",
+      "boundary": "Zaznaczono zmianę zadań w notatce z {date}.",
       "bothSides": "Przy kryterium „{criterion}” masz notatki sprzed zmiany zadań i po niej. Zapytaj, co się zmieniło po przejęciu nowych zadań.",
       "noNotes": "Przy kryterium „{criterion}” nie masz żadnej notatki. Zapytaj, jak pracownik widzi to kryterium, i dopisz notatkę po rozmowie.",
       "pending": "To stała zmiana zadań?",
-      "feedbackNever": "Nie przekazałeś {dat} jeszcze żadnej informacji zwrotnej. Zastanów się, o czym możesz powiedzieć.",
-      "feedbackLast": "Ostatnią informację zwrotną przekazałeś {dat} {date}. Zapytaj, czy była pomocna.",
+      "feedbackNever": "Brak zapisanej informacji zwrotnej dla {gen}.",
+      "feedbackLast": "Ostatnia informacja zwrotna dla {gen}: {date}.",
       "teamNone": "O {loc} nie masz jeszcze żadnej notatki.",
       "teamOld": "O {loc} nie masz żadnej notatki od {n} miesięcy.",
       "teamFallback": "Nie masz żadnej notatki o osobie: {name}.",
-      "reminder": "Od {date} nie przekazałeś {dat} żadnej informacji zwrotnej."
+      "reminder": "Od {date} brak zapisanej informacji zwrotnej dla {gen}."
     }
   }
 }

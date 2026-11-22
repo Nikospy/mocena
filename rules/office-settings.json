@@ -69,7 +69,7 @@
     {
       "id": "rozmowa-z-mentorem",
       "name": "Spotkania z doświadczoną osobą z urzędu",
-      "description": "Co dwa tygodnie krótkie spotkanie z kimś, kto zna nowy zakres zadań i może pokazać, jak go ogarnąć.",
+      "description": "Co dwa tygodnie krótkie spotkanie z kimś, kto zna nowy zakres zadań i może pokazać, jak sobie z nim poradzić.",
       "criteria": ["wspolpraca", "komunikacja"]
     },
     {

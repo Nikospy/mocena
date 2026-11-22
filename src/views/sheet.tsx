@@ -110,7 +110,7 @@ export function SheetFooter(props: { d: SheetData }) {
   );
 }
 
-export function SheetView(props: { viewer: Person; today: string; data: SheetData; links: CycleLink[] }) {
+export function SheetView(props: { viewer: Person; today: string; data: SheetData; links: CycleLink[]; autoPrint?: boolean }) {
   const d = props.data;
   const p1 = d.part1;
   const p2 = d.part2;
@@ -284,6 +284,7 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
           </section>
         )}
         <SheetFooter d={d} />
+        {props.autoPrint ? <script src="/auto-print.js" defer></script> : null}
       </article>
     </Layout>
   );

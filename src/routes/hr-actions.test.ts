@@ -12,7 +12,7 @@ describe("odnotowanie przyznania stopnia", () => {
     expect(await html(app, "joanna", "/hr")).toContain("Odnotuj przyznanie stopnia");
     const r = await call(app, "joanna", "/hr/grades/tomasz", {});
     expect(r.status).toBe(303);
-    expect(r.headers.get("location")).toBe("/hr");
+    expect(r.headers.get("location")).toBe("/hr?awarded=tomasz");
     const ev = visibleEventsOfType("mandatory_grade_awarded");
     expect(ev).toHaveLength(1);
     expect(ev[0].cycleId).toBe("cycle-tomasz");

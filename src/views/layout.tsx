@@ -1,12 +1,5 @@
 import type { Child } from "hono/jsx";
-import type { Person } from "../people";
-
-const ROLES: Record<Person["role"], string> = {
-  appraiser: "oceniający",
-  employee: "pracownik",
-  hr: "kadry",
-  admin: "administrator",
-};
+import { roleLabel, type Person } from "../people";
 
 export function formatDate(iso: string): string {
   const [y, m, d] = iso.split("-");
@@ -59,7 +52,7 @@ export function Layout(props: { title: string; person: Person | null; today: str
             <p class="who">
               {person ? (
                 <>
-                  <b>{person.name}</b> · {ROLES[person.role]}
+                  <b>{person.name}</b> · {roleLabel(person)}
                   <br />
                 </>
               ) : null}

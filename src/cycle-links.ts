@@ -6,8 +6,12 @@ type Provider = (cycle: Cycle, person: Person) => CycleLink[];
 
 const providers: Provider[] = [];
 
-export function registerCycleLinks(fn: Provider): void {
+/** Zwraca funkcję wyrejestrowującą (używają jej testy, żeby nie zostawiać dostawców w pamięci procesu). */
+export function registerCycleLinks(fn: Provider): () => void {
   providers.push(fn);
+  return () => {
+    providers.splice(providers.indexOf(fn), 1);
+  };
 }
 
 export function cycleLinks(cycle: Cycle, person: Person): CycleLink[] {

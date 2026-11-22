@@ -72,11 +72,16 @@ function noteGuard(c: Context): { viewer: Person; note: Note } | Response {
   return { viewer, note };
 }
 
+/** Osoba, której dotyczy notatka, w dopełniaczu („zmianę zadań Piotra”). */
+function subjectGenitive(note: Note): string {
+  const name = personById(note.subject_id)?.name ?? "";
+  return nameForm(name, "gen") ?? name;
+}
 app.get("/notes/:noteId/task-change", (c) => {
   const g = noteGuard(c);
   if (g instanceof Response) return g;
   const answered = answersFor(g.note).pop();
-  if (!answered) return c.html(<TaskChangeQuestionView viewer={g.viewer} today={today()} note={g.note} />);
+  if (!answered) return c.html(<TaskChangeQuestionView viewer={g.viewer} today={today()} note={g.note} card={card("taskChange")} subjectGenitive={subjectGenitive(g.note)} />);
   if (answered.payload.answer === "yes") {
     const forms = officeSettings().developmentForms;
     const form = forms.find((f) => f.id === answered.payload.developmentFormId) ?? suggestDevelopmentForm(g.note);
@@ -88,11 +93,14 @@ app.get("/notes/:noteId/task-change", (c) => {
 app.post("/notes/:noteId/task-change", async (c) => {
   const g = noteGuard(c);
   if (g instanceof Response) return g;
-  if (lastAnswer(g.note.id, answersFor(g.note)) !== null) return c.text("Na to pytanie już odpowiedziałeś.", 409);
+  if (lastAnswer(g.note.id, answersFor(g.note)) !== null) return c.text("Na to pytanie już odpowiedziano.", 409);
   const raw = (await c.req.parseBody()).answer;
   const answer = raw === "yes" || raw === "no" ? raw : null;
   if (!answer) {
-    return c.html(<TaskChangeQuestionView viewer={g.viewer} today={today()} note={g.note} error="Wybierz „Tak” albo „Nie”." />, 422);
+    return c.html(
+      <TaskChangeQuestionView viewer={g.viewer} today={today()} note={g.note} card={card("taskChange")} subjectGenitive={subjectGenitive(g.note)} error="Wybierz „Tak” albo „Nie”." />,
+      422,
+    );
   }
   const developmentFormId = answer === "yes" ? suggestDevelopmentForm(g.note).id : null;
   recordEvent("task_change_answered", g.note.cycle_id, g.note.author_id, { noteId: g.note.id, answer, developmentFormId });

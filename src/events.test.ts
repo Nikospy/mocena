@@ -84,11 +84,13 @@ describe("cykle", () => {
 
 describe("rejestry i seed", () => {
   test("homeTasks i cycleLinks zbierają zarejestrowane funkcje", () => {
-    registerHomeTasks((p) => [{ title: `a-${p.id}`, href: "/a" }]);
-    registerCycleLinks((c) => [{ label: c.id, href: "/c" }]);
+    const offTasks = registerHomeTasks((p) => [{ title: `a-${p.id}`, href: "/a" }]);
+    const offLinks = registerCycleLinks((c) => [{ label: c.id, href: "/c" }]);
     const marek = { id: "marek" } as any;
     expect(homeTasks(marek).map((t) => t.title)).toContain("a-marek");
     expect(cycleLinks({ id: "c1" } as any, marek).map((l) => l.label)).toContain("c1");
+    offTasks();
+    offLinks();
   });
 
   test("runSeed wgrywa siedem kont", () => {

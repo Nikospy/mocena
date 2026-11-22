@@ -62,7 +62,7 @@ describe("przypomnienie o docenianiu", () => {
   test("jest bez informacji zwrotnej i niesie notatkę z 18.06.2026; znika, gdy informacja zwrotna jest z dnia dzisiejszego", () => {
     createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } });
     const r = appreciationReminder({ ...base, notes: notes(), lastFeedback: null, today: "2026-11-21" });
-    expect(r?.sentence).toBe("Od 09.12.2024 nie przekazałeś Piotrowi żadnej informacji zwrotnej.");
+    expect(r?.sentence).toBe("Od 09.12.2024 brak zapisanej informacji zwrotnej dla Piotra.");
     expect(r?.goodNotes.some((n) => n.date === "2026-06-18")).toBe(true);
     expect(appreciationReminder({ ...base, lastFeedback: "2026-11-21", today: "2026-11-21" })).toBeNull();
   });

@@ -1,4 +1,5 @@
 import { Hono, type Context } from "hono";
+import { assessmentPhaseOpen } from "../assessment/phase";
 import { card } from "../content";
 import { cycleById, openCycle } from "../cycles";
 import { registerCycleLinks } from "../cycle-links";
@@ -23,7 +24,9 @@ export function afterNoteSaved(note: Note): string {
 }
 
 registerCycleLinks((cycle, person) =>
-  cycle.appraiser_id === person.id ? [{ label: "Karta rozmowy oceniającej", href: `/cycles/${cycle.id}/cards/assessment-conversation` }] : [],
+  cycle.appraiser_id === person.id && assessmentPhaseOpen(cycle)
+    ? [{ label: "Karta rozmowy oceniającej", href: `/cycles/${cycle.id}/cards/assessment-conversation` }]
+    : [],
 );
 
 registerHomeTasks((person) => (person.role === "appraiser" ? [{ title: "Notatki o zespole", href: "/notes" }] : []));
@@ -134,7 +137,8 @@ app.get("/notes", (c) => {
     const canWrite = canWriteNoteAbout(viewer.id, id);
     const own = notes.filter((n) => n.subject_id === id);
     if (own.length === 0 && !canWrite) continue;
-    groups.push({ person, notes: own, canWrite });
+    const cycle = openCycle(id);
+    groups.push({ person, notes: own, canWrite, cycleHref: cycle && cycle.appraiser_id === viewer.id ? `/cycles/${cycle.id}` : undefined });
   }
   const latest = (g: NoteGroup) => g.notes[0]?.date ?? "";
   groups.sort((a, b) => latest(b).localeCompare(latest(a)) || a.person.name.localeCompare(b.person.name, "pl"));

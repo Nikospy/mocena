@@ -28,6 +28,8 @@ export type CycleState = {
   /** Termin sporządzenia oceny minął (tylko kroki przed zatwierdzeniem oceny). */
   overdue?: boolean;
   since?: string;
+  /** Dalszy ciąg opisu stanu: w tabeli zwinięty pod „Szczegóły”. */
+  more?: string;
 };
 
 const OUTCOME_TEXT = {
@@ -92,7 +94,8 @@ export function cycleState(cycleId: string): CycleState {
     const d = effectiveDeadline(cycleId);
     return {
       step: "due_change_requested",
-      text: "Wniosek ocenianego o zmianę terminu czeka na rozpatrzenie przez oceniającego. Po zmianie terminu oceniający zawiadamia pracownika pisemnie, a kopia pisma idzie do arkusza",
+      text: "Wniosek ocenianego o zmianę terminu czeka na rozpatrzenie przez oceniającego",
+      more: "Po zmianie terminu oceniający zawiadamia pracownika pisemnie, a kopia pisma idzie do arkusza.",
       deadline: { date: d.date, basis: ["art. 81 ust. 8 ustawy", "§ 8 rozporządzenia"] },
       deadlineLabel: "Bieżący termin oceny",
       overdue: d.date < now,

@@ -66,12 +66,16 @@ const STEP_LABEL: Record<CycleStep, string> = {
   due_change_requested: "Wniosek o zmianę terminu",
 };
 
+function Chevron() {
+  return <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6" /></svg>;
+}
+
 /** Liczby dla całego urzędu, bez nazwisk i bez podziału na komórki. */
 export function StatsBlock(props: { stats: OfficeStats }) {
   const s = props.stats;
   return (
     <section class="card" id="statystyki">
-      <h2>Statystyki terminowości (widok dyrektora generalnego, bez nazwisk)</h2>
+      <h2>Terminowość w urzędzie (bez nazwisk)</h2>
       <ul class="hr-stats plain-list">
         {(Object.keys(STEP_LABEL) as CycleStep[]).map((k) => (
           <li class="stat">
@@ -122,13 +126,25 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
               <th scope="row">{r.personName}</th>
               <td>{r.appraiserName}</td>
               <td>{r.sheet ?? "—"}</td>
-              <td>{r.state.text}</td>
+              <td>
+                {r.state.text}
+                {r.state.more ? (
+                  <details class="disc">
+                    <summary>Szczegóły <Chevron /></summary>
+                    <p class="cap">{r.state.more}</p>
+                  </details>
+                ) : null}
+              </td>
               <td>
                 {r.state.deadline ? (
                   <>
-                    <span>
-                      {r.state.deadlineLabel}: {formatDate(r.state.deadline.date)}
-                    </span>{" "}
+                    {(r.state.step === "acknowledged" || r.state.step === "fiction") && r.state.deadline.date < r.today ? (
+                      <span>Termin sprzeciwu minął {formatDate(r.state.deadline.date)}</span>
+                    ) : (
+                      <span>
+                        {r.state.deadlineLabel}: {formatDate(r.state.deadline.date)}
+                      </span>
+                    )}{" "}
                     <LegalBasis basis={r.state.deadline.basis} />
                     {r.state.overdue ? <small class="cap"> · termin minął {formatDate(r.state.deadline.date)}</small> : null}
                   </>
@@ -143,6 +159,11 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
                       {l.label}
                     </a>
                   ))}
+                  {r.sheet ? (
+                    <a class="btn link-chip" href={`/cycles/${r.cycleId}/sheet?print=1`}>
+                      Drukuj / pobierz PDF
+                    </a>
+                  ) : null}
                 </span>
                 {r.state.step === "objection_filed" ? (
                   <form method="post" action={`/cycles/${r.cycleId}/objection-outcome`} class="hr-actions">
@@ -167,13 +188,19 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
   );
 }
 
-export function HrOverviewView(props: { viewer: Person; today: string; cards: ReminderProps[]; rows: StateRow[]; stats: OfficeStats }) {
+export function HrOverviewView(props: { viewer: Person; today: string; cards: ReminderProps[]; rows: StateRow[]; stats: OfficeStats; awarded?: { dative: string; date: string } }) {
   return (
     <Layout title="Stan cykli" person={props.viewer} today={props.today}>
       <section class="card hdr slim">
         <h1>Stan cykli</h1>
         <p class="cap">Najnowszy cykl każdej osoby, od najbliższego terminu.</p>
       </section>
+      {props.awarded ? (
+        <div class="st ok" role="status">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+          <div><b>Odnotowano przyznanie stopnia {props.awarded.dative}, {formatDate(props.awarded.date)}.</b></div>
+        </div>
+      ) : null}
       {props.cards.map((c) => (
         <ReminderCard {...c} />
       ))}

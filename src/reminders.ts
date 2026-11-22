@@ -1,19 +1,17 @@
 import { assessmentState } from "./assessment/state";
 import { cycleDeadlineDetails, openCycle, type Cycle } from "./cycles";
+import { shiftedDeadlineSentence } from "./deadline-shift";
 import { getDb } from "./db";
 import { addDays } from "./engine/deadlines";
-import { registerHomeTasks } from "./home-tasks";
-import { officeSettings } from "./office-settings";
+import { registerHomeTasks, type HomeTask } from "./home-tasks";
+import { assessmentWindowDays } from "./office-settings";
 import { personById } from "./people";
 import { today } from "./settings";
 import { formatDate } from "./views/layout";
 
-const DEFAULT_DAYS = 30;
 
 registerHomeTasks((person) => {
-  const days = officeSettings().assessmentReminderDays;
-  const window = days?.value ?? DEFAULT_DAYS;
-  const label = days?.label ?? "ustawienie urzędu";
+  const { value: window, label } = assessmentWindowDays();
   const rows = getDb().query("SELECT DISTINCT person_id FROM cycles WHERE appraiser_id = ?").all(person.id) as { person_id: string }[];
   const cycles: Cycle[] = [];
   for (const id of new Set([...rows.map((r) => r.person_id), person.id])) {
@@ -21,25 +19,21 @@ registerHomeTasks((person) => {
     if (c && (c.appraiser_id === person.id || c.person_id === person.id)) cycles.push(c);
   }
   const now = today();
-  const tasks: { title: string; href: string; detail?: string }[] = [];
+  const tasks: HomeTask[] = [];
   for (const c of cycles) {
     const stage = assessmentState(c.id).stage;
     if (stage !== "no_part1" && stage !== "draft") continue; // po zatwierdzeniu termin jest zamrożony
     const d = cycleDeadlineDetails(c.id);
-    if (now < addDays(d.deadline, -window) || now > d.deadline) continue;
+    const shifted = shiftedDeadlineSentence(c.id);
+    const own = c.person_id === person.id;
     const name = personById(c.person_id)?.name;
-    const basis = d.basis.join("; ");
+    if (shifted) tasks.push({ title: shifted.text, person: own ? undefined : name, detail: `Nieobecność dłuższa niż miesiąc zmienia termin oceny (${shifted.basis.join("; ")}). Daty na osi czasu.`, action: "Zobacz oś czasu", href: `/cycles/${c.id}/timeline` });
+    if (now < addDays(d.deadline, -window) || now > d.deadline) continue;
     tasks.push({
-      title: `Termin oceny ${name}: ${formatDate(d.deadline)}`,
+      title: own ? `Twój termin oceny: ${formatDate(d.deadline)}` : `Termin oceny ${name}: ${formatDate(d.deadline)}`,
       href: `/cycles/${c.id}/timeline`,
-      detail: `${basis}. Przypomnienie na ${window} dni przed terminem: ${label}.`,
+      detail: `${d.basis.join("; ")}. Przypomnienie na ${window} dni przed terminem: ${label}.`,
     });
-    if (d.extensionDays > 0) {
-      tasks.push({
-        title: `Termin oceny przesunięty z ${formatDate(d.base)} na ${formatDate(d.deadline)} z powodu nieobecności dłuższej niż miesiąc (art. 81 ust. 7 ustawy)`,
-        href: `/cycles/${c.id}/timeline`,
-      });
-    }
   }
   return tasks;
 });
