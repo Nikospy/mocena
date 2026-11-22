@@ -5,5 +5,6 @@
   "compatibility_flags": ["nodejs_compat"],
   "assets": { "directory": "./public" },
   "durable_objects": { "bindings": [{ "name": "DEMO_SESSION", "class_name": "DemoSession" }] },
+  "version_metadata": { "binding": "CF_VERSION_METADATA" },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DemoSession"] }]
 }

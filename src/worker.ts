@@ -7,7 +7,7 @@ import { runSeed } from "./seed";
 
 const SESSION_COOKIE = "mocena_demo";
 
-type Env = { DEMO_SESSION: DurableObjectNamespace<DemoSession> };
+type Env = { DEMO_SESSION: DurableObjectNamespace<DemoSession>; CF_VERSION_METADATA?: { id: string } };
 
 export class DemoSession extends DurableObject<Env> {
   private db: Db;
@@ -15,15 +15,21 @@ export class DemoSession extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     this.db = durableObjectDb(ctx.storage);
+    // A session started on an older deployment keeps its old schema and data.
+    // Each deployment has its own version id; on mismatch the session is rebuilt.
+    const version = env.CF_VERSION_METADATA?.id ?? "dev";
     ctx.blockConcurrencyWhile(async () => {
-      const seeded = ctx.storage.sql
-        .exec("SELECT count(*) AS n FROM sqlite_master WHERE type = 'table' AND name = 'people'")
-        .one().n;
-      if (seeded) return;
+      const sql = ctx.storage.sql;
+      const hasMeta = sql.exec("SELECT count(*) AS n FROM sqlite_master WHERE type = 'table' AND name = 'deploy_meta'").one().n;
+      const stored = hasMeta ? (sql.exec("SELECT value FROM deploy_meta WHERE key = 'version'").toArray()[0]?.value ?? null) : null;
+      if (stored === version) return;
+      await ctx.storage.deleteAll();
       withDb(this.db, () => {
         createSchema(this.db);
         runSeed(this.db, { liveStep2: true });
       });
+      sql.exec("CREATE TABLE IF NOT EXISTS deploy_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)");
+      sql.exec("INSERT OR REPLACE INTO deploy_meta (key, value) VALUES ('version', ?)", version);
     });
   }
 
