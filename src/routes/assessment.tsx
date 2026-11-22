@@ -239,7 +239,14 @@ app.post("/cycles/:id/assessment/approve", async (c) => {
     if (blockers.length) return "blocked";
     const snapshot = buildAssessmentSnapshot(g.cycle.id, draft);
     const r = state.redo;
-    recordEvent("assessment_approved", g.cycle.id, g.person.id, r?.first.approvedOn ? { ...snapshot, redo: { objectionFiledOn: r.filedOn, firstApprovedOn: r.first.approvedOn } } : snapshot);
+    // Druga ocena: termin to termin rozpatrzenia sprzeciwu (art. 83 ust. 3 ustawy), który ją obejmuje.
+    const due = r ? reassessmentDeadline(g.cycle.id) : null;
+    recordEvent(
+      "assessment_approved",
+      g.cycle.id,
+      g.person.id,
+      r?.first.approvedOn ? { ...snapshot, ...(due ? { deadline: due } : {}), redo: { objectionFiledOn: r.filedOn, firstApprovedOn: r.first.approvedOn } } : snapshot,
+    );
     return "ok";
   })();
   if (outcome === "closed") return render(c, g, { status: 409, errors: { _: CLOSED } });

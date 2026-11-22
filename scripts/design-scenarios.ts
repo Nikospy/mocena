@@ -230,6 +230,25 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await invalid(H, "/hr", "objection-error", objection, { noValidate: true });
   await shot(H, await post(H, objection, { outcome: "rejected" }), "hr-objection-resolved", { check: "Sprzeciw rozpatrzony" });
   await roles(objectionCycle + "/assessment", "assessment-objection-resolved", [S, H]);
+  // Ocena sporządzona po raz drugi (art. 83 ust. 4 ustawy): ten sam sprzeciw rozstrzygnięty inaczej, w punkcie zapisu cofanym po zrzutach.
+  const redoDb = getDb();
+  redoDb.exec("SAVEPOINT audit_redo");
+  try {
+    redoDb.query("DELETE FROM events WHERE cycle_id = 'cycle-katarzyna' AND type = 'objection_resolved'").run();
+    await post(H, objection, { outcome: "redone" });
+    const redoAssessment = objectionCycle + "/assessment";
+    await shot(S, redoAssessment, "assessment-redo-form", { selector: "#assessment-form", check: "po raz drugi" });
+    const redoFields: Fields = { justification: "", developmentConclusions: "Szkolenie z zarządzania zespołem w ciągu roku.", interviewDate: "2026-11-22" };
+    for (const id of regulation.sheets.C.mandatoryCriteria) redoFields[`score[${id}]`] = id === "rzetelnosc" ? "3" : "5";
+    await post(S, redoAssessment, redoFields);
+    await invalid(S, redoAssessment, "assessment-redo-lowered", redoAssessment + "/approve", { button: 'button[formaction$="/assessment/approve"]' });
+    redoFields["score[rzetelnosc]"] = "7";
+    await post(S, redoAssessment + "/approve", redoFields);
+    await roles(redoAssessment, "assessment-redo-approved", [S, H]);
+    await shot(H, objectionCycle + "/sheet", "sheet-redo", { check: "po raz drugi" });
+  } finally {
+    redoDb.exec("ROLLBACK TO audit_redo; RELEASE audit_redo");
+  }
   await shot(D, "/office/statistics", "office-statistics-final");
   await keyboard(H, "/hr", "hr");
   await shot(H, "/hr", "hover-link", { hover: "a.brand" });

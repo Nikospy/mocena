@@ -85,6 +85,11 @@ Identyfikator zrzutu daje plik `<identyfikator>-<szerokość>.jpg`. Eksporty CSV
 | `/cycles/:id/assessment` | `joanna` | ocena po wniesieniu sprzeciwu | `assessment-objection-filed-joanna` | nie przechodzi · 320 — przechodzi / 360 — przechodzi / 768 — T2, L3 / 1024 — L3 / 1440 — L3 |
 | `/cycles/:id/assessment` | `anna` | ocena po rozstrzygnięciu sprzeciwu | `assessment-objection-resolved-anna` | nie przechodzi · 320 — przechodzi / 360 — przechodzi / 768 — T2, L3 / 1024 — L3 / 1440 — L3 |
 | `/cycles/:id/assessment` | `joanna` | ocena po rozstrzygnięciu sprzeciwu | `assessment-objection-resolved-joanna` | nie przechodzi · 320 — przechodzi / 360 — przechodzi / 768 — T2, L3 / 1024 — L3 / 1440 — L3 |
+| `/cycles/:id/assessment` | `anna` | ocena sporządzana po raz drugi · formularz z pierwszą oceną | `assessment-redo-form` | przechodzi przy 360 i 1440 (mierzone tylko te szerokości) |
+| `/cycles/:id/assessment` | `anna` | 422 · ocena sporządzona po raz drugi niższa niż pierwsza | `assessment-redo-lowered` | przechodzi przy 360 i 1440 (mierzone tylko te szerokości) |
+| `/cycles/:id/assessment` | `anna` | ocena sporządzona po raz drugi, zatwierdzona | `assessment-redo-approved-anna` | przechodzi przy 360 i 1440 (mierzone tylko te szerokości) |
+| `/cycles/:id/assessment` | `joanna` | ocena sporządzona po raz drugi, zatwierdzona | `assessment-redo-approved-joanna` | przechodzi przy 360 i 1440 (mierzone tylko te szerokości) |
+| `/cycles/:id/sheet` | `joanna` | arkusz z oceną sporządzoną po raz drugi | `sheet-redo` | przechodzi przy 360 i 1440 (mierzone tylko te szerokości) |
 | `/cycles/:id/assessment/export.json` | `marek` | 404 · ocena przed zatwierdzeniem | `assessment-export-not-approved` | nie przechodzi · 320 — T1, T2, H1, L4 / 360 — T1, T2, H1, H3, L4 / 768 — T1, T2, H1, L4 / 1024 — T1, T2, H1, L4 / 1440 — T1, T2, H1, L4 |
 | `/cycles/:id/assessment/export.json` | `marek` | zatwierdzona ocena · plik JSON | `assessment-export-approved-marek` | przechodzi przy wszystkich szerokościach |
 | `/cycles/:id/assessment/export.json` | `piotr` | zatwierdzona ocena · plik JSON | `assessment-export-approved-piotr` | przechodzi przy wszystkich szerokościach |

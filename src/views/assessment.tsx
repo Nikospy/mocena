@@ -462,7 +462,7 @@ function RedoNote(p: AssessmentViewProps & { first: AssessmentStateData }) {
       <div>
         {p.redo ? (
           <p>
-            Sprzeciw uwzględniony {formatDate(redo.resolvedOn)}: sporządzasz ocenę po raz drugi do <b>{formatDate(p.redo.date)}</b>; żadna ocena cząstkowa nie może być niższa niż w pierwszej. <LegalBasis basis={[rules.objectionRedo.basis, ...p.redo.basis]} />
+            Sprzeciw uwzględniony {formatDate(redo.resolvedOn)}: sporządzasz ocenę po raz drugi do {formatDate(p.redo.date)}; żadna ocena cząstkowa nie może być niższa niż w pierwszej. <LegalBasis basis={[rules.objectionRedo.basis, ...p.redo.basis]} />
           </p>
         ) : (
           <p>Ocena sporządzona po raz drugi po uwzględnieniu sprzeciwu z dnia {formatDate(redo.filedOn)}. <LegalBasis basis={[rules.objectionRedo.basis]} /></p>

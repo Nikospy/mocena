@@ -33,7 +33,7 @@ describe("ocena sporządzona po raz drugi (art. 83 ust. 4 ustawy)", () => {
     const app = await redone();
     const page = await html(app, "anna", `${CYCLE}/assessment`);
     expect(page).toContain('id="assessment-form"');
-    expect(page).toContain("sporządzasz ocenę po raz drugi do <b>04.12.2026</b>");
+    expect(page).toContain("sporządzasz ocenę po raz drugi do 04.12.2026");
     expect(page).toContain("Pierwsza ocena z dnia 16.11.2026");
     expect(page).not.toContain("Prototyp nie ma jeszcze formularza drugiej oceny");
     for (const id of ids()) expect(page).toContain(`name="score[${id}]" value="5" checked`);
@@ -62,6 +62,7 @@ describe("ocena sporządzona po raz drugi (art. 83 ust. 4 ustawy)", () => {
     expect(rows.length).toBe(2);
     expect(JSON.parse(rows[0].payload).redo).toBeUndefined();
     expect(JSON.parse(rows[1].payload).redo).toEqual({ objectionFiledOn: "2026-11-20", firstApprovedOn: "2026-11-16" });
+    expect(JSON.parse(rows[1].payload).deadline).toEqual({ date: "2026-12-04", basis: ["art. 83 ust. 3 ustawy"] });
     const view = await html(app, "anna", `${CYCLE}/assessment`);
     expect(view).toContain("Ocena sporządzona po raz drugi po uwzględnieniu sprzeciwu z dnia 20.11.2026");
     expect(view).toContain("Pierwsza ocena z dnia 16.11.2026");
