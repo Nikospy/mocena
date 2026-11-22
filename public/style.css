@@ -1055,6 +1055,33 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 .person-del .btn.primary { background: var(--red-200); border-color: var(--red-200); }
 @media (hover: hover) and (pointer: fine) { .person-del .btn.primary:not(:disabled):hover { background: var(--red-100); border-color: var(--red-100); } }
 
+/* -- Import pracowników z CSV -- */
+.imp-form > h2 + *, .imp-plan > h2 + * { margin-block-start: var(--sp-300); }
+.imp-form .person-form { max-inline-size: none; }
+.imp-file.area { block-size: auto; min-block-size: var(--hit); padding-block: var(--sp-100); }
+.imp-colnames { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-50) var(--sp-200); font-weight: var(--w-bold); }
+.imp-rows { list-style: none; padding: 0; }
+.imp-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--sp-100) var(--sp-300); padding-block: var(--sp-200); border-block-start: 1px solid var(--line); }
+.imp-row:first-child { border: 0; padding-block-start: 0; }
+.imp-row p { margin-block-start: var(--sp-50); color: var(--text-2); }
+.imp-st { font-weight: var(--w-bold); color: var(--text-2); }
+.imp-row.ok .imp-st { color: var(--green-200); }
+.imp-row.error .imp-st { color: var(--red-200); }
+.imp-row.error p { color: var(--red-200); }
+.imp-plan .person-actions { margin-block-start: var(--sp-300); }
+
+/* -- strony administratora: wersja przepisów, korekty -- */
+.card:not(.rule) .hr-facts dt { color: var(--text-2); }
+.card:not(.rule) .hr-facts dd { color: var(--text); }
+.hr-facts dd { overflow-wrap: anywhere; }
+.hr-doc > h2 + * { margin-block-start: var(--sp-300); }
+.hr-steps { padding-inline-start: var(--sp-300); display: grid; gap: var(--sp-150); }
+.hr-steps li { max-inline-size: 66ch; padding-inline-start: var(--sp-100); }
+.hr-steps li::marker { font-weight: var(--w-bold); color: var(--primary); }
+.hr-note { color: var(--text-2); max-inline-size: 66ch; }
+.side.subs-side .card > h2 + * { margin-block-start: var(--sp-200); }
+:is(.hr-facts, .hr-steps, .hr-doc) code { overflow-wrap: anywhere; }
+
 /* --- koniec sekcji hr-admin (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
 /* . */
 /* . */
