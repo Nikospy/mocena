@@ -84,7 +84,7 @@ describe("krok 4 pokazu: ocena i blokady", () => {
     const ev = events("assessment_approved");
     expect(ev).toHaveLength(1);
     const s = ev[0].payload as AssessmentSnapshot;
-    expect(s.periodFrom).toBe("2024-11-27");
+    expect(s.periodFrom).toBe("2024-12-09");
     expect(s.deadline).toEqual(effectiveDeadline(piotr));
     expect(s.deadline.date).toBe("2026-11-27");
     expect(s.grade).toBeNull();

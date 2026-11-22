@@ -6,6 +6,7 @@ import { visibleEvents } from "../events";
 import { personById, type Person } from "../people";
 import { setting, today } from "../settings";
 import { assessmentHistory } from "./history";
+import { assessmentPeriodFrom } from "../cycles/part1";
 
 type Confirmation = { place: string; date: string; name: string };
 type Deadline = { date: string; basis: string[] };
@@ -116,7 +117,7 @@ export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetDat
     },
     part2: {
       interviewDate: snap?.interviewDate ?? null,
-      periodFrom: snap?.periodFrom ?? cycle.period_start,
+      periodFrom: snap?.periodFrom ?? assessmentPeriodFrom(cycleId, cycle.period_start),
       periodTo: snap?.periodTo ?? null,
       rows,
       mean: snap?.result.mean ?? null,

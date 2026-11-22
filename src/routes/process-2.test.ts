@@ -26,3 +26,21 @@ describe("proces 2: wniosek ocenianego o zmianę terminu jest zawsze do znalezie
     expect(await html(app, "piotr", "/cycles/cycle-piotr/timeline")).not.toContain("deadline-change/request");
   });
 });
+
+describe("proces 2: okres podlegania ocenie od ustalenia kryteriów", () => {
+  test("arkusz Piotra po zatwierdzeniu: od 09.12.2024 (potwierdzenie części I), termin oceny bez zmian", async () => {
+    const { app } = createTestApp({ today: "2026-11-22", seedOptions: { afterStep1: true } });
+    await approveAndAcknowledgePiotr(app);
+    const sheet = await html(app, "piotr", "/cycles/cycle-piotr/sheet");
+    expect(sheet).toContain("od 09.12.2024");
+    expect(sheet).not.toContain("od 27.11.2024");
+    const { effectiveDeadline } = await import("../cycles");
+    expect(effectiveDeadline("cycle-piotr").date).toBe("2026-11-27");
+  });
+
+  test("arkusz Tomasza: od dnia potwierdzenia jego części I (03.12.2024)", async () => {
+    const { app } = createTestApp({ today: "2026-11-22" });
+    const sheet = await html(app, "joanna", "/cycles/cycle-tomasz/sheet");
+    expect(sheet).toContain("od 03.12.2024");
+  });
+});

@@ -24,7 +24,7 @@ describe("buildAssessmentSnapshot", () => {
     const before = count();
     const s = buildAssessmentSnapshot(piotr, draft);
     expect(count()).toBe(before);
-    expect(s.periodFrom).toBe("2024-11-27");
+    expect(s.periodFrom).toBe("2024-12-09");
     expect(s.periodTo).toBe("2026-11-21");
     expect(s.confirmation).toEqual({ place: "Rzeszów", date: "2026-11-21", name: "Marek Zieliński" });
     expect(s.deadline).toEqual(effectiveDeadline(piotr));
