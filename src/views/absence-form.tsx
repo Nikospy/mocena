@@ -46,12 +46,15 @@ export function AbsenceFormView(props: {
       <div class="o-main">
       <section class="card form-card ct-form">
         <form method="post" action={`/cycles/${props.cycleId}/absences`} class="abs-form">
-          <ErrorSummary errors={{ from: e.from, to: e.to }} />
+          <ErrorSummary
+            errors={{ from: e.from, to: e.to }}
+            lead={e.from && v.from > props.today ? <a href={`/cycles/${props.cycleId}/deadline-change`}>Zmiana terminu oceny</a> : undefined}
+          />
           <div class="dates">
             <div class="field">
               <label class="lbl" for="from">Od</label>
               <FieldError id="from" errors={e} />
-              <input class="area" type="date" id="from" name="from" value={v.from} {...invalid("from", e, "from-words")} />
+              <input class="area" type="date" id="from" name="from" value={v.from} max={props.today} {...invalid("from", e, "from-words")} />
               <p class="date-words" id="from-words" data-date-words-for="from">{v.from ? formatDateLong(v.from) : ""}</p>
             </div>
             <div class="field">

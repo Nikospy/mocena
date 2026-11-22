@@ -60,6 +60,8 @@ function summaryOf(cycle: Cycle): AbsenceSummary | null {
   };
 }
 
+export const FUTURE_START = "Wpisz nieobecność, która już się zaczęła: początek najpóźniej dziś. Przewidywaną nieobecność załatwia oceniający zmianą terminu oceny (art. 81 ust. 8 pkt 2 ustawy).";
+
 const closed = (c: Context) => errorPage(c, "Cykl jest zamknięty. Nieobecność wpisuje się tylko w otwartym cyklu.", 409);
 const isOpen = (cycle: Cycle) => openCycle(cycle.person_id)?.id === cycle.id;
 
@@ -80,6 +82,8 @@ app.post("/cycles/:id/absences", async (c) => {
   const excused = body.excused !== undefined;
   const errors: Partial<Record<"from" | "to", string>> = {};
   if (!validDate(from)) errors.from = "Wybierz z kalendarza datę początku nieobecności.";
+  // Art. 81 ust. 7 przedłuża termin o nieobecność, która już trwa; przewidywaną załatwia zmiana terminu (art. 81 ust. 8 pkt 2).
+  else if (from > today()) errors.from = FUTURE_START;
   if (!validDate(to)) errors.to = "Wybierz z kalendarza datę końca nieobecności.";
   else if (!errors.from && to < from) errors.to = "Wybierz datę końca równą dacie początku albo późniejszą.";
   if (errors.from || errors.to) return render(c, g, { from, to, excused }, errors, 422);
