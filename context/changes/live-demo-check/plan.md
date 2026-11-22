@@ -73,7 +73,7 @@ Równolegle powstają S-08 (`guided-demo-tour`, pliki `src/tour/*`, `layout.tsx`
 
 #### Manual
 
-- [ ] 1.3 `bun run demo-check <żywy adres> --runs 2` przechodzi
+- [x] 1.3 `bun run demo-check <żywy adres> --runs 2` przechodzi — b901583
 
 ### Phase 2: Przewodnik pokazu (po scaleniu S-08)
 

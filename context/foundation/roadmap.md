@@ -55,7 +55,7 @@ Ocena okresowa w służbie cywilnej powstaje raz na 24 miesiące, na papierze i 
 | S-03 | timeline-and-absences        | kadry wpisują nieobecność i zmianę oceniającego, a wszyscy widzą oś czasu z regułami | S-01, S-06    | US-03, FR-010, FR-011, FR-014, FR-033, FR-034 | in-progress |
 | S-06 | hr-overview-and-print        | kadry widzą stan cykli i stopnie obowiązkowe, a arkusz da się pobrać i wydrukować    | S-02          | FR-026, FR-027, FR-029, FR-031             | in-progress |
 | S-07 | design-parity                | każdy ekran wygląda jak przyjęte makiety, na telefonie i komputerze                 | S-01–S-06     | MS-01                                      | in-progress |
-| S-08 | guided-demo-tour             | juror przechodzi cały proces sam, prowadzony krok po kroku przez przewodnik pokazu  | S-07          | MS-02, US-01–US-05                         | planning |
+| S-08 | guided-demo-tour             | juror przechodzi cały proces sam, prowadzony krok po kroku przez przewodnik pokazu  | S-07          | MS-02, US-01–US-05                         | in-progress |
 | S-09 | review-polish                | juror nie trafia na niejasny tekst, pusty obszar ani ślepy zaułek                   | S-07          | MS-03                                      | planning |
 | S-10 | live-demo-check              | pokaz przechodzi automatycznie dwa razy z rzędu na żywej stronie                    | S-08, S-09    | MS-04                                      | proposed |
 | S-11 | jury-materials               | juror dostaje nagranie, PDF, README i opis zgłoszenia zgodne z działającą wersją    | S-10          | MS-05                                      | proposed |
