@@ -1,7 +1,7 @@
 import { CRITERIA } from "../engine/scoring";
 import type { Person } from "../people";
 import type { NoteSuggestion } from "../suggestions";
-import { Layout } from "./layout";
+import { Layout, formatDateLong } from "./layout";
 
 export type NoteFormValues = { criterion_id: string; text: string; rating: string; task_change: boolean; date: string };
 export type CriteriaGroup = { label: string; ids: string[] };
@@ -36,18 +36,33 @@ export function NoteFormView(props: {
       <section class="enter">
         <h1 class="n-title">Nowa notatka: {props.subject.name}</h1>
         <form method="post" action={`/people/${props.subject.id}/notes`} class="n-form" id="note-form">
+          <div class="who-block">
+            <div class="who-row">
+              <div class="tok">
+                <span class="k">O kim</span>
+                <span class="v">{props.subject.name}</span>
+              </div>
+              <label class="tok" for="date">
+                <span class="k">Kiedy</span>
+                <input class="tok-date" type="date" id="date" name="date" max={props.today} value={v.date} />
+              </label>
+            </div>
+            {e.date ? <p class="st bad" role="alert">{e.date}</p> : null}
+          </div>
+
           <div class="card hero-field">
             <label for="text"><h2>Co się stało</h2></label>
             <textarea id="text" name="text" rows={5} aria-invalid={e.text ? "true" : undefined}>{v.text}</textarea>
             {e.text ? <p class="st bad" role="alert">{e.text}</p> : null}
+            <div class="hero-foot">
+              <p class="sign">
+                <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5" /><path d="M5 20a7 7 0 0 1 14 0" /></svg>
+                {props.viewer.name} · {formatDateLong(props.today)}
+              </p>
+            </div>
           </div>
 
           <div class="n-fields">
-            <div>
-              <label class="lbl" for="date">Data zdarzenia</label>
-              <input class="area" type="date" id="date" name="date" max={props.today} value={v.date} />
-              {e.date ? <p class="st bad" role="alert">{e.date}</p> : null}
-            </div>
             <div role="radiogroup" aria-labelledby="l-krit">
               <span class="lbl" id="l-krit">Kryterium</span>
               {props.groups.map((g) => (
@@ -57,7 +72,7 @@ export function NoteFormView(props: {
                     {g.ids.map((id) => (
                       <label class="chip">
                         <input type="radio" name="criterion_id" value={id} checked={v.criterion_id === id} />
-                        <span>{CRITERIA.find((c) => c.id === id)?.name ?? id}</span>
+                        <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>{CRITERIA.find((c) => c.id === id)?.name ?? id}</span>
                       </label>
                     ))}
                   </div>
@@ -70,17 +85,18 @@ export function NoteFormView(props: {
               <div class="seg">
                 <label>
                   <input type="radio" name="rating" value="good" checked={v.rating === "good"} />
-                  <span>dobrze</span>
+                  <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>dobrze</span>
                 </label>
                 <label>
                   <input type="radio" name="rating" value="needs_improvement" checked={v.rating === "needs_improvement"} />
-                  <span>do poprawy</span>
+                  <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>do poprawy</span>
                 </label>
               </div>
             </div>
           </div>
 
           <div class="hint">
+            <p class="voice hint-v"><span>Podpowiedź · możesz odznaczyć</span></p>
             <label class="cb">
               <input type="checkbox" id="task_change" name="task_change" value="1" checked={v.task_change} aria-describedby="task-change-hint" />
               <span class="box">
@@ -97,7 +113,7 @@ export function NoteFormView(props: {
             <button class="btn primary full" type="submit">Zapisz notatkę</button>
           </div>
         </form>
-        <a class="btn text" href="/notes">Moje notatki</a>
+        <p class="again"><a class="btn text" href="/notes">Notatki o zespole</a></p>
       </section>
       <script src="/note-form.js" defer></script>
     </Layout>

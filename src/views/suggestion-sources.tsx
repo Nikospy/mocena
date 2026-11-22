@@ -12,25 +12,33 @@ export function SuggestionSourcesView(props: { viewer: Person; today: string; da
   const d = props.data;
   return (
     <Layout title="Skąd biorą się podpowiedzi" person={props.viewer} today={props.today}>
-      <section class="card">
-        <h1>Skąd biorą się podpowiedzi</h1>
+      <section class="n-state sources">
+        <h1 class="n-title">Skąd biorą się podpowiedzi</h1>
         <p>{d.intro}</p>
-        <p><b>Teraz działa: {props.modeLabel}</b></p>
-        <ol class="note-list" aria-label="Miejsca podpowiedzi">
+        <div class="st ok" role="status">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+          <div><b>Teraz działa: {props.modeLabel}</b></div>
+        </div>
+        <ol class="src-list" aria-label="Miejsca podpowiedzi">
           {d.places.map((p) => (
-            <li class="note-item">
-              <p class="cap">{p.place}</p>
-              <p>Model w tle: {p.model}</p>
-              <p class="cap">W prototypie: {p.prototype}</p>
+            <li class="hint">
+              <p class="voice hint-v"><span>Podpowiedź</span></p>
+              <h2>{p.place}</h2>
+              <p><span class="lbl">Model w tle:</span> {p.model}</p>
+              <p><span class="lbl">W prototypie:</span> {p.prototype}</p>
             </li>
           ))}
         </ol>
-      </section>
-      <section class="card">
-        <h2>Czego model nigdy nie robi</h2>
-        <ul aria-label="Czego model nigdy nie robi">{d.never.map((t) => <li>{t}</li>)}</ul>
-        <h2>Warunki wspólne</h2>
-        <ul>{d.conditions.map((t) => <li>{t}</li>)}</ul>
+        <div class="src-cols">
+          <section class="card">
+            <h2>Czego model nigdy nie robi</h2>
+            <ul class="points" aria-label="Czego model nigdy nie robi">{d.never.map((t) => <li><span>{t}</span></li>)}</ul>
+          </section>
+          <section class="card">
+            <h2>Warunki wspólne</h2>
+            <ul class="points">{d.conditions.map((t) => <li><span>{t}</span></li>)}</ul>
+          </section>
+        </div>
       </section>
     </Layout>
   );
