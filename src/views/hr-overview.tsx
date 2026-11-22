@@ -216,6 +216,11 @@ export function HrOverviewView(props: { viewer: Person; today: string; cards: Re
         <h1>Stan cykli</h1>
         <p class="cap">Najpierw cykle, które wymagają działania, na końcu zamknięte. W każdej grupie od najbliższego terminu.</p>
       </section>
+      <nav class="hr-links hr-tools" aria-label="Dane i zestawienia">
+        <a class="btn" href="/hr/people">Pracownicy</a>
+        <a class="btn" href="/hr/substitutions">Zastępstwa</a>
+        <a class="btn" href="/hr/export.csv" download>Pobierz zestawienie (CSV)</a>
+      </nav>
       {props.awarded ? (
         <div class="st ok" role="status">
           <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>

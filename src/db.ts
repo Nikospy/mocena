@@ -61,6 +61,10 @@ CREATE TABLE IF NOT EXISTS absences (
   excused INTEGER NOT NULL DEFAULT 1, recorded_on TEXT NOT NULL, recorded_by TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS absences_person ON absences (person_id, recorded_on);
+CREATE TABLE IF NOT EXISTS substitutions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, absent_id TEXT NOT NULL, substitute_id TEXT NOT NULL,
+  date_from TEXT NOT NULL, date_to TEXT NOT NULL, recorded_on TEXT NOT NULL, recorded_by TEXT NOT NULL
+);
 `);
 }
 

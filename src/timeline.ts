@@ -1,3 +1,4 @@
+import { actsAsAppraiser } from "./substitutions";
 // Oś czasu cyklu oceny: fakty z widocznych wpisów i terminy wyliczone z przepisów (te widać także w przyszłości).
 import { registerCycleLinks } from "./cycle-links";
 import { cycleById, cycleDeadlineDetails, openCycle, visibleAbsences, type Cycle } from "./cycles";
@@ -19,7 +20,7 @@ export type TimelineEntry = {
 
 /** Oceniany, obecny oceniający i kadry; inni nie. */
 export function canViewTimeline(viewer: Person, cycle: Cycle): boolean {
-  return viewer.id === cycle.person_id || viewer.id === cycle.appraiser_id || viewer.role === "hr";
+  return viewer.id === cycle.person_id || actsAsAppraiser(cycle.appraiser_id, viewer.id) || viewer.role === "hr";
 }
 
 /** Zapis nieobecności: tylko kadry i tylko dla cyklu, który jest otwarty. */
@@ -36,7 +37,7 @@ const EXTENDS = `${rules.deadlines.longAbsenceOverMonths.basis}`;
 export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] {
   const cycle = cycleById(cycleId);
   if (!cycle) throw new Error(`Brak cyklu ${cycleId}`);
-  const full = viewer.id === cycle.appraiser_id || viewer.role === "hr";
+  const full = actsAsAppraiser(cycle.appraiser_id, viewer.id) || viewer.role === "hr";
   const events = visibleEvents(cycleId);
   const approved = events.find((e) => e.type === "assessment_approved");
   const details = cycleDeadlineDetails(cycleId);
@@ -81,6 +82,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
 
   for (const e of events) {
     const x = e.payload ?? {};
+    const before = entries.length;
     if (e.type === "appraiser_changed") {
       if (!full) continue;
       const name = (id: string) => personById(id)?.name ?? id;
@@ -117,6 +119,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
         kind: "fact",
       });
     }
+    if (x.on_behalf_of) for (let i = before; i < entries.length; i++) entries[i].title += " (w zastępstwie)";
   }
 
   const snap = approved?.payload?.deadline as { date: string; basis: string[] } | undefined;

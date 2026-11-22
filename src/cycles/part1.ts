@@ -1,9 +1,10 @@
+import { actsAsAppraiser } from "../substitutions";
 import { getDb } from "../db";
 import { cycleById, effectiveDeadline } from "../cycles";
 import { sheetForPosition, type PositionKind } from "../engine/criteria";
 import { rulesVersion } from "../engine/rules";
 import { mandatoryCriteria, validateAdditionalCriteria, type Sheet } from "../engine/scoring";
-import { recordEvent, seedEvent, visibleEvents } from "../events";
+import { onBehalfOf, recordEvent, seedEvent, visibleEvents } from "../events";
 import { today } from "../settings";
 
 export type Part1Input = { additional: string[]; expectations: Record<string, string> };
@@ -63,7 +64,7 @@ function writeCriteria(cycleId: string, sheet: Sheet, input: Part1Input): void {
 }
 
 function isAppraiser(cycleId: string, actorId: string): boolean {
-  return cycleById(cycleId)?.appraiser_id === actorId;
+  return actsAsAppraiser(cycleById(cycleId)?.appraiser_id, actorId);
 }
 
 function precheck(cycleId: string, actorId: string, input: Part1Input): string[] {
@@ -105,6 +106,7 @@ export function savePart1(cycleId: string, actorId: string, input: Part1Input, d
         rulesVersion: rulesVersion(),
         place,
         appraiserName: actor?.name ?? "",
+        ...onBehalfOf(cycleId, actorId),
       },
       date,
     );

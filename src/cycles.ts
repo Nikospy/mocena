@@ -29,7 +29,7 @@ export type CycleDeadlineDetails = ReturnType<typeof assessmentDeadline> & {
 export function cycleDeadlineDetails(cycleId: string, opts: { asOf?: string } = {}): CycleDeadlineDetails {
   const cycle = cycleById(cycleId);
   if (!cycle) throw new Error(`Brak cyklu ${cycleId}`);
-  const p = visibleEvents(cycleId, opts).filter((e) => e.type === "cycle_started").pop()?.payload;
+  const p = visibleEvents(cycleId, opts).filter((e) => e.type === "cycle_started" || e.type === "previous_assessment_recorded").pop()?.payload;
   const kind: CycleKind = p?.previousOutcome === "negative" && p.previousAcknowledgedOn ? "after_negative" : "regular";
   const absences = visibleAbsences(cycle.person_id, opts).map((a) => ({ id: a.id, from: a.date_from, to: a.date_to, excused: a.excused === 1 }));
   const r = assessmentDeadline({ kind, periodStart: cycle.period_start, previousAcknowledgedOn: p?.previousAcknowledgedOn ?? null }, absences);

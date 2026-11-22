@@ -1,3 +1,4 @@
+import { previousAssessments } from "../hr/people";
 import { Hono } from "hono";
 import "../hr/links";
 import { cycleById } from "../cycles";
@@ -16,7 +17,7 @@ app.get("/people/:id/history", (c) => {
   if (!person) return c.text("Nie ma takiej osoby.", 404);
   if (!canViewHistory(viewer, person.id)) return c.text("Historię ocen widzi ta osoba, jej oceniający i kadry.", 403);
   const entries = assessmentHistory(person.id).map((h) => ({ ...h, canOpenSheet: canViewSheet(viewer, cycleById(h.cycleId)!) }));
-  return c.html(<HistoryView viewer={viewer} today={today()} person={person} entries={entries} />);
+  return c.html(<HistoryView viewer={viewer} today={today()} person={person} entries={entries} previous={previousAssessments(person.id)} />);
 });
 
 export default app;

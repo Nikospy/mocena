@@ -24,8 +24,23 @@ export function seedEvent(type: string, cycleId: string | null, actorId: string 
   return Number(r.lastInsertRowid);
 }
 
+/** Zdarzenie z datą dnia. Gdy aktor działa w zastępstwie oceniającego cyklu, `payload.on_behalf_of` to id nieobecnego. */
 export function recordEvent(type: string, cycleId: string | null, actorId: string | null, payload: unknown): number {
-  return seedEvent(type, cycleId, actorId, payload, today());
+  const isObject = typeof payload === "object" && payload !== null && !Array.isArray(payload);
+  const extra = isObject || payload === undefined ? onBehalfOf(cycleId, actorId) : null;
+  return seedEvent(type, cycleId, actorId, extra ? { ...(payload as object | undefined), ...extra } : payload, today());
+}
+
+/** `{ on_behalf_of }`, gdy aktor ma dziś zastępstwo za oceniającego cyklu; inaczej `null`. */
+export function onBehalfOf(cycleId: string | null, actorId: string | null): { on_behalf_of: string } | null {
+  if (!cycleId || !actorId) return null;
+  const cycle = getDb().query("SELECT person_id, appraiser_id FROM cycles WHERE id = ?").get(cycleId) as { person_id: string; appraiser_id: string } | null;
+  if (!cycle || cycle.appraiser_id === actorId || cycle.person_id === actorId) return null;
+  const now = today();
+  const sub = getDb()
+    .query("SELECT 1 FROM substitutions WHERE absent_id = ? AND substitute_id = ? AND date_from <= ? AND date_to >= ?")
+    .get(cycle.appraiser_id, actorId, now, now);
+  return sub ? { on_behalf_of: cycle.appraiser_id } : null;
 }
 
 /** Zdarzenia z datą nie późniejszą niż `asOf` (domyślnie `today()`), w porządku (date, id). `null` = zdarzenia bez cyklu. */

@@ -1,3 +1,4 @@
+import { OUTCOME_LABEL, type PreviousAssessment } from "../hr/people";
 import type { HistoryEntry } from "../hr/history";
 import type { Person } from "../people";
 import { RulesVersion } from "./components";
@@ -36,14 +37,32 @@ export function HistoryList(props: { entries: Entry[] }) {
   );
 }
 
-export function HistoryView(props: { viewer: Person; today: string; person: Person; entries: Entry[] }) {
+export function HistoryView(props: { viewer: Person; today: string; person: Person; entries: Entry[]; previous?: PreviousAssessment[] }) {
+  const previous = props.previous ?? [];
   return (
     <Layout title="Historia ocen" person={props.viewer} today={props.today}>
       <section class="card hdr slim">
         <h1>Historia ocen</h1>
         <p class="cap">Osoba: {props.person.name}</p>
       </section>
-      <HistoryList entries={props.entries} />
+      {props.entries.length > 0 || previous.length === 0 ? <HistoryList entries={props.entries} /> : null}
+      {previous.length > 0 ? (
+        <section aria-labelledby="h-prev">
+          <h2 id="h-prev">Ocena sprzed systemu</h2>
+          <ul class="plain-list hist-list">
+            {previous.map((p) => (
+              <li class="card">
+                <h3>Ocena z {formatDate(p.on)}</h3>
+                <p>
+                  {OUTCOME_LABEL[p.outcome]}
+                  {p.level ? ` · ${p.level}` : ""}
+                </p>
+                <p class="cap">Wpisana przez kadry {formatDate(p.recordedOn)}. Ocena wystawiona poza systemem, bez arkusza.</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </Layout>
   );
 }
