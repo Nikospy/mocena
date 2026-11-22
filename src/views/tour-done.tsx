@@ -9,13 +9,13 @@ const SEEN = [
   "Zapoznanie i sprzeciw mają swoje terminy, a kadry widzą obowiązki urzędu.",
 ];
 
-export function TourDone(props: { ewaTimeline: string | null }) {
+export function TourDone() {
   return (
     <TourShell title="Koniec pokazu">
       <div class="e-done">
         <h1 class="e-h1">Koniec pokazu</h1>
         <section class="card e-card">
-          <h2>Co widziałeś</h2>
+          <h2>Co było widać</h2>
           <ol class="e-seen">
             {SEEN.map((t, i) => (
               <li>
@@ -29,12 +29,16 @@ export function TourDone(props: { ewaTimeline: string | null }) {
           <h2>W wersji 5-minutowej warto zobaczyć</h2>
           <ul class="e-more">
             <li>
-              Oś czasu Ewy ze zmianą oceniającego: oceny dokonuje się na podstawie wcześniej wybranych kryteriów ({rules.appraiserChange.basis}).
-              {props.ewaTimeline ? <> <a href={props.ewaTimeline}>Otwórz po wyborze konta kadr</a>.</> : null}
+              <span>Oś czasu Ewy: cykl zaczął poprzedni naczelnik, potem wydział przejął Marek. Oceny dokonuje się na podstawie wcześniej wybranych kryteriów ({rules.appraiserChange.basis}).</span>
+              <form method="post" action="/tour/extra/ewa-timeline"><button class="btn text" type="submit">Otwórz oś czasu Ewy</button></form>
             </li>
-            <li>Fikcja zapoznania: gdy pracownik nie potwierdza oceny, można wpisać uznanie zapoznania za dokonane, z powodem i sposobem doręczenia.</li>
             <li>
-              Źródła podpowiedzi: <a href="/admin/suggestion-sources">/admin/suggestion-sources</a> (konto administratora).
+              <span>Fikcja zapoznania: gdy oceniany nie potwierdza oceny, oceniający wpisuje uznanie zapoznania za dokonane, z powodem i sposobem doręczenia.</span>
+              <form method="post" action="/tour/extra/fiction"><button class="btn text" type="submit">Stwierdź fikcję zapoznania</button></form>
+            </li>
+            <li>
+              <span>Źródła podpowiedzi: skąd pochodzi każda podpowiedź kryterium i formy rozwoju.</span>
+              <form method="post" action="/tour/extra/sources"><button class="btn text" type="submit">Pokaż źródła podpowiedzi</button></form>
             </li>
           </ul>
         </section>

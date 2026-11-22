@@ -24,7 +24,7 @@ const ver = `reguły ${rules.version}`;
 const d = rules.deadlines;
 const basis = (art: string): Basis => ({ art, ver });
 
-const PERSON_LABEL: Record<string, string> = { marek: "Marek, oceniający", piotr: "Piotr, pracownik", joanna: "Joanna, kadry" };
+const PERSON_LABEL: Record<string, string> = { marek: "Marek, oceniający", piotr: "Piotr, oceniany", joanna: "Joanna, kadry" };
 const PERSON_GENITIVE: Record<string, string> = { marek: "Marka", piotr: "Piotra", joanna: "Joanny" };
 
 type Body = Omit<StopContent, keyof TourStop | "prev" | "next">;

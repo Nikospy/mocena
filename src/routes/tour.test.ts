@@ -102,4 +102,32 @@ describe("przewodnik pokazu", () => {
     expect(text).toContain("Koniec pokazu");
     expect(text).not.toContain("gpanel");
   });
+
+  test("dodatki z ekranu końcowego ustawiają konto i otwierają ekran bez przewodnika", async () => {
+    const { app } = createTestApp();
+    const cases: [string, string, RegExp][] = [
+      ["ewa-timeline", "person_id=joanna", /\/cycles\/[^/]+\/timeline$/],
+      ["fiction", "person_id=marek", /\/assessment\/fiction$/],
+      ["sources", "person_id=admin", /^\/admin\/suggestion-sources$/],
+    ];
+    for (const [id, who, path] of cases) {
+      const res = await post(app, `/tour/extra/${id}`, "mocena_tour=5b");
+      expect(res.status).toBe(303);
+      expect(res.headers.get("location") ?? "").toMatch(path);
+      const set = res.headers.getSetCookie().join(" ");
+      expect(set).toContain(who);
+      expect(set).toMatch(/mocena_tour=;/);
+      const page = await html(app, res.headers.get("location")!, cookies(res));
+      expect(page.res.status).toBe(200);
+    }
+    expect((await post(app, "/tour/extra/nic")).status).toBe(404);
+  });
+
+  test("przycisk Dalej nazywa następny przystanek", async () => {
+    const { app } = createTestApp();
+    const res = await post(app, "/tour/4");
+    const { text } = await html(app, res.headers.get("location")!, cookies(res));
+    expect(text).toContain("Dalej<span class=\"long\">: zapoznanie</span>");
+    expect(text).not.toContain("pracownik\"");
+  });
 });

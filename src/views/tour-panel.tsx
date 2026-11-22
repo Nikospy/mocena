@@ -25,7 +25,9 @@ function Head(props: TourPanelProps) {
     <div class="gp-h">
       <div class="row">
         <b>Krok {stop.step} z 5</b>
-        <span>Pokaz na ocenie Piotra</span>
+        <form method="post" action="/tour/end">
+          <button class="btn text gp-end" type="submit">Zakończ pokaz</button>
+        </form>
       </div>
       <ol class="g-dots" aria-label="Kroki pokazu">
         {[1, 2, 3, 4, 5].map((n) => (
@@ -74,19 +76,21 @@ function Body(props: TourPanelProps & { withSelectors: boolean }) {
       {!props.onScreen ? (
         <a class="btn text" href={props.screenPath}>Wróć do ekranu kroku</a>
       ) : null}
-      <form method="post" action="/tour/end">
-        <button class="btn text" type="submit">Zakończ pokaz</button>
-      </form>
+      {props.withSelectors ? null : (
+        <form method="post" action="/tour/end">
+          <button class="btn text" type="submit">Zakończ pokaz</button>
+        </form>
+      )}
     </div>
   );
 }
 
 function NextForm(props: { stop: StopContent; compact?: boolean }) {
   const { stop } = props;
-  const label = stop.next === "done" ? "koniec" : (stopById(stop.next)?.short ?? "");
+  const label = stop.short;
   const inner = (
     <>
-      Dalej<span class="long">: {label}</span>
+      <span>Dalej<span class="long">: {label}</span></span>
       {ARROW}
     </>
   );

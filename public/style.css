@@ -791,3 +791,8 @@ body.tour-on .nav { display: none; }
   .e-mob .gap { color: var(--text-3); font-size: var(--f-c2); line-height: var(--lh-c2); padding-inline-start: calc(var(--sp-300) + var(--sp-150)); }
   .e-mob .memo { background: var(--orange-20); border-radius: var(--r-100); margin-inline-start: calc(var(--sp-300) + var(--sp-150)); padding: var(--sp-50) var(--sp-100); color: var(--orange-200); font-size: var(--f-c2); line-height: var(--lh-c2); }
 }
+/* guided-demo-tour: poprawki po przeglądzie */
+.gp-h .row form { margin: 0; }
+.gp-end { min-block-size: 0; padding: 0; font-size: var(--f-c1); line-height: var(--lh-c1); }
+.e-more li { display: grid; gap: var(--sp-50); justify-items: start; }
+.e-more form { margin: 0; }
