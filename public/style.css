@@ -183,14 +183,12 @@ p { max-inline-size: 66ch; }
 .pg { flex: none; inline-size: var(--sp-300); block-size: var(--sp-300); border-radius: var(--pill-r); background: var(--rule-mark); color: var(--on-primary);
   display: grid; place-items: center; font-size: var(--f-c1); line-height: 1; font-weight: var(--w-bold); }
 
-/* pigułka podstawy: § + przepis + wersja reguł; stoi przy każdej dacie i wyniku policzonym przez regułę */
-.basis { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--sp-50) var(--sp-100); max-inline-size: 100%; background: var(--white);
-  border: 1px solid var(--cobalt-30); border-radius: var(--r-200); padding: var(--sp-50) var(--sp-150) var(--sp-50) var(--sp-50);
-  font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--cobalt-200); }
-.basis .art { font-weight: var(--w-bold); }
-.basis .ver { color: var(--text-2); padding-inline-start: var(--sp-100); border-inline-start: 1px solid var(--cobalt-30); white-space: nowrap; }
+/* podstawa prawna: zwykły tekst 14 px przy dacie albo wyniku („art. 81 ust. 7 ustawy”); objaśnienie idzie do zdania obok */
+.basis { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+.basis .art { font-weight: var(--w-regular); }
+.basis .pg { display: none; }
+.basis .ver { padding-inline-start: var(--sp-100); }
 .basis.mini .ver { display: none; }
-.basis.mini .art { white-space: nowrap; }
 
 /* komunikaty stanu: tło z palety „20”, ikona „100”, tekst „200” */
 .st { display: flex; align-items: flex-start; gap: var(--sp-150); padding: var(--sp-150) var(--sp-200); border-radius: var(--ctl-r); font-size: var(--f-p); line-height: var(--lh-p); }
@@ -367,7 +365,7 @@ p { max-inline-size: 66ch; }
 .crit .kind { color: var(--text-3); font-size: var(--f-c1); line-height: var(--lh-c1); margin-block-start: var(--sp-50); }
 .crit .warns:not(:empty) { margin-block-start: var(--sp-200); display: grid; gap: var(--sp-100); }
 /* komunikat reguły przy kryterium: liczony z dat notatek, mówi głosem reguły */
-.crit .warns .st { background: var(--rule-surface); color: var(--text); padding: var(--sp-100) var(--sp-150); align-items: center; }
+.crit .warns .st { background: none; color: var(--text); padding: 0; border-radius: 0; }
 .crit .warns .st .ico { color: var(--rule-mark); }
 .crit .warns .st.warn .ico { color: var(--orange-100); }
 .exp { display: grid; grid-template-rows: 0fr; }
@@ -431,7 +429,6 @@ p { max-inline-size: 66ch; }
 .ax-lead.dash { border-inline-start-style: dashed; }
 .ax-lab { position: absolute; inline-size: 200px; font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--rule-quiet); z-index: 3; }
 .ax-lab b { display: block; color: var(--text); font-size: var(--f-p); line-height: var(--lh-p); }
-.ax-lab .basis { margin-block-start: var(--sp-50); }
 .ax-lab.l { text-align: start; padding-inline-start: var(--sp-100); }
 .ax-lab.r { text-align: end; margin-inline-start: -200px; padding-inline-end: var(--sp-100); }
 .ax-lab.c { text-align: center; margin-inline-start: -100px; }
@@ -480,7 +477,7 @@ p { max-inline-size: 66ch; }
 .task { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--sp-150) var(--sp-400); padding: var(--sp-250) var(--sp-300); }
 .task + .task { border-block-start: 1px solid var(--line); }
 .task h2 { font-size: var(--f-p); line-height: var(--lh-p); }
-.task-link { color: var(--text); text-decoration: none; }
+.task-link { display: block; color: var(--text); text-decoration: none; }
 .task-link::after { content: ""; position: absolute; inset: 0; }
 .task-link:focus-visible { box-shadow: none; }
 .task:has(.task-link:focus-visible) { box-shadow: inset 0 0 0 2px var(--grey-500); }
@@ -577,14 +574,6 @@ p { max-inline-size: 66ch; }
 }
 @media (prefers-reduced-motion: reduce) { .enter, .flash, .after-ok, .picker, .cal, .abs-row.enter { animation: none; } }
 
-/* Pigułka podstawy w wąskiej kolumnie wyniku: przepis i wersja reguł w dwóch wierszach, bez kreski między nimi. */
-.side .basis { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: var(--sp-100); row-gap: 0; align-items: center; border-radius: var(--ctl-r); padding-block: var(--sp-100); padding-inline: var(--sp-100) var(--sp-200); }
-.side .basis .pg { grid-row: 1 / span 2; align-self: start; }
-.side .basis .ver { grid-column: 2; border-inline-start: 0; padding-inline-start: 0; }
-/* Podstawa z ustawy (art.) nie dostaje znaku paragrafu: „§ art.” to błąd formy. */
-.basis.act { padding-inline-start: var(--sp-150); }
-/* Mała pigułka na osi nigdy się nie łamie, nawet gdy etykieta jest węższa. */
-.basis.mini { flex-wrap: nowrap; inline-size: max-content; max-inline-size: none; }
 /* Pasek etapów: linia łącząca zawsze pod kółkiem (linia następnego etapu malowała się na kółku poprzedniego). */
 .steps5 { isolation: isolate; }
 .steps5 li::before { z-index: 0; }
@@ -634,8 +623,10 @@ p { max-inline-size: 66ch; }
 .hr-stats { display: grid; gap: var(--sp-100); }
 .hr-actions { display: flex; flex-wrap: wrap; gap: var(--sp-100); }
 /* S-04 notes-and-justification */
-.note-list { list-style: none; padding: 0; display: grid; gap: var(--sp-150); }
-.note-item { display: grid; gap: var(--sp-100); padding: var(--sp-150); border: 1px solid var(--line); border-radius: var(--ctl-r); background: var(--white); }
+/* notatka: wiersz z cienką linią, bez własnej ramki i tła */
+.note-list { list-style: none; padding: 0; display: grid; }
+.note-item { display: grid; gap: var(--sp-100); padding-block: var(--sp-200); border-block-start: 1px solid var(--line); }
+.note-item:first-child { border-block-start: 0; padding-block-start: 0; }
 .note-item .cb { min-block-size: 0; }
 .note-body { display: grid; gap: var(--sp-50); min-inline-size: 0; }
 .note-text { overflow-wrap: anywhere; }
@@ -672,7 +663,7 @@ p { max-inline-size: 66ch; }
 .hr-table tbody th { font-size: var(--f-p); line-height: var(--lh-p); }
 /* Statystyki: kafelki bez nazwisk. */
 .hr-stats { grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr)); gap: var(--sp-150); }
-.stat { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: var(--sp-50); padding: var(--sp-150) var(--sp-200); border: 1px solid var(--line); border-radius: var(--ctl-r); background: var(--grey-10); }
+.stat { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: var(--sp-50); padding-block-start: var(--sp-150); border-block-start: 1px solid var(--line); }
 .stat-n { font-size: var(--f-h5); line-height: var(--lh-h5); font-weight: var(--w-bold); color: var(--text); }
 .stat-label { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
 /* Oś czasu: pionowa linia z kropkami; terminy w głosie reguły. */
@@ -701,7 +692,7 @@ p { max-inline-size: 66ch; }
 .acc > * + * { margin-block-start: 0; }
 .acc:hover { border-color: var(--primary); }
 .acc:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.acc-role { margin-block-start: var(--sp-100); padding: var(--sp-50) var(--sp-150); border-radius: var(--pill-r); background: var(--cobalt-20); color: var(--primary); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); }
+.acc-role { margin-block-start: var(--sp-100); color: var(--primary); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); }
 .list-h h2 { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
 .term-date { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-150); }
 .hint .crit { background: var(--white); }
@@ -714,7 +705,6 @@ p { max-inline-size: 66ch; }
 .b-later { margin-block-start: var(--sp-100); }
 .b-facts > * + * { margin-block-start: var(--sp-100); }
 .plain-list > li.st { margin: 0; }
-.miss li .basis { display: inline-flex; vertical-align: baseline; }
 /* design-c */
 /* formularz notatki: pole daty w kafelku „Kiedy” */
 .tok-date { inline-size: 100%; border: 0; background: none; padding: 0; font: inherit; font-size: var(--f-p); line-height: var(--lh-p); font-weight: var(--w-bold); color: var(--text); }
@@ -722,7 +712,7 @@ p { max-inline-size: 66ch; }
 .tok:has(.tok-date:focus-visible) { border-color: var(--primary); box-shadow: var(--focus); }
 .n-form .hero-foot .sign { color: var(--text-3); }
 .n-form ~ .again, .n-state .again, .enter > .again { margin-block-start: var(--sp-200); }
-/* lista notatek o zespole: karta osoby, notatki jako małe karty */
+/* lista notatek o zespole: karta osoby, notatki jako wiersze */
 .notes-team, .sources { display: grid; gap: var(--sp-300); }
 .pn-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-150); }
 .pn-head .btn .ico, .person-notes .btn .ico { inline-size: var(--sp-250); block-size: var(--sp-250); }
@@ -732,7 +722,6 @@ p { max-inline-size: 66ch; }
 .r-chip.good { background: var(--cobalt-10); border-color: var(--cobalt-10); color: var(--primary); }
 .note-item .btns { justify-content: flex-start; }
 .btn.sm-btn { min-block-size: var(--sp-400); padding-inline: var(--sp-150); font-size: var(--f-c1); line-height: var(--lh-c1); }
-@media (min-width: 900px) { .person-notes .note-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* informacja zwrotna */
 .fb-src > * + *, .fb-msg > * + * { margin-block-start: var(--sp-150); }
 /* skąd biorą się podpowiedzi */
@@ -749,7 +738,6 @@ p { max-inline-size: 66ch; }
 .res.pos .verdict-level { color: var(--green-200); }
 .reason { list-style: none; padding-inline-start: 0; display: grid; gap: var(--sp-100); }
 .verdict-box .reason { padding-inline-start: 0; }
-.reason .basis { vertical-align: baseline; }
 .avg-line { padding-block-start: var(--sp-200); border-block-start: 1px solid var(--rule-divider); color: var(--rule-ink); font-size: var(--f-h5); line-height: var(--lh-h5); }
 .avg-line b { font-weight: var(--w-bold); }
 /* 1.4 podpis wybranego poziomu tuż pod rzędem cyfr, bez pustego marginesu */
@@ -774,18 +762,15 @@ details.disc > .area { margin-block-start: var(--sp-50); }
 /* 1.8 odnośniki cyklu na telefonie: jeden rząd chipów przewijany w poziomie; przycisk potwierdzenia części I przyklejony */
 @media (min-width: 900px) { .part1-confirm { inset-block-end: var(--sp-200); } }
 /* 1.9 pytanie o zmianę zadań: cytat notatki, skutki odpowiedzi, przyciski na całą szerokość na telefonie */
-.note-quote { margin: 0; padding: var(--sp-150) var(--sp-200); border-inline-start: var(--sp-50) solid var(--cobalt-30); border-radius: var(--ctl-r); background: var(--grey-10); }
+.note-quote { margin: 0; padding-inline-start: var(--sp-200); border-inline-start: var(--sp-50) solid var(--cobalt-30); }
 .note-quote > * + * { margin-block-start: var(--sp-50); }
 .outcomes { color: var(--text); }
 @media (max-width: 640px) { .q-hero .btns { flex-direction: column; } .q-hero .btns .btn { inline-size: 100%; } .q-hero .b-later { inline-size: 100%; } }
 /* 1.11 lista kadr: pigułka terminu w szerszej kolumnie, nie łamie się na kilka linii */
 .hr-table td:nth-child(5) { min-inline-size: 15rem; }
-.hr-table .basis .art { white-space: normal; overflow-wrap: break-word; }
 .hr-table details.disc > summary { min-block-size: var(--sp-500); }
 /* 2.2 zdanie wspólne pod listą pozycji */
 .shared-prompt { margin-block-start: var(--sp-100); }
-/* 2.5 pigułki przepisów w liście braków nie łamią linii w środku */
-.miss .basis .art { white-space: nowrap; }
 /* guided-demo-tour */
 /* numery i obwódki "Na co patrzeć" na ekranie aplikacji (nadaje je tour.js) */
 [data-look] { position: relative; }
@@ -825,7 +810,7 @@ body.tour-on .nav { display: none; }
 .g-dots li { block-size: var(--sp-50); border-radius: var(--pill-r); background: var(--grey-30); }
 .g-dots li.done { background: var(--cobalt-40); } .g-dots li.cur { background: var(--primary); }
 .acct { display: flex; gap: var(--sp-100); flex-wrap: wrap; }
-.acct span { display: inline-flex; gap: var(--sp-50); align-items: center; background: var(--cobalt-10); color: var(--cobalt-200); border-radius: var(--pill-r); padding: var(--sp-50) var(--sp-150); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); }
+.acct span { display: inline-flex; gap: var(--sp-50); align-items: center; color: var(--text-2); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); }
 .gp-b { padding: var(--sp-300); overflow: auto; display: grid; gap: var(--sp-250); align-content: start; }
 .gp-b h2 { font-size: var(--f-h5); line-height: var(--lh-h5); }
 
@@ -869,7 +854,6 @@ body.tour-on .nav { display: none; }
 .labs .d { color: var(--primary); font-weight: var(--w-bold); }
 .labs b { font-size: var(--f-p); line-height: var(--lh-p); }
 .labs small { color: var(--text-2); font-size: var(--f-c1); line-height: var(--lh-c1); margin-block-end: var(--sp-100); }
-.labs .basis .art { white-space: normal; min-inline-size: 0; }
 .e-mob { display: none; }
 .e-done { display: grid; gap: var(--sp-400); max-inline-size: 720px; }
 .e-card { padding: var(--sp-300); display: grid; gap: var(--sp-200); }
@@ -909,7 +893,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* lista braków: jedna linia z pigułką, nazwy kryteriów rozwijane */
 .miss-d > summary { cursor: pointer; }
 .miss-d ul { margin-block-start: var(--sp-100); }
-.miss .basis, .miss .basis .art { white-space: nowrap; }
 /* kolumna ocen cząstkowych u ocenianego: cyfry w jednej kolumnie, wyrównane do końca */
 .sheet > h2 { padding-block: var(--sp-300) var(--sp-100); padding-inline: var(--sp-300); }
 .scorebox:has(> .big) { align-items: flex-end; min-inline-size: 12ch; }
