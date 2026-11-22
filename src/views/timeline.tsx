@@ -1,3 +1,4 @@
+import type { CycleLink } from "../cycle-links";
 import type { Person } from "../people";
 import type { TimelineEntry } from "../timeline";
 import { LegalBasis, RulesVersion, PageHeader } from "./components";
@@ -12,10 +13,16 @@ export function TimelineView(props: {
   rulesVersion: { version: string; effectiveFrom: string };
   notice?: string;
   canAddAbsence: boolean;
+  links?: CycleLink[];
 }) {
   return (
     <Layout title={`Oś czasu: ${props.personName}`} person={props.viewer} today={props.today}>
-      <PageHeader title={<>Oś czasu: {props.personName}</>} lead="Daty wyliczone z przepisu albo wpisane przez człowieka." />
+      <PageHeader
+        title={<>Oś czasu: {props.personName}</>}
+        lead="Daty wyliczone z przepisu albo wpisane przez człowieka."
+        links={props.links?.length ? props.links.map((l) => <a href={l.href}>{l.label}</a>) : undefined}
+        linksLabel="Czynności w cyklu"
+      />
       {props.notice ? (
         <p class="ct-notice" role="status">
           {props.notice}

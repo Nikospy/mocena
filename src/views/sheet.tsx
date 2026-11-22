@@ -298,6 +298,21 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
                 </p>
               </section>
             </section>
+            {d.corrections.length ? (
+              <section class="card sheet-part" aria-labelledby="h-corrections">
+                <h2 id="h-corrections">Korekty błędów po zatwierdzeniu</h2>
+                <p class="cap">Pola poprawione przez administratora. Na arkuszu jest wartość po korekcie.</p>
+                <ul class="plain-list">
+                  {d.corrections.map((c) => (
+                    <li>
+                      <SheetField label={`${formatDate(c.date)}, ${c.actorName}: ${c.label}`}>
+                        {`Było: ${c.field === "interviewDate" && c.from ? formatDate(c.from) : c.from || DASH}. Jest: ${c.field === "interviewDate" ? formatDate(c.to) : c.to}. Powód: ${c.reason}`}
+                      </SheetField>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
           </>
         )}
         {only1 || !d.part3 ? null : (

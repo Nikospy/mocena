@@ -2,7 +2,7 @@ import { Hono, type NotFoundHandler } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { getDb } from "./db";
 import { runSeed } from "./seed";
-import { homeTasks } from "./home-tasks";
+import { homeOptions, homeTasks } from "./home-tasks";
 import { PERSON_COOKIE, currentPerson, personById, roleLabel, type Person } from "./people";
 import { today } from "./settings";
 import cycleStart from "./routes/cycle-start";
@@ -88,6 +88,7 @@ app.get("/", (c) => {
   const person = currentPerson(c);
   if (!person) return c.html(<TourEntry />);
   const tasks = homeTasks(person);
+  const options = homeOptions(person);
   const now = today();
   return c.html(
     <Layout title="Start" person={person} today={today()}>
@@ -140,6 +141,31 @@ app.get("/", (c) => {
           </ul>
         )}
       </section>
+      {options.length ? (
+        <section aria-labelledby="h-options">
+          <h2 id="h-options">Twoje możliwości</h2>
+          <ul class="tasks">
+            {options.map((t) => (
+              <li class="task">
+                <div class="task-main">
+                  <h3>
+                    <a class="task-link" href={t.href}>
+                      {t.heading ?? t.title}
+                    </a>
+                  </h3>
+                  {t.detail ? <p class="task-detail">{t.detail}</p> : null}
+                </div>
+                <div class="task-side">
+                  <span class="task-go" aria-hidden="true">
+                    {t.action ?? "Otwórz"}
+                    <svg class="ico s" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></svg>
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </Layout>,
   );
 });

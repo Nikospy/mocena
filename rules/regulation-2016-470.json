@@ -97,6 +97,11 @@
     }
   ],
   "deadlines": {
+    "assessmentPeriodFrom": {
+      "value": "part1_confirmed",
+      "basis": "wzór arkusza, część II; okres od ustalenia kryteriów",
+      "from": "dzień potwierdzenia części I (ustalenia kryteriów), a gdy go brak: dzień przekazania części I; przed częścią I: początek okresu"
+    },
     "assessmentEveryMonths": {
       "value": 24,
       "basis": "art. 81 ust. 4 ustawy"

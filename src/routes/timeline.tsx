@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cycleLinks } from "../cycle-links";
 import { visibleCycleById, openCycle } from "../cycles";
 import { currentPerson, personById } from "../people";
 import { today } from "../settings";
@@ -6,6 +7,10 @@ import { buildTimeline, canRecordAbsence, canViewTimeline, timelineRulesVersion 
 import { TimelineView } from "../views/timeline";
 
 const app = new Hono();
+
+/** Na osi własnego cyklu oceniany zawsze widzi drogę do wniosku o zmianę terminu (art. 81 ust. 8 pkt 4 ustawy). */
+const deadlineLinks = (cycle: Parameters<typeof cycleLinks>[0], viewer: Parameters<typeof cycleLinks>[1]) =>
+  cycleLinks(cycle, viewer).filter((l) => l.href.includes("/deadline-change"));
 
 app.get("/cycles/:id/timeline", (c) => {
   const viewer = currentPerson(c);
@@ -30,6 +35,7 @@ app.get("/cycles/:id/timeline", (c) => {
       rulesVersion={timelineRulesVersion(cycle.id)}
       notice={viewer.role === "hr" && saved ? notices[saved] : undefined}
       canAddAbsence={canRecordAbsence(viewer, cycle) && openCycle(cycle.person_id)?.id === cycle.id}
+      links={viewer.id === cycle.person_id ? deadlineLinks(cycle, viewer) : []}
     />,
   );
 });

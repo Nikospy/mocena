@@ -32,6 +32,7 @@ export function PeopleListView(props: { viewer: Person; today: string; rows: Per
             <button class="btn primary" type="submit">Szukaj</button>
             {props.q ? <a class="btn" href={`/hr/people?sort=${props.sort}`}>Pokaż wszystkich</a> : null}
             <a class="btn" href="/hr/people/new">Dodaj pracownika</a>
+            <a class="btn" href="/hr/people/import">Importuj z CSV</a>
           </div>
         </form>
         <nav class="hr-links" aria-label="Sortowanie">
@@ -125,6 +126,7 @@ export function PersonFormView(props: {
   hasCycle: boolean;
   hasOpenCycle: boolean;
   personId?: string;
+  units?: string[];
 }) {
   const v = props.values;
   const e = props.errors;
@@ -147,7 +149,12 @@ export function PersonFormView(props: {
           </div>
           <div>
             <label class="lbl" for="unit">Komórka organizacyjna</label>
-            <input class="area" type="text" id="unit" name="unit" value={v.unit} aria-invalid={e.unit ? "true" : undefined} />
+            <select class="area" id="unit" name="unit" aria-invalid={e.unit ? "true" : undefined}>
+              <option value="">Wybierz komórkę</option>
+              {(props.units ?? []).map((u) => (
+                <option value={u} selected={v.unit === u}>{u}</option>
+              ))}
+            </select>
             <FieldError text={e.unit} />
           </div>
           <div>
