@@ -161,6 +161,16 @@ To nie są decyzje autora. Agent przyjął je sam, bo są techniczne i dają si�
 
 Trzy sprawy z warsztatu event stormingu czekają na decyzję autora (przyjęte ustawienie domyślne w nawiasie): czy oceniany widzi wpis o fikcji zapoznania (nie widzi, jak w PRD); czy pokaz Ewy mówi, że nowy oceniający nie widzi notatek poprzednika (nie mówi); czy rozmowa o kryteriach ma własną datę (nie ma, liczy się dzień przekazania części I). Pełna lista miejsc niepewnych: `context/domain/event-storming.board.json`.
 
+## 13. Poprzeczka jakości (decyzja autora, 22.11.2026, ok. 01:35)
+
+Autor: „samo kodowanie szybko nam teraz idzie wiec mozna powiedziec ze mamy mnostwo czasu na dopracowanie tego na 100% - to ma byc projekt ktory powalczy o nagrode glowna - nie ma zadnych polsrodkow”.
+
+- **13a. Cel to nagroda główna.** Czas zwolniony przez szybkie kodowanie idzie na dopracowanie, nie na nowe funkcje bez sensu dla jury.
+- **13b. „Gotowe” znaczy sprawdzone tak, jak zobaczy to juror:** cały przebieg kliknięty w prawdziwej przeglądarce przy 360 i 1440 px, zrzuty porównane z makietami, testy zielone. Zielone testy i PASS arbitra to warunek konieczny, nie dowód gotowości.
+- **13c. Każdy ekran na poziomie przyjętych makiet** (`context/design/`). Ekran, którego makieta nie pokazuje, najpierw powstaje jako wizja do oceny okiem autora, potem w kodzie.
+- **13d. Zakres i to, co widać na ekranach, ustalamy z autorem** w kolejnym kroku workflow 10x (roadmapa i plany), zanim powstanie kod.
+- Odrzucono: oddanie „bo działa” i poprawianie wyglądu na końcu.
+
 ## Pytania otwarte (do mentorów organizatora)
 
 1. Czy potwierdzenie w systemie na własnym koncie wystarcza zamiast podpisu? (Z przepisów: nie zastępuje podpisu, decyzja 11b. Pytanie zostaje o to, czego organizator oczekuje w prototypie.)
