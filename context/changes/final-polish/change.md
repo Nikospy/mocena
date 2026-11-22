@@ -2,11 +2,16 @@
 
 Decyzja autora z 22.11 ok. 03:15: „z twojego przeglądu naprawiamy wszystko, co tam było do zaznaczenia i poprawy, oraz naprawiamy wszystko, co ten grog nam tutaj pokazał”.
 
-Źródła: przegląd wyglądu (17 punktów, pomiar `scripts/design-audit.ts`) i zewnętrzny audyt wymogów zadania. Praca idzie w trzech paczkach równolegle, każda na swojej gałęzi i w swoim worktree:
+Źródła: przegląd wyglądu (17 punktów, pomiar `scripts/design-audit.ts`) i zewnętrzny audyt wymogów zadania. Praca idzie w ośmiu paczkach równolegle, każda na swojej gałęzi i w swoim worktree:
 
 | Paczka | Gałąź | Plik zlecenia | Pliki, które wolno zmieniać |
 |---|---|---|---|
-| wygląd | `main` (koordynator) | `visual.md` | `public/style.css`, `public/rodzina.css`, `src/views/layout.tsx`, znaczniki i klasy istniejących widoków |
+| wygląd | `final-visual` | `visual.md` | `public/style.css`, `public/rodzina.css`, `public/tour.js`, `src/views/` (znaczniki i klasy) |
+| wydruk | `final-print` | pozycja 6 z `delivery.md` | `public/print.css`, `src/views/sheet.tsx` |
+| pomiar całości | `final-audit` | `audit.md` | `scripts/design-audit.ts`, nowe pliki w `scripts/`, `coverage.md` |
+| teksty interfejsu | `final-copy` | `copy.md` | tylko `copy-findings.md` (przegląd) |
+| prezentacja | `final-pitch` | `pitch.md` | `docs/pitch/`, `scripts/pitch-shots.ts` |
+| proces 2 | `final-process-2` | `process-2.md` | jak „proces”, po jej scaleniu |
 | proces | `final-process` | `process.md` | `src/routes/`, `src/engine/`, `src/seed/`, `src/tour/stops.ts`, `src/home-tasks.ts`, `src/hr/`, `src/cycles*`, `src/people.ts`, testy |
 | oddanie | `final-delivery` | `delivery.md` | nowa strona `/about`, `README.md`, `public/print.css`, `src/views/sheet.tsx`, `src/views/before-meeting.tsx` (treść), `src/hr-partner/`, `src/views/tour-entry.tsx`, `context/foundation/decisions.md` |
 
