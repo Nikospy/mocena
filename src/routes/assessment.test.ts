@@ -340,6 +340,21 @@ describe("fikcja zapoznania i wgląd kadr", () => {
     expect(effectiveDeadline(successor.id).date).toBe("2027-05-23");
   });
 
+  test("dniem zapoznania przy fikcji jest dzień wpisu, nie dzień doręczenia (ustalenie 3 audytu)", async () => {
+    const app = fresh("2026-11-21");
+    await approvePiotr(app);
+    await setDate(app, "2026-11-22");
+    expect((await call(app, "marek", `/cycles/${piotr}/assessment/fiction`, { reason: "could_not", deliveryMethod: "post", deliveredOn: "2026-11-21" })).status).toBe(303);
+    const successor = openCycle("piotr")!;
+    const started = visibleEvents(successor.id).find((e) => e.type === "cycle_started")!;
+    expect(started.payload.previousAcknowledgedOn).toBe("2026-11-22");
+    expect(successor.period_start).toBe("2026-11-22");
+    expect(effectiveDeadline(successor.id).date).toBe("2027-05-23");
+    const tl = await (await call(app, "marek", `/cycles/${piotr}/timeline`)).text();
+    expect(tl).toContain('<time datetime="2026-11-22">22.11.2026</time><div class="tl-body"><b>Fikcja zapoznania z oceną</b><p class="tl-detail">Kopię arkusza doręczono 21.11.2026.</p>');
+    expect(await (await call(app, "joanna", `/cycles/${piotr}/assessment`)).text()).toContain("21.11.2026");
+  });
+
   test("potwierdzenie, potem fikcja: 409; równoczesne żądania zostawiają jedno zdarzenie końcowe", async () => {
     const app = fresh("2026-11-22");
     await approvePiotr(app);

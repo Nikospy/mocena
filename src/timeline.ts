@@ -137,8 +137,9 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
     } else if (e.type === "assessment_acknowledged" || e.type === "acknowledgement_fiction") {
       const fiction = e.type === "acknowledgement_fiction";
       entries.push({
-        date: fiction ? (x.deliveredOn ?? e.date) : e.date,
+        date: e.date,
         title: fiction ? "Fikcja zapoznania z oceną" : "Zapoznanie z oceną",
+        ...(fiction && x.deliveredOn ? { detail: `Kopię arkusza doręczono ${formatDate(x.deliveredOn)}.` } : {}),
         basis: [rules.deadlines.objectionDays.basis],
         kind: "fact",
       });
