@@ -30,7 +30,7 @@ export function ObjectionChangeView(p: {
         </span>
       </p>
       <ErrorSummary errors={p.errors} title="Nie zapisano zmiany oceny" />
-      <form method="post" action={`/cycles/${p.cycleId}/objection-change`}>
+      <form class="objection-change-form" method="post" action={`/cycles/${p.cycleId}/objection-change`}>
         <div class="o-grid">
           <div class="o-main">
             <section aria-labelledby="h-crits">
