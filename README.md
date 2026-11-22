@@ -55,7 +55,7 @@ bun run dev
 bun test
 ```
 
-`bun run seed` wgrywa dane pokazowe. `bun run dev` uruchamia serwer z przeładowaniem.
+`bun run seed` wgrywa dane pokazowe. `bun run dev` uruchamia serwer z przeładowaniem. `bun test` uruchamia 395 testów.
 
 ## Wdrożenie
 
