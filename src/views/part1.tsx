@@ -123,14 +123,17 @@ export function Part1View(p: Part1ViewProps) {
       ) : null}
     </section>
   );
-  const links = p.links.map((l) => <a href={l.href}>{l.label}</a>);
+  const opening = p.links.find((link) => link.href === `/cycles/${p.cycleId}/cards/opening`);
+  const links = p.links.filter((link) => link !== opening).map((link) => <a href={link.href}>{link.label}</a>);
   return (
     <Layout title="Część I oceny" person={p.viewer} today={p.today}>
       <PageHeader
         context={<>Ocena okresowa · arkusz {p.sheet} <LegalBasis basis={p.sheetBasis} /></>}
         title={<>Część I oceny: {p.employeeName}</>}
         linksLabel="Cykl oceny"
-        links={links.length ? <CycleLinks links={links} /> : undefined}
+        links={opening || links.length ? (
+          <CycleLinks links={links} opening={opening ? <a href={opening.href} data-tour="opening-card">{opening.label}</a> : undefined} />
+        ) : undefined}
       />
       <Steps current={stepIdx} />
 
@@ -225,11 +228,13 @@ export function Part1View(p: Part1ViewProps) {
 }
 
 /** Odnośniki cyklu: na komputerze jeden rząd, na telefonie dwa pierwsze i reszta w menu „Więcej”. */
-function CycleLinks(props: { links: JSX.Element[] }) {
-  const head = props.links.slice(0, 2);
-  const tail = props.links.slice(2);
+function CycleLinks(props: { links: JSX.Element[]; opening?: JSX.Element }) {
+  const inlineCount = props.opening ? 1 : 2;
+  const head = props.links.slice(0, inlineCount);
+  const tail = props.links.slice(inlineCount);
   return (
     <>
+      {props.opening}
       <span class="pl-wide">{props.links}</span>
       <span class="pl-narrow">
         {head}

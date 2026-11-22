@@ -58,7 +58,7 @@ describe("przewodnik pokazu", () => {
     expect(text).not.toContain('action="/demo/date"');
   });
 
-  test("przystanki wskazują widoczny termin i notatki przy kryteriach", async () => {
+  test("przystanki wskazują termin, wspólny odnośnik do karty i rozwijane notatki", async () => {
     const { app } = createTestApp();
     const window = new Window();
     for (const [id, expected] of [["1", "Termin oceny"], ["4", "Notatki:"]]) {
@@ -67,8 +67,22 @@ describe("przewodnik pokazu", () => {
       window.document.body.innerHTML = page.text;
       const look = stopById(id)!.look[0];
       const element = window.document.querySelector(`main ${look.selector}`)!;
-      expect(id === "1" ? element.textContent : element.getAttribute("aria-label")).toContain(expected);
-      if (id === "4") expect(element.querySelector("input[data-insert]")).not.toBeNull();
+      if (id === "1") {
+        expect(element.textContent).toContain(expected);
+        const selector = '[data-tour="opening-card"]';
+        expect(page.text).toContain('data-tour="opening-card"');
+        expect(stopById(id)!.look.some((item) => item.selector === selector)).toBe(true);
+        const links = window.document.querySelectorAll(`main header .page-links ${selector}`);
+        expect(links).toHaveLength(1);
+        expect(links[0].getAttribute("href")).toBe("/cycles/cycle-piotr/cards/opening");
+        expect(links[0].textContent).toBe("Karta rozmowy o kryteriach");
+        expect(links[0].closest(".pl-wide, .pl-narrow")).toBeNull();
+      } else {
+        expect(element.tagName).toBe("SUMMARY");
+        const notes = element.parentElement!.querySelector(".note-list")!;
+        expect(notes.getAttribute("aria-label")).toContain(expected);
+        expect(notes.querySelector("input[data-insert]")).not.toBeNull();
+      }
     }
     const note = await post(app, "/tour/2");
     const page = await html(app, note.headers.get("location")!, cookies(note));
