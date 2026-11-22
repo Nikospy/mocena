@@ -10,9 +10,12 @@ export function FeedbackView(props: { viewer: Person; today: string; messages: (
         <h1 class="n-title">Informacja zwrotna</h1>
         {props.messages.length === 0 ? <p class="cap">Nie masz jeszcze informacji zwrotnej.</p> : null}
         {props.messages.map((m) => (
-          <article class="card">
-            <p class="cap">{m.sender} · {formatDate(m.sent_on)}</p>
+          <article class="card fb-msg">
             <p class="note-text">{m.text}</p>
+            <p class="sign">
+              <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5" /><path d="M5 20a7 7 0 0 1 14 0" /></svg>
+              {m.sender} · {formatDate(m.sent_on)}
+            </p>
           </article>
         ))}
       </section>
