@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>mOcena: okładka zgłoszenia (800 × 600)</title>
+<link rel="stylesheet" href="../../public/rodzina.css">
+<style>
+/* Okładka zgłoszenia 4:3. Render: scripts/pitch-cover.ts (PNG 1600 × 1200, skala 2). */
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--grey-30); font-family: var(--font); padding: 24px; display: grid; gap: 24px; justify-content: start; }
+.cover { inline-size: 800px; block-size: 600px; overflow: hidden; position: relative; background: var(--cobalt-300); color: var(--white); }
+
+/* A: sama teza z osią czasu */
+#a { padding: 48px 56px 44px; display: grid; grid-template-rows: auto 1fr auto auto; row-gap: 0; }
+#a .brand { font-size: 28px; line-height: 36px; font-weight: var(--w-bold); letter-spacing: 0.3px; }
+#a h1 { align-self: center; font-size: 64px; line-height: 72px; font-weight: var(--w-bold); letter-spacing: -1.5px; text-wrap: balance; }
+#a h1 em { font-style: normal; color: var(--cobalt-30); }
+#a .axis { position: relative; block-size: 64px; margin-block-end: 24px; }
+#a .axis .line { position: absolute; inset-inline: 0; inset-block-start: 30px; block-size: 4px; background: var(--cobalt-100); }
+#a .axis .band { position: absolute; inset-inline-end: 0; inset-block-start: 20px; inline-size: 56px; block-size: 24px; border-radius: 8px; background: var(--cobalt-30); }
+#a .axis .tag { position: absolute; inset-inline-end: 0; inset-block-start: -14px; font-size: 20px; font-weight: var(--w-bold); color: var(--cobalt-30); }
+#a .axis .end { position: absolute; inset-block-start: 46px; font-size: 18px; font-weight: var(--w-bold); }
+#a .axis .l { inset-inline-start: 0; } #a .axis .r { inset-inline-end: 0; }
+#a .foot { font-size: 20px; line-height: 28px; color: var(--cobalt-20); }
+
+/* B: teza nad zrzutem ekranu */
+#b { display: grid; grid-template-rows: auto 1fr; }
+#b .head { padding: 40px 48px 28px; }
+#b .brand { font-size: 24px; line-height: 32px; font-weight: var(--w-bold); margin-block-end: 16px; }
+#b h1 { font-size: 46px; line-height: 54px; font-weight: var(--w-bold); letter-spacing: -1px; text-wrap: balance; }
+#b h1 em { font-style: normal; color: var(--cobalt-30); }
+#b .shot { margin-inline: 48px; border-radius: 16px 16px 0 0; overflow: hidden; background: var(--white); box-shadow: 0 -8px 40px rgb(0 0 0 / 0.25); }
+#b .shot img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; object-position: 100% 90%; }
+</style>
+</head>
+<body>
+<section class="cover" id="a">
+  <div class="brand">mOcena</div>
+  <h1>Przełożony ocenia dwa lata pracy. <em>Pamięta ostatnie tygodnie.</em></h1>
+  <div class="axis" aria-hidden="true">
+    <span class="tag">to pamięta</span><i class="line"></i><i class="band"></i>
+    <span class="end l">09.12.2024</span><span class="end r">dzień oceny</span>
+  </div>
+  <p class="foot">Asystent ocen okresowych w służbie cywilnej · fakty zbierane przez cały okres, terminy liczone z przepisu</p>
+</section>
+
+<section class="cover" id="b">
+  <div class="head">
+    <div class="brand">mOcena</div>
+    <h1>Przełożony ocenia dwa lata pracy. <em>Pamięta ostatnie tygodnie.</em></h1>
+  </div>
+  <div class="shot"><img src="img/hero.jpg" alt=""></div>
+</section>
+</body>
+</html>
