@@ -171,7 +171,7 @@ export function RequestFormView(props: {
             <div>
               <b>Wniosek z {formatDate(s!.request.date)} przyjęty {formatDate(decision.date)}</b>
               <p>Nowy termin oceny: {formatDate(decision.payload.newDeadline)}.</p>
-              <a class="btn link-chip" href={`/cycles/${props.cycleId}/deadline-change/${decision.id}/letter`}>Pismo o zmianie terminu</a>
+              <a href={`/cycles/${props.cycleId}/deadline-change/${decision.id}/letter`}>Pismo o zmianie terminu</a>
             </div>
           </div>
         ) : null}

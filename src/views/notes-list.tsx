@@ -22,7 +22,7 @@ function NoteCard(props: { note: Note }) {
       </p>
       <p class="note-text">{n.text}</p>
       <div class="btns">
-        <a class="btn sm-btn" href={`/notes/${n.id}/feedback`}>Przekaż pracownikowi</a>
+        <a class="btn text" href={`/notes/${n.id}/feedback`}>Przekaż pracownikowi</a>
       </div>
     </li>
   );

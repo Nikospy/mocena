@@ -36,7 +36,7 @@ export function PeopleListView(props: { viewer: Person; today: string; rows: Per
         <nav class="hr-links" aria-label="Sortowanie">
           <span class="cap">Sortuj:</span>
           {SORTS.map((s) => (
-            <a class="btn link-chip" href={`/hr/people?sort=${s.id}${props.q ? `&q=${encodeURIComponent(props.q)}` : ""}`} aria-current={props.sort === s.id ? "true" : undefined}>
+            <a href={`/hr/people?sort=${s.id}${props.q ? `&q=${encodeURIComponent(props.q)}` : ""}`} aria-current={props.sort === s.id ? "true" : undefined}>
               {s.label}
             </a>
           ))}
@@ -79,8 +79,8 @@ export function PeopleListView(props: { viewer: Person; today: string; rows: Per
                     </td>
                     <td data-label="Działania">
                       <div class="hr-links">
-                        <a class="btn link-chip" href={`/hr/people/${r.id}/edit`}>Edytuj</a>
-                        <a class="btn link-chip" href={`/people/${r.id}/history`}>Historia ocen</a>
+                        <a href={`/hr/people/${r.id}/edit`}>Edytuj</a>
+                        <a href={`/people/${r.id}/history`}>Historia ocen</a>
                       </div>
                     </td>
                   </tr>
@@ -230,8 +230,8 @@ export function PersonFormView(props: {
           </fieldset>
           <button class="btn primary full" type="submit">Zapisz</button>
           <p>
-            <a class="btn link-chip" href="/hr/people">Wróć do listy</a>
-            {props.personId ? <a class="btn link-chip" href={`/people/${props.personId}/history`}>Historia ocen</a> : null}
+            <a href="/hr/people">Wróć do listy</a>
+            {props.personId ? <a href={`/people/${props.personId}/history`}>Historia ocen</a> : null}
           </p>
         </form>
       </section>

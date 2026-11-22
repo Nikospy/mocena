@@ -47,7 +47,7 @@ export function TimelineView(props: {
                   </span>
                 ) : null}
                 {e.detail ? <p class="cap">{e.detail}</p> : null}
-                {e.href ? <a class="btn link-chip" href={e.href}>Pismo o zmianie terminu</a> : null}
+                {e.href ? <a href={e.href}>Pismo o zmianie terminu</a> : null}
                 <LegalBasis basis={e.basis} />
               </div>
             </li>

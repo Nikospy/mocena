@@ -29,7 +29,7 @@ export function HistoryList(props: { entries: Entry[] }) {
                 : "Zapoznanie jeszcze niepotwierdzone"}
               {" · "}<RulesVersion version={h.rulesVersion.version} effectiveFrom={h.rulesVersion.effectiveFrom} />
             </p>
-            {h.canOpenSheet ? <a class="btn link-chip" href={`/cycles/${h.cycleId}/sheet`}>Arkusz</a> : null}
+            {h.canOpenSheet ? <a href={`/cycles/${h.cycleId}/sheet`}>Arkusz</a> : null}
           </li>
         );
       })}

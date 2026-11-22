@@ -201,18 +201,22 @@ p { max-inline-size: 66ch; }
 .st.info { background: var(--blue-20); color: var(--blue-200); } .st.info .ico { color: var(--blue-100); }
 
 /* ================= 5. Kontrolki ================= */
-.btn { min-block-size: var(--hit); padding-inline: var(--sp-300); border: 0; border-radius: var(--r-300); display: inline-flex; align-items: center; justify-content: center;
+/* Przyciski: jedna wysokość (48 px) i trzy postaci.
+   .btn.primary – wypełniony, jedna główna akcja na ekranie;
+   .btn (= .btn.outline) – z obrysem, akcja drugorzędna;
+   .btn.text – tekstowy, akcja poboczna albo „Wróć”. Małych pigułkowych przycisków nie ma. */
+.btn { min-block-size: var(--hit); padding-inline: var(--sp-300); border: 2px solid var(--primary); border-radius: var(--r-300); display: inline-flex; align-items: center; justify-content: center;
   gap: var(--sp-100); font-weight: var(--w-bold); font-size: var(--f-p); line-height: var(--lh-p); text-align: center; text-decoration: none; cursor: pointer;
-  background: var(--secondary); color: var(--on-secondary); }
+  background: var(--white); color: var(--primary); }
 .btn.primary { background: var(--primary); color: var(--on-primary); }
-.btn.text { background: none; padding-inline: var(--sp-200); }
+.btn.text { background: none; border-color: transparent; padding-inline: var(--sp-150); }
 .btn.full { inline-size: 100%; }
-.btn:disabled, .btn[aria-disabled="true"] { background: var(--grey-30); color: var(--text-2); cursor: not-allowed; }
+.btn:disabled, .btn[aria-disabled="true"] { background: var(--grey-30); border-color: var(--grey-30); color: var(--text-2); cursor: not-allowed; }
 .btn:not(:disabled):active { background: var(--cobalt-20); transform: scale(.98); }
-.btn.primary:not(:disabled):active { background: var(--cobalt-200); }
+.btn.primary:not(:disabled):active { background: var(--cobalt-200); border-color: var(--cobalt-200); }
 @media (hover: hover) and (pointer: fine) {
-  .btn:not(:disabled):hover { background: var(--cobalt-20); }
-  .btn.primary:not(:disabled):hover { background: var(--cobalt-200); }
+  .btn:not(:disabled):hover { background: var(--cobalt-10); }
+  .btn.primary:not(:disabled):hover { background: var(--cobalt-200); border-color: var(--cobalt-200); }
   .btn.text:not(:disabled):hover { background: var(--cobalt-10); }
 }
 .btns { display: flex; flex-wrap: wrap; gap: var(--sp-100) var(--sp-150); }
@@ -522,7 +526,6 @@ p { max-inline-size: 66ch; }
 
 .dev { padding: calc(var(--sp-200) + var(--sp-50)) calc(var(--sp-200) - 2px); }
 .dev .btns { margin-block-start: var(--sp-200); }
-.dev .btn { padding-inline: var(--sp-100); }
 .again { display: flex; justify-content: center; }
 
 /* --- ocena (komputer) --- */
@@ -649,14 +652,10 @@ p { max-inline-size: 66ch; }
 @media screen and (max-width: 520px) { .sheet-matrix { display: block; overflow-x: auto; } }
 /* Rozstrzygnięcie sprzeciwu: mały przycisk drugorzędny, wyrównany do lewej, pod etykietą. */
 .hr-actions { flex-direction: column; align-items: flex-start; margin-block-start: var(--sp-100); }
-.hr-actions .lbl, .hr-actions .btn { white-space: nowrap; }
+.hr-actions .lbl { white-space: nowrap; }
 .hr-actions .lbl { margin-block-end: 0; color: var(--text-3); font-size: var(--f-c1); line-height: var(--lh-c1); }
-.hr-actions .btn { min-block-size: var(--sp-400); padding-inline: var(--sp-150); font-size: var(--f-c1); font-weight: var(--w-regular); justify-content: flex-start; text-align: start; }
 
 /* design-d */
-/* Linki-czynności jako małe przyciski drugorzędne. */
-.btn.link-chip { min-block-size: var(--sp-400); padding-inline: var(--sp-150); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-regular);
-  background: var(--secondary); color: var(--on-secondary); border: 1px solid var(--cobalt-30); border-radius: var(--pill-r); text-decoration: none; white-space: nowrap; }
 .hr-links { display: flex; flex-wrap: wrap; gap: var(--sp-50) var(--sp-100); }
 .hr-table td, .hr-table th { vertical-align: middle; }
 .hr-table tbody tr:last-child > * { border-block-end: 0; }
@@ -721,7 +720,6 @@ p { max-inline-size: 66ch; }
 .r-chip { display: inline-flex; align-items: center; padding-inline: var(--sp-100); border: 1px solid var(--card-line); border-radius: var(--pill-r); background: var(--white); color: var(--text-2); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); }
 .r-chip.good { background: var(--cobalt-10); border-color: var(--cobalt-10); color: var(--primary); }
 .note-item .btns { justify-content: flex-start; }
-.btn.sm-btn { min-block-size: var(--sp-400); padding-inline: var(--sp-150); font-size: var(--f-c1); line-height: var(--lh-c1); }
 /* informacja zwrotna */
 .fb-src > * + *, .fb-msg > * + * { margin-block-start: var(--sp-150); }
 /* skąd biorą się podpowiedzi */
@@ -914,7 +912,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 }
 /* review-polish-2-3 */
 .gp-b h2, .gm-t, .e-h1 { text-wrap: balance; }
-.gp-f .btn.primary, .gm-bar .btn.primary { white-space: nowrap; font-size: var(--f-c1); line-height: var(--lh-c1); padding-inline: var(--sp-150); }
+.gp-f .btn.primary, .gm-bar .btn.primary { white-space: nowrap; padding-inline: var(--sp-200); }
 .gp-f .btn.primary > span { white-space: nowrap; }
 .gpanel:focus, .gmob:focus { outline: none; }
 .demo-today { color: var(--text-2); }
@@ -935,9 +933,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .due-pill.late { background: var(--orange-20); color: var(--orange-200); }
 .people-table td:nth-child(5) { min-inline-size: 0; }
 .people-tools > * + * { margin-block-start: var(--sp-200); }
-.people-tools .hr-links { align-items: center; }
-.people-tools .link-chip[aria-current="true"] { background: var(--primary); color: var(--on-primary); }
-.hr-tools .btn { text-decoration: none; }
+.people-tools .hr-links { align-items: center; gap: var(--sp-100) var(--sp-300); }
+.hr-links a { display: inline-flex; align-items: center; min-block-size: var(--sp-500); }
+.hr-links a[aria-current] { color: var(--text); font-weight: var(--w-bold); text-decoration: none; }
 fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 
 /* deadline-change: wybór jednego przypadku wygląda jak radio */

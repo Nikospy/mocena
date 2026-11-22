@@ -120,7 +120,7 @@ const VISIBLE_LINKS = 3;
 function HrLinks(props: { links: CycleLink[]; printHref: string | null }) {
   const all = [...props.links.map((l) => ({ href: l.href, label: l.label })), ...(props.printHref ? [{ href: props.printHref, label: "Drukuj / pobierz PDF" }] : [])];
   const link = (l: { href: string; label: string }) => (
-    <a class="btn link-chip" href={l.href}>
+    <a href={l.href}>
       {l.label}
     </a>
   );
