@@ -221,12 +221,30 @@ describe("1.13 fikcja zapoznania do znalezienia", () => {
 describe("1.14 formy ról według osoby", () => {
   test("nagłówek: rola w procesie w formie osoby", async () => {
     const { app } = createTestApp({ today: "2026-11-22", seedOptions: { afterStep1: true } });
-    const who = async (id: string) => /<p class="who"><b>[^<]*<\/b> · ([^<]*)</.exec(await html(app, id, "/"))![1];
+    const who = async (id: string) => /<span class="user-id"><b>[^<]*<\/b><span>([^<]*)</.exec(await html(app, id, "/"))![1];
     expect(await who("anna")).toBe("oceniająca");
     expect(await who("marek")).toBe("oceniający");
     expect(await who("ewa")).toBe("oceniana");
     expect(await who("piotr")).toBe("oceniany");
     expect(await who("joanna")).toBe("kadry");
+  });
+
+  test("nawigacja usługi: tylko miejsca roli, bieżąca strona z aria-current, zmiana konta w panelu konta", async () => {
+    const { app } = createTestApp({ today: "2026-11-22", seedOptions: { afterStep1: true } });
+    const navOf = (h: string) => /<nav class="nav" aria-label="Usługa">([\s\S]*?)<\/nav>/.exec(h)![1]!;
+    const labels = (h: string) => [...navOf(h).matchAll(/<span>([^<]+)<\/span>/g)].map((m) => m[1]);
+    const marek = await html(app, "marek", "/notes");
+    expect(labels(marek)).toEqual(["Sprawy", "Notatki"]);
+    expect(navOf(marek)).toMatch(/href="\/notes" aria-current="page"/);
+    expect(navOf(marek)).not.toContain("/account");
+    expect(marek).toMatch(/<details class="user">[\s\S]*href="\/account"[\s\S]*Zmień konto/);
+    const joanna = await html(app, "joanna", "/hr");
+    expect(labels(joanna)).toEqual(["Stan cykli", "Pracownicy", "Zastępstwa"]);
+    expect(navOf(joanna)).toMatch(/href="\/hr" aria-current="page"/);
+    expect(labels(await html(app, "piotr", "/"))).toEqual(["Sprawy", "Historia ocen", "Informacja zwrotna"]);
+    for (const path of ["/hr/people", "/hr/substitutions"]) expect((await call(app, "joanna", path)).status).toBe(200);
+    for (const path of ["/notes"]) expect((await call(app, "marek", path)).status).toBe(200);
+    for (const path of ["/people/piotr/history", "/feedback"]) expect((await call(app, "piotr", path)).status).toBe(200);
   });
 
   test("Anna nie widzi własnego terminu oceny jako terminu osoby ocenianej przez nią", async () => {
