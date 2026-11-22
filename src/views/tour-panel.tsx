@@ -29,11 +29,9 @@ function Head(props: TourPanelProps) {
           <button class="btn text gp-end" type="submit">Zakończ pokaz</button>
         </form>
       </div>
-      <ol class="g-dots" aria-label="Kroki pokazu">
+      <ol class="g-dots" aria-hidden="true">
         {[1, 2, 3, 4, 5].map((n) => (
-          <li class={n < stop.step ? "done" : n === stop.step ? "cur" : ""}>
-            <span class="vh">Krok {n}</span>
-          </li>
+          <li class={n < stop.step ? "done" : n === stop.step ? "cur" : ""} />
         ))}
       </ol>
       <div class="acct">

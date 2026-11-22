@@ -143,7 +143,7 @@ p, li { text-wrap: pretty; }
    Cztery stopnie na całą usługę: 28 nagłówek strony (telefon 24) · 20 sekcja, termin, werdykt · 16 treść · 14 metadane
    (data, rodzaj, podpis pola). Hierarchia niżej: grubość i położenie, nie nowy rozmiar. Tekst ciągły do 66 znaków. */
 h1 { font-size: var(--f-h4); line-height: var(--lh-h4); font-weight: var(--w-bold); }
-@media (min-width: 900px) { h1 { font-size: var(--f-h2); line-height: var(--lh-h2); } }
+@media (min-width: 640px) { h1 { font-size: var(--f-h2); line-height: var(--lh-h2); } }
 h2 { font-size: var(--f-h5); line-height: var(--lh-h5); font-weight: var(--w-bold); }
 h3 { font-size: var(--f-p); line-height: var(--lh-p); font-weight: var(--w-bold); }
 p, blockquote, dd, :is(ul, ol):not([class]) > li, :is(.topics, .b-ol, .points, .why, .reason, .outcomes, .plain-list, .g-look, .tl-list) > li { max-inline-size: 66ch; }
@@ -925,6 +925,13 @@ main h1[tabindex="-1"]:focus, main h1[tabindex="-1"]:focus-visible { outline: no
 /* strona główna: wiersz bez nazwy czynności kończy sama strzałka; pusty stan to jedno zdanie i jedna akcja */
 .task-go.bare { color: var(--text-2); }
 .home-empty { display: grid; gap: var(--sp-100); justify-items: start; background: var(--surface); border: 1px solid var(--card-line); border-radius: var(--card-r); padding: var(--sp-300); }
+/* „Twoje możliwości”: drugorzędne wobec spraw – niżej, bez powierzchni karty, same linie podziału */
+.home-options { margin-block-start: var(--sp-600); }
+.home-options > h2 { margin-block-end: var(--sp-100); }
+.tasks.quiet { background: none; border: 0; border-block-end: 1px solid var(--line); border-radius: 0; }
+.tasks.quiet .task { padding-inline: 0; border-block-start: 1px solid var(--line); }
+.tasks.quiet .task-link { color: var(--primary); }
+@media (hover: hover) and (pointer: fine) { .tasks.quiet .task:hover { background: none; } }
 .home-empty a, .err-back a { display: inline-flex; align-items: center; gap: var(--sp-50); min-block-size: var(--hit); font-weight: var(--w-bold); }
 
 /* wybór konta: lista na jednej powierzchni, cały wiersz to przycisk; rola zwykłym tekstem */
@@ -938,7 +945,7 @@ main h1[tabindex="-1"]:focus, main h1[tabindex="-1"]:focus-visible { outline: no
   gap: var(--sp-200); padding: var(--sp-150) var(--sp-300); cursor: pointer; color: var(--text); }
 .acc-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--sp-100); min-inline-size: 0; }
 .acc-main b { flex: 1 0 100%; font-size: var(--f-p); line-height: var(--lh-p); }
-.account-list .acc .cap { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+.account-list .acc .cap { font-size: var(--f-p); line-height: var(--lh-p); color: var(--text-2); }
 .account-list .acc > .ico { color: var(--primary); }
 .account-list .acc:focus-visible { box-shadow: inset 0 0 0 2px var(--grey-500); outline: none; }
 @media (hover: hover) and (pointer: fine) { .account-list .acc:hover { background: var(--cobalt-10); } .account-list .acc:hover b { text-decoration: underline; text-underline-offset: .2em; } }
@@ -977,18 +984,24 @@ main h1[tabindex="-1"]:focus, main h1[tabindex="-1"]:focus-visible { outline: no
 }
 .e-mob .memo { font-size: var(--f-c1); line-height: var(--lh-c1); }
 
+/* kropki osi i numery chwil to odnośniki do kroków, nie akcja główna: obrys zamiast wypełnienia */
+.t-dot, .labs .n { box-sizing: border-box; background: var(--white); color: var(--primary); border: 2px solid var(--primary); }
+@media (hover: hover) and (pointer: fine) { .t-dot:hover { background: var(--cobalt-10); } }
+.skip-link { border-radius: var(--r-100); }
+
 /* koniec pokazu: sekcje oddziela linia i odstęp, bez kart */
 .e-done { gap: var(--sp-400); max-inline-size: 720px; margin-inline: 0; }
 .e-done .e-card { background: none; border: 0; border-radius: 0; padding: var(--sp-300) 0 0; border-block-start: 1px solid var(--line); gap: var(--sp-200); }
 .e-done > .e-h1 + .e-card { border-block-start: 0; padding-block-start: 0; }
 .e-more { gap: var(--sp-300); }
 .e-more li { gap: 0; }
+.e-more li > span, .e-seen li > span:last-child { max-inline-size: 66ch; }
 .e-actions { gap: var(--sp-150) var(--sp-200); }
 @media (max-width: 599px) { .e-actions form, .e-actions .btn { inline-size: 100%; } }
 
 /* panel przewodnika (komputer) */
-.gp-h .row { min-block-size: var(--sp-500); }
-.gp-end { min-block-size: var(--sp-500); padding-inline: var(--sp-100); margin-inline-end: calc(var(--sp-100) * -1); font-size: var(--f-c1); line-height: var(--lh-c1); }
+.gp-h .row { min-block-size: var(--hit); }
+.gp-end { min-block-size: var(--hit); padding-inline: var(--sp-100); margin-inline-end: calc(var(--sp-100) * -1); font-size: var(--f-c1); line-height: var(--lh-c1); }
 .gp-b > .basis { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
 .gp-b > .btn.text { justify-self: start; padding-inline: 0; }
 .gp-f { align-items: center; }
@@ -1002,6 +1015,15 @@ main h1[tabindex="-1"]:focus, main h1[tabindex="-1"]:focus-visible { outline: no
 .gmob summary::after { content: ""; grid-column: 2; grid-row: 1 / span 2; inline-size: var(--sp-100); block-size: var(--sp-100); border-inline-end: 2px solid var(--text-2); border-block-start: 2px solid var(--text-2); transform: rotate(-45deg); margin-inline-end: var(--sp-100); }
 .gmob details[open] summary::after { transform: rotate(135deg); }
 .gmob details[open] summary { border-block-end: 1px solid var(--line); }
+/* przyciski przewodnika należą do warstwy pokazu, nie do usługi: ta sama postać przycisku, kolor atramentu zamiast kobaltu,
+   żeby na ekranie kroku była jedna kobaltowa akcja główna – ta, którą juror ma kliknąć w usłudze */
+.gpanel .btn.primary, .gm-bar .btn.primary { background: var(--grey-400); border-color: var(--grey-400); color: var(--white); }
+.gpanel .btn.primary:not(:disabled):active, .gm-bar .btn.primary:not(:disabled):active { background: var(--grey-300); border-color: var(--grey-300); }
+@media (hover: hover) and (pointer: fine) { .gpanel .btn.primary:hover, .gm-bar .btn.primary:hover { background: var(--grey-300); border-color: var(--grey-300); } }
+.gp-h .row b { color: var(--text); }
+.g-dots li.cur { background: var(--grey-400); }
+.g-dots li.done { background: var(--grey-80); }
+@media (min-width: 640px) and (max-width: 899px) { .e-h1 { font-size: var(--f-h2); line-height: var(--lh-h2); } }
 body.tour-on { padding-block-end: 140px; }
 @media (min-width: 900px) { body.tour-on { padding-block-end: 0; } }
 

@@ -184,9 +184,9 @@ app.get("/", (c) => {
         )}
       </section>
       {options.length ? (
-        <section aria-labelledby="h-options">
+        <section class="home-options" aria-labelledby="h-options">
           <h2 id="h-options">Twoje możliwości</h2>
-          <ul class="tasks">
+          <ul class="tasks quiet">
             {options.map((t) => (
               <li class="task">
                 <div class="task-main">
@@ -198,9 +198,9 @@ app.get("/", (c) => {
                   {t.detail ? <p class="task-detail">{t.detail}</p> : null}
                 </div>
                 <div class="task-side">
-                  <span class="task-go" aria-hidden="true">
-                    {t.action ?? "Otwórz"}
-                    <svg class="ico s" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></svg>
+                  <span class={t.action ? "task-go" : "task-go bare"} aria-hidden="true">
+                    {t.action ?? null}
+                    {CHEVRON_R}
                   </span>
                 </div>
               </li>
