@@ -31,7 +31,7 @@ function piotrSummary(today: string, opts: { answer?: "yes" | "no" } = {}) {
 describe("pytanie o pracę po godzinach", () => {
   test("wyzwala je notatka po zmianie zadań z „po 18:00”; karta rozmowy tylko po odpowiedzi „tak”", () => {
     const { summary } = piotrSummary("2026-11-21");
-    expect(summary.afterHours?.notes.map((n) => n.date)).toContain("2026-04-21");
+    expect(summary.afterHours?.notes.map((n) => n.date)).toEqual(["2026-04-21"]);
     // Bez odpowiedzi „tak” na notatce ze zmianą zadań nie ma karty rozmowy.
     expect(summary.afterHours?.cardHref).toBeNull();
     const yes = piotrSummary("2026-11-21", { answer: "yes" }).summary;
