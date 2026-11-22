@@ -29,7 +29,7 @@ Nazwy tabel, zdarzeń, tras i funkcji wspólnych dla plastrów są w rozdziale �
 6. **Słowo „potwierdzenie”, nigdy „podpis”.** Podpisu elektronicznego nie budujemy.
 7. **Przy nazwisku pracownika nie ma etykiet ani wskaźników.** Sygnały pochodzą tylko z wpisów przełożonego. Nic się nie zapisuje bez kliknięcia człowieka.
 8. **Bez płatnych licencji i usług.** Dane nie wychodzą poza komputer, na którym działa aplikacja.
-9. **Budowę zaczynasz dopiero na wyraźne polecenie autora** (na przykład „ruszaj”). Stan na 22.11.2026, 01:30: plany gotowe, budowa czeka na to polecenie. Dokumenty możesz poprawiać.
+9. **Budowę zaczynasz dopiero na wyraźne polecenie autora** (na przykład „ruszaj”). Dokumenty możesz poprawiać.
 10. **Wygląd.** Pierwszy gotowy ekran (ekran startowy ze zmiany `rules-engine-and-demo-data`) pokazujesz autorowi na zrzucie (360 px i 1440 px). Dopiero po jego akceptacji powielasz wygląd na kolejne ekrany.
 
 ## Komendy
@@ -38,19 +38,22 @@ Nazwy tabel, zdarzeń, tras i funkcji wspólnych dla plastrów są w rozdziale �
 bun install
 bun run dev      # serwer z przeładowaniem
 bun test         # testy silnika i tras
-bun run seed     # dane pokazowe (powstaje w zmianie rules-engine-and-demo-data)
+bun run seed     # dane pokazowe
 bun run scripts/design-audit.ts <outDir>   # pomiar wyglądu na ekranach pokazu (360 i 1440 px): pismo, kontrast, cele, długość wiersza, ramki
 ```
 
 Trasy sprawdzaj w testach przez `app.request()`, bez uruchamiania serwera.
 
-## Stan pracy (22.11.2026, 01:30)
+## Stan pracy (22.11.2026)
 
-- **Kod:** jest starter Hono (`src/index.ts`, `GET /`) i silnik z nazwami po polsku: `reguly/rozporzadzenie-2016-470.json`, `src/silnik/ocena.ts`, `src/silnik/terminy.ts`, `src/silnik/ocena.test.ts` (19 testów przechodzi). Ekranów, bazy i danych pokazowych jeszcze nie ma.
-- **Plany:** wszystkie siedem zmian ma gotowy `plan.md` po czterech recenzjach krzyżowych. Wspólne nazwy są w rozdziale „Kontrakt wspólny dla wszystkich plastrów” planu F-01.
-- **Wygląd:** autor przyjął design system („wygląd A”, rodzina mObywatel) 22.11 ok. 00:05. Jest w repo: tokeny `public/rodzina.css`, komponenty `public/style.css`, fonty `public/fonts/`. Wzorce układu i zachowania ekranów: `context/design/mockups/*.html` (notatka, ocena, oś czasu). Ekrany używają tych klas i tokenów, bez własnych kolorów i rozmiarów. Decyzja autora z 22.11 ok. 02:50: „wygląd A to tylko szkielet, można go zmieniać dowolnie, byle by to były zmiany na lepsze”. Zmiany wyglądu sprawdzasz pomiarem `scripts/design-audit.ts` (liczby przed i po) i pokazujesz autorowi na zrzutach.
+- **Aplikacja.** Działają ekrany oceniającego, ocenianego, kadr, dyrektora generalnego i administratora oraz strony błędów. Cykl obejmuje kryteria, notatki, nieobecności, ocenę, zapoznanie, arkusz i historię. Silnik w `src/engine/` liczy wynik, terminy i stopnie służbowe z reguł w `rules/`.
+- **Sprzeciw i kadry.** Kadry odnotowują zmianę oceny po sprzeciwie albo zlecają sporządzenie drugiej oceny. Dostępne są import pracowników z CSV oraz eksport zestawienia i pojedynczej oceny.
+- **Uruchomienie.** `/tour` prowadzi przez pokaz dla jury. `bun run seed` wgrywa dane pokazowe, a `bun run init` zakłada pierwsze konto kadr w pustej bazie urzędu. Świeży `bun test` zakończył się wynikiem 395 zaliczonych, 0 niezaliczonych testów.
+- **Zlecenia i pomiar.** Zlecenia końcowe są w `context/changes/final-polish/`. Pomiary wyglądu wykonuje `scripts/design-audit.ts`, raport progów generuje `scripts/design-report.ts`, a zakres audytu opisuje `context/changes/final-polish/coverage.md`.
 
 ## Start budowy po poleceniu autora
+
+Budowa wymienionych niżej plastrów jest zakończona. Poniżej zapisano kolejność jej realizacji.
 
 1. Design system jest już w `public/` (zrobione 22.11). Układ `src/views/layout.tsx` podpina `/rodzina.css` i `/style.css`.
 2. Buduj w tej kolejności: F-01 `rules-engine-and-demo-data`, S-01 `cycle-start-criteria`, S-02 `assessment-and-confirmation`, S-04 `notes-and-justification`, S-05 `hr-partner-question`, S-06 `hr-overview-and-print`, S-03 `timeline-and-absences`. Jedna zmiana to `/10x-implement <change-id>`.
