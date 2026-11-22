@@ -26,7 +26,12 @@ milestone_status: open
 - **Intent:** Jedna ocena okresowa przechodzi w prototypie całą drogę, od początku cyklu do potwierdzenia zapoznania, na trzech kontach (oceniający, oceniany, kadry), bez papieru.
 - **Source materials:** `context/foundation/prd.md` (v1)
 - **Done when:** every F-NN and S-NN below is `done`, plus dwa pełne przebiegi pokazu bez błędu, nagranie zapasowe i prezentacja PDF.
-- **Scope anchors:** FR-001–FR-036, US-01–US-05.
+- **Scope anchors:** FR-001–FR-036, US-01–US-05, oraz zakres dopisany przez autora 22.11 ok. 01:40 (decyzje 13a–13g: „to ma byc projekt ktory powalczy o nagrode glowna - nie ma zadnych polsrodkow”):
+  - MS-01: Każdy ekran wygląda na poziomie przyjętych makiet przy 360 i 1440 px (decyzja 13c).
+  - MS-02: Juror otwiera link i bez instrukcji przechodzi cały proces w ok. 3 minuty dzięki przewodnikowi pokazu (decyzja 13e).
+  - MS-03: Uwagi testera i przeglądu są rozwiązane; teksty interfejsu zgodne z zasadami pisania interfejsu.
+  - MS-04: Cały pokaz przechodzi dwa razy z rzędu bez błędu na żywej stronie, sprawdzone automatem.
+  - MS-05: Materiały dla jury: nagranie ok. 90 s, zrzuty do PDF, README z linkiem do żywej wersji, teksty do formularza zgłoszenia.
 
 ## Vision recap
 
@@ -49,6 +54,11 @@ Ocena okresowa w służbie cywilnej powstaje raz na 24 miesiące, na papierze i 
 | S-05 | hr-partner-question          | oceniający dostaje pytanie HR partnera po notatce, zestawienie przed rozmową i przypomnienie o docenianiu | S-04 | US-04, FR-015, FR-016, FR-035, FR-036 | in-progress |
 | S-03 | timeline-and-absences        | kadry wpisują nieobecność i zmianę oceniającego, a wszyscy widzą oś czasu z regułami | S-01, S-06    | US-03, FR-010, FR-011, FR-014, FR-033, FR-034 | in-progress |
 | S-06 | hr-overview-and-print        | kadry widzą stan cykli i stopnie obowiązkowe, a arkusz da się pobrać i wydrukować    | S-02          | FR-026, FR-027, FR-029, FR-031             | in-progress |
+| S-07 | design-parity                | każdy ekran wygląda jak przyjęte makiety, na telefonie i komputerze                 | S-01–S-06     | MS-01                                      | in-progress |
+| S-08 | guided-demo-tour             | juror przechodzi cały proces sam, prowadzony krok po kroku przez przewodnik pokazu  | S-07          | MS-02, US-01–US-05                         | proposed |
+| S-09 | review-polish                | juror nie trafia na niejasny tekst, pusty obszar ani ślepy zaułek                   | S-07          | MS-03                                      | proposed |
+| S-10 | live-demo-check              | pokaz przechodzi automatycznie dwa razy z rzędu na żywej stronie                    | S-08, S-09    | MS-04                                      | proposed |
+| S-11 | jury-materials               | juror dostaje nagranie, PDF, README i opis zgłoszenia zgodne z działającą wersją    | S-10          | MS-05                                      | proposed |
 
 ## Streams
 
@@ -164,6 +174,67 @@ What's already in place in the codebase as of `2026-11-21`.
 - **Unknowns:** —
 - **Risk:** Zamyka „kompletność”: to ekran, na którym widać podprocesy, których pokaz nie klika.
 - **Status:** in-progress
+
+### S-07: Wygląd na poziomie makiet
+
+- **Outcome:** juror widzi każdy ekran w przyjętym wyglądzie (karty, trzy głosy, pigułki przepisów, przyciski zamiast gołych linków).
+- **Change ID:** design-parity
+- **PRD refs:** MS-01
+- **Prerequisites:** S-01–S-06
+- **Parallel with:** —
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Pierwsze wrażenie jurora; cztery grupy ekranów poprawione 22.11, przegląd ujawni resztę.
+- **Status:** in-progress
+
+### S-08: Przewodnik pokazu
+
+- **Outcome:** juror otwiera link, czyta tezę, klika „Rozpocznij pokaz” i przechodzi 5 kroków; każdy krok jednym kliknięciem zmienia konto i datę i mówi, na co patrzeć.
+- **Change ID:** guided-demo-tour
+- **PRD refs:** MS-02, US-01–US-05
+- **Prerequisites:** S-07
+- **Parallel with:** S-09
+- **Blockers:** —
+- **Unknowns:**
+  - Który wariant wyglądu przewodnika (pasek, karta boczna, oś dwóch lat)? — Owner: user. Block: yes.
+- **Risk:** Najważniejsza zmiana dla jurora, który nie zna procesu; nowy ekran, więc najpierw warianty do oceny okiem (decyzja 13c).
+- **Status:** blocked
+
+### S-09: Dopracowanie po przeglądzie
+
+- **Outcome:** juror nie trafia na niejasny tekst, pusty obszar, niespójny komponent ani ślepy zaułek.
+- **Change ID:** review-polish
+- **PRD refs:** MS-03
+- **Prerequisites:** S-07
+- **Parallel with:** S-08
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Zakres wynika z przeglądu na żywej stronie (22.11); bez niego poprawki byłyby zgadywaniem.
+- **Status:** proposed
+
+### S-10: Sprawdzenie pokazu na żywej stronie
+
+- **Outcome:** automat przechodzi cały pokaz (kroki 1–5 i dodatki wersji 5-minutowej) dwa razy z rzędu bez błędu na żywej stronie.
+- **Change ID:** live-demo-check
+- **PRD refs:** MS-04
+- **Prerequisites:** S-08, S-09
+- **Parallel with:** —
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** To jest warunek „dwa pełne przebiegi bez błędu” z karty kamienia.
+- **Status:** proposed
+
+### S-11: Materiały dla jury
+
+- **Outcome:** juror dostaje nagranie ok. 90 s, PDF ze zrzutami gotowej wersji, README z linkiem i opis zgłoszenia, wszystko zgodne z tym, co działa.
+- **Change ID:** jury-materials
+- **PRD refs:** MS-05
+- **Prerequisites:** S-10
+- **Parallel with:** —
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Teksty idą pod nazwiskiem autora, więc wymagają jego przeglądu.
+- **Status:** proposed
 
 ## Backlog Handoff
 
