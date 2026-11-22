@@ -60,5 +60,42 @@
   ],
   "recentFactsWindowMonths": 1,
   "assessmentReminderDays": { "value": 30, "label": "ustawienie urzędu" },
-  "noteSettingsNote": "taskChangeWords i recentFactsWindowMonths: ustawienie urzędu, nie pochodzi z przepisów. Słowa to rdzenie szukane jako podciąg tekstu notatki (małe litery)."
+  "noteSettingsNote": "taskChangeWords i recentFactsWindowMonths: ustawienie urzędu, nie pochodzi z przepisów. Słowa to rdzenie szukane jako podciąg tekstu notatki (małe litery).",
+  "hrPartnerLabel": "ustawienie urzędu",
+  "hrPartnerNote": "developmentForms, appreciationReminderDays i teamSilenceMonths: ustawienie urzędu, nie pochodzi z przepisów. Urząd może zmienić katalog i progi u siebie.",
+  "appreciationReminderDays": 90,
+  "teamSilenceMonths": 6,
+  "developmentForms": [
+    {
+      "id": "rozmowa-z-mentorem",
+      "name": "Spotkania z doświadczoną osobą z urzędu",
+      "description": "Co dwa tygodnie krótkie spotkanie z kimś, kto zna nowy zakres zadań i może pokazać, jak go ogarnąć.",
+      "criteria": ["wspolpraca", "komunikacja"]
+    },
+    {
+      "id": "szkolenie-organizacja-pracy",
+      "name": "Szkolenie z organizacji pracy i ustalania priorytetów",
+      "description": "Jednodniowe szkolenie o planowaniu zadań, gdy zakres obowiązków urósł.",
+      "criteria": ["organizacja-pracy", "rzetelnosc"]
+    },
+    {
+      "id": "szkolenie-obsluga-interesanta",
+      "name": "Szkolenie z obsługi interesanta",
+      "description": "Warsztat z prowadzenia trudnych rozmów z interesantem i pisania jasnych pism.",
+      "criteria": ["orientacja-na-klienta", "komunikacja"]
+    },
+    {
+      "id": "szkolenie-analityczne",
+      "name": "Szkolenie z analizy danych i przygotowywania zestawień",
+      "description": "Kurs praktyczny z pracy na zestawieniach i raportach.",
+      "criteria": ["myslenie-analityczne", "podejmowanie-decyzji"]
+    },
+    {
+      "id": "szkolenie-stanowiskowe",
+      "name": "Szkolenie stanowiskowe z nowego zakresu zadań",
+      "description": "Szkolenie albo praktyka przy stanowisku, które obejmuje nowe zadania pracownika.",
+      "criteria": [],
+      "default": true
+    }
+  ]
 }

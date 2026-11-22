@@ -2,6 +2,7 @@ import data from "../rules/office-settings.json";
 import { CRITERIA } from "./engine/scoring";
 
 export type DutyType = { id: string; name: string };
+export type DevelopmentForm = { id: string; name: string; description: string; criteria: string[]; default?: boolean };
 export type OfficeSettings = {
   label: string;
   note: string;
@@ -10,6 +11,9 @@ export type OfficeSettings = {
   taskChangeWords: string[];
   recentFactsWindowMonths: number;
   assessmentReminderDays?: { value: number; label: string };
+  appreciationReminderDays: number;
+  teamSilenceMonths: number;
+  developmentForms: DevelopmentForm[];
 };
 
 let checked = false;

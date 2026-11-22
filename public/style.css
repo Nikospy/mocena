@@ -529,6 +529,12 @@ h2, h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w
 
 /* F-01 */
 .plain-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-150); }
+
+/* layout: pasek pokazu */
+.demo-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100) var(--sp-200); padding: var(--sp-100) var(--sp-200); border-block-end: 1px solid var(--line); background: var(--page-bg); color: var(--text-2); font-size: var(--f-c1); line-height: var(--lh-c1); }
+.demo-bar b { color: var(--text); }
+.demo-bar label { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
+.who { margin-block: 0; }
 .date-switch { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
 
 /* S-02 assessment-and-confirmation */

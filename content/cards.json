@@ -46,5 +46,65 @@
         "whatToDo": "Wróć do pracy i kryteriów; sprawy osobiste nie należą do uzasadnienia oceny."
       }
     ]
+  },
+  "taskChange": {
+    "title": "Rozmowa po zmianie zadań",
+    "purpose": "Krótka rozmowa o tym, co zmieniło się w zakresie zadań pracownika, zanim zmiana odbije się na terminach i jakości pracy.",
+    "legal": {
+      "text": "Jeśli to zmiana stanowiska z istotną zmianą obowiązków, prawo wymaga nowej rozmowy o kryteriach albo oceny. Sprawdź terminy z kadrami.",
+      "basis": "art. 81 ust. 6 ustawy, § 9 ust. 1–2 rozporządzenia"
+    },
+    "questions": [
+      "Które zadania są teraz najważniejsze i w jakiej kolejności je robić?",
+      "Co można odłożyć albo przekazać komuś innemu?",
+      "Czego potrzebujesz, żeby poradzić sobie z nowym zakresem: informacji, narzędzi, szkolenia?",
+      "Jak będziemy sprawdzać, czy podział zadań działa?",
+      "Kiedy spotkamy się znowu, żeby to omówić?"
+    ],
+    "hardSituations": [
+      {
+        "situation": "Pracownik mówi, że nie zdąży ze wszystkim.",
+        "whatToDo": "Poproś, żeby wskazał, co jest najbardziej pilne, i ustalcie razem, co poczeka. Zapisz ustalenie i umów kolejną rozmowę."
+      }
+    ],
+    "texts": {
+      "formIntro": "Forma rozwoju do rozważenia. Możesz ją przenieść do wniosków rozwojowych oceny albo wybrać inną.",
+      "no": "Zapisano odpowiedź „Nie”. Pytanie nie wróci."
+    }
+  },
+  "appreciation": {
+    "title": "Docenienie",
+    "purpose": "Pracownik wie, co robi dobrze, tylko wtedy, gdy mu o tym powiesz. Informacja zwrotna o dobrym fakcie jest równie ważna jak uwaga o poprawie.",
+    "questions": [
+      "Jaki konkretny fakt z ostatnich tygodni chcesz wskazać: co się wydarzyło i kiedy?",
+      "Jaki miało to skutek dla wydziału albo interesanta?",
+      "Jak powiesz o tym w dwóch zdaniach, własnymi słowami?"
+    ],
+    "hardSituations": [
+      {
+        "situation": "Nie masz pod ręką konkretnego faktu.",
+        "whatToDo": "Dopisz notatkę, gdy tylko coś zauważysz. Docenienie ogólnikiem („dobra robota”) niewiele daje."
+      }
+    ],
+    "texts": {
+      "avoid": "Czego unikać: porównań z innymi pracownikami i docenienia razem z uwagą krytyczną w jednym zdaniu.",
+      "noNotes": "Nie masz zapisanych notatek o dobrych faktach od tej daty. Zastanów się, co ostatnio zauważyłeś, i dopisz notatkę."
+    }
+  },
+  "beforeMeeting": {
+    "title": "Przed rozmową z pracownikiem",
+    "purpose": "Zestawienie z Twoich własnych notatek i dat. Niczego nie ocenia; podpowiada, o co zapytać.",
+    "texts": {
+      "boundary": "Zaznaczyłeś zmianę zadań w notatce z {date}.",
+      "bothSides": "Przy kryterium „{criterion}” masz notatki sprzed zmiany zadań i po niej. Zapytaj, co się zmieniło po przejęciu nowych zadań.",
+      "noNotes": "Przy kryterium „{criterion}” nie masz żadnej notatki. Zapytaj, jak pracownik widzi to kryterium, i dopisz notatkę po rozmowie.",
+      "pending": "To stała zmiana zadań?",
+      "feedbackNever": "Nie przekazałeś {dat} jeszcze żadnej informacji zwrotnej. Zastanów się, o czym możesz powiedzieć.",
+      "feedbackLast": "Ostatnią informację zwrotną przekazałeś {dat} {date}. Zapytaj, czy była pomocna.",
+      "teamNone": "O {loc} nie masz jeszcze żadnej notatki.",
+      "teamOld": "O {loc} nie masz żadnej notatki od {n} miesięcy.",
+      "teamFallback": "Nie masz żadnej notatki o osobie: {name}.",
+      "reminder": "Od {date} nie przekazałeś {dat} żadnej informacji zwrotnej."
+    }
   }
 }

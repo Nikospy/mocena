@@ -1,0 +1,12 @@
+{
+  "Piotr": { "gen": "Piotra", "dat": "Piotrowi", "ins": "Piotrem", "loc": "Piotrze" },
+  "Ewa": { "gen": "Ewy", "dat": "Ewie", "ins": "Ewą", "loc": "Ewie" },
+  "Maria": { "gen": "Marii", "dat": "Marii", "ins": "Marią", "loc": "Marii" },
+  "Tomasz": { "gen": "Tomasza", "dat": "Tomaszowi", "ins": "Tomaszem", "loc": "Tomaszu" },
+  "Katarzyna": { "gen": "Katarzyny", "dat": "Katarzynie", "ins": "Katarzyną", "loc": "Katarzynie" },
+  "Marek": { "gen": "Marka", "dat": "Markowi", "ins": "Markiem", "loc": "Marku" },
+  "Anna": { "gen": "Anny", "dat": "Annie", "ins": "Anną", "loc": "Annie" },
+  "Joanna": { "gen": "Joanny", "dat": "Joannie", "ins": "Joanną", "loc": "Joannie" },
+  "Jerzy": { "gen": "Jerzego", "dat": "Jerzemu", "ins": "Jerzym", "loc": "Jerzym" },
+  "Barbara": { "gen": "Barbary", "dat": "Barbarze", "ins": "Barbarą", "loc": "Barbarze" }
+}

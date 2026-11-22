@@ -257,10 +257,10 @@ Każde ma domyślne rozstrzygnięcie; wdrażający stosuje je bez pytania i wpis
 
 #### Automated
 
-- [ ] 1.1 Notatka z zaznaczeniem prowadzi do pytania, a notatka bez zaznaczenia nie (`createTestApp({ today: '2026-03-11', seedOptions: { afterStep1: true, liveStep2: true } })`): `bun test src/routes/hr-partner.test.ts`
-- [ ] 1.2 `GET` pytania nie dodaje wiersza do `events`; `POST` dodaje dokładnie jeden z `actor_id` = autor notatki i odpowiada 303; błędne `answer` daje 422, nieistniejąca notatka 404, cudze konto 403 (także oceniający cyklu, który nie jest autorem: test ustawia `cycles.appraiser_id` cyklu Piotra na Annę i Anna dostaje 403, a Marek dalej odpowiada), powtórny `POST` 409, wszystkie bez zapisu: `bun test src/routes/hr-partner.test.ts`
-- [ ] 1.3 Odpowiedź na notatkę o Marii (bez cyklu) zapisuje zdarzenie z pustym `cycle_id` i jest odnajdywana przez `visibleEvents(null)` po `payload.noteId`; test sam zapisuje tę notatkę przez `POST /people/:personId/notes` na danych F-01, S-01 i S-04, bez danych dokładanych przez późniejsze plastry: `bun test src/routes/hr-partner.test.ts`
-- [ ] 1.4 `suggestDevelopmentForm` daje formę dla „Współpracy” i formę domyślną dla kryterium spoza katalogu; w `developmentForms` jest dokładnie jedna forma z `default: true` (test pada przy zerze i przy dwóch); pliki treści są poprawnym JSON: `bun test src/hr-partner`
+- [x] 1.1 Notatka z zaznaczeniem prowadzi do pytania, a notatka bez zaznaczenia nie (`createTestApp({ today: '2026-03-11', seedOptions: { afterStep1: true, liveStep2: true } })`): `bun test src/routes/hr-partner.test.ts` — c011433
+- [x] 1.2 `GET` pytania nie dodaje wiersza do `events`; `POST` dodaje dokładnie jeden z `actor_id` = autor notatki i odpowiada 303; błędne `answer` daje 422, nieistniejąca notatka 404, cudze konto 403 (także oceniający cyklu, który nie jest autorem: test ustawia `cycles.appraiser_id` cyklu Piotra na Annę i Anna dostaje 403, a Marek dalej odpowiada), powtórny `POST` 409, wszystkie bez zapisu: `bun test src/routes/hr-partner.test.ts` — c011433
+- [x] 1.3 Odpowiedź na notatkę o Marii (bez cyklu) zapisuje zdarzenie z pustym `cycle_id` i jest odnajdywana przez `visibleEvents(null)` po `payload.noteId`; test sam zapisuje tę notatkę przez `POST /people/:personId/notes` na danych F-01, S-01 i S-04, bez danych dokładanych przez późniejsze plastry: `bun test src/routes/hr-partner.test.ts` — c011433
+- [x] 1.4 `suggestDevelopmentForm` daje formę dla „Współpracy” i formę domyślną dla kryterium spoza katalogu; w `developmentForms` jest dokładnie jedna forma z `default: true` (test pada przy zerze i przy dwóch); pliki treści są poprawnym JSON: `bun test src/hr-partner` — c011433
 
 #### Manual
 
@@ -271,10 +271,10 @@ Każde ma domyślne rozstrzygnięcie; wdrażający stosuje je bez pytania i wpis
 
 #### Automated
 
-- [ ] 2.1 Logika na danych pokazowych: granica 2026-03-11, brak granicy po „no” i przy dacie 2026-03-10, „Rzetelność”, „Komunikacja” i „Współpraca” po obu stronach, „Myślenie analityczne” bez notatek, zdanie o Marii i brak zdania o Ewie: `bun test src/hr-partner`
-- [ ] 2.2 Wersja 90 sekund (`createTestApp({ today: '2026-11-21', seedOptions: { afterStep1: true } })`, bez kroków 2–3): ekran „Przed rozmową” dla Piotra pokazuje podział na 11.03.2026 bez kliknięcia „Tak” i zaległe pytanie przy notatce z 11.03.2026: `bun test src/routes/hr-partner.test.ts`
-- [ ] 2.3 Pełny pokaz (`createTestApp({ today: '2026-03-11', seedOptions: { afterStep1: true, liveStep2: true } })`): notatka z zaznaczeniem zapisana przy dacie 2026-03-11, „Tak”, przesunięcie daty na 2026-11-21: ekran pokazuje podział na 11.03.2026, jedną notatkę ze zmianą zadań i brak zaległego pytania: `bun test src/routes/hr-partner.test.ts`
-- [ ] 2.4 Ekran nie zawiera słów z listy zakazanej ani liczby notatek przy nazwisku; inne konto dostaje 403; ekran wejściowy cyklu ma odnośnik „Przed rozmową”, a przycisk „Dopisz notatkę” przy Marii prowadzi do `/people/:personId/notes/new`: `bun test src/routes/hr-partner.test.ts`
+- [x] 2.1 Logika na danych pokazowych: granica 2026-03-11, brak granicy po „no” i przy dacie 2026-03-10, „Rzetelność”, „Komunikacja” i „Współpraca” po obu stronach, „Myślenie analityczne” bez notatek, zdanie o Marii i brak zdania o Ewie: `bun test src/hr-partner` — c011433
+- [x] 2.2 Wersja 90 sekund (`createTestApp({ today: '2026-11-21', seedOptions: { afterStep1: true } })`, bez kroków 2–3): ekran „Przed rozmową” dla Piotra pokazuje podział na 11.03.2026 bez kliknięcia „Tak” i zaległe pytanie przy notatce z 11.03.2026: `bun test src/routes/hr-partner.test.ts` — c011433
+- [x] 2.3 Pełny pokaz (`createTestApp({ today: '2026-03-11', seedOptions: { afterStep1: true, liveStep2: true } })`): notatka z zaznaczeniem zapisana przy dacie 2026-03-11, „Tak”, przesunięcie daty na 2026-11-21: ekran pokazuje podział na 11.03.2026, jedną notatkę ze zmianą zadań i brak zaległego pytania: `bun test src/routes/hr-partner.test.ts` — c011433
+- [x] 2.4 Ekran nie zawiera słów z listy zakazanej ani liczby notatek przy nazwisku; inne konto dostaje 403; ekran wejściowy cyklu ma odnośnik „Przed rozmową”, a przycisk „Dopisz notatkę” przy Marii prowadzi do `/people/:personId/notes/new`: `bun test src/routes/hr-partner.test.ts` — c011433
 
 #### Manual
 
@@ -285,9 +285,9 @@ Każde ma domyślne rozstrzygnięcie; wdrażający stosuje je bez pytania i wpis
 
 #### Automated
 
-- [ ] 3.1 Przypomnienie przy dacie 2026-11-21 bez informacji zwrotnej, z notatką z 18.06.2026 w karcie, i jego brak, gdy data ostatniej informacji zwrotnej równa się `today` (czysta funkcja, bez zapisu do `feedback_messages`): `bun test src/hr-partner`
-- [ ] 3.2 Ekran startowy Marka ma pozycję przypomnienia (`createTestApp({ today: '2026-11-21', seedOptions: { afterStep1: true } })`), a karta docenienia daje 403 innemu kontu: `bun test src/routes/hr-partner.test.ts`
-- [ ] 3.3 Tylko gdy w kodzie są wszystkie trzy trasy `GET /notes/:id/feedback`, `POST /notes/:id/feedback` i `GET /feedback`: notatka z 18.06.2026 w karcie ma przycisk „Przekaż pracownikowi” do `/notes/:id/feedback`; bez tych tras test nie powstaje, a krok oznacza się jako pominięty z tym powodem: `bun test src/routes/hr-partner.test.ts`
+- [x] 3.1 Przypomnienie przy dacie 2026-11-21 bez informacji zwrotnej, z notatką z 18.06.2026 w karcie, i jego brak, gdy data ostatniej informacji zwrotnej równa się `today` (czysta funkcja, bez zapisu do `feedback_messages`): `bun test src/hr-partner` — c011433
+- [x] 3.2 Ekran startowy Marka ma pozycję przypomnienia (`createTestApp({ today: '2026-11-21', seedOptions: { afterStep1: true } })`), a karta docenienia daje 403 innemu kontu: `bun test src/routes/hr-partner.test.ts` — c011433
+- [x] 3.3 Tylko gdy w kodzie są wszystkie trzy trasy `GET /notes/:id/feedback`, `POST /notes/:id/feedback` i `GET /feedback`: notatka z 18.06.2026 w karcie ma przycisk „Przekaż pracownikowi” do `/notes/:id/feedback`; bez tych tras test nie powstaje, a krok oznacza się jako pominięty z tym powodem: `bun test src/routes/hr-partner.test.ts` — c011433
 
 #### Manual
 
@@ -297,8 +297,8 @@ Każde ma domyślne rozstrzygnięcie; wdrażający stosuje je bez pytania i wpis
 
 #### Automated
 
-- [ ] 4.1 Ekran administratora ma sześć miejsc i listę „Czego model nigdy nie robi”, a inne konta dostają 403: `bun test src/routes/admin.test.ts`
-- [ ] 4.2 Cały zestaw testów przechodzi: `bun test`
+- [x] 4.1 Ekran administratora ma sześć miejsc i listę „Czego model nigdy nie robi”, a inne konta dostają 403: `bun test src/routes/admin.test.ts` — c011433
+- [x] 4.2 Cały zestaw testów przechodzi: `bun test` — c011433
 
 #### Manual
 
