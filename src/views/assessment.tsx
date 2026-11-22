@@ -20,6 +20,18 @@ export const METHOD_LABEL = { in_person: "osobiście", post: "pocztą", email: "
 
 const LEVELS = new Map<number, string>(rules.partialScale.map((s) => [s.points, s.name]));
 
+export function PersonIco() {
+  return (
+    <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5" /><path d="M5 20a7 7 0 0 1 14 0" /></svg>
+  );
+}
+export function WarnIco() {
+  return <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3z" /><path d="M12 10v4.5M12 17.5h.01" /></svg>;
+}
+export function OkIco() {
+  return <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>;
+}
+
 function mean2(n: number): string {
   return n.toFixed(2).replace(".", ",");
 }
@@ -52,7 +64,7 @@ export function ResultPanel(props: { result: ResultLike | null }) {
         <span><b>Wynik oceny</b> · wyliczony z przepisu</span>
       </p>
       <div class="verdict-box">
-        <p class="verdict">{neg ? "Ocena negatywna" : "Ocena pozytywna"}</p>
+        <p class="verdict">{neg ? <WarnIco /> : <OkIco />}<span>{neg ? "Ocena negatywna" : "Ocena pozytywna"}</span></p>
         <ul class="reason">{r.reasons.map((x) => <li>{x}</li>)}</ul>
       </div>
       <div class="res-calc">
@@ -71,7 +83,7 @@ export function BlockerList(props: { blockers: Blocker[] }) {
   return (
     <div id="assessment-blockers" class={props.blockers.length ? "st warn miss" : "st-none"}>
       {props.blockers.length ? (
-        <div>
+        <><span><WarnIco /></span><div>
           <b>Do zatwierdzenia brakuje:</b>
           <ul>
             {props.blockers.map((b) => (
@@ -80,7 +92,7 @@ export function BlockerList(props: { blockers: Blocker[] }) {
               </li>
             ))}
           </ul>
-        </div>
+        </div></>
       ) : null}
     </div>
   );
@@ -117,7 +129,7 @@ export function AssessmentMessage(props: { viewer: Person; person: Person; today
       <section class="card">
         <h1>Ocena okresowa: {props.person.name}</h1>
         <p class="st info">{props.text}</p>
-        <a class="btn text" href="/">Wróć na stronę główną</a>
+        <div class="btns"><a class="btn" href="/">Wróć na stronę główną</a></div>
       </section>
     </Layout>
   );
@@ -147,7 +159,7 @@ export type AssessmentViewProps = {
 function Header(p: { person: Person; sheet: string; period: string }) {
   return (
     <section class="card hdr" aria-label="Cykl oceny">
-      <p class="cap">Ocena okresowa · arkusz {p.sheet}</p>
+      <p class="voice src">Ocena okresowa · arkusz {p.sheet}</p>
       <h1>{p.person.name}</h1>
       <p class="cap">
         {p.person.position_title ?? ""} · {p.period}
@@ -230,7 +242,7 @@ function EditForm(p: AssessmentViewProps) {
               </label>
               {slots.conclusionsTools ?? null}
               <textarea class="area" id="developmentConclusions" name="developmentConclusions" rows={4}>{d.developmentConclusions}</textarea>
-              <p class="sign">{p.viewer.name}</p>
+              <p class="sign"><PersonIco />{p.viewer.name}</p>
             </section>
 
             {p.gradeOption === "not_applicable" ? null : (
@@ -318,7 +330,7 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
       </div>
       <aside class="side" aria-label="Wynik i potwierdzenia">
         <ResultPanel result={s.result} />
-        <section class="card">
+        <section class="card b-facts">
           <p>
             Okres oceny: {formatDate(s.periodFrom)} – {formatDate(s.periodTo)}
           </p>

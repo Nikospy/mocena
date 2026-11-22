@@ -646,3 +646,11 @@ h2, h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w
 .p1-form > * + * { margin-block-start: var(--sp-300); }
 .hdr-top.many { grid-template-columns: 1fr; }
 .hdr-top.many .hdr-links { display: flex; flex-wrap: wrap; justify-content: flex-start; margin-inline: calc(var(--sp-200) * -1) 0; margin-block-start: 0; }
+/* design-b */
+.hdr > * + *, .b-sec > * + *, .rule > .b-ol { margin-block-start: var(--sp-150); }
+.b-sec h3 { margin-block-start: var(--sp-300); }
+.b-ol { margin: 0; padding-inline-start: var(--sp-300); display: grid; gap: var(--sp-100); color: var(--rule-ink); }
+.b-later { margin-block-start: var(--sp-100); }
+.b-facts > * + * { margin-block-start: var(--sp-100); }
+.plain-list > li.st { margin: 0; }
+.miss li .basis { display: inline-flex; vertical-align: baseline; }
