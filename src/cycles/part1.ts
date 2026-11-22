@@ -29,6 +29,15 @@ export function part1Status(cycleId: string): {
   return { state: rows ? "draft" : "not_started" };
 }
 
+/**
+ * Początek okresu podlegania ocenie w części II arkusza: dzień ustalenia kryteriów
+ * (potwierdzenie części I, a gdy go brak: przekazanie części I). Termin oceny liczy się osobno (art. 81 ust. 4 ustawy).
+ */
+export function assessmentPeriodFrom(cycleId: string, fallback: string): string {
+  const ev = visibleEvents(cycleId);
+  return (ev.find((e) => e.type === "part1_confirmed") ?? ev.find((e) => e.type === "part1_submitted"))?.date ?? fallback;
+}
+
 function daysBetween(from: string, to: string): number {
   return Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000);
 }

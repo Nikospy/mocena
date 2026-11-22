@@ -2,7 +2,7 @@
 import { join } from "node:path";
 
 type Metrics = {
-  under16Pct: number;
+  under16PctMain: number | null;
   sizes: [number, number][];
   sizeCount: number;
   maxCpl: number;
@@ -35,7 +35,7 @@ type Sample = {
   focus?: { visible: boolean };
 };
 const numeric = [
-  "under16Pct", "sizeCount", "maxCpl", "biggestCount", "primaryCount", "maxBoxDepth",
+  "sizeCount", "maxCpl", "biggestCount", "primaryCount", "maxBoxDepth",
   "boxes", "shadows", "pillLinks", "screens", "overflowPx", "under24", "h1Count",
   "contrastFails", "unlabeled", "controlsUnder48", "mobileNavUnder48",
 ] as const satisfies readonly (keyof Metrics)[];
@@ -48,11 +48,12 @@ function failedThresholds({ width, metrics: m, focus, kind }: Sample): string[] 
   const check = (failed: boolean, name: string, detail: string) => {
     if (failed) failures.push(`${name} (${detail})`);
   };
-  const sizes = [14, 16, 20, mobile(width) ? 24 : 28];
-  const unexpected = m.sizes.map(([size]) => size).filter((size) => !sizes.includes(size));
+  const allowedSizes = [14, 16, 20, mobile(width) ? 24 : 28];
+  const observedSizes = m.sizes.map(([size]) => size).sort((a, b) => a - b);
+  const unexpected = observedSizes.filter((size) => !allowedSizes.includes(size));
   check(m.mobileNavUnder48 > 0, "N1", `${m.mobileNavUnder48} celów nawigacji poniżej 48 px`);
-  check(m.under16Pct > 50, "T1", `${m.under16Pct}% tekstu poniżej 16 px`);
-  check(m.sizeCount > 4 || unexpected.length > 0, "T2", `${m.sizeCount} rozmiarów; poza skalą: ${unexpected.join(", ") || "brak"}`);
+  check(m.under16PctMain !== null && m.under16PctMain > 50, "T1", `${m.under16PctMain}% tekstu w main poniżej 16 px`);
+  check(m.sizeCount > 4 || unexpected.length > 0, "T2", `rozmiary: ${observedSizes.join(", ")} px; poza skalą: ${unexpected.join(", ") || "brak"}`);
   check(width === 1440 && m.maxCpl > 80, "T3", `${m.maxCpl} znaków w wierszu`);
   check(m.biggestCount !== 1 || !m.largestIsH1, "H1", `${m.biggestCount} największych; h1: ${m.largestIsH1 ? "tak" : "nie"}`);
   check(m.primaryCount > 1, "H2", `${m.primaryCount} akcji głównych`);
@@ -82,6 +83,7 @@ export async function readReport(dir: string) {
   for (const sample of samples) {
     const m = sample.metrics;
     if (!m || numeric.some((key) => !Number.isFinite(m[key])) ||
+        !(m.under16PctMain === null || Number.isFinite(m.under16PctMain)) ||
         typeof m.largestIsH1 !== "boolean" || typeof m.assessmentForm !== "boolean" ||
         !(m.h1Top === null || Number.isFinite(m.h1Top)) || !Array.isArray(m.sizes)) {
       throw new Error(`Brak miar wymaganych przez raport w wierszu ${sample.id}. Powtórz pomiar aktualnym skryptem.`);
@@ -102,9 +104,9 @@ export async function readReport(dir: string) {
       const artifact = Bun.file(join(dir, file));
       if (!(await artifact.exists()) || artifact.size === 0) problems.push(`Brak pliku lub pusty plik: ${file}`);
     }
-    if (sample.kind !== "download") {
+    if (sample.kind !== "download" && m.under16PctMain !== null) {
       const text = textByWidth.get(sample.width) ?? [];
-      text.push(m.under16Pct);
+      text.push(m.under16PctMain);
       textByWidth.set(sample.width, text);
     }
     rows.push({ ...sample, failures: failedThresholds(sample) });
@@ -128,7 +130,7 @@ if (import.meta.main) {
     const { rows, medians, problems } = await readReport(dir);
     console.log("| Ekran | Szerokość | Niespełnione progi |\n| --- | ---: | --- |");
     for (const row of rows) console.log(`| ${row.name} | ${row.width} | ${row.failures.join("; ") || "—"} |`);
-    console.log("\n| Szerokość | T1 · mediana tekstu poniżej 16 px | Próg ≤ 30% |\n| ---: | ---: | --- |");
+    console.log("\n| Szerokość | T1 · mediana tekstu w main poniżej 16 px | Próg ≤ 30% |\n| ---: | ---: | --- |");
     for (const { width, median, pass } of medians) console.log(`| ${width} | ${median}% | ${pass ? "przechodzi" : "nie przechodzi"} |`);
     for (const problem of problems) console.error(problem);
     const failed = rows.filter((row) => row.failures.length > 0).length;

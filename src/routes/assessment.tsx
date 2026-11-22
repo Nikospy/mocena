@@ -5,7 +5,7 @@ import { buildAssessmentSnapshot } from "../assessment/snapshot";
 import { assessmentState, currentGradeNumber, type AssessmentDraft } from "../assessment/state";
 import { visibleCycleById, startNextCycle, type Cycle } from "../cycles";
 import { assessmentSlots } from "../notes/assessment-slots";
-import { cycleCriteria } from "../cycles/part1";
+import { assessmentPeriodFrom, cycleCriteria } from "../cycles/part1";
 import { getDb } from "../db";
 import { approvalBlockers, gradeRequestOptions } from "../engine/approval";
 import { objectionDeadline } from "../engine/deadlines";
@@ -139,7 +139,7 @@ function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; er
       gradeOption={d.gradeOption}
       grade={d.grade}
       sheet={cx.cycle.sheet ?? ""}
-      periodFrom={cx.cycle.period_start}
+      periodFrom={assessmentPeriodFrom(cx.cycle.id, cx.cycle.period_start)}
       errors={extra.errors}
       canAcknowledge={isAppraisee(cx) && state.stage === "approved"}
       canFiction={appraiser && state.stage === "approved"}

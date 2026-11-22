@@ -8,6 +8,7 @@ import { getDb } from "../db";
 import { rules } from "../engine/rules";
 import { CRITERIA } from "../engine/scoring";
 import { registerHomeTasks } from "../home-tasks";
+import { developmentSummary } from "../notes/development";
 import { addNote, canWriteNoteAbout, feedbackFor, noteById, notesByAuthor, sendFeedback, type Note, type Rating } from "../notes/repo";
 import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
@@ -196,6 +197,7 @@ app.get("/cycles/:id/cards/assessment-conversation", (c) => {
       card={card("assessment")}
       basis={rules.assessmentConversation.basis}
       topics={rules.assessmentConversation.topics}
+      development={developmentSummary(cycle.id, viewer.id)}
       invitation={
         canInvite(viewer, cycle) ? <InvitationBlock cycle={cycle} kind="assessment" active={activeInvitations(cycle.id).find((i) => i.kind === "assessment") ?? null} /> : undefined
       }
