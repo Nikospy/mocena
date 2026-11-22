@@ -32,16 +32,18 @@ app.post("/tour/extra/:id", (c) => {
   let path: string;
   if (id === "ewa-timeline") {
     const stop = stopById("5b");
-    const ewa = cycleIdOf("ewa");
-    if (!stop || !ewa) return c.text("Nie ma takiego dodatku.", 404);
+    if (!stop) return c.text("Nie ma takiego dodatku.", 404);
     applyTourStop(db, stop);
+    const ewa = cycleIdOf("ewa");
+    if (!ewa) return c.text("Nie ma takiego dodatku.", 404);
     personId = "joanna";
     path = `/cycles/${ewa}/timeline`;
   } else if (id === "fiction") {
     const stop = stopById("5");
-    const piotr = cycleIdOf("piotr");
-    if (!stop || !piotr) return c.text("Nie ma takiego dodatku.", 404);
+    if (!stop) return c.text("Nie ma takiego dodatku.", 404);
     applyTourStop(db, stop);
+    const piotr = cycleIdOf("piotr");
+    if (!piotr) return c.text("Nie ma takiego dodatku.", 404);
     personId = "marek";
     path = `/cycles/${piotr}/assessment/fiction`;
   } else if (id === "sources") {

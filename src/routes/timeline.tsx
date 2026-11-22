@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { cycleById, openCycle } from "../cycles";
+import { visibleCycleById, openCycle } from "../cycles";
 import { currentPerson, personById } from "../people";
 import { today } from "../settings";
 import { buildTimeline, canRecordAbsence, canViewTimeline, timelineRulesVersion } from "../timeline";
@@ -10,7 +10,7 @@ const app = new Hono();
 app.get("/cycles/:id/timeline", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  const cycle = cycleById(c.req.param("id"));
+  const cycle = visibleCycleById(c.req.param("id"));
   if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
   if (!canViewTimeline(viewer, cycle)) return c.text("Oś czasu widzi oceniany, jego oceniający i kadry.", 403);
   const person = personById(cycle.person_id);

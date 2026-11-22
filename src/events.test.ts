@@ -93,8 +93,8 @@ describe("rejestry i seed", () => {
     offLinks();
   });
 
-  test("runSeed wgrywa siedem kont", () => {
+  test("runSeed wgrywa osiem kont", () => {
     const n = getDb().query("SELECT COUNT(*) n FROM people WHERE has_account = 1").get() as { n: number };
-    expect(n.n).toBe(7);
+    expect(n.n).toBe(8);
   });
 });

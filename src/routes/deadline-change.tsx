@@ -1,5 +1,5 @@
 import { Hono, type Context } from "hono";
-import { cycleById, effectiveDeadline, type Cycle } from "../cycles";
+import { visibleCycleById, effectiveDeadline, type Cycle } from "../cycles";
 import { deadlineCase, deadlineChangeBlocked, newDeadlineError, pendingRequest, requestState } from "../deadline-change";
 import { toWorkingDay } from "../engine/deadlines";
 import { recordEvent, visibleEvents } from "../events";
@@ -16,7 +16,7 @@ const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 function guard(c: Context, who: "appraiser" | "appraisee"): Response | Ctx {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  const cycle = cycleById(c.req.param("id") ?? "");
+  const cycle = visibleCycleById(c.req.param("id") ?? "");
   if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
   if (who === "appraiser" && viewer.id !== cycle.appraiser_id) return c.text("Termin zmienia oceniający tego cyklu.", 403);
   if (who === "appraisee" && viewer.id !== cycle.person_id) return c.text("Wniosek o zmianę terminu składa oceniany.", 403);
@@ -136,7 +136,7 @@ app.post("/cycles/:id/deadline-change/request", async (c) => {
 app.get("/cycles/:id/deadline-change/:eventId/letter", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  const cycle = cycleById(c.req.param("id"));
+  const cycle = visibleCycleById(c.req.param("id"));
   if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
   const event = visibleEvents(cycle.id).find((e) => e.type === "deadline_changed" && String(e.id) === c.req.param("eventId"));
   if (!event) return c.text("Nie ma takiego pisma.", 404);

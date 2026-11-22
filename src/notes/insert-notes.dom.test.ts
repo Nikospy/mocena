@@ -17,8 +17,6 @@ test("„Wstaw do uzasadnienia” dopisuje zaznaczone notatki i niczego nie zapi
   const boxes = [...doc.querySelectorAll("input[data-insert]")] as unknown as HTMLInputElement[];
   expect(boxes.length).toBeGreaterThanOrEqual(3);
   const [a, b, skipped] = boxes;
-  a.checked = true;
-  b.checked = true;
   let submitted = false;
   doc.querySelector("form")!.addEventListener("submit", () => (submitted = true));
   let inputEvents = 0;
@@ -26,9 +24,17 @@ test("„Wstaw do uzasadnienia” dopisuje zaznaczone notatki i niczego nie zapi
   field.addEventListener("input", () => inputEvents++);
 
   new Function("document", "Event", readFileSync("public/insert-notes.js", "utf8"))(doc, window.Event);
-  (doc.querySelector('button[data-target="justification"]') as unknown as HTMLButtonElement).click();
+  const button = doc.querySelector('button[data-target="justification"]') as unknown as HTMLButtonElement;
+  const status = doc.querySelector("[data-insert-status]")!;
+  button.click();
+  expect(status.textContent).toBe("Zaznacz notatki, które mają trafić do uzasadnienia.");
+  expect(field.value).toBe("");
+  a.checked = true;
+  b.checked = true;
+  button.click();
+  expect(status.textContent).toBe("");
 
-  expect(field.value).toBe(`${a.getAttribute("data-insert")}\n\n${b.getAttribute("data-insert")}`);
+  expect(field.value).toBe(`${a.getAttribute("data-insert")}\n${b.getAttribute("data-insert")}`);
   expect(field.value).not.toContain(skipped.getAttribute("data-insert")!);
   expect(inputEvents).toBe(1);
   field.value += " Poprawka.";

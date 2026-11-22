@@ -91,10 +91,13 @@ describe("zaproszenia na rozmowy", () => {
     expect(home).not.toContain("pokój 214");
   });
 
-  test("rozmowa oceniająca: karta ma przycisk, Ewa ma potwierdzone zaproszenie z danych pokazowych", async () => {
+  test("zaproszenia Ewy do rozmowy o kryteriach, zaproszenie Piotra do rozmowy oceniającej", async () => {
     const { app } = createTestApp();
-    const card = await html(app, "marek", "/cycles/cycle-ewa/cards/assessment-conversation");
-    expect(card).toContain("Potwierdzone przez Ewy 3.12");
+    const timeline = await html(app, "marek", "/cycles/cycle-ewa/timeline");
+    expect(timeline).toContain("Zaproszenie na rozmowę o kryteriach");
+    expect(timeline).not.toContain("Zaproszenie na rozmowę oceniającą");
+    const card = await html(app, "marek", "/cycles/cycle-ewa/cards/opening");
+    expect(card).toContain("Potwierdzone przez Ewy 2.12");
     expect(card).toContain("Zmień termin");
     expect(await html(app, "marek", `/cycles/${PIOTR}/cards/assessment-conversation`)).toContain("Zaproś na rozmowę");
     expect(await html(app, "marek", `/cycles/${PIOTR}/invitations/new?kind=assessment`)).toContain("§ 10");
