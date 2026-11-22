@@ -1,5 +1,5 @@
 // Użycie: bun run demo-check [BASE_URL] [--runs N]
-import { runDemo } from "../src/demo-check/run";
+import { runDemo, runTour } from "../src/demo-check/run";
 
 const args = process.argv.slice(2);
 let base = "http://localhost:3000";
@@ -25,5 +25,14 @@ for (let run = 1; run <= runs; run++) {
     },
   });
   if (results.some((r) => r.status === "error")) failed = true;
+  console.log("Przewodnik pokazu:");
+  const tour = await runTour(fetcher, {
+    onResult: (r) => {
+      if (r.status === "ok") console.log(`✓ przewodnik ${r.step}: ${r.description}`);
+      else if (r.status === "skipped") console.log(`- przewodnik ${r.step}: pominięty (${r.detail ?? r.description})`);
+      else console.log(`✗ przewodnik ${r.step}: ${r.detail ?? r.description}`);
+    },
+  });
+  if (tour.some((r) => r.status === "error")) failed = true;
 }
 process.exit(failed ? 1 : 0);

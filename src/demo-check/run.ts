@@ -397,3 +397,154 @@ export async function runDemo(fetcher: Fetcher, options: DemoOptions = {}): Prom
   await attempt("5c", "fikcja zapoznania w osobnej sesji", () => fictionStep(new Session(fetcher)));
   return results;
 }
+
+type TourCheck = (s: Session, screen: Reply) => Promise<string>;
+type TourStopCheck = { id: string; title: string; next: string; location: string; facts: TourCheck };
+
+/** Przystanki przewodnika (src/tour/stops.ts, state.ts) z faktami ze „Stanów danych” planu guided-demo-tour. Tytuły i adresy z kodu, bez zdań z ekranu. */
+const tourStops: TourStopCheck[] = [
+  {
+    id: "1",
+    title: "Kryteria na początku cyklu",
+    next: "1b",
+    location: "/cycles/cycle-piotr/part1",
+    facts: async (_s, r) => {
+      includes(r.html, 'action="/cycles/cycle-piotr/part1/criteria"', "formularz kryteriów Marka");
+      excludes(r.html, "/part1/confirm", "potwierdzenie części I (jeszcze nie przekazana)");
+      includes(r.html, "27.11.2026", "termin oceny 27.11.2026");
+      return "część I jeszcze nieprzekazana, termin oceny 27.11.2026";
+    },
+  },
+  {
+    id: "1b",
+    title: "Piotr potwierdza kryteria",
+    next: "2",
+    location: "/cycles/cycle-piotr/part1",
+    facts: async (_s, r) => {
+      includes(r.html, 'action="/cycles/cycle-piotr/part1/confirm"', "formularz potwierdzenia części I");
+      includes(r.html, "Orientacja na klienta/interesanta", "kryterium dodatkowe Orientacja na klienta/interesanta");
+      includes(r.html, "Myślenie analityczne", "kryterium dodatkowe Myślenie analityczne");
+      return "część I przekazana, kryteria dodatkowe 2, czeka na potwierdzenie Piotra";
+    },
+  },
+  {
+    id: "2",
+    title: "Notatka w dniu, w którym coś się stało",
+    next: "3",
+    location: "/people/piotr/notes/new",
+    facts: async (s, r) => {
+      includes(r.html, 'action="/people/piotr/notes"', "formularz notatki o Piotrze");
+      includes(r.html, "11 marca 2026", "data przystanku 11 marca 2026");
+      const tl = await s.get("/cycles/cycle-piotr/timeline");
+      includes(tl.html, "09.12.2024", "część I potwierdzona 09.12.2024");
+      excludes(tl.html, "05.10.2026", "nieobecność Piotra");
+      return "11.03.2026, część I potwierdzona, bez nieobecności";
+    },
+  },
+  {
+    id: "3",
+    title: "Nieobecność przesuwa termin",
+    next: "4",
+    location: "/cycles/cycle-piotr/absences",
+    facts: async (_s, r) => {
+      includes(r.html, 'action="/cycles/cycle-piotr/absences"', "formularz nieobecności");
+      excludes(r.html, "05.10.2026", "wpisana nieobecność Piotra");
+      return "10.11.2026, żadnej nieobecności Piotra";
+    },
+  },
+  {
+    id: "4",
+    title: "Jedna „1” przesądza o wyniku",
+    next: "5",
+    location: "/cycles/cycle-piotr/assessment",
+    facts: async (s, r) => {
+      includes(r.html, 'name="score[rzetelnosc]"', "pole punktów przy Rzetelności");
+      includes(r.html, "11.03.2026", "notatka z 11.03.2026");
+      excludes(r.html, "/assessment/acknowledge", "zapoznanie (ocena jeszcze niezatwierdzona)");
+      const tl = await s.get("/cycles/cycle-piotr/timeline");
+      includes(tl.html, "05.10.2026–06.11.2026", "jedna nieobecność 05.10–06.11.2026");
+      includes(tl.html, "33 dni", "nieobecność 33 dni");
+      return "formularz oceny, dwie nieobecności jako jedna 05.10–06.11.2026 (33 dni)";
+    },
+  },
+  {
+    id: "5",
+    title: "Zapoznanie i 7 dni na sprzeciw",
+    next: "5b",
+    location: "/cycles/cycle-piotr/assessment",
+    facts: async (s, r) => {
+      includes(r.html, 'action="/cycles/cycle-piotr/assessment/acknowledge"', "formularz zapoznania Piotra");
+      excludes(r.html, 'name="score[', "pola punktów (ocena zatwierdzona)");
+      const tl = await s.get("/cycles/cycle-piotr/timeline");
+      includes(tl.html, "21.11.2026", "ocena zatwierdzona 21.11.2026");
+      excludes(tl.html, "30.11.2026", "termin sprzeciwu przed zapoznaniem");
+      return "ocena zatwierdzona 21.11.2026, zapoznanie jeszcze nie potwierdzone";
+    },
+  },
+  {
+    id: "5b",
+    title: "Kadry widzą cały urząd",
+    next: "done",
+    location: "/hr",
+    facts: async (s, r) => {
+      includes(r.html, "/hr/grades/tomasz", "obowiązek stopnia Tomasza");
+      includes(r.html, "14.12.2026", "termin przyznania stopnia 14.12.2026");
+      const tl = await s.get("/cycles/cycle-piotr/timeline");
+      includes(tl.html, "30.11.2026", "termin sprzeciwu 30.11.2026 po zapoznaniu 22.11.2026");
+      return "stopień Tomasza do 14.12.2026, zapoznanie Piotra 22.11.2026, sprzeciw do 30.11.2026";
+    },
+  },
+];
+
+/** Przewodnik pokazu: nowa sesja, `/demo/restart`, potem `POST /tour/<przystanek>` po kolei i `/tour/done`. Kroki: id przystanku albo „done”. */
+export async function runTour(fetcher: Fetcher, options: DemoOptions = {}): Promise<StepResult[]> {
+  const results: StepResult[] = [];
+  const push = (r: StepResult) => {
+    results.push(r);
+    options.onResult?.(r);
+  };
+  const s = new Session(fetcher);
+  const fail = (step: string, description: string, e: unknown) =>
+    push({ step, status: "error", description, detail: e instanceof Mismatch ? e.message : `oczekiwano przebiegu bez wyjątku, było ${e instanceof Error ? e.message : String(e)}` });
+  const skip = (step: string, description: string) => push({ step, status: "skipped", description, detail: "wcześniejszy krok nie przeszedł" });
+
+  let broken = false;
+  try {
+    await s.restart();
+  } catch (e) {
+    fail("start", "nowa sesja i /demo/restart", e);
+    broken = true;
+  }
+  for (const st of tourStops) {
+    const description = `przystanek ${st.id}: ${st.title}`;
+    if (broken) {
+      skip(st.id, description);
+      continue;
+    }
+    try {
+      const go = await s.post(`/tour/${st.id}`, []);
+      const loc = go.location ?? "";
+      equal(loc, st.location, `przekierowanie 303 z /tour/${st.id}`);
+      const screen = await s.get(loc);
+      includes(screen.html, st.title, `tytuł przystanku „${st.title}”`);
+      includes(screen.html, st.next === "done" ? 'action="/tour/done"' : `action="/tour/${st.next}"`, `formularz „Dalej” do /tour/${st.next}`);
+      const facts = await st.facts(s, screen);
+      push({ step: st.id, status: "ok", description: `${description}: 303 → ${loc}, ${facts}` });
+    } catch (e) {
+      fail(st.id, description, e);
+      broken = true;
+    }
+  }
+  if (broken) {
+    skip("done", "ekran końcowy przewodnika");
+    return results;
+  }
+  try {
+    const done = await s.get("/tour/done");
+    includes(done.html, 'action="/tour/1"', "formularz powtórki od przystanku 1");
+    push({ step: "done", status: "ok", description: "ekran końcowy /tour/done: 200, powtórka od przystanku 1" });
+  } catch (e) {
+    fail("done", "ekran końcowy przewodnika", e);
+  }
+  return results;
+}
