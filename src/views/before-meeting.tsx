@@ -100,12 +100,6 @@ export function BeforeMeetingView(props: {
         <h2>Informacja zwrotna</h2>
         <Items items={[s.feedback]} label="Informacja zwrotna" />
       </section>
-      {s.team.length ? (
-        <section class="card b-sec">
-          <h2>Zespół</h2>
-          <Items items={s.team} label="Zespół" />
-        </section>
-      ) : null}
       <div class="btns"><a class="btn" href={`/cycles/${props.cycleId}/part1`}>Wróć do cyklu</a></div>
     </Layout>
   );

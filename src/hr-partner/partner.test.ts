@@ -3,7 +3,7 @@ import officeData from "../../rules/office-settings.json";
 import { seedEvent } from "../events";
 import { suggestDevelopmentForm } from "../suggestions";
 import { createTestApp } from "../test-helpers";
-import { answersForNotes, cycleCriteria, lastFeedbackDate, notesAbout, teamOf } from "./data";
+import { answersForNotes, cycleCriteria, lastFeedbackDate, notesAbout } from "./data";
 import { appreciationReminder, beforeMeetingSummary, nameForm, taskChangeBoundary } from "./partner";
 
 function piotrSummary(today: string, opts: { answer?: "yes" | "no" } = {}) {
@@ -22,8 +22,6 @@ function piotrSummary(today: string, opts: { answer?: "yes" | "no" } = {}) {
     events: answersForNotes(notes),
     criteriaIds: cycleCriteria("cycle-piotr").map((k) => k.id),
     lastFeedback: lastFeedbackDate("marek", "piotr"),
-    team: teamOf("marek"),
-    silenceMonths: officeData.teamSilenceMonths,
   };
   return { db, notes, summary: beforeMeetingSummary(input) };
 }
@@ -44,16 +42,12 @@ describe("pytanie o pracę po godzinach", () => {
 });
 
 describe("granica zmiany zadań i zestawienie", () => {
-  test("granica 11.03.2026, kryteria po obu stronach i bez notatek, zdanie o Marii bez Ewy", () => {
+  test("granica 11.03.2026, kryteria po obu stronach i bez notatek", () => {
     const { summary } = piotrSummary("2026-11-21");
     expect(summary.boundary).toBe("2026-03-11");
     const both = summary.bothSides.map((i) => i.text).join("|");
     for (const k of ["Rzetelność", "Komunikacja", "Współpraca"]) expect(both).toContain(`„${k}”`);
     expect(summary.criteriaWithoutNotes.map((i) => i.text).join("|")).toContain("Myślenie analityczne");
-    const team = summary.team.map((i) => i.text);
-    expect(team).toContain("O Marii nie masz jeszcze żadnej notatki.");
-    expect(team.join("|")).not.toContain("Ewie");
-    expect(summary.team[0].action?.href).toBe("/people/maria/notes/new");
     expect(summary.pendingQuestion?.note.date).toBe("2026-03-11");
   });
 
