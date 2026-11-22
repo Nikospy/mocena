@@ -1,4 +1,5 @@
 import type { Child } from "hono/jsx";
+import type { JSX } from "hono/jsx/jsx-runtime";
 import type { CycleLink } from "../cycle-links";
 import type { Person } from "../people";
 import type { Card } from "../content";
@@ -45,16 +46,16 @@ function CriterionRow(props: { id: string; kind?: string; expectation: string; e
           {props.checkbox ? (
             <label class="cb">
               <input type="checkbox" name="additional" value={props.id} checked={props.checkbox.checked} />
-              <span class="box" />
+              <span class="box"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
               <span>
                 <span class="cbt">{c.name}</span>
-                {props.extra ? <small>{props.extra}</small> : null}
+                {props.extra ? <small>{props.extra}</small> : props.kind ? <small>{props.kind}</small> : null}
               </span>
             </label>
           ) : (
             <h3>{c.name}</h3>
           )}
-          {props.kind ? <p class="kind">{props.kind}</p> : null}
+          {props.kind && !props.checkbox ? <p class="kind">{props.kind}</p> : null}
           <details class="disc">
             <summary>Opis kryterium <Chevron /></summary>
             <ul>{c.description.map((d) => <li>{d}</li>)}</ul>
@@ -76,7 +77,7 @@ function CriterionRow(props: { id: string; kind?: string; expectation: string; e
   );
 }
 
-const STEPS = ["Kryteria", "Okres oceny", "Rozmowa", "Ocena", "Zapoznanie"];
+const STEPS = ["Kryteria", "Okres oceny", "Rozmowa oceniająca", "Ocena", "Zapoznanie"];
 
 function Steps(props: { current: number }) {
   return (
@@ -108,22 +109,25 @@ export function Part1View(p: Part1ViewProps) {
       <p class="cap">Wynikają z arkusza {p.sheet}, który system dobrał do stanowiska ocenianego. Oceniający ich nie wybiera.</p>
     </div>
   );
+  const term = (
+    <section class="rule p1-term">
+      <p class="voice rule-v">Reguła · {p.deadline.label}</p>
+      <p class="term-date">
+        <b class="big">{formatDate(p.deadline.date)}</b> <LegalBasis basis={p.deadline.basis} />
+      </p>
+    </section>
+  );
+  const links = p.links.map((l) => <a href={l.href}>{l.label}</a>);
   return (
     <Layout title="Część I oceny" person={p.viewer} today={p.today}>
       <PageHeader
         context={<>Ocena okresowa · arkusz {p.sheet} <LegalBasis basis={p.sheetBasis} /></>}
         title={<>Część I oceny: {p.employeeName}</>}
         linksLabel="Cykl oceny"
-        links={p.links.length ? p.links.map((l) => <a href={l.href}>{l.label}</a>) : undefined}
+        links={links.length ? <CycleLinks links={links} /> : undefined}
       />
       <Steps current={stepIdx} />
 
-      <section class="rule">
-        <p class="voice rule-v">Reguła · {p.deadline.label}</p>
-        <p class="term-date">
-          <b class="big">{formatDate(p.deadline.date)}</b> <LegalBasis basis={p.deadline.basis} />
-        </p>
-      </section>
       {p.notice ? <p class="st info">{p.notice}</p> : null}
       {p.waiting ? <p class="st info">Przekazano {formatDate(p.waiting.submittedOn)}. Czeka na potwierdzenie {p.waiting.appraiseeGenitive}.</p> : null}
       {p.errors?.length ? (
@@ -134,61 +138,99 @@ export function Part1View(p: Part1ViewProps) {
 
       {edit ? (
         <form class="p1-form" method="post" action={`/cycles/${p.cycleId}/part1/criteria`}>
-          <section class="card sheet">
-            {mandatoryHead}
-            {p.mandatory.map((m) => <CriterionRow id={m.id} kind="obowiązkowe" expectation={exp(m.id)} editable />)}
-          </section>
-          <div class="list-h"><h2>Kryteria dodatkowe (do 3) <LegalBasis basis="§ 5 ust. 2" /></h2></div>
-          {p.suggestions.length ? (
-            <section class="hint">
-              <p class="voice hint-v">Podpowiedź · ustawienie urzędu</p>
-              <p class="cap">Podpowiedzi z tabeli urzędu „rodzaj obowiązku → kryterium” ({office.label}, nie przepis). Do oceny trafią tylko zaznaczone.</p>
-              {p.suggestions.map((s) => (
-                <CriterionRow
-                  id={s.criterionId}
-                  extra={because.get(s.criterionId)}
-                  expectation={exp(s.criterionId)}
-                  editable
-                  checkbox={{ checked: p.selected.includes(s.criterionId) }}
-                />
-              ))}
-            </section>
-          ) : null}
-          <section class="card sheet">
-            {rest.map((id) => (
-              <CriterionRow id={id} kind="do wyboru" expectation={exp(id)} editable checkbox={{ checked: p.selected.includes(id) }} />
-            ))}
-          </section>
-          <div class="btns">
-            <button class="btn" type="submit">Zapisz</button>
-            <button class="btn primary" type="submit" formaction={`/cycles/${p.cycleId}/part1/submit`}>
-              Potwierdzam rozmowę i przekazuję część I
-            </button>
+          <div class="o-grid">
+            <div class="o-main">
+              <section class="card sheet">
+                {mandatoryHead}
+                {p.mandatory.map((m) => <CriterionRow id={m.id} kind="obowiązkowe" expectation={exp(m.id)} editable />)}
+              </section>
+              <section class="p1-extra">
+                <div class="list-h"><h2>Kryteria dodatkowe (do 3) <LegalBasis basis="§ 5 ust. 2" /></h2></div>
+                {p.suggestions.length ? (
+                  <div class="hint">
+                    <p class="voice hint-v">Podpowiedź · ustawienie urzędu</p>
+                    <p class="cap">Podpowiedzi z tabeli urzędu „rodzaj obowiązku → kryterium” ({office.label}, nie przepis). Do oceny trafią tylko zaznaczone.</p>
+                    {p.suggestions.map((s) => (
+                      <CriterionRow
+                        id={s.criterionId}
+                        extra={because.get(s.criterionId)}
+                        expectation={exp(s.criterionId)}
+                        editable
+                        checkbox={{ checked: p.selected.includes(s.criterionId) }}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+                {rest.length ? (
+                  <div class="card sheet">
+                    <h3 class="p1-rest-h">Pozostałe kryteria dodatkowe</h3>
+                    {rest.map((id) => (
+                      <CriterionRow id={id} expectation={exp(id)} editable checkbox={{ checked: p.selected.includes(id) }} />
+                    ))}
+                  </div>
+                ) : null}
+              </section>
+            </div>
+            <aside class="side p1-side" aria-label="Termin i przekazanie">
+              {term}
+              <div class="decide">
+                <button class="btn primary full" type="submit" formaction={`/cycles/${p.cycleId}/part1/submit`}>
+                  Potwierdzam rozmowę i przekazuję część I
+                </button>
+                <button class="btn full" type="submit">Zapisz szkic części I</button>
+              </div>
+            </aside>
           </div>
         </form>
       ) : (
-        <section class="card sheet">
-          {mandatoryHead}
-          {p.mandatory.map((m) => <CriterionRow id={m.id} kind="obowiązkowe" expectation={m.expectation ?? ""} editable={false} />)}
-          <div class="list-h"><h2>Kryteria dodatkowe</h2></div>
-          {p.additional.length === 0 ? <p>Brak kryteriów dodatkowych.</p> : null}
-          {p.additional.map((m) => <CriterionRow id={m.id} kind="dodatkowe" expectation={m.expectation ?? ""} editable={false} />)}
-        </section>
+        <div class="o-grid">
+          <div class="o-main">
+            <section class="card sheet">
+              {mandatoryHead}
+              {p.mandatory.map((m) => <CriterionRow id={m.id} kind="obowiązkowe" expectation={m.expectation ?? ""} editable={false} />)}
+              <div class="list-h p1-add-h"><h2>Kryteria dodatkowe</h2></div>
+              {p.additional.length === 0 ? <p>Brak kryteriów dodatkowych.</p> : null}
+              {p.additional.map((m) => <CriterionRow id={m.id} kind="dodatkowe" expectation={m.expectation ?? ""} editable={false} />)}
+            </section>
+          </div>
+          <aside class="side first" aria-label="Termin i potwierdzenie">
+            {term}
+            {p.state === "submitted" || p.state === "confirmed" ? (
+              <section class="card p1-confirmation">
+                <h2>Potwierdzenie części I</h2>
+                <ConfirmationBlock kind="confirmation" {...p.confirmation} />
+                {p.canConfirm ? <p class="cap">Miejscowość, data i Twoje imię i nazwisko wpiszą się same.</p> : null}
+              </section>
+            ) : null}
+            {p.canConfirm ? (
+              <form method="post" action={`/cycles/${p.cycleId}/part1/confirm`} class="actionbar part1-confirm">
+                <button class="btn primary full" type="submit">Potwierdzam rozmowę, kryteria i termin oceny</button>
+              </form>
+            ) : null}
+          </aside>
+        </div>
       )}
-
-      {p.state === "submitted" || p.state === "confirmed" ? (
-        <section class="card">
-          <h2>Potwierdzenie części I</h2>
-          <ConfirmationBlock kind="confirmation" {...p.confirmation} />
-          {p.canConfirm ? <p class="cap">Miejscowość, data i Twoje imię i nazwisko wpiszą się same.</p> : null}
-        </section>
-      ) : null}
-      {p.canConfirm ? (
-        <form method="post" action={`/cycles/${p.cycleId}/part1/confirm`} class="actionbar part1-confirm">
-          <button class="btn primary full" type="submit">Potwierdzam rozmowę, kryteria i termin oceny</button>
-        </form>
-      ) : null}
     </Layout>
+  );
+}
+
+/** Odnośniki cyklu: na komputerze jeden rząd, na telefonie dwa pierwsze i reszta w menu „Więcej”. */
+function CycleLinks(props: { links: JSX.Element[] }) {
+  const head = props.links.slice(0, 2);
+  const tail = props.links.slice(2);
+  return (
+    <>
+      <span class="pl-wide">{props.links}</span>
+      <span class="pl-narrow">
+        {head}
+        {tail.length ? (
+          <details class="pl-more">
+            <summary>Więcej <Chevron /></summary>
+            <div class="pl-menu">{tail}</div>
+          </details>
+        ) : null}
+      </span>
+    </>
   );
 }
 
@@ -203,32 +245,39 @@ export function OpeningCardView(props: {
 }) {
   const { questions, hardSituations } = props.card;
   return (
-    <Layout title="Karta rozmowy rozpoczynającej" person={props.viewer} today={props.today}>
+    <Layout title="Karta rozmowy o kryteriach" person={props.viewer} today={props.today}>
       <PageHeader
         context="Karta rozmowy"
         title={props.card.title}
         lead={props.card.purpose}
         links={<a href={`/cycles/${props.cycleId}/part1`}>Wróć do części I</a>}
       />
-      <section class="rule">
-        <p class="voice rule-v">Reguła · Tematy rozmowy <LegalBasis basis={props.basis} /></p>
-        <ol class="topics">{props.topics.map((t) => <li>{t}</li>)}</ol>
-      </section>
-      <section class="card">
-        {questions?.length ? (
-          <>
-            <h2>Pytania</h2>
-            <ul>{questions.map((q) => <li>{q}</li>)}</ul>
-          </>
-        ) : null}
-        {hardSituations?.length ? (
-          <>
-            <h2>Trudne sytuacje</h2>
-            <ul>{hardSituations.map((h) => <li><b>{h.situation}</b> {h.whatToDo}</li>)}</ul>
-          </>
-        ) : null}
-      </section>
-      {props.invitation}
+      <div class="o-grid">
+        <div class="o-main">
+          <section class="card b-sec">
+            {questions?.length ? (
+              <>
+                <h2>Pytania</h2>
+                <ul class="note-list">{questions.map((q) => <li class="note-item"><p>{q}</p></li>)}</ul>
+              </>
+            ) : null}
+            {hardSituations?.length ? (
+              <>
+                <h2>Trudne sytuacje</h2>
+                <ul class="hard-list">{hardSituations.map((h) => <li><b>{h.situation}</b><p>{h.whatToDo}</p></li>)}</ul>
+              </>
+            ) : null}
+          </section>
+          {props.invitation}
+        </div>
+        <aside class="side first" aria-label="Tematy rozmowy z przepisu">
+          <section class="rule">
+            <p class="voice rule-v"><span class="pg" aria-hidden="true">§</span><span><b>Tematy rozmowy</b> · z przepisu</span></p>
+            <ol class="b-ol">{props.topics.map((t) => <li>{t}</li>)}</ol>
+            <p><LegalBasis basis={props.basis} /></p>
+          </section>
+        </aside>
+      </div>
     </Layout>
   );
 }

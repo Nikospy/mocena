@@ -83,14 +83,14 @@ describe("zmiana terminu przez oceniającego", () => {
     expect(await html(app, "marek", `/cycles/${PIOTR}/deadline-change`)).toContain("ocena ponowna po negatywnej");
     expect((await call(app, "marek", `/cycles/${PIOTR}/deadline-change`, CHANGE)).status).toBe(409);
     const piotr = personById("piotr")!;
-    expect(cycleLinks(cycleById(PIOTR)!, piotr).map((l) => l.label)).not.toContain("Wnioskuj o zmianę terminu");
+    expect(cycleLinks(cycleById(PIOTR)!, piotr).map((l) => l.label)).not.toContain("Wniosek o zmianę terminu oceny");
   });
 });
 
 describe("wniosek ocenianego", () => {
   test("wniosek Piotra → sprawa u Marka → odrzucenie z powodem → Piotr widzi decyzję", async () => {
     const { app } = createTestApp({ today: "2026-11-21" });
-    expect(cycleLinks(cycleById(PIOTR)!, personById("piotr")!).map((l) => l.label)).toContain("Wnioskuj o zmianę terminu");
+    expect(cycleLinks(cycleById(PIOTR)!, personById("piotr")!).map((l) => l.label)).toContain("Wniosek o zmianę terminu oceny");
     expect((await call(app, "piotr", `/cycles/${PIOTR}/deadline-change/request`, { reason: "" })).status).toBe(422);
     const sent = await call(app, "piotr", `/cycles/${PIOTR}/deadline-change/request`, { reason: "Urlop szkoleniowy w grudniu" });
     expect(sent.status).toBe(303);

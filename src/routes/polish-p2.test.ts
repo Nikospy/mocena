@@ -10,14 +10,14 @@ describe("2.1 strona główna Joanny przed terminami ocen", () => {
   test("10.11.2026: sprawa „Wpisz nieobecności” z Piotrem i terminem z silnika", async () => {
     const { app } = createTestApp({ today: "2026-11-10", seedOptions: { afterStep1: true } });
     const h = await html(app, "joanna", "/");
-    expect(text(h)).toContain("Wpisz nieobecności");
+    expect(text(h)).toContain("Wpisz nieobecność");
     expect(text(h)).toContain("Piotr Wójcik");
     expect(text(h)).toContain("do 27.11.2026");
     expect(h).toContain('href="/cycles/cycle-piotr/absences"');
     // po wpisaniu nieobecności termin wychodzi poza okno i sprawa znika
     await call(app, "joanna", "/cycles/cycle-piotr/absences", { from: "2026-10-05", to: "2026-10-16", excused: "1" });
     await call(app, "joanna", "/cycles/cycle-piotr/absences", { from: "2026-10-19", to: "2026-11-06", excused: "1" });
-    expect(text(await html(app, "joanna", "/"))).not.toContain("Wpisz nieobecności: Piotr Wójcik");
+    expect(text(await html(app, "joanna", "/"))).not.toContain("Wpisz nieobecność: Piotr Wójcik");
   });
 });
 

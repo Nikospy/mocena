@@ -4,7 +4,6 @@ import type { DevelopmentGroup, DevelopmentSummary } from "../notes/development"
 import type { Person } from "../people";
 import { LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
-import { WarnIco } from "./assessment";
 
 export function AssessmentCardView(props: {
   viewer: Person;
@@ -20,28 +19,34 @@ export function AssessmentCardView(props: {
   return (
     <Layout title="Karta rozmowy oceniającej" person={props.viewer} today={props.today}>
       <PageHeader context="Karta rozmowy" title={props.card.title} lead={props.card.purpose} />
-      <section class="rule">
-        <p class="voice rule-v"><span class="pg" aria-hidden="true">§</span><span><b>Tematy rozmowy</b> · z przepisu</span></p>
-        <ol class="b-ol">{props.topics.map((t) => <li>{t}</li>)}</ol>
-        <p><LegalBasis basis={props.basis} /></p>
-      </section>
-      <section class="card b-sec">
-        {questions?.length ? (
-          <>
-            <h2>Pytania</h2>
-            <ul class="note-list">{questions.map((q) => <li class="note-item"><p>{q}</p></li>)}</ul>
-          </>
-        ) : null}
-        {hardSituations?.length ? (
-          <>
-            <h2>Trudne sytuacje</h2>
-            <ul class="plain-list">{hardSituations.map((h) => <li class="st warn"><WarnIco /><div><b>{h.situation}</b><small>{h.whatToDo}</small></div></li>)}</ul>
-          </>
-        ) : null}
-        <div class="btns"><a class="btn primary" href={`/cycles/${props.cycleId}/assessment`}>Notatki przy kryteriach</a></div>
-      </section>
-      {props.development ? <DevelopmentSection d={props.development} cycleId={props.cycleId} /> : null}
-      {props.invitation}
+      <div class="o-grid">
+        <div class="o-main">
+          <section class="card b-sec">
+            {questions?.length ? (
+              <>
+                <h2>Pytania</h2>
+                <ul class="note-list">{questions.map((q) => <li class="note-item"><p>{q}</p></li>)}</ul>
+              </>
+            ) : null}
+            {hardSituations?.length ? (
+              <>
+                <h2>Trudne sytuacje</h2>
+                <ul class="hard-list">{hardSituations.map((h) => <li><b>{h.situation}</b><p>{h.whatToDo}</p></li>)}</ul>
+              </>
+            ) : null}
+          </section>
+          {props.development ? <DevelopmentSection d={props.development} cycleId={props.cycleId} /> : null}
+          {props.invitation}
+        </div>
+        <aside class="side first" aria-label="Tematy rozmowy z przepisu">
+          <section class="rule">
+            <p class="voice rule-v"><span class="pg" aria-hidden="true">§</span><span><b>Tematy rozmowy</b> · z przepisu</span></p>
+            <ol class="b-ol">{props.topics.map((t) => <li>{t}</li>)}</ol>
+            <p><LegalBasis basis={props.basis} /></p>
+          </section>
+          <a class="btn full" href={`/cycles/${props.cycleId}/assessment`}>Przejdź do oceny</a>
+        </aside>
+      </div>
     </Layout>
   );
 }
@@ -56,8 +61,8 @@ function Groups(props: { groups: DevelopmentGroup[]; label: string }) {
           <ul class="note-list" aria-label={`${props.label}: ${g.name}`}>
             {g.notes.map((n) => (
               <li class="note-item">
-                <p class="cap">{formatDate(n.date)}</p>
-                <p>„{n.text}”</p>
+                <p class="note-meta-c"><b>{formatDate(n.date)}</b></p>
+                <p class="note-text">„{n.text}”</p>
               </li>
             ))}
           </ul>

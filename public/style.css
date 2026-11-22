@@ -886,6 +886,140 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 /* === screens: cycle === */
 /* Część I, karty rozmów, przed rozmową, ocena, fikcja zapoznania, pytanie o zmianę zadań. */
 /* Reguły tej grupy dopisuj bezpośrednio pod tą linią. */
+/* pasek etapów: zaczyna się na lewej krawędzi treści (pierwsza kropka pod pierwszą literą h1) */
+.steps5 { grid-template-columns: repeat(5, minmax(0, 1fr)); max-inline-size: 600px; margin-inline-start: 0; }
+.steps5 li { align-items: flex-start; text-align: start; }
+.steps5 li::before { inset-inline-start: calc(-100% + var(--sp-400)); inline-size: calc(100% - var(--sp-400)); }
+.steps5 + * { margin-block-start: var(--sp-300); }
+/* odnośniki cyklu: komputer – jeden rząd; telefon – dwa pierwsze i menu „Więcej” */
+.pl-wide { display: contents; }
+.pl-narrow { display: none; }
+@media (max-width: 639px) {
+  .pl-wide { display: none; }
+  .pl-narrow { display: contents; }
+}
+.pl-more { position: relative; }
+.pl-more > summary { list-style: none; display: inline-flex; align-items: center; gap: var(--sp-50); min-block-size: var(--sp-500); font-weight: var(--w-bold); color: var(--primary); cursor: pointer; }
+.pl-more > summary::-webkit-details-marker { display: none; }
+.pl-more[open] > summary .ico { transform: rotate(180deg); }
+.pl-menu { position: absolute; z-index: 6; inset-inline-end: 0; inset-block-start: 100%; min-inline-size: 16rem; display: grid; padding-block: var(--sp-100);
+  background: var(--surface); border: 1px solid var(--card-line); border-radius: var(--card-r); box-shadow: var(--elev-2); }
+.page-links .pl-menu a { display: flex; padding-inline: var(--sp-200); min-block-size: var(--hit); }
+/* Część I: termin i akcja w prawej kolumnie, kryteria po lewej */
+.p1-form > * + * { margin-block-start: 0; }
+.p1-extra > .list-h { margin-block-end: var(--sp-200); }
+.p1-extra > .hint + .card { margin-block-start: var(--sp-300); }
+.p1-rest-h { padding-block-start: var(--sp-300); }
+.p1-add-h { padding-block-start: var(--sp-400); margin-block-end: 0; }
+.p1-term .term-date { gap: var(--sp-100) var(--sp-150); }
+.p1-confirmation > * + * { margin-block-start: var(--sp-150); }
+.crit details.disc + details.disc { margin-block-start: 0; }
+.crit .crit-row h3, .crit .cbt { max-inline-size: 40ch; }
+@media (min-width: 1000px) {
+  .side .actionbar { position: static; padding-block: 0; background: none; margin-block-start: 0; }
+  .side .actionbar::before { display: none; }
+}
+.card.sheet > .list-h:first-child { padding-block-start: var(--sp-300); margin-block-end: 0; }
+/* telefon: podpis tylko przy bieżącym etapie (pozostałe zostają dla czytników) */
+@media (max-width: 639px) {
+  .steps5 li:not(.cur) > span:last-child { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .steps5 li.cur > span:last-child { white-space: nowrap; }
+}
+/* telefon i tablet: termin nad kryteriami, akcja pod nimi */
+@media (max-width: 999px) {
+  .o-grid > .side.p1-side { display: contents; }
+  .p1-side > .p1-term { order: -1; }
+}
+/* ocena: narzędzia „Wstaw” na szerokość treści, data rozmowy jak zwykłe pole 48 px */
+.insert-tools > .btn { justify-self: start; }
+.tx-card .date-field { block-size: var(--hit); padding-block: 0; }
+.crit-notes-d > summary { color: var(--text); font-weight: var(--w-bold); }
+.crit-notes-d > .note-list { margin-block-start: var(--sp-100); }
+/* wersja reguł w wyniku: cel kliknięcia co najmniej 24 px */
+.res .cap a { display: inline-block; min-block-size: var(--sp-300); }
+/* fakty oceny: etykieta 14 px nad wartością 16 px; każde potwierdzenie ma swoją etykietę */
+.o-facts > div + div { margin-block-start: var(--sp-200); }
+.o-facts dt { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+.o-facts dd .sign { font-size: var(--f-p); line-height: var(--lh-p); color: var(--text); }
+.o-facts dd .st { margin-block-start: var(--sp-50); }
+/* lista kryteriów po zatwierdzeniu: nagłówek z tym samym wcięciem co kryteria */
+.card.sheet > h2:first-child { padding-block-start: var(--sp-300); padding-inline: 0; }
+/* ocena na telefonie: zwarte kryteria, żeby formularz mieścił się w ok. 4 ekranach */
+@media (max-width: 639px) {
+  #assessment-form .crit { padding-block: var(--sp-200); }
+  #assessment-form .crit-row { gap: var(--sp-100); }
+  #assessment-form .crit-notes { margin-block-start: var(--sp-100); gap: var(--sp-100); }
+  #assessment-form .crit-notes-d > summary { min-block-size: var(--sp-500); }
+  #assessment-form .card { padding: var(--sp-200); }
+  #assessment-form .card.sheet { padding-block: 0; }
+  #assessment-form .o-main, #assessment-form .o-grid { gap: var(--sp-200); }
+  .insert-tools > .btn { justify-self: stretch; }
+}
+.o-score { display: flex; align-items: baseline; gap: var(--sp-100); }
+@media (min-width: 760px) { .o-score { justify-content: flex-end; text-align: end; } }
+@media (max-width: 639px) {
+  #assessment-form .crit-row > div:first-child { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--sp-100); }
+  #assessment-form .crit-row > div:first-child > .kind { margin-block-start: 0; }
+  #assessment-form .crit-row > div:first-child > .cap { flex-basis: 100%; }
+  #assessment-form .tx-card { background: none; border: 0; padding: 0; }
+  #assessment-form .tx-card + .tx-card { padding-block-start: var(--sp-200); border-block-start: 1px solid var(--line); }
+}
+details.crit-notes-d > .note-list { padding-inline-start: 0; max-inline-size: none; gap: 0; }
+/* karty rozmów: trudne sytuacje jako wiersze z kreską ostrzeżenia, bez pomarańczowych pudełek */
+.hard-list { list-style: none; padding: 0; display: grid; gap: var(--sp-200); }
+.hard-list > li { padding-inline-start: var(--sp-200); border-inline-start: var(--sp-50) solid var(--orange-100); max-inline-size: 66ch; }
+.hard-list > li > p { color: var(--text-2); }
+.b-sec > h2:not(:first-child) { margin-block-start: var(--sp-400); }
+/* przed rozmową: notatki po lewej, pytania na rozmowę w jednej karcie po prawej (zamiast czterech kart) */
+.bm-asks > * + * { margin-block-start: 0; }
+.bm-asks-h { margin-block-end: var(--sp-100); }
+.bm-ask { padding-block: var(--sp-200); border-block-start: 1px solid var(--line); }
+.bm-ask:last-child { padding-block-end: 0; }
+.bm-ask > * + * { margin-block-start: var(--sp-100); }
+.bm-ask .btns { margin-block-start: var(--sp-150); }
+.bm-ask .note-list .note-item { padding-block: var(--sp-100); }
+.bm-single { max-inline-size: 48rem; }
+.bm-boundary { padding-inline-start: var(--sp-200); border-inline-start: var(--sp-50) solid var(--cobalt-60); }
+/* karta rozmowy oceniającej: część rozwojowa – nazwa kryterium nad wierszami cytatów */
+.b-sec > h4 { font-size: var(--f-p); line-height: var(--lh-p); font-weight: var(--w-bold); color: var(--text-2); margin-block-start: var(--sp-200); }
+.b-sec > h4 + .note-list { margin-block-start: var(--sp-100); }
+.b-sec > h3 + h4 { margin-block-start: var(--sp-100); }
+/* komunikat zamiast oceny: stan i akcje bez karty wokół */
+.am-msg { display: grid; gap: var(--sp-200); justify-items: start; max-inline-size: 40rem; }
+/* pytanie o zmianę zadań: jedna kolumna czytelnej szerokości, cytat oddzielony odstępem */
+.q-hero { max-inline-size: 48rem; }
+.q-hero > .note-quote { margin-block: var(--sp-200); }
+.q-hero > .outcomes { display: grid; gap: var(--sp-100); }
+/* przed rozmową: pytania do zadania są treścią (16 px), nie metadanymi */
+.bm-ask .cap { font-size: var(--f-p); line-height: var(--lh-p); }
+/* 320 px: pięć kółek ocen mieści się bez przewijania w poziomie */
+@media (max-width: 359px) { #assessment-form .score { gap: var(--sp-50); } }
+@media (max-width: 639px) {
+  #assessment-form .crit { padding-block: var(--sp-150); }
+  #assessment-form .tx-card .area:not(.date-field) { min-block-size: calc(var(--sp-800) + var(--sp-400)); }
+  #assessment-form .list-h .cap { font-size: var(--f-c1); line-height: var(--lh-c1); }
+}
+/* lista braków: rozwijana pozycja z szewronem zamiast surowego trójkąta */
+.miss-d > summary { list-style: none; cursor: pointer; }
+.miss-d > summary::-webkit-details-marker { display: none; }
+.miss-d > summary::after { content: ""; display: inline-block; inline-size: var(--sp-100); block-size: var(--sp-100); margin-inline-start: var(--sp-100);
+  border-inline-end: 2px solid currentColor; border-block-end: 2px solid currentColor; transform: translateY(-25%) rotate(45deg); }
+.miss-d[open] > summary::after { transform: translateY(25%) rotate(-135deg); }
+/* tablet (640–999 px): przyciski kolumny bocznej na szerokość treści, w jednym rzędzie */
+@media (min-width: 640px) and (max-width: 999px) {
+  .side .decide, .p1-side .decide { display: flex; flex-wrap: wrap; gap: var(--sp-150); }
+  .side .btn.full, .p1-side .btn.full { inline-size: auto; justify-self: start; }
+  .side { justify-items: start; }
+  .side > .rule, .side > .card, .side > .st, .side > #assessment-blockers { justify-self: stretch; }
+}
+.decide > .cap { flex-basis: 100%; }
+.o-export { justify-self: start; }
+@media (min-width: 1000px) { .side > .o-export { justify-self: stretch; } }
+/* część rozwojowa: „Co szło dobrze” i „Co do poprawy” oddzielone linią, objaśnienie jako treść */
+section[aria-labelledby="h-dev"] > .voice + h2 { margin-block-start: var(--sp-50); }
+section[aria-labelledby="h-dev"] > h2 + .cap { font-size: var(--f-p); line-height: var(--lh-p); }
+section[aria-labelledby="h-dev"] > h3 { margin-block-start: var(--sp-300); padding-block-start: var(--sp-300); border-block-start: 1px solid var(--line); }
+.crit .cb .box .ico { pointer-events: none; }
 
 /* --- koniec sekcji cycle (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
 /* . */

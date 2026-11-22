@@ -17,7 +17,7 @@ registerCycleLinks((cycle, viewer) => {
   return links;
 });
 
-registerHomeTasks((person) => (person.role === "hr" ? [{ title: "Stan cykli", href: "/hr", detail: "Stan wszystkich cykli oceny i obowiązki urzędu" }] : []));
+registerHomeTasks((person) => (person.role === "hr" ? [{ title: "Stan cykli", href: "/hr", detail: "Stan wszystkich cykli oceny i obowiązki urzędu." }] : []));
 
 /** Kadry: nieobecności wpisuje się przed terminem oceny, bo od nich zależy termin. Sprawa od okna przed terminem (to samo co „Wystaw ocenę”). */
 registerHomeTasks((person) => {
@@ -33,13 +33,13 @@ registerHomeTasks((person) => {
     const name = personById(c.person_id)?.name;
     return [
       {
-        title: `Wpisz nieobecności: ${name}`,
-        heading: "Wpisz nieobecności",
+        title: `Wpisz nieobecność: ${name}`,
+        heading: "Wpisz nieobecność",
         person: name,
         detail: "Termin oceny się zbliża. Nieobecność dłuższa niż miesiąc przesuwa termin, więc wpisz ją przed terminem.",
         due: d.deadline,
         basis: d.basis.join(", "),
-        action: "Wpisz nieobecności",
+        action: "Wpisz nieobecność",
         href: `/cycles/${c.id}/absences`,
       },
     ];
