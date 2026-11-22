@@ -174,6 +174,7 @@ Autor: „samo kodowanie szybko nam teraz idzie wiec mozna powiedziec ze mamy mn
 - **13f. Widoczny zostaje cały proces**, dopracowany, bez nowych funkcji. Odrzucono: chowanie funkcji spoza 5 kroków, nowe funkcje.
 - **13g. Push na GitHub po każdym sprawdzonym etapie**, po kontroli, że w repo nie ma prywatnych ścieżek ani materiałów organizatora. Zmienia decyzję 8c (push tylko przez autora) na ten czas.
 - **13h. Wygląd przewodnika: wejście V3 (oś dwóch lat z pięcioma przystankami) i krok V2 (karta boczna z numerowaną listą „Na co patrzeć”, na telefonie zwijana karta u dołu).** Wzorzec: `context/design/mockups/tour/`. Odrzucono: pasek u góry (V1), przyciemniony ekran z dymkiem (V3 krok).
+- **13i. Dobudowujemy do pełnej wersji trzy uproszczone czynności (autor, 22.11 ok. 03:15):** zmiana terminu oceny przez oceniającego i wniosek ocenianego o zmianę terminu z rozpatrzeniem; zaproszenia na rozmowę o kryteriach i rozmowę oceniającą; dane i lista pracowników w kadrach (wyszukiwanie, sortowanie, edycja danych, zastępstwa, eksport zestawienia). Sprzeciw zostaje uproszczony. Nagranie robimy na końcu według wzoru autora. Autor: na ekranach jest za dużo tekstu (szczegóły dopisze). Odrzucono: ogłaszanie „ostatniej rundy”; poprawki trwają do oddania.
 
 ## Pytania otwarte (do mentorów organizatora)
 
