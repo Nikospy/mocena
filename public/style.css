@@ -884,13 +884,57 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
    ====================================================================== */
 
 /* === screens: cycle === */
-/* Część I, karty rozmów, przed rozmową, oś czasu, ocena, arkusz, zaproszenia, zmiana terminu. */
+/* Część I, karty rozmów, przed rozmową, ocena, fikcja zapoznania, pytanie o zmianę zadań. */
+/* Reguły tej grupy dopisuj bezpośrednio pod tą linią. */
+
+/* --- koniec sekcji cycle (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
+/* . */
+/* . */
+/* . */
+/* . */
+/* . */
+
+/* === screens: cycle-time === */
+/* Oś czasu, nieobecności, zmiana terminu, zmiana oceniającego, arkusz na ekranie, historia ocen, zaproszenia. */
+/* Reguły tej grupy dopisuj bezpośrednio pod tą linią. */
+
+/* --- koniec sekcji cycle-time (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
+/* . */
+/* . */
+/* . */
+/* . */
+/* . */
 
 /* === screens: hr-admin === */
-/* Stan cykli, pracownicy, zastępstwa, zmiana oceniającego, nieobecności, podpowiedzi (administrator). */
+/* Stan cykli, pracownicy, zastępstwa, statystyki urzędu, źródła podpowiedzi, wdrożenie i dane. */
+/* Reguły tej grupy dopisuj bezpośrednio pod tą linią. */
+
+/* --- koniec sekcji hr-admin (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
+/* . */
+/* . */
+/* . */
+/* . */
+/* . */
 
 /* === screens: home-tour === */
-/* Strona główna, wybór konta, wejście i koniec pokazu, panel przewodnika. */
+/* Strona główna, wybór konta, wejście i koniec pokazu, panel przewodnika, powłoka, strony 403 i 404. */
+/* Reguły tej grupy dopisuj bezpośrednio pod tą linią. */
+
+/* --- koniec sekcji home-tour (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
+/* . */
+/* . */
+/* . */
+/* . */
+/* . */
 
 /* === screens: forms-states === */
-/* Formularze (notatka, informacja zwrotna, osoba) oraz stany: puste, błąd, zapisano, 404 i 500. */
+/* Notatka, lista notatek, docenienie, informacja zwrotna oraz wspólne stany błędów formularzy. */
+/* Reguły tej grupy dopisuj bezpośrednio pod tą linią. */
+
+/* --- koniec sekcji forms-states (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
+/* . */
+/* . */
+/* . */
+/* . */
+/* . */
+
