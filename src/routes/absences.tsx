@@ -60,7 +60,7 @@ function summaryOf(cycle: Cycle): AbsenceSummary | null {
   };
 }
 
-export const FUTURE_START = "Wpisz nieobecność, która już się zaczęła: początek najpóźniej dziś. Przewidywaną nieobecność załatwia oceniający zmianą terminu oceny (art. 81 ust. 8 pkt 2 ustawy).";
+export const FUTURE_START = "Wpisz nieobecność, która już się zaczęła: początek najpóźniej dziś.";
 
 const closed = (c: Context) => errorPage(c, "Cykl jest zamknięty. Nieobecność wpisuje się tylko w otwartym cyklu.", 409);
 const isOpen = (cycle: Cycle) => openCycle(cycle.person_id)?.id === cycle.id;

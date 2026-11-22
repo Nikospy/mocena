@@ -48,7 +48,11 @@ export function AbsenceFormView(props: {
         <form method="post" action={`/cycles/${props.cycleId}/absences`} class="abs-form">
           <ErrorSummary
             errors={{ from: e.from, to: e.to }}
-            lead={e.from && v.from > props.today ? <a href={`/cycles/${props.cycleId}/deadline-change`}>Zmiana terminu oceny</a> : undefined}
+            lead={
+              e.from && v.from > props.today ? (
+                <>Przewidywaną nieobecność załatwia oceniający przez <a href={`/cycles/${props.cycleId}/deadline-change`}>zmianę terminu oceny</a> (art. 81 ust. 8 pkt 2 ustawy).</>
+              ) : undefined
+            }
           />
           <div class="dates">
             <div class="field">

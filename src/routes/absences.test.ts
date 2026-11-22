@@ -173,7 +173,8 @@ describe("nieobecność z przyszłości (ustalenie 2 audytu)", () => {
     const res = await call(app, "joanna", `/cycles/${PIOTR}/absences`, { from: "2026-11-23", to: "2027-01-15", excused: "1" });
     expect(res.status).toBe(422);
     const body = await res.text();
-    expect(body).toContain("zmianą terminu oceny");
+    expect(body).toContain("Przewidywaną nieobecność załatwia oceniający");
+    expect(body).toContain("zmianę terminu oceny");
     expect(body).toContain(`href="/cycles/${PIOTR}/deadline-change"`);
     expect(body).toContain('class="field-err"');
     expect(effectiveDeadline(PIOTR).date).toBe(before);
