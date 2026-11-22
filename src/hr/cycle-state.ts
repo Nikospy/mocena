@@ -34,9 +34,9 @@ export type CycleState = {
 };
 
 const OUTCOME_TEXT = {
-  changed: "zmiana oceny",
-  redone: "ponowne sporządzenie oceny",
-  rejected: "sprzeciw nieuwzględniony",
+  changed: "uwzględniony, zmiana oceny",
+  redone: "uwzględniony, ponowne sporządzenie oceny",
+  rejected: "nieuwzględniony",
 } as const;
 
 const D = rules.deadlines;
@@ -51,7 +51,7 @@ export function cycleState(cycleId: string): CycleState {
     const o = resolved.payload.outcome as keyof typeof OUTCOME_TEXT;
     return {
       step: "objection_resolved",
-      text: o === "rejected" ? "Sprzeciw rozpatrzony: sprzeciw nieuwzględniony" : `Sprzeciw rozpatrzony: ${OUTCOME_TEXT[o] ?? o}`,
+      text: `Sprzeciw rozpatrzony: ${OUTCOME_TEXT[o] ?? o}`,
       since: resolved.date,
     };
   }
@@ -73,7 +73,7 @@ export function cycleState(cycleId: string): CycleState {
       step: "fiction",
       text: `Fikcja zapoznania stwierdzona ${formatDate(f.eventDate)} przez oceniającego: oceniany ${REASON_LABEL[f.reason]}. Kopię arkusza doręczono ${METHOD_LABEL[f.deliveryMethod]} ${formatDate(f.deliveredOn)}`,
       deadline: { date: f.objectionDeadline, basis: [D.objectionDays.basis] },
-      deadlineLabel: "System liczy sprzeciw do",
+      deadlineLabel: "Sprzeciw do",
       since: f.eventDate,
     };
   }

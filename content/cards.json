@@ -38,7 +38,7 @@
         "whatToDo": "Wysłuchaj jego wersji, sprawdź datę i okoliczności; do uzasadnienia wpisz to, co potrafisz potwierdzić."
       },
       {
-        "situation": "Przy kryterium masz notatki tylko z ostatnich tygodni.",
+        "situation": "Przy kryterium masz notatki tylko z ostatniego miesiąca.",
         "whatToDo": "Przypomnij sobie, co działo się wcześniej w okresie oceny, i zapytaj ocenianego; ocena obejmuje cały okres."
       },
       {
@@ -68,7 +68,7 @@
       }
     ],
     "texts": {
-      "formIntro": "Forma rozwoju z katalogu urzędu, do rozważenia.",
+      "formIntro": "Forma rozwoju z katalogu urzędu (ustawienie urzędu). Omów ją z pracownikiem.",
       "no": "Zapisano odpowiedź „Nie”. Pytanie nie wróci.",
       "ifYes": "Po „Tak” pojawi się karta rozmowy po zmianie zadań i propozycja formy rozwoju z katalogu urzędu.",
       "ifNo": "Po „Nie” nic się nie zmienia, a pytanie nie wróci."
@@ -90,7 +90,7 @@
     ],
     "texts": {
       "avoid": "Czego unikać: porównań z innymi pracownikami i docenienia razem z uwagą krytyczną w jednym zdaniu.",
-      "noNotes": "Brak zapisanych notatek o dobrych faktach od tej daty. Dopisz notatkę, gdy coś zauważysz."
+      "noNotes": "Nie masz jeszcze notatek oznaczonych „dobrze” z tego okresu. Dopisz notatkę, gdy coś zauważysz."
     }
   },
   "beforeMeeting": {
@@ -109,7 +109,7 @@
       "afterHours": "Od zmiany zadań w Twoich notatkach wraca praca po godzinach.",
       "afterHoursAsk": "Czy zakres zadań jest do udźwignięcia?",
       "afterHoursLead": "Notatki, o których mowa:",
-      "afterHoursCard": "Karta rozmowy o podziale zadań",
+      "afterHoursCard": "Karta rozmowy po zmianie zadań",
       "reminder": "Od {date} brak zapisanej informacji zwrotnej dla {gen}."
     }
   }

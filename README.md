@@ -15,19 +15,20 @@ Pokaz idzie jedną oceną pracownika od początku cyklu do potwierdzenia zapozna
 1. **Początek cyklu i kryteria.** Stanowisko bez kierowania ludźmi dostaje arkusz C (§ 3 ust. 4 rozporządzenia). Kryteria obowiązkowe pochodzą z arkusza; oceniający wybiera najwyżej 3 kryteria dodatkowe (§ 5 ust. 2). Karta rozmowy rozpoczynającej ma cztery tematy (§ 5 ust. 1). Podpowiedź kryteriów dodatkowych pochodzi z tabeli ustawień urzędu, nie z przepisu, i jest tak oznaczona.
 2. **Zmiana zadań.** Przy notatce jest pole „Zmiana zadań pracownika”. Gdy jest zaznaczone, system zadaje jedno pytanie zamknięte; po odpowiedzi „tak” pokazuje kartę rozmowy i formę rozwoju z katalogu urzędu. Próg zmiany stanowiska to art. 81 ust. 6 ustawy. System nie rozstrzyga, czy zmiana jest zmianą stanowiska.
 3. **Nieobecność i termin.** Dwie nieobecności rozdzielone tylko dniami wolnymi liczą się jako jedna. Nieobecność dłuższa niż miesiąc przedłuża termin oceny o swój czas (art. 81 ust. 7 ustawy). Okres oceny to 24 miesiące (art. 81 ust. 4 ustawy).
-4. **Ocena i wynik.** Średnia nie jest zaokrąglana. Jedna ocena cząstkowa „1” daje wynik negatywny, nawet przy wysokiej średniej (§ 11 ust. 1). Przy ocenie negatywnej uzasadnienie jest obowiązkowe (§ 11 ust. 3). Wnioski do indywidualnego programu rozwoju są zawsze wymagane (art. 81 ust. 5 ustawy).
+4. **Ocena i wynik.** Średnia nie jest zaokrąglana. Jedna ocena cząstkowa „1” daje wynik negatywny, nawet przy wysokiej średniej (§ 11 ust. 1). Przy ocenie negatywnej uzasadnienie jest obowiązkowe (§ 11 ust. 3). Wnioski do indywidualnego programu rozwoju zawodowego są zawsze wymagane (art. 81 ust. 5 ustawy).
 5. **Zapoznanie i sprzeciw.** Oceniany potwierdza zapoznanie z oceną na własnym koncie. Od tego dnia liczy się 7 dni na sprzeciw (art. 83 ust. 1 ustawy). Stopień służbowy z mocy prawa wymaga działania w 30 dni od zapoznania z drugą oceną (art. 89 ust. 2 ustawy).
 
 Z 30 czynności z listy organizatora 15 działa, 12 jest uproszczonych, a 3 są poza prototypem. Szczegóły i gdzie każdą zobaczyć: [`docs/coverage.md`](docs/coverage.md).
 
 ## Czego nie robi
 
-- Nie pisze oceny ani zdań o pracowniku. Treść arkusza pochodzi od przełożonego, a uzasadnienie składa się z jego własnych notatek.
+- Nie pisze oceny ani zdań o pracowniku. Treść arkusza pisze przełożony. Do uzasadnienia może wstawić własne notatki z datą.
 - Nie proponuje punktów.
 - Nie porównuje pracowników i nie ma rankingów.
 - Nie stawia etykiet ani wskaźników przy nazwisku.
 - Nic nie zapisuje bez kliknięcia człowieka.
-- Nie używa modelu językowego. Kliknięcie to potwierdzenie w systemie. Moc prawną daje dziś wydruk arkusza; urząd może w tym miejscu podłączyć kwalifikowane albo zaufane rozwiązanie elektroniczne.
+- Nie używa modelu językowego.
+- Kliknięcie to potwierdzenie w systemie. Moc prawną daje dziś wydruk z podpisem. Urząd może w tym miejscu podpiąć podpis kwalifikowany albo zaufany.
 
 ## Jak działa
 

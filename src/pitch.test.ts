@@ -13,7 +13,9 @@ describe("materiały dla jury", () => {
 
   for (const [name, text] of Object.entries(files)) {
     test(`${name}: bez słowa „podpis”, ścieżek prywatnych i e-maili`, () => {
-      expect(text.toLowerCase()).not.toContain("podpis");
+      // Zdanie 11b (słownik, „Zdania, których nie mówimy”) jest jedynym dopuszczalnym użyciem „podpis”; reszta tekstu go nie ma.
+      const elevenB = "Kliknięcie to potwierdzenie w systemie. Moc prawną daje dziś wydruk z podpisem. Urząd może w tym miejscu podpiąć podpis kwalifikowany albo zaufany.";
+      expect(text.replace(elevenB, "").toLowerCase()).not.toContain("podpis");
       expect(text).not.toContain("/Users/");
       expect(text).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/);
     });

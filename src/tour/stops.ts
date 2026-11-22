@@ -37,9 +37,9 @@ const BODY: Record<TourStopId, Body> = {
     look: [
       { text: "Termin oceny z przepisem.", selector: ".rule" },
       { text: "Podpowiedzi kryteriów: przerywana ramka i powód. Nic nie jest zaznaczone z góry.", selector: ".hint" },
-      { text: "Karta rozmowy rozpoczynającej z tematami z przepisu.", selector: 'a[href$="/cards/opening"]' },
+      { text: "Karta rozmowy o kryteriach z tematami z przepisu.", selector: 'a[href$="/cards/opening"]' },
     ],
-    tryIt: "Zaznacz „Orientacja na klienta/interesanta” i „Myślenie analityczne”, potem przekaż Piotrowi.",
+    tryIt: "Zaznacz „Orientacja na klienta/interesanta” i „Myślenie analityczne”, potem kliknij „Potwierdzam rozmowę i przekazuję część I”.",
     basis: basis(d.criteriaTalkDays.basis),
     screen: (c) => `/cycles/${c}/part1`,
   },
@@ -58,7 +58,7 @@ const BODY: Record<TourStopId, Body> = {
     short: "nieobecność",
     lead: "Marek zapisuje fakt w dniu, w którym się zdarzył, a nie po dwóch latach z pamięci. Asystent nie ocenia notatki. Zauważa tylko słowo „przejął” i pyta, czy to stała zmiana zadań.",
     look: [
-      { text: "Po wpisaniu »przejął« pole »Zmiana zadań pracownika« zaznacza się samo jako podpowiedź; można je odznaczyć.", selector: ".hint" },
+      { text: "Po wpisaniu słowa „przejął” pole „Zmiana zadań pracownika” zaznacza się samo jako podpowiedź. Można je odznaczyć.", selector: ".hint" },
       { text: "Po zapisie pytanie „To stała zmiana zadań?”, a po „Tak” karta rozmowy i forma rozwoju." },
       { text: "Przy nazwisku Piotra nie ma punktów ani etykiet." },
     ],
@@ -81,7 +81,7 @@ const BODY: Record<TourStopId, Body> = {
   "4": {
     title: "Jedna „1” przesądza o wyniku",
     short: "zapoznanie",
-    lead: "Formularz oceny wypełnia się w ostatnim tygodniu, ale notatki są z 24 miesięcy. Punkty stawia Marek. System liczy wynik według przepisu i pilnuje braków.",
+    lead: "Ocenę wystawia się w ostatnim tygodniu, ale notatki są z 24 miesięcy. Oceny cząstkowe stawia Marek. System liczy wynik według przepisu i pilnuje braków.",
     look: [
       { text: "Notatki i pola wyboru przy kryteriach.", selector: ".crit-notes .note-list" },
       { text: "Ostrzeżenie, gdy fakty do kryterium są tylko z ostatniego miesiąca.", selector: ".st.warn" },

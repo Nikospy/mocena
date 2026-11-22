@@ -4,7 +4,7 @@
     { "place": "zapis notatki", "model": "wstępnie zaznacza pole „Zmiana zadań pracownika”", "prototype": "działa na liście słów" },
     { "place": "zapis notatki", "model": "ostrzega, że notatka zawiera dane o zdrowiu", "prototype": "tylko pokazane jako miejsce" },
     { "place": "zapis notatki", "model": "podpowiada kryterium, którego notatka dotyczy", "prototype": "tylko pokazane jako miejsce" },
-    { "place": "zapis notatki", "model": "„podobna notatka już jest”", "prototype": "tylko pokazane jako miejsce" },
+    { "place": "zapis notatki", "model": "ostrzega, że podobna notatka już jest", "prototype": "tylko pokazane jako miejsce" },
     { "place": "karta rozmowy", "model": "dopasowuje formę rozwoju z katalogu", "prototype": "działa na katalogu form rozwoju" },
     { "place": "uzasadnienie oceny", "model": "wskazuje zbyt trudne zdania, niczego nie przepisuje", "prototype": "tylko pokazane jako miejsce" }
   ],

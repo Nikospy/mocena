@@ -33,13 +33,13 @@ registerHomeTasks((person) => {
     const name = personById(c.person_id)?.name;
     return [
       {
-        title: `Wpisz nieobecności: ${name}`,
-        heading: "Wpisz nieobecności",
+        title: `Wpisz nieobecność: ${name}`,
+        heading: "Wpisz nieobecność",
         person: name,
         detail: "Termin oceny się zbliża. Nieobecność dłuższa niż miesiąc przesuwa termin, więc wpisz ją przed terminem.",
         due: d.deadline,
         basis: d.basis.join(", "),
-        action: "Wpisz nieobecności",
+        action: "Wpisz nieobecność",
         href: `/cycles/${c.id}/absences`,
       },
     ];
