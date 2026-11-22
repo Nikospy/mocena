@@ -1,344 +1,747 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>mOcena: prezentacja dla jury</title>
+<title>mOcena: prezentacja dla jury (HackNation 2026)</title>
 <link rel="stylesheet" href="../../public/rodzina.css">
-<link rel="stylesheet" href="../../public/style.css">
 <style>
-/* Prezentacja: tylko tokeny z rodzina.css. Slajd ma proporcje 16:9. */
-body { padding: var(--sp-300); }
-.deck { display: grid; gap: var(--sp-300); justify-items: center; }
+/* Slajd 1920 × 1080 px. Skala pisma: 22, 28, 36, 56, 96 px. Odstępy: 8, 16, 24, 32, 48, 64, 96 px. */
+* { box-sizing: border-box; margin: 0; }
+html, body { background: var(--grey-30); font-family: var(--font); color: var(--grey-500); }
+body { padding: 24px; }
+.deck { display: grid; gap: 24px; justify-content: center; counter-reset: s; }
 .slide {
-  inline-size: 100%; max-inline-size: calc(var(--sp-800) * 18); aspect-ratio: 16 / 9; overflow: hidden;
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-200); box-shadow: var(--elev-1);
-  padding: var(--sp-500) var(--sp-600); display: grid; grid-template-rows: auto 1fr auto; gap: var(--sp-200);
+  inline-size: 1920px; block-size: 1080px; overflow: hidden; position: relative; counter-increment: s;
+  padding: 56px 96px 48px; display: grid; grid-template-rows: 32px minmax(0, 1fr) 32px; row-gap: 32px;
+  background: var(--white); break-after: page;
 }
-.slide > header { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-200); color: var(--text-3); font-size: var(--f-c1); line-height: var(--lh-c1); }
-.slide > header b { color: var(--primary); font-weight: var(--w-bold); }
-.slide > footer { color: var(--text-3); font-size: var(--f-c2); line-height: var(--lh-c2); }
-.slide h1 { font-size: var(--f-h1); line-height: var(--lh-h1); font-weight: var(--w-bold); color: var(--cobalt-300); }
-.slide h2 { font-size: var(--f-h2); line-height: var(--lh-h2); font-weight: var(--w-bold); color: var(--cobalt-300); }
-.slide h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w-bold); }
-.slide p, .slide li { font-size: var(--f-p); line-height: var(--lh-p); color: var(--text-2); }
-.slide .lead { font-size: var(--f-h5); line-height: var(--lh-h5); color: var(--text); }
-.body { display: grid; gap: var(--sp-300); align-content: start; min-block-size: 0; }
-.body.two { grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: stretch; }
-.body.three { grid-template-columns: repeat(3, minmax(0, 1fr)); align-content: stretch; }
-.body.step { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: stretch; }
-.stack > * + * { margin-block-start: var(--sp-150); }
-ul.plain { list-style: none; }
-ul.plain li { padding-inline-start: var(--sp-300); position: relative; }
-ul.plain li::before { content: ""; position: absolute; inset-inline-start: 0; inset-block-start: var(--sp-100); inline-size: var(--sp-100); block-size: var(--sp-100); border-radius: var(--r-500); background: var(--primary); }
-ul.no li::before { background: var(--red-100); }
-.provs { display: flex; flex-wrap: wrap; gap: var(--sp-100); }
-.prov { background: var(--cobalt-20); color: var(--cobalt-200); border: 1px solid var(--cobalt-30); border-radius: var(--r-500); padding: var(--sp-50) var(--sp-150); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); }
-.when { color: var(--primary); font-weight: var(--w-bold); font-size: var(--f-c1); line-height: var(--lh-c1); }
-figure.frame { display: grid; grid-template-rows: 1fr auto; gap: var(--sp-100); min-block-size: 0; margin: 0; }
-figure.frame .shot { position: relative; min-block-size: 0; overflow: hidden; background: var(--cobalt-10); border: 2px dashed var(--cobalt-40); border-radius: var(--r-150); display: grid; place-items: center; }
-figure.frame img { inline-size: 100%; block-size: 100%; object-fit: cover; object-position: top; display: block; }
-figure.frame .ph { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: var(--sp-200); color: var(--cobalt-200); font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w-bold); z-index: 0; }
-figure.frame img { position: relative; z-index: 1; }
-figure.frame figcaption { color: var(--text-3); font-size: var(--f-c1); line-height: var(--lh-c1); }
-.big { font-size: var(--f-h1); line-height: var(--lh-h1); font-weight: var(--w-bold); color: var(--primary); overflow-wrap: anywhere; }
-.num { font-size: var(--f-h1); line-height: var(--lh-h1); font-weight: var(--w-bold); color: var(--primary); }
-.slide .card, .slide .rule, .slide .hint { align-self: start; }
-.diagram { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
-.diagram .node { background: var(--cobalt-10); border: 1px solid var(--cobalt-40); border-radius: var(--r-100); padding: var(--sp-100) var(--sp-150); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); color: var(--cobalt-200); }
-.diagram .arrow { color: var(--text-3); }
+.slide[data-kind="dark"] { background: var(--cobalt-300); color: var(--white); }
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; padding: 0; }
 
-@media (max-width: 900px) {
-  .slide { aspect-ratio: auto; padding: var(--sp-300); }
-  .body.two, .body.three, .body.step { grid-template-columns: minmax(0, 1fr); }
-  figure.frame .shot { min-block-size: calc(var(--sp-800) * 3); }
-}
+.top, .foot { display: flex; justify-content: space-between; align-items: baseline; gap: 48px; font-size: 22px; line-height: 32px; color: var(--grey-100); }
+.top b { color: var(--cobalt-100); font-weight: var(--w-bold); letter-spacing: 0.5px; }
+.foot .n::after { content: counter(s) " / 15"; font-variant-numeric: tabular-nums; }
+[data-kind="dark"] :is(.top, .foot) { color: var(--cobalt-30); }
+[data-kind="dark"] .top b { color: var(--white); }
 
-/* Druk: A4 poziomo, każdy slajd na osobnej stronie. */
-@page { size: A4 landscape; margin: 0; }
-@media print {
-  html, body { background: var(--white); }
-  body { padding: 0; }
-  .deck { display: block; }
-  .slide {
-    inline-size: 100%; max-inline-size: none; block-size: 100vh; aspect-ratio: auto; border: 0; border-radius: 0; box-shadow: none;
-    break-after: page; break-inside: avoid; padding: var(--sp-400) var(--sp-600);
-  }
-  .slide:last-child { break-after: auto; }
-}
+h1, h2 { font-weight: var(--w-bold); color: var(--cobalt-300); letter-spacing: -1px; text-wrap: balance; }
+h2 { font-size: 56px; line-height: 68px; }
+h1 em, h2 em, .scene em { font-style: normal; color: var(--cobalt-100); }
+[data-kind="dark"] :is(h1, h2) { color: var(--white); }
+[data-kind="dark"] :is(h1, h2, .scene) em { color: var(--cobalt-30); }
+.scene { font-size: 96px; line-height: 108px; font-weight: var(--w-bold); letter-spacing: -2.5px; color: var(--cobalt-300); text-wrap: balance; }
+.lead { font-size: 36px; line-height: 50px; color: var(--grey-400); text-wrap: pretty; }
+[data-kind="dark"] .lead { color: var(--cobalt-20); }
+.p { font-size: 28px; line-height: 40px; color: var(--grey-400); text-wrap: pretty; }
+[data-kind="dark"] .p { color: var(--cobalt-20); }
+
+/* Układ: całość (nagłówek nad schematem) */
+.full { display: grid; grid-template-rows: auto minmax(0, 1fr); row-gap: 32px; }
+.full .gfx { align-self: center; }
+
+/* Układ: tekst i obraz obok siebie, strona obrazu zmienia się między slajdami */
+.split { display: grid; grid-template-columns: 624px 1040px; column-gap: 64px; align-items: center; }
+.split[data-img="left"] { grid-template-columns: 1040px 624px; }
+.split[data-img="left"] .txt { order: 2; }
+.txt { display: grid; row-gap: 32px; align-content: center; }
+.pts { display: grid; row-gap: 24px; }
+.pts li { font-size: 28px; line-height: 40px; color: var(--grey-400); padding-inline-start: 24px; border-inline-start: 4px solid var(--cobalt-100); text-wrap: pretty; }
+.pts li b { display: block; color: var(--cobalt-300); }
+[data-kind="dark"] .pts li { color: var(--cobalt-20); border-color: var(--cobalt-60); }
+[data-kind="dark"] .pts li b { color: var(--white); }
+.law { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 22px; line-height: 32px; font-weight: var(--w-bold); color: var(--cobalt-100); }
+[data-kind="dark"] .law { color: var(--cobalt-30); }
+
+figure.shot { margin: 0; display: grid; row-gap: 8px; }
+figure.shot figcaption { font-size: 22px; line-height: 32px; color: var(--grey-100); }
+figure.shot img { display: block; inline-size: 1040px; block-size: 780px; object-fit: cover; object-position: top; border-radius: var(--r-200); border: 1px solid var(--grey-40); box-shadow: 0 16px 48px rgba(3, 11, 40, .12); }
+[data-kind="dark"] figure.shot figcaption { color: var(--cobalt-30); }
+[data-kind="dark"] figure.shot img { border: 0; box-shadow: 0 32px 80px rgba(3, 11, 40, .45); }
+
+/* Oś okresu oceny: 09.12.2024 = 0%, 21.11.2026 = 100% */
+.axis { position: relative; block-size: 176px; }
+.axis .line { position: absolute; inset-inline: 0; inset-block-start: 86px; block-size: 4px; background: var(--cobalt-30); }
+[data-kind="dark"] .axis .line { background: var(--cobalt-80); }
+.axis .band { position: absolute; inset-block-start: 64px; block-size: 48px; inset-inline-end: 0; inline-size: 4.4%; background: var(--cobalt-20); border-radius: var(--r-100); }
+[data-kind="dark"] .axis .band { background: var(--cobalt-60); inset-block-start: 70px; block-size: 36px; }
+.axis .tag { position: absolute; inset-block-start: 8px; inset-inline-end: 0; font-size: 28px; line-height: 40px; font-weight: var(--w-bold); color: var(--cobalt-100); white-space: nowrap; }
+[data-kind="dark"] .axis .tag { color: var(--cobalt-30); }
+.axis .end { position: absolute; inset-block-start: 124px; font-size: 22px; line-height: 32px; font-weight: var(--w-bold); white-space: nowrap; }
+.axis .end.l { inset-inline-start: 0; } .axis .end.r { inset-inline-end: 0; }
+.axis .dot { position: absolute; inset-block-start: 72px; inline-size: 32px; block-size: 32px; margin-inline-start: -16px; border-radius: 50%; background: var(--grey-60); border: 4px solid var(--white); }
+.axis .dot.new { background: var(--cobalt-100); }
+.axis .dot span { position: absolute; inset-block-start: 44px; inset-inline-start: 50%; translate: -50% 0; font-style: normal; font-size: 22px; line-height: 32px; color: var(--grey-100); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.axis .dot.up span { inset-block-start: -48px; }
+.axis .dot.new span { color: var(--cobalt-100); font-weight: var(--w-bold); translate: -86% 0; }
+#s2 .axis .tag { inset-block-start: -8px; }
+
+/* 1. Okładka */
+#s1 .body { display: grid; align-content: center; row-gap: 48px; }
+#s1 h1 { font-size: 112px; line-height: 124px; letter-spacing: -3px; max-inline-size: 1560px; }
+#s1 .lead { max-inline-size: 1300px; }
+#s1 .top b { font-size: 36px; line-height: 32px; letter-spacing: 0; }
+#s1 .foot b { color: var(--white); font-size: 28px; }
+
+/* 2. Przekonanie */
+#s2 .body { display: grid; align-content: center; row-gap: 48px; }
+.quote { font-size: 36px; line-height: 50px; font-weight: var(--w-bold); color: var(--grey-100); }
+
+/* 8. Dowód na ciemnym tle */
+#s8 .split { grid-template-columns: 624px 1040px; }
+#s8 .scene { font-size: 80px; line-height: 92px; color: var(--white); letter-spacing: -2px; }
+
+/* 10. Perspektywa ocenianego */
+.phones { display: grid; grid-template-columns: 720px repeat(2, 440px); column-gap: 64px; align-items: center; }
+figure.phone { margin: 0; display: grid; row-gap: 8px; justify-items: start; }
+figure.phone figcaption { font-size: 22px; line-height: 32px; color: var(--grey-100); }
+figure.phone img { display: block; inline-size: 440px; block-size: 760px; object-fit: cover; object-position: top; border-radius: 32px 32px 0 0; border: 8px solid var(--grey-400); border-block-end: 0; background: var(--white); -webkit-mask-image: linear-gradient(#000 80%, transparent); mask-image: linear-gradient(#000 80%, transparent); }
+
+/* 15. Zamknięcie */
+#s15 .body { display: grid; grid-template-columns: 960px 704px; column-gap: 64px; align-items: center; }
+#s15 .scene { color: var(--white); font-size: 88px; line-height: 100px; }
+.go { display: grid; row-gap: 24px; padding: 32px; border-radius: var(--r-200); background: var(--white); color: var(--grey-500); }
+.go .qrrow { display: grid; grid-template-columns: 176px 1fr; column-gap: 24px; align-items: center; }
+.go .qr svg { display: block; inline-size: 176px; block-size: 176px; }
+.go .lbl { font-size: 22px; line-height: 32px; font-weight: var(--w-bold); letter-spacing: 1px; text-transform: uppercase; color: var(--cobalt-100); }
+.go .url { font-size: 28px; line-height: 40px; font-weight: var(--w-bold); color: var(--cobalt-300); }
+.go .small { font-size: 22px; line-height: 32px; color: var(--grey-200); }
+.go hr { border: 0; border-block-start: 1px solid var(--grey-40); }
+.next { display: grid; row-gap: 16px; }
+.next .lbl { font-size: 22px; line-height: 32px; font-weight: var(--w-bold); letter-spacing: 1px; text-transform: uppercase; color: var(--cobalt-30); }
+
+@media print { html, body { background: none; } body { padding: 0; } .deck { gap: 0; } }
+@page { size: 1920px 1080px; margin: 0; }
 </style>
 </head>
 <body>
 <main class="deck">
 
-<!-- 1. Tytuł i teza -->
-<section class="slide" id="s1">
-  <header><b>mOcena</b><span>HackNation 2026, zadanie KPRM</span></header>
-  <div class="body" style="align-content:center">
-    <h1>Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie.</h1>
-    <p class="lead">mOcena to przewodnik po procesie oceny okresowej i notatki o faktach zbierane przez cały cykl. Asystent pilnuje terminów, przepisów i pamięci o faktach. Ocenę stawia człowiek.</p>
-    <div class="provs"><span class="prov">Prototyp cyfrowego asystenta ocen okresowych w służbie cywilnej</span><span class="prov">Bez modelu językowego</span><span class="prov">Dane tylko u widza</span></div>
+<!-- 1. Okładka -->
+<section class="slide" id="s1" data-kind="dark">
+  <div class="top"><b>mOcena</b><span>HackNation 2026 · zadanie KPRM „Cyfrowy Asystent Ocen Okresowych”</span></div>
+  <div class="body">
+    <h1>Przełożony ocenia dwa lata pracy. <em>Pamięta ostatnie tygodnie.</em></h1>
+    <div class="axis" aria-label="Okres oceny od 09.12.2024 do 21.11.2026">
+      <span class="tag">to pamięta</span>
+      <i class="line"></i><i class="band"></i>
+      <span class="end l">09.12.2024 · początek okresu oceny</span>
+      <span class="end r">21.11.2026 · dzień oceny</span>
+    </div>
+    <p class="lead">mOcena prowadzi ocenę okresową w służbie cywilnej od pierwszego dnia okresu: zbiera fakty wtedy, gdy się dzieją, i liczy terminy z przepisu.</p>
   </div>
-  <footer>Dane pokazowe są fikcyjne.</footer>
+  <div class="foot"><span><b>Mikołaj Pietkiewicz</b> · działający prototyp</span><span>Osoby i zdarzenia w pokazie są fikcyjne.</span></div>
 </section>
 
-<!-- 2. Problem -->
+<!-- 2. Przekonanie do rozbrojenia -->
 <section class="slide" id="s2">
-  <header><b>2 · Problem</b><span>mOcena</span></header>
-  <div class="body two">
-    <div class="stack">
-      <h2>Ocena co 24 miesiące, na papierze, z pamięci</h2>
-      <ul class="plain">
-        <li>Przełożony ocenia podwładnego raz na 24 miesiące, na arkuszu A, B albo C.</li>
-        <li>Między rozmową rozpoczynającą a oceniającą nic się nie zapisuje, więc ocena powstaje z pamięci o ostatnich tygodniach.</li>
-        <li>Uwagę zabierają terminy i poprawność formularza: wybór kryteriów, oczekiwania, informacja zwrotna, wnioski rozwojowe.</li>
-      </ul>
+  <div class="top"><b>Problem</b><span>mOcena</span></div>
+  <div class="body">
+    <p class="quote">„Wystarczy przenieść arkusz oceny do komputera.”</p>
+    <h2 class="scene">Arkusz w komputerze też wypełnia się z pamięci. <em>A pamięć zaczyna się w listopadzie.</em></h2>
+    <div class="axis" aria-label="Dziewięć notatek Marka na osi okresu oceny">
+      <span class="tag">ostatni miesiąc</span>
+      <i class="band"></i><i class="line"></i>
+      <i class="dot" style="inset-inline-start: 9%"><span>11.02.2025</span></i>
+      <i class="dot" style="inset-inline-start: 24.7%"><span>03.06.2025</span></i>
+      <i class="dot up" style="inset-inline-start: 33.4%"><span>04.08.2025</span></i>
+      <i class="dot" style="inset-inline-start: 48.3%"><span>18.11.2025</span></i>
+      <i class="dot up" style="inset-inline-start: 64.2%"><span>11.03.2026</span></i>
+      <i class="dot" style="inset-inline-start: 69.9%"><span>21.04.2026</span></i>
+      <i class="dot up" style="inset-inline-start: 78.1%"><span>18.06.2026</span></i>
+      <i class="dot" style="inset-inline-start: 87.8%"><span>26.08.2026</span></i>
+      <i class="dot new" style="inset-inline-start: 98.7%"><span>12.11.2026</span></i>
     </div>
-    <div class="stack">
-      <p class="num">123 tys.</p>
-      <p class="lead">osób ocenianych w ok. 1743 urzędach.</p>
-      <p>Błędny termin albo brak potwierdzenia zostaje na biurku konkretnej osoby, bez śladu.</p>
-      <div class="provs"><span class="prov">art. 81 ust. 4 ustawy: okres oceny 24 miesiące</span></div>
-    </div>
+    <p class="lead">Marek, przełożony, zapisał przez dwa lata dziewięć faktów o pracy Piotra. Tylko jeden jest z ostatniego miesiąca. Bez ośmiu pozostałych oceniałby to, co pamięta z listopada 2026.</p>
   </div>
-  <footer>Źródło: wymagania produktu (PRD) i decyzje autora.</footer>
+  <div class="foot"><span>Okres między ocenami: 24 miesiące (art. 81 ust. 4 ustawy o służbie cywilnej).</span><span class="n"></span></div>
 </section>
 
-<!-- 3. Dla kogo -->
+<!-- 3. Alternatywy -->
 <section class="slide" id="s3">
-  <header><b>3 · Dla kogo</b><span>mOcena</span></header>
-  <div class="body">
-    <h2>Trzy role, trzy konta, jedna ocena</h2>
-    <div class="body three">
-      <div class="card"><h3>Oceniający</h3><p>Marek Zieliński, naczelnik wydziału. Ocenia raz na dwa lata, obok bieżącej pracy. Potrzebuje notatki w pół minuty z telefonu i faktów ułożonych przy kryteriach przed rozmową.</p></div>
-      <div class="card"><h3>Oceniany</h3><p>Piotr Wójcik, starszy specjalista. Na własnym koncie, na telefonie, potwierdza kryteria i zapoznanie z oceną oraz czyta informację zwrotną.</p></div>
-      <div class="card"><h3>Kadry</h3><p>Joanna Mazur. Wpisuje daty nieobecności zamiast interpretować reguły i widzi stan wszystkich ocen na jednym ekranie.</p></div>
-    </div>
+  <div class="top"><b>Problem</b><span>mOcena</span></div>
+  <div class="body full">
+    <h2>Kłopot nie leży w formularzu. <em>Leży w pamięci.</em></h2>
+    <style>
+.gfx-alternatywy { inline-size: 1728px; block-size: 620px; font-family: var(--font); color: var(--text); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: auto 1fr; column-gap: 32px; box-sizing: border-box; }
+.gfx-alternatywy * { box-sizing: border-box; margin: 0; padding: 0; }
+.gfx-alternatywy .lab { grid-row: 1; font-size: 22px; line-height: 32px; font-weight: var(--w-bold); text-transform: uppercase; letter-spacing: .05em; color: var(--text-2); border-block-end: 2px solid var(--grey-500); padding-block-end: 8px; margin-block-end: 16px; }
+.gfx-alternatywy .lab.them { grid-column: 1 / 4; }
+.gfx-alternatywy .lab.us { grid-column: 4; color: var(--cobalt-100); border-color: var(--cobalt-100); }
+.gfx-alternatywy .card { grid-row: 2; display: flex; flex-direction: column; background: var(--grey-10); border-radius: var(--r-200); padding: 24px 32px 24px; }
+.gfx-alternatywy h3 { font-size: 36px; line-height: 44px; font-weight: var(--w-bold); color: var(--cobalt-300); padding-block-end: 16px; }
+.gfx-alternatywy h3 small { display: block; font-size: 22px; line-height: 32px; font-weight: var(--w-regular); color: var(--text-2); margin-block-start: 4px; }
+.gfx-alternatywy .sec { border-block-start: 1px solid var(--grey-40); padding-block: 16px; }
+.gfx-alternatywy .sec b { display: block; font-size: 22px; line-height: 32px; font-weight: var(--w-bold); text-transform: uppercase; letter-spacing: .05em; color: var(--text-2); margin-block-end: 8px; }
+.gfx-alternatywy ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.gfx-alternatywy li { font-size: 28px; line-height: 36px; padding-inline-start: 40px; position: relative; }
+.gfx-alternatywy .yes li::before { content: ""; position: absolute; inset-inline-start: 2px; inset-block-start: 6px; inline-size: 14px; block-size: 22px; border: solid var(--green-100); border-width: 0 5px 5px 0; transform: rotate(45deg); transform-origin: 60% 50%; }
+.gfx-alternatywy .no li::before { content: ""; position: absolute; inset-inline-start: 0; inset-block-start: 16px; inline-size: 22px; block-size: 4px; border-radius: 2px; background: var(--grey-80); }
+.gfx-alternatywy .no li.risk { color: var(--red-200); }
+.gfx-alternatywy .no li.risk::before { background: var(--red-100); }
+.gfx-alternatywy .card.us { background: var(--cobalt-300); color: var(--white); }
+.gfx-alternatywy .us h3 { color: var(--white); }
+.gfx-alternatywy .us .sec { border-color: var(--cobalt-80); }
+.gfx-alternatywy .us .sec b { color: var(--cobalt-30); }
+.gfx-alternatywy .us .yes li::before { border-color: var(--green-30); }
+.gfx-alternatywy .us .no li::before { background: var(--cobalt-40); }
+.gfx-alternatywy .us .no p { font-size: 22px; line-height: 32px; color: var(--cobalt-20); margin-block-start: 8px; }
+</style>
+<div class="gfx gfx-alternatywy">
+  <p class="lab them">Czego urząd użyje zamiast</p>
+  <p class="lab us">Nasza propozycja</p>
+  <div class="card">
+    <h3>Arkusz w&nbsp;edytorze tekstu<small>i kalendarz kadr</small></h3>
+    <div class="sec yes"><b>Daje</b><ul><li>brak kosztu wdrożenia</li></ul></div>
+    <div class="sec no"><b>Nie daje</b><ul><li>faktów z&nbsp;24 miesięcy</li><li>przypomnień</li><li>terminu po nieobecności</li></ul></div>
   </div>
-  <footer>Osoby i zdarzenia pokazowe są fikcyjne.</footer>
+  <div class="card">
+    <h3>Formularz elektroniczny</h3>
+    <div class="sec yes"><b>Daje</b><ul><li>arkusz bez papieru</li></ul></div>
+    <div class="sec no"><b>Nie daje</b><ul><li>niczego przed dniem oceny</li><li>rozmowy i&nbsp;notatki zostają poza systemem</li></ul></div>
+  </div>
+  <div class="card">
+    <h3>Model, który pisze ocenę</h3>
+    <div class="sec yes"><b>Daje</b><ul><li>tekst w&nbsp;minutę</li></ul></div>
+    <div class="sec no"><b>Nie daje</b><ul><li>faktów, których przełożony nie zapisał</li><li class="risk">może dopisać fakt, którego nie było</li></ul></div>
+  </div>
+  <div class="card us">
+    <h3>mOcena</h3>
+    <div class="sec yes"><b>Daje</b><ul><li>fakty zapisane przez przełożonego przez cały okres</li><li>terminy i&nbsp;wynik liczone z&nbsp;przepisu</li></ul></div>
+    <div class="sec no"><b>Nie daje</b><ul><li>gotowego tekstu oceny</li></ul><p>Ocenę i&nbsp;uzasadnienie pisze przełożony.</p></div>
+  </div>
+</div>
+  </div>
+  <div class="foot"><span>Porównanie dotyczy tego, co urząd ma w ręku w dniu oceny.</span><span class="n"></span></div>
 </section>
 
-<!-- 4. Zasada -->
+<!-- 4. Cykl -->
 <section class="slide" id="s4">
-  <header><b>4 · Zasada</b><span>mOcena</span></header>
-  <div class="body two" style="align-content:center">
-    <div class="stack">
-      <h2>Asystent, nie autor oceny</h2>
-      <p class="lead">Punkty stawia człowiek. Treść arkusza pochodzi od przełożonego, a uzasadnienie składa się z jego notatek.</p>
-      <p>Trudności z oceną dotyczą wyboru kryteriów, rozmów, uzasadnienia i terminów. Żadna nie polega na tym, że brakuje tekstu oceny.</p>
+  <div class="top"><b>Rozwiązanie</b><span>mOcena</span></div>
+  <div class="body full">
+    <h2>Jedna ocena od początku do końca: trzy osoby, pięć kroków</h2>
+    <style>
+/* Schemat „cykl”: pięć kroków jednej oceny na osi czasu. Pole 1728 × 600 px. */
+.gfx-cykl { inline-size: 1728px; block-size: 600px; box-sizing: border-box; font-family: var(--font); color: var(--text); display: grid; grid-template-rows: 1fr auto; gap: 24px; position: relative; }
+.gfx-cykl * { box-sizing: border-box; margin: 0; }
+.gfx-cykl .steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 24px; position: relative; }
+/* Oś: od środka pierwszego kółka do strzałki na końcu pola. */
+.gfx-cykl .steps::before { content: ""; position: absolute; inset-inline: 24px 16px; inset-block-start: 70px; block-size: 4px; background: var(--cobalt-40); }
+.gfx-cykl .steps::after { content: ""; position: absolute; inset-inline-end: 0; inset-block-start: 62px; border-block: 10px solid transparent; border-inline-start: 16px solid var(--cobalt-40); }
+.gfx-cykl .step { display: flex; flex-direction: column; min-inline-size: 0; position: relative; }
+.gfx-cykl .date { font-size: 28px; line-height: 40px; font-weight: var(--w-bold); color: var(--cobalt-300); font-variant-numeric: tabular-nums; }
+.gfx-cykl .num { inline-size: 48px; block-size: 48px; margin-block: 8px 24px; border-radius: 50%; background: var(--primary); color: var(--white); display: grid; place-items: center; font-size: 22px; line-height: 32px; font-weight: var(--w-bold); box-shadow: 0 0 0 8px var(--surface); }
+.gfx-cykl h4 { min-block-size: 96px; font-size: 36px; line-height: 48px; font-weight: var(--w-bold); color: var(--cobalt-300); letter-spacing: -0.5px; }
+.gfx-cykl .who { display: flex; flex-direction: column; align-items: start; gap: 8px; min-block-size: 88px; margin-block: 16px; }
+.gfx-cykl .who span { padding: 4px 16px; border-radius: var(--r-500); font-size: 22px; line-height: 32px; font-weight: var(--w-bold); white-space: nowrap; }
+.gfx-cykl .r1 { background: var(--primary); color: var(--white); }
+.gfx-cykl .r2 { background: var(--cobalt-20); color: var(--cobalt-300); }
+.gfx-cykl .r3 { background: var(--grey-20); color: var(--grey-500); }
+.gfx-cykl .step p { font-size: 28px; line-height: 40px; color: var(--text); padding-inline-end: 8px; }
+/* Klamra okresu oceny: od kroku 1 do kroku 4. */
+.gfx-cykl .period { position: relative; margin-inline-start: 24px; }
+.gfx-cykl .period { inline-size: calc((1728px - 96px) / 5 * 3 + 72px); }
+.gfx-cykl .period i { display: block; block-size: 16px; border: 2px solid var(--cobalt-40); border-block-start: 0; border-radius: 0 0 var(--r-100) var(--r-100); }
+.gfx-cykl .period p { margin-block-start: 8px; text-align: center; font-size: 22px; line-height: 32px; color: var(--text-2); }
+.gfx-cykl .period b { color: var(--cobalt-300); font-weight: var(--w-bold); }
+</style>
+<div class="gfx gfx-cykl" role="img" aria-label="Pięć kroków jednej oceny okresowej: od kryteriów 09.12.2024 do zapoznania z oceną 22.11.2026">
+  <div class="steps">
+    <div class="step">
+      <span class="date">09.12.2024</span>
+      <span class="num">1</span>
+      <h4>Kryteria i&nbsp;oczekiwania</h4>
+      <div class="who"><span class="r1">Marek · oceniający</span><span class="r2">Piotr · oceniany</span></div>
+      <p>Marek ustala kryteria na rozmowie, Piotr potwierdza je na swoim koncie.</p>
     </div>
-    <div class="stack">
-      <h3>Asystent robi</h3>
-      <ul class="plain"><li>liczy terminy i średnią według przepisu</li><li>układa notatki przy kryteriach z całych 24 miesięcy</li><li>przypomina o rozmowie, informacji zwrotnej i stopniu służbowym</li><li>pokazuje przepis przy każdej regule</li></ul>
-      <h3>Człowiek robi</h3>
-      <ul class="plain"><li>pisze notatki i zaznacza zmianę zadań</li><li>wybiera kryteria i stawia oceny cząstkowe</li><li>klika potwierdzenie na własnym koncie</li></ul>
+    <div class="step">
+      <span class="date">11.03.2026</span>
+      <span class="num">2</span>
+      <h4>Notatka o&nbsp;fakcie</h4>
+      <div class="who"><span class="r1">Marek · oceniający</span></div>
+      <p>Zapisuje, że Piotr przejął nowe zadania. System pyta: „To stała zmiana zadań?”</p>
+    </div>
+    <div class="step">
+      <span class="date">10.11.2026</span>
+      <span class="num">3</span>
+      <h4>Dwie nieobecności</h4>
+      <div class="who"><span class="r3">Joanna · kadry</span></div>
+      <p>Termin oceny przesuwa się z&nbsp;27.11.2026 na 30.12.2026.</p>
+    </div>
+    <div class="step">
+      <span class="date">21.11.2026</span>
+      <span class="num">4</span>
+      <h4>Rozmowa i&nbsp;ocena</h4>
+      <div class="who"><span class="r1">Marek · oceniający</span></div>
+      <p>Punkty klika Marek. Wynik liczy reguła z&nbsp;rozporządzenia.</p>
+    </div>
+    <div class="step">
+      <span class="date">22.11.2026</span>
+      <span class="num">5</span>
+      <h4>Zapoznanie z&nbsp;oceną</h4>
+      <div class="who"><span class="r2">Piotr · oceniany</span></div>
+      <p>Potwierdza zapoznanie. Od&nbsp;tego dnia biegnie 7&nbsp;dni na sprzeciw.</p>
     </div>
   </div>
-  <footer>Nic nie zapisuje się bez kliknięcia człowieka.</footer>
+  <div class="period">
+    <i></i>
+    <p><b>Okres oceny:</b> 09.12.2024 – 21.11.2026</p>
+  </div>
+</div>
+  </div>
+  <div class="foot"><span>Ten sam przebieg prowadzi wersja pokazowa: przycisk „Rozpocznij pokaz”.</span><span class="n"></span></div>
 </section>
 
-<!-- 5. Krok 1 -->
+<!-- 5. Notatka -->
 <section class="slide" id="s5">
-  <header><b>5 · Krok 1 z 5</b><span>grudzień 2024</span></header>
-  <div class="body step">
-    <div class="stack">
-      <p class="when">Marek zaczyna cykl Piotra, Piotr potwierdza część I</p>
-      <h2>Arkusz i kryteria dobiera przepis</h2>
-      <ul class="plain">
-        <li>System dobiera arkusz C i podpowiada kryteria dodatkowe, każde ze zdaniem „dlaczego”.</li>
-        <li>Marek wybiera 2 kryteria i wpisuje oczekiwanie, a potem otwiera kartę rozmowy rozpoczynającej.</li>
-        <li>Przy potwierdzeniu Piotra miejscowość, data i nazwisko wpisują się same, a kryteria się blokują.</li>
+  <div class="top"><b>Krok 2 · Marek, oceniający</b><span>mOcena</span></div>
+  <div class="body split">
+    <div class="txt">
+      <h2>Fakt zapisany w dniu, w którym się zdarzył</h2>
+      <ul class="pts">
+        <li><b>11.03.2026: Piotr przejął kolejkę wniosków.</b>Marek zapisuje to jednym zdaniem, z datą i kryterium.</li>
+        <li><b>Notatka dostaje oznaczenie „zmiana zadań”.</b>Od tej chwili mOcena wie, o co zapytać przed rozmową.</li>
+        <li><b>Po dwóch latach</b>notatki z całego okresu leżą przy kryteriach oceny.</li>
       </ul>
-      <div class="provs"><span class="prov">§ 3 ust. 4: arkusz C</span><span class="prov">§ 5 ust. 1: cztery tematy rozmowy</span><span class="prov">§ 7 pkt 1: 30 dni</span></div>
     </div>
-    <figure class="frame">
-      <div class="shot"><span class="ph">Ekran: część I, kryteria i potwierdzenie</span><img src="shots/step1-start.png" alt="Ekran części I z wybranymi kryteriami" onerror="this.hidden=true"></div>
-      <figcaption>Ekran „Część I”: kryteria obowiązkowe i dodatkowe z uzasadnieniem podpowiedzi.</figcaption>
-    </figure>
+    <figure class="shot"><figcaption>Notatki o zespole · konto oceniającego · 11.03.2026</figcaption><img style="block-size: 688px" src="img/notes.jpg" alt="Lista notatek Marka o Piotrze z wyróżnioną notatką z 11.03.2026 oznaczoną jako zmiana zadań"></figure>
   </div>
-  <footer>Dane pokazowe: Piotr Wójcik, poprzednia ocena 27.11.2024.</footer>
+  <div class="foot"><span>Pracownik nie widzi notatki, dopóki przełożony mu jej nie przekaże.</span><span class="n"></span></div>
 </section>
 
-<!-- 6. Krok 2 -->
+<!-- 6. Wirtualny HR partner -->
 <section class="slide" id="s6">
-  <header><b>6 · Krok 2 z 5</b><span>marzec 2026</span></header>
-  <div class="body step">
-    <div class="stack">
-      <p class="when">Marek zapisuje notatkę z telefonu</p>
-      <h2>Partner pyta, nie ocenia</h2>
-      <ul class="plain">
-        <li>Notatka o przejęciu kolejki wniosków, pole „Zmiana zadań pracownika” wstępnie zaznaczone z listy słów.</li>
-        <li>Partner pyta: „To stała zmiana zadań?”. Po „tak” pokazuje kartę rozmowy i formę rozwoju z katalogu.</li>
-        <li>Druga notatka bez zaznaczenia: nic się nie dzieje. Brak punktów i etykiet.</li>
+  <div class="top"><b>Wirtualny HR partner</b><span>mOcena</span></div>
+  <div class="body split" data-img="left">
+    <div class="txt">
+      <h2>Wirtualny HR partner pyta, zanim zrobi się problem</h2>
+      <ul class="pts">
+        <li><b>Łączy dwa wpisy Marka:</b>zmianę zadań z 11.03.2026 i pracę po godzinach z 21.04.2026.</li>
+        <li><b>Podsuwa pytanie na rozmowę:</b>czy zakres zadań jest do udźwignięcia.</li>
+        <li><b>Pokazuje, czego brakuje:</b>kryteria bez żadnej notatki i dobrą pracę, o której Piotr jeszcze nie usłyszał.</li>
       </ul>
-      <div class="provs"><span class="prov">Pole zaznacza i odznacza człowiek</span><span class="prov">Katalog form rozwoju: ustawienie urzędu</span></div>
     </div>
-    <figure class="frame">
-      <div class="shot"><span class="ph">Ekran: pytanie partnera po notatce</span><img src="shots/step2-question.png" alt="Ekran pytania partnera po notatce" onerror="this.hidden=true"></div>
-      <figcaption>Ekran „To stała zmiana zadań?” na telefonie, po zapisaniu notatki.</figcaption>
-    </figure>
+    <figure class="shot"><figcaption>Przed rozmową · konto oceniającego · 21.11.2026</figcaption><img src="img/partner.jpg" alt="Panel Do zapytania na rozmowie z pytaniem o pracę po godzinach po zmianie zadań"></figure>
   </div>
-  <footer>System nie rozumie treści notatki: pole wypełnia przełożony, lista słów tylko je podpowiada.</footer>
+  <div class="foot"><span>Sygnały pochodzą wyłącznie z wpisów przełożonego. Przy nazwisku pracownika nie ma etykiet ani wskaźników.</span><span class="n"></span></div>
 </section>
 
-<!-- 7. Krok 3 -->
+<!-- 7. Terminy -->
 <section class="slide" id="s7">
-  <header><b>7 · Krok 3 z 5</b><span>listopad 2026</span></header>
-  <div class="body step">
-    <div class="stack">
-      <p class="when">Joanna wpisuje dwie nieobecności Piotra</p>
-      <h2>Termin przesuwa reguła, kadry tylko wpisują daty</h2>
-      <ul class="plain">
-        <li>05.10–16.10.2026 i 19.10–06.11.2026, obie usprawiedliwione. Dzieli je tylko weekend, więc liczą się jako jedna.</li>
-        <li>Oś czasu pokazuje jedną ciągłą nieobecność, próg „dłużej niż miesiąc”, nowy termin oceny, regułę i wersję pliku reguł.</li>
+  <div class="top"><b>Krok 3 · Joanna, kadry</b><span>mOcena</span></div>
+  <div class="body split">
+    <div class="txt">
+      <h2>Termin liczy przepis. Kadry wpisują tylko daty</h2>
+      <ul class="pts">
+        <li><b>Joanna wpisuje nieobecność Piotra:</b>05.10.2026–06.11.2026, razem 33 dni.</li>
+        <li><b>Termin oceny przesuwa się sam:</b>z 27.11.2026 na 30.12.2026.</li>
+        <li><b>Przy dacie stoi przepis,</b>z którego wynika. Nikt nie liczy dni na kartce.</li>
       </ul>
-      <div class="provs"><span class="prov">art. 81 ust. 7 ustawy</span><span class="prov">art. 110–115 Kodeksu cywilnego</span></div>
+      <p class="law"><span>art. 81 ust. 4 ustawy</span><span>art. 81 ust. 7 ustawy</span></p>
     </div>
-    <figure class="frame">
-      <div class="shot"><span class="ph">Ekran: oś czasu cyklu Piotra</span><img src="shots/step3-timeline.png" alt="Oś czasu z połączoną nieobecnością" onerror="this.hidden=true"></div>
-      <figcaption>Ekran „Oś czasu”: nieobecność, reguła i nowy termin na jednej osi.</figcaption>
-    </figure>
+    <figure class="shot"><figcaption>Oś czasu · konto kadr · 10.11.2026</figcaption><img style="block-size: 720px" src="img/timeline.jpg" alt="Oś czasu oceny Piotra: nieobecność 33 dni i termin oceny przesunięty z 27.11.2026 na 30.12.2026"></figure>
   </div>
-  <footer>Ciszy w środku osi nikt nie zamienia na ocenę.</footer>
+  <div class="foot"><span>Nieobecność dłuższa niż miesiąc przedłuża termin oceny o czas tej nieobecności.</span><span class="n"></span></div>
 </section>
 
-<!-- 8. Krok 4 -->
-<section class="slide" id="s8">
-  <header><b>8 · Krok 4 z 5</b><span>21.11.2026</span></header>
-  <div class="body step">
-    <div class="stack">
-      <p class="when">Marek przed rozmową oceniającą i przy formularzu</p>
-      <h2>Fakty z dwóch lat przy kryteriach</h2>
-      <ul class="plain">
-        <li>Ekran „Przed rozmową z Piotrem”: notatki z 24 miesięcy, podział na sprzed zmiany zadań i po niej, kryteria bez notatek.</li>
-        <li>Ocena cząstkowa „1” daje wynik negatywny mimo średniej powyżej 4. Uzasadnienie staje się obowiązkowe i składa się z notatek.</li>
-        <li>Zatwierdzenie bez wniosków do programu rozwoju jest zablokowane.</li>
-      </ul>
-      <div class="provs"><span class="prov">§ 10: tematy rozmowy oceniającej</span><span class="prov">§ 11 ust. 1 pkt 3–4</span><span class="prov">§ 11 ust. 3</span><span class="prov">art. 81 ust. 5 ustawy</span></div>
+<!-- 8. Ocena: dowód -->
+<section class="slide" id="s8" data-kind="dark">
+  <div class="top"><b>Krok 4 · Marek, oceniający</b><span>mOcena</span></div>
+  <div class="body split">
+    <div class="txt">
+      <h2 class="scene">Średnia 6,14. Wynik: <em>ocena negatywna.</em></h2>
+      <p class="p">Marek stawia jedną „1” przy Rzetelności. mOcena mówi mu przed zatwierdzeniem, że to przesądza o wyniku, i pokazuje przepis. Pod kryterium leżą notatki Marka. Do uzasadnienia trafi ta, którą sam zaznaczył: z 26.08.2026.</p>
+      <p class="law"><span>§ 11 ust. 1 pkt 4 rozporządzenia</span><span>§ 11 ust. 3</span></p>
     </div>
-    <figure class="frame">
-      <div class="shot"><span class="ph">Ekran: formularz oceny z regułą wyniku</span><img src="shots/step4-assessment.png" alt="Formularz oceny z wynikiem negatywnym" onerror="this.hidden=true"></div>
-      <figcaption>Ekran „Ocena”: ocena „1” postawiona na pokaz, żeby było widać regułę.</figcaption>
-    </figure>
+    <figure class="shot"><figcaption>Ocena okresowa · konto oceniającego · 21.11.2026</figcaption><img style="block-size: 672px" src="img/assessment.jpg" alt="Ekran oceny: Rzetelność 1 z notatką z 26.08.2026, wynik ocena negatywna, średnia 6,14 nie zmienia wyniku"></figure>
   </div>
-  <footer>Ocenę „1” stawia człowiek przy „Rzetelności”. System pokazuje tylko, co z niej wynika.</footer>
+  <div class="foot"><span>Punkty klika Marek, wynik liczy reguła. Ocena „1” jest w pokazie postawiona dla przykładu.</span><span class="n"></span></div>
 </section>
 
-<!-- 9. Krok 5 -->
+<!-- 9. Zasada -->
 <section class="slide" id="s9">
-  <header><b>9 · Krok 5 z 5</b><span>22.11.2026</span></header>
-  <div class="body step">
-    <div class="stack">
-      <p class="when">Piotr potwierdza zapoznanie, potem ekran kadr</p>
-      <h2>Zegar sprzeciwu i obowiązek, który nie ucieka</h2>
-      <ul class="plain">
-        <li>Po potwierdzeniu zaczyna biec 7 dni na sprzeciw do dyrektora generalnego urzędu; tu wypada 30.11.2026.</li>
-        <li>Ekran kadr pokazuje obowiązkowy stopień Tomasza: dwie oceny od ostatniego stopnia i 30 dni.</li>
-        <li>Stany uproszczone są nazwane, a przycisk „Drukuj / pobierz PDF” daje arkusz w kolejności wzoru.</li>
-      </ul>
-      <div class="provs"><span class="prov">art. 83 ust. 1 ustawy: 7 dni</span><span class="prov">art. 89 ust. 2 ustawy: 30 dni</span><span class="prov">§ 12: zapoznanie z oceną</span></div>
+  <div class="top"><b>Zasada</b><span>mOcena</span></div>
+  <div class="body split">
+    <div class="txt">
+      <h2>Podpowiedź porządkuje, nigdy nie ocenia</h2>
+      <p class="p">Prototyp działa bez modelu językowego: na datach, polach i regułach. To wybór, nie brak. Model piszący o człowieku może dopisać fakt, którego nie było.</p>
+      <p class="p">Urząd, który zechce, podłączy własny model w jednym miejscu. Zakres jego pracy jest zamknięty z góry.</p>
     </div>
-    <figure class="frame">
-      <div class="shot"><span class="ph">Ekran: kadry, stan wszystkich ocen</span><img src="shots/step5-hr.png" alt="Ekran kadr ze stanem ocen" onerror="this.hidden=true"></div>
-      <figcaption>Ekran „Kadry”: stany cykli, stopień obowiązkowy i wydruk.</figcaption>
-    </figure>
+    <style>
+.gfx-zasada { inline-size: 1040px; block-size: 760px; font-family: var(--font); color: var(--text); display: grid; grid-template-rows: minmax(0, 1fr) auto; row-gap: 24px; box-sizing: border-box; }
+.gfx-zasada * { box-sizing: border-box; margin: 0; padding: 0; }
+.gfx-zasada .flow { display: grid; grid-template-columns: 584px 32px 196px 32px 196px; align-items: stretch; }
+.gfx-zasada .arrow { display: grid; place-items: center; }
+.gfx-zasada .arrow svg { inline-size: 32px; block-size: 24px; color: var(--cobalt-100); }
+.gfx-zasada h3 { font-size: 28px; line-height: 36px; font-weight: var(--w-bold); color: var(--cobalt-300); }
+.gfx-zasada .places { border-block-start: 2px solid var(--cobalt-300); padding-block-start: 16px; display: flex; flex-direction: column; }
+.gfx-zasada .sum { font-size: 22px; line-height: 32px; color: var(--text-2); margin-block-start: 4px; }
+.gfx-zasada .sum b { color: var(--green-100); }
+.gfx-zasada .grp { margin-block-start: 8px; font-size: 22px; line-height: 32px; font-weight: var(--w-bold); color: var(--text-2); }
+.gfx-zasada ul { list-style: none; }
+.gfx-zasada li { display: grid; grid-template-columns: 112px minmax(0, 1fr); column-gap: 16px; align-items: start; padding-block: 4px; border-block-start: 1px solid var(--border); font-size: 22px; line-height: 32px; }
+.gfx-zasada .chip { display: block; text-align: center; border-radius: var(--r-500); font-size: 22px; line-height: 28px; padding-block: 2px; font-weight: var(--w-bold); white-space: nowrap; }
+.gfx-zasada .chip.on { background: var(--green-20); color: var(--green-100); border: 2px solid var(--green-100); }
+.gfx-zasada .chip.off { color: var(--text-2); border: 2px dashed var(--grey-80); font-weight: var(--w-regular); }
+.gfx-zasada li small { color: var(--text-2); font-size: 22px; }
+.gfx-zasada .box { border-radius: var(--r-200); padding: 24px 16px; display: flex; flex-direction: column; justify-content: center; gap: 16px; }
+.gfx-zasada .one { background: var(--cobalt-10); border: 2px solid var(--cobalt-100); }
+.gfx-zasada .one p { font-size: 22px; line-height: 32px; }
+.gfx-zasada .one p b { color: var(--cobalt-300); }
+.gfx-zasada .one .note { color: var(--text-2); border-block-start: 1px solid var(--cobalt-30); padding-block-start: 16px; }
+.gfx-zasada .human { background: var(--cobalt-300); }
+.gfx-zasada .human h3 { color: var(--white); }
+.gfx-zasada .human p { font-size: 22px; line-height: 32px; color: var(--cobalt-20); }
+.gfx-zasada .never { border-block-start: 2px solid var(--grey-500); padding-block-start: 16px; display: flex; flex-wrap: wrap; column-gap: 48px; row-gap: 0; }
+.gfx-zasada .never span.lab { padding-inline-start: 0; }
+.gfx-zasada .never span.lab::before { content: none; }
+.gfx-zasada .never .lab { flex-basis: 100%; margin-block-end: 8px; font-size: 22px; line-height: 32px; font-weight: var(--w-bold); text-transform: uppercase; letter-spacing: .05em; color: var(--text-2); }
+.gfx-zasada .never span { white-space: nowrap; font-size: 22px; line-height: 32px; padding-inline-start: 32px; position: relative; }
+.gfx-zasada .never span::before { content: "×"; position: absolute; inset-inline-start: 0; inset-block-start: 0; font-size: 28px; line-height: 32px; font-weight: var(--w-bold); color: var(--red-100); }
+</style>
+<div class="gfx gfx-zasada">
+  <div class="flow">
+    <div class="places">
+      <h3>Sześć miejsc na podpowiedź</h3>
+      <p class="sum"><b>2 z&nbsp;6 działają dziś</b>, 4 czekają na model urzędu</p>
+      <p class="grp">Zapis notatki</p>
+      <ul>
+        <li><span class="chip on">dziś</span><span>Wstępnie zaznacza pole „Zmiana zadań pracownika” <small>(lista słów)</small></span></li>
+        <li><span class="chip off">model</span><span>Ostrzega, że notatka zawiera dane o&nbsp;zdrowiu</span></li>
+        <li><span class="chip off">model</span><span>Podpowiada kryterium, którego notatka dotyczy</span></li>
+        <li><span class="chip off">model</span><span>Ostrzega, że podobna notatka już jest</span></li>
+      </ul>
+      <p class="grp">Karta rozmowy</p>
+      <ul>
+        <li><span class="chip on">dziś</span><span>Dopasowuje formę rozwoju z&nbsp;katalogu urzędu</span></li>
+      </ul>
+      <p class="grp">Uzasadnienie oceny</p>
+      <ul>
+        <li><span class="chip off">model</span><span>Wskazuje zbyt trudne zdania, niczego nie przepisuje</span></li>
+      </ul>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 32 24" aria-hidden="true"><path d="M2 12h24M18 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="3"/></svg></div>
+    <div class="box one">
+      <h3>Jedno wymienne miejsce w&nbsp;kodzie</h3>
+      <p><b>Dziś:</b> reguły.</p>
+      <p><b>Później:</b> model uruchomiony w&nbsp;urzędzie.</p>
+      <p class="note">Nazwiska do niego nie trafiają.</p>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 32 24" aria-hidden="true"><path d="M2 12h24M18 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="3"/></svg></div>
+    <div class="box human">
+      <h3>Decyduje człowiek</h3>
+      <p>Przełożony przyjmuje albo poprawia jednym kliknięciem.</p>
+      <p>Każdy ekran działa także bez podpowiedzi.</p>
+    </div>
   </div>
-  <footer>Kliknięcie to potwierdzenie w systemie. Moc prawną daje dziś wydruk z własnoręcznym potwierdzeniem; urząd może podłączyć własny mechanizm.</footer>
+  <div class="never">
+    <span class="lab">Czego podpowiedź nigdy nie robi</span>
+    <span>Nie proponuje punktów</span>
+    <span>Nie pisze o&nbsp;pracowniku</span>
+    <span>Nie oznacza notatek jako „dobrze / do poprawy”</span>
+    <span>Nie porównuje pracowników</span>
+  </div>
+</div>
+  </div>
+  <div class="foot"><span>Stan każdej podpowiedzi widać w aplikacji: ekran „Skąd biorą się podpowiedzi”.</span><span class="n"></span></div>
 </section>
 
-<!-- 10. Trzy głosy -->
+<!-- 10. Oceniany -->
 <section class="slide" id="s10">
-  <header><b>10 · Trzy głosy</b><span>mOcena</span></header>
-  <div class="body">
-    <h2>Zawsze widać, kto mówi: człowiek, reguła, podpowiedź</h2>
-    <div class="body three">
-      <div class="card"><h3>Człowiek</h3><p>Biała karta z sygnaturą autora. Notatka, ocena i potwierdzenie pochodzą od osoby, nigdy od systemu.</p><p class="sign">Marek Zieliński, 21.11.2026</p></div>
-      <div class="rule"><h3>Reguła</h3><p>Niebieska powierzchnia z ciągłą obwódką i pigułką przepisu. Termin, wynik i próg zawsze ze wskazaniem, skąd wynikają.</p><p class="sign">§ 11 ust. 1 pkt 4</p></div>
-      <div class="hint"><h3>Podpowiedź</h3><p>Obwódka przerywana i widoczne odrzucenie. Można ją zignorować jednym kliknięciem i nic się wtedy nie zapisuje.</p></div>
+  <div class="top"><b>Kroki 1 i 5 · Piotr, oceniany</b><span>mOcena</span></div>
+  <div class="body phones">
+    <div class="txt">
+      <h2>Piotr od pierwszego dnia wie, z czego będzie oceniany</h2>
+      <ul class="pts">
+        <li><b>09.12.2024: potwierdza kryteria</b>na swoim koncie, w telefonie.</li>
+        <li><b>W trakcie okresu: dostaje informację zwrotną,</b>gdy Marek przekaże mu swoją notatkę.</li>
+        <li><b>22.11.2026: czyta ocenę i potwierdza zapoznanie.</b>Od tego dnia biegnie 7 dni na sprzeciw, do 30.11.2026.</li>
+        
+      </ul>
     </div>
+    <figure class="phone"><figcaption>Krok 1 · 09.12.2024</figcaption><img src="img/phone-part1.png" alt="Telefon pracownika: potwierdzenie kryteriów oceny"></figure>
+    <figure class="phone"><figcaption>Krok 5 · 22.11.2026</figcaption><img src="img/phone-confirm.png" alt="Telefon pracownika: zapoznanie z oceną"></figure>
   </div>
-  <footer>Znak „§” stoi tylko przy paragrafie rozporządzenia, przy artykule ustawy go nie ma.</footer>
+  <div class="foot"><span>Kliknięcie to potwierdzenie w systemie. Arkusz do akt urząd drukuje.</span><span class="n"></span></div>
 </section>
 
-<!-- 11. Pod spodem -->
+<!-- 11. Kadry -->
 <section class="slide" id="s11">
-  <header><b>11 · Pod spodem</b><span>mOcena</span></header>
-  <div class="body two">
-    <div class="stack">
-      <h2>Przepisy w pliku z wersją, silnik, testy</h2>
-      <ul class="plain">
-        <li><b>Reguły:</b> jeden plik JSON z wersją (2016-470/1) i datą obowiązywania. Każda ocena zachowuje wersję reguł, w której powstała.</li>
-        <li><b>Silnik:</b> czyste funkcje na datach i liczbach: terminy, nieobecności, arkusze, średnia i wynik.</li>
-        <li><b>Testy:</b> 215 testów w zestawie <code>bun test</code>, w tym silnika i tras.</li>
-        <li><b>Dane tylko u widza:</b> baza w pliku, w demo własna dla każdego widza. Nic nie wychodzi poza komputer.</li>
+  <div class="top"><b>Po ocenie · Joanna, kadry</b><span>mOcena</span></div>
+  <div class="body split" data-img="left">
+    <div class="txt">
+      <h2>Kadry widzą obowiązki urzędu przed terminem</h2>
+      <ul class="pts">
+        <li><b>Stopień służbowy z mocy prawa:</b>przyznać do 14.12.2026.</li>
+        <li><b>Sprzeciw do rozpatrzenia:</b>do 04.12.2026. Kadry odnotowują zmianę oceny albo zlecają drugą ocenę.</li>
+        <li><b>Każda sprawa ma datę i przepis.</b>Termin nie zależy od tego, czy ktoś o nim pamięta.</li>
       </ul>
+      <p class="law"><span>art. 89 ust. 2 ustawy</span><span>art. 83 ust. 3 ustawy</span></p>
     </div>
-    <div class="stack">
-      <h3>Wymienne miejsce na model uruchomiony w urzędzie</h3>
-      <p>Prototyp działa na regułach. Podpowiedzi przechodzą przez jeden adapter, który urząd może zastąpić modelem uruchomionym u siebie. Administrator widzi ekran „Skąd biorą się podpowiedzi”.</p>
-      <div class="diagram"><span class="node">Notatka</span><span class="arrow">→</span><span class="node">Adapter podpowiedzi</span><span class="arrow">→</span><span class="node">Reguły (dziś)</span><span class="arrow">albo</span><span class="node">Model urzędu (później)</span></div>
-      <p>Model nigdy nie proponuje punktów, nie pisze o pracowniku, nie porównuje pracowników.</p>
-    </div>
+    <figure class="shot"><figcaption>Stan cykli · konto kadr · 22.11.2026</figcaption><img src="img/hr.jpg" alt="Ekran kadr: stopień służbowy do przyznania do 14.12.2026 i sprzeciw do rozpatrzenia do 04.12.2026"></figure>
   </div>
-  <footer>Bun, Hono, SQLite w jednym pliku, bez płatnych licencji.</footer>
+  <div class="foot"><span>Na ekranie kadr widać inne osoby z tego samego urzędu: dla nich terminy biegną właśnie teraz.</span><span class="n"></span></div>
 </section>
 
-<!-- 12. Czego nie robimy -->
+<!-- 12. Zakres -->
 <section class="slide" id="s12">
-  <header><b>12 · Granice</b><span>mOcena</span></header>
-  <div class="body two">
-    <div class="stack">
-      <h2>Czego świadomie nie robimy</h2>
-      <ul class="plain no">
-        <li>Nie piszemy oceny ani zdań o pracowniku.</li>
-        <li>Nie proponujemy punktów i nie porównujemy pracowników.</li>
-        <li>Nie ma etykiet ani wskaźników przy nazwisku.</li>
-        <li>Nie używamy modelu językowego w prototypie.</li>
-      </ul>
+  <div class="top"><b>Kompletność</b><span>mOcena</span></div>
+  <div class="body full">
+    <h2>28 z 30 czynności z listy organizatora działa. Dwie są uproszczone</h2>
+    <style>
+/* Schemat „zakres”: 30 czynności z listy organizatora w 6 etapach cyklu. Pole 1728 × 560 px. */
+.gfx-zakres { inline-size: 1728px; block-size: 560px; box-sizing: border-box; font-family: var(--font); color: var(--text); display: grid; grid-template-rows: 1fr auto; gap: 16px; }
+.gfx-zakres * { box-sizing: border-box; margin: 0; }
+.gfx-zakres .stages { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; min-block-size: 0; }
+.gfx-zakres .stage { display: flex; flex-direction: column; gap: 8px; min-inline-size: 0; position: relative; }
+.gfx-zakres .stage h4 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding-block: 8px; border-block-start: 4px solid var(--cobalt-100); font-size: 22px; line-height: 32px; font-weight: var(--w-bold); color: var(--cobalt-300); }
+.gfx-zakres .stage h4 span { font-weight: var(--w-regular); color: var(--text-2); font-variant-numeric: tabular-nums; }
+/* Strzałka kolejności etapów w odstępie między kolumnami. */
+.gfx-zakres .stage + .stage::before { content: ""; position: absolute; inset-inline-start: -14px; inset-block-start: -6px; inline-size: 0; block-size: 0; border-block: 8px solid transparent; border-inline-start: 10px solid var(--cobalt-100); }
+.gfx-zakres .t { display: flex; gap: 8px; padding: 4px 12px; border: 2px solid var(--cobalt-20); background: var(--cobalt-10); border-radius: var(--r-100); font-size: 22px; line-height: 28px; color: var(--cobalt-300); }
+.gfx-zakres .t b { flex: none; min-inline-size: 28px; font-weight: var(--w-bold); color: var(--primary); font-variant-numeric: tabular-nums; }
+.gfx-zakres .t.s { background: var(--surface); border: 2px dashed var(--grey-200); color: var(--text); }
+.gfx-zakres .t.s b { color: var(--text-2); }
+.gfx-zakres .legend { display: flex; gap: 48px; align-items: center; padding-block-start: 16px; border-block-start: 1px solid var(--border); font-size: 22px; line-height: 32px; color: var(--text-2); }
+.gfx-zakres .legend > span { display: flex; gap: 16px; align-items: center; }
+.gfx-zakres .legend strong { color: var(--cobalt-300); font-weight: var(--w-bold); }
+.gfx-zakres .legend i { inline-size: 40px; block-size: 28px; border-radius: var(--r-100); border: 2px solid var(--cobalt-20); background: var(--cobalt-10); }
+.gfx-zakres .legend i.s { border: 2px dashed var(--grey-200); background: var(--surface); }
+</style>
+<div class="gfx gfx-zakres" role="img" aria-label="30 czynności z listy organizatora w sześciu etapach cyklu oceny: 28 działa, 2 uproszczone">
+  <div class="stages">
+    <div class="stage">
+      <h4>Początek cyklu <span>4</span></h4>
+      <p class="t"><b>1</b>Przypomnienie o&nbsp;kryteriach</p>
+      <p class="t"><b>17</b>Zaproszenie na rozmowę o&nbsp;kryteriach</p>
+      <p class="t"><b>2</b>Wybór kryteriów, rozmowa</p>
+      <p class="t"><b>3</b>Potwierdzenie kryteriów</p>
     </div>
-    <div class="stack">
-      <h3>Dlaczego</h3>
-      <p>Model piszący o człowieku może dopisać fakt, którego nie było. Ocena pracownika to w AI Act obszar wysokiego ryzyka, a dane wysyłane poza urząd wymagają anonimizacji.</p>
-      <p>Etykieta przy nazwisku to profilowanie pracownika. Serię zwolnień lekarskich traktujemy jak dane o zdrowiu, więc nie ma jej analizy.</p>
+    <div class="stage">
+      <h4>W trakcie okresu <span>3</span></h4>
+      <p class="t"><b>11</b>Wpisanie nieobecności</p>
+      <p class="t"><b>29</b>Zastępstwa</p>
+      <p class="t"><b>10</b>Zmiana oceniającego</p>
+    </div>
+    <div class="stage">
+      <h4>Terminy <span>4</span></h4>
+      <p class="t"><b>4</b>Przypomnienie o&nbsp;terminie oceny</p>
+      <p class="t"><b>8</b>Przesunięcie przez nieobecność</p>
+      <p class="t"><b>16</b>Zmiana terminu przez oceniającego</p>
+      <p class="t"><b>19</b>Wniosek ocenianego o&nbsp;termin</p>
+    </div>
+    <div class="stage">
+      <h4>Ocena <span>5</span></h4>
+      <p class="t"><b>18</b>Zaproszenie na rozmowę oceniającą</p>
+      <p class="t"><b>5</b>Wystawienie oceny</p>
+      <p class="t s"><b>20</b>Wniosek o&nbsp;kolejny stopień</p>
+      <p class="t"><b>6</b>Potwierdzenie zapoznania</p>
+      <p class="t"><b>7</b>Fikcja zapoznania</p>
+    </div>
+    <div class="stage">
+      <h4>Po ocenie <span>6</span></h4>
+      <p class="t"><b>13</b>Podgląd arkusza</p>
+      <p class="t"><b>14</b>Pobranie arkusza</p>
+      <p class="t"><b>15</b>Wydruk arkusza</p>
+      <p class="t"><b>21</b>Zmiana oceny po sprzeciwie</p>
+      <p class="t"><b>22</b>Ponowna ocena po sprzeciwie</p>
+      <p class="t"><b>9</b>Obowiązkowy stopień służbowy</p>
+    </div>
+    <div class="stage">
+      <h4>Kadry i&nbsp;urząd <span>8</span></h4>
+      <p class="t"><b>23</b>Dane pracowników</p>
+      <p class="t"><b>24</b>Podległość</p>
+      <p class="t"><b>27</b>Lista pracowników</p>
+      <p class="t"><b>28</b>Edycja danych</p>
+      <p class="t"><b>30</b>Usunięcie danych</p>
+      <p class="t"><b>12</b>Historia ocen</p>
+      <p class="t s"><b>25</b>Archiwizacja</p>
+      <p class="t"><b>26</b>Statystyki, zestawienia</p>
     </div>
   </div>
-  <footer>Sygnały pochodzą tylko z wpisów przełożonego.</footer>
+  <div class="legend">
+    <span><i></i><strong>Działa: 28</strong></span>
+    <span><i class="s"></i><strong>Uproszczone: 2</strong> wniosek o&nbsp;stopień bez osobnego obiegu, archiwizacja bez osobnej operacji</span>
+    <span>Numery jak w tabeli 30 czynności w repozytorium</span>
+  </div>
+</div>
+  </div>
+  <div class="foot"><span>Pięć ról: oceniający, oceniany, kadry, dyrektor generalny, administrator. Poprawność reguł i ekranów sprawdza 397 automatycznych testów.</span><span class="n"></span></div>
 </section>
 
-<!-- 13. Co dalej -->
+<!-- 13. Granice -->
 <section class="slide" id="s13">
-  <header><b>13 · Co dalej</b><span>wdrożenie</span></header>
-  <div class="body two">
-    <div class="stack">
-      <h2>Poza prototypem, w drodze do wdrożenia</h2>
-      <ul class="plain">
-        <li>Integracja z systemem kadrowym zamiast danych wgranych z góry.</li>
-        <li>Wysyłka e-maili i integracja z elektronicznym systemem zarządzania dokumentacją.</li>
-        <li>Potwierdzenie z mocą prawną: urząd podpina własny mechanizm w miejscu kliknięcia.</li>
-        <li>Pełny obieg sprzeciwu i decyzji o stopniu służbowym.</li>
-      </ul>
-    </div>
-    <div class="stack">
-      <p class="num">15 / 12 / 3</p>
-      <p class="lead">z 30 czynności z listy organizatora: 15 działa, 12 jest uproszczonych, 3 są poza prototypem.</p>
-      <p>Poza prototypem: edycja danych pracownika, zastępstwa i usuwanie danych.</p>
-      <p>Model uruchomiony w urzędzie włącza się przez adapter, bez zmian w ekranach.</p>
-    </div>
+  <div class="top"><b>Wdrożenie</b><span>mOcena</span></div>
+  <div class="body full">
+    <h2>Granice prototypu i co dochodzi w pilotażu</h2>
+    <style>
+.gfx-granice { inline-size: 1728px; block-size: 600px; font-family: var(--font); color: var(--text); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 32px; box-sizing: border-box; }
+.gfx-granice * { box-sizing: border-box; margin: 0; padding: 0; }
+.gfx-granice .col { border-radius: var(--r-200); padding: 32px; display: flex; flex-direction: column; gap: 24px; }
+.gfx-granice .hd { display: grid; grid-template-columns: 56px minmax(0, 1fr); column-gap: 16px; align-items: center; }
+.gfx-granice .ico { inline-size: 56px; block-size: 56px; border-radius: 50%; position: relative; }
+.gfx-granice h3 { font-size: 28px; line-height: 36px; font-weight: var(--w-bold); }
+.gfx-granice ul { list-style: none; display: flex; flex-direction: column; }
+.gfx-granice li { font-size: 28px; line-height: 36px; padding-block: 16px; border-block-start: 1px solid var(--grey-40); }
+.gfx-granice li:first-child { padding-block-start: 0; border: 0; }
+.gfx-granice li small { display: block; font-size: 22px; line-height: 32px; color: var(--text-2); margin-block-start: 4px; }
+/* 1. Dochodzi w pilotażu */
+.gfx-granice .add { background: var(--surface); border: 2px solid var(--cobalt-100); }
+.gfx-granice .add h3 { color: var(--cobalt-100); }
+.gfx-granice .add .ico { background: var(--cobalt-100); }
+.gfx-granice .add .ico::before, .gfx-granice .add .ico::after { content: ""; position: absolute; left: 50%; top: 50%; inline-size: 26px; block-size: 5px; margin: -2.5px 0 0 -13px; background: var(--white); border-radius: 2px; }
+.gfx-granice .add .ico::after { transform: rotate(90deg); }
+.gfx-granice .add li { padding-block: 8px; }
+.gfx-granice .add li:first-child { padding-block-start: 0; }
+/* 2. Uproszczone dziś */
+.gfx-granice .simp { background: var(--surface); border: 2px dashed var(--grey-80); }
+.gfx-granice .simp h3 { color: var(--grey-200); }
+.gfx-granice .simp .ico { border: 3px dashed var(--grey-80); display: grid; place-items: center; font-size: 36px; line-height: 1; font-weight: var(--w-bold); color: var(--grey-200); }
+.gfx-granice .simp li b { font-weight: var(--w-bold); }
+/* 3. Zostaje na stałe */
+.gfx-granice .keep { background: var(--green-10); border: 2px solid var(--green-100); }
+.gfx-granice .keep h3 { color: var(--green-100); }
+.gfx-granice .keep .ico { background: var(--green-100); }
+.gfx-granice .keep .ico::before { content: ""; position: absolute; left: 20px; top: 12px; inline-size: 14px; block-size: 24px; border: solid var(--white); border-width: 0 5px 5px 0; transform: rotate(45deg); }
+.gfx-granice .keep li { border-color: var(--green-30); }
+</style>
+<div class="gfx gfx-granice">
+  <div class="col add">
+    <div class="hd"><span class="ico" aria-hidden="true"></span><h3>Dochodzi w&nbsp;pilotażu</h3></div>
+    <ul>
+      <li>Logowanie urzędu<small>dziś konta pokazowe bez hasła</small></li>
+      <li>Połączenie z&nbsp;systemem kadrowym i&nbsp;elektronicznym obiegiem dokumentów</li>
+      <li>Wnoszenie sprzeciwu w&nbsp;aplikacji<small>dziś kadry odnotowują wynik rozpatrzenia</small></li>
+      <li>Wysyłka poczty<small>dziś zaproszenie daje plik kalendarza i&nbsp;szkic wiadomości</small></li>
+    </ul>
   </div>
-  <footer>Źródło: decyzje autora i PRD, sekcja „Non-Goals”.</footer>
+  <div class="col simp">
+    <div class="hd"><span class="ico" aria-hidden="true">~</span><h3>Uproszczone dziś: 2&nbsp;z&nbsp;30 czynności</h3></div>
+    <ul>
+      <li><b>Wniosek o&nbsp;kolejny stopień służbowy</b><small>jest w&nbsp;formularzu oceny i&nbsp;w&nbsp;arkuszu, bez osobnego obiegu</small></li>
+      <li><b>Archiwizacja</b><small>oceny zostają w&nbsp;historii, bez osobnej operacji</small></li>
+    </ul>
+  </div>
+  <div class="col keep">
+    <div class="hd"><span class="ico" aria-hidden="true"></span><h3>Zostaje na stałe</h3></div>
+    <ul>
+      <li>Ocenę wystawia przełożony, nie system</li>
+      <li>Kliknięcie to potwierdzenie w&nbsp;systemie<small>arkusz do akt urząd drukuje</small></li>
+      <li>Każdy urząd ma własną instalację i&nbsp;własne dane</li>
+    </ul>
+  </div>
+</div>
+  </div>
+  <div class="foot"><span>Aplikacja powstała na hackathonie. Wcześniej istniały notatki o przepisach i mały silnik reguł z testami.</span><span class="n"></span></div>
 </section>
 
-<!-- 14. Zobacz na żywo -->
+<!-- 14. Wdrożenie -->
 <section class="slide" id="s14">
-  <header><b>14 · Zobacz na żywo</b><span>mOcena</span></header>
-  <div class="body" style="align-content:center">
-    <h2>Kliknij „Rozpocznij pokaz”: 5 kroków, ok. 3 minut</h2>
-    <p class="big">https://mocena.pietkiewicz-mikolaj.workers.dev</p>
-    <p class="lead">Każdy widz ma własne dane pokazowe. Kod i dokumentacja są w repozytorium projektu.</p>
+  <div class="top"><b>Wdrożenie</b><span>mOcena</span></div>
+  <div class="body split">
+    <div class="txt">
+      <h2>Urząd uruchamia mOcenę u siebie</h2>
+      <ul class="pts">
+        <li><b>Mały i duży urząd tak samo:</b>jeden serwer i przeglądarka, bez płatnych licencji. Pracowników wgrywa się z pliku albo wpisuje ręcznie.</li>
+        <li><b>Zmiana przepisu to nowa wersja reguł</b>z datą. Ocena pamięta wersję, w której powstała.</li>
+        <li><b>Pomyłkę poprawia administrator.</b>Arkusz pokazuje, kto poprawił, kiedy, co było i dlaczego.</li>
+      </ul>
+    </div>
+    <style>
+.gfx-wdrozenie { inline-size: 1040px; block-size: 760px; position: relative; font-family: var(--font); color: var(--text); box-sizing: border-box; }
+.gfx-wdrozenie * { box-sizing: border-box; margin: 0; padding: 0; }
+.gfx-wdrozenie .net { position: absolute; left: 0; top: 0; inline-size: 820px; block-size: 656px; border: 2px solid var(--cobalt-100); border-radius: var(--r-200); background: var(--cobalt-10); }
+.gfx-wdrozenie .net-lab { position: absolute; left: 32px; top: 24px; font-size: 28px; line-height: 36px; font-weight: var(--w-bold); color: var(--cobalt-300); }
+.gfx-wdrozenie .dev { position: absolute; left: 32px; inline-size: 216px; block-size: 152px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-150); padding: 16px 24px; display: flex; flex-direction: column; justify-content: end; }
+.gfx-wdrozenie .dev b { font-size: 28px; line-height: 36px; font-weight: var(--w-bold); }
+.gfx-wdrozenie .dev span { font-size: 22px; line-height: 32px; color: var(--text-2); }
+.gfx-wdrozenie .ico { position: absolute; left: 24px; top: 16px; }
+.gfx-wdrozenie .pc { inline-size: 56px; block-size: 36px; border: 3px solid var(--cobalt-100); border-radius: var(--r-50); }
+.gfx-wdrozenie .pc::after { content: ""; position: absolute; left: 16px; top: 36px; inline-size: 24px; block-size: 6px; border-block-end: 3px solid var(--cobalt-100); border-inline: 3px solid transparent; }
+.gfx-wdrozenie .ph { inline-size: 26px; block-size: 44px; border: 3px solid var(--cobalt-100); border-radius: var(--r-100); }
+.gfx-wdrozenie .srv { position: absolute; left: 344px; top: 104px; inline-size: 444px; block-size: 384px; background: var(--surface); border: 2px solid var(--cobalt-300); border-radius: var(--r-200); padding: 16px 24px; display: flex; flex-direction: column; gap: 16px; }
+.gfx-wdrozenie .srv h3 { font-size: 28px; line-height: 40px; font-weight: var(--w-bold); color: var(--cobalt-300); }
+.gfx-wdrozenie .item { block-size: 88px; border-radius: var(--r-150); background: var(--cobalt-10); border-inline-start: 6px solid var(--cobalt-100); padding: 8px 16px; display: flex; flex-direction: column; justify-content: center; }
+.gfx-wdrozenie .item b { font-size: 28px; line-height: 36px; font-weight: var(--w-bold); color: var(--cobalt-300); }
+.gfx-wdrozenie .item span { font-size: 22px; line-height: 32px; color: var(--text-2); }
+.gfx-wdrozenie .model { position: absolute; left: 344px; top: 528px; inline-size: 444px; block-size: 88px; border: 2px dashed var(--grey-80); border-radius: var(--r-200); background: var(--surface); display: flex; align-items: center; padding-inline: 24px; font-size: 28px; line-height: 36px; color: var(--text-2); }
+.gfx-wdrozenie .model b { font-weight: var(--w-bold); color: var(--text); margin-inline-end: 8px; }
+.gfx-wdrozenie svg.lines { position: absolute; left: 0; top: 0; inline-size: 1040px; block-size: 656px; overflow: visible; pointer-events: none; }
+.gfx-wdrozenie .out { position: absolute; left: 852px; top: 324px; inline-size: 188px; font-size: 28px; line-height: 36px; font-weight: var(--w-bold); color: var(--red-200); }
+.gfx-wdrozenie .cap { position: absolute; left: 0; top: 680px; inline-size: 1040px; font-size: 28px; line-height: 36px; color: var(--text); }
+.gfx-wdrozenie .cap b { color: var(--cobalt-300); }
+</style>
+<div class="gfx gfx-wdrozenie">
+  <div class="net"></div>
+  <p class="net-lab">Sieć urzędu</p>
+  <div class="dev" style="top: 104px"><i class="ico pc"></i><b>Przełożony</b><span>komputer</span></div>
+  <div class="dev" style="top: 280px"><i class="ico ph"></i><b>Pracownik</b><span>telefon</span></div>
+  <div class="dev" style="top: 456px"><i class="ico pc"></i><b>Kadry</b><span>komputer</span></div>
+  <div class="srv">
+    <h3>Serwer urzędu</h3>
+    <div class="item"><b>Aplikacja mOcena</b><span>otwierana w&nbsp;przeglądarce</span></div>
+    <div class="item"><b>Plik reguł</b><span>rozporządzenie z&nbsp;2016&nbsp;r., wersja 1</span></div>
+    <div class="item"><b>Dane urzędu</b><span>w jednym pliku</span></div>
   </div>
-  <footer>Dziękujemy. Prezentację zapiszesz jako PDF z przeglądarki: Drukuj → Zapisz jako PDF, A4 poziomo.</footer>
+  <div class="model"><b>Model urzędu</b> (opcjonalnie)</div>
+  <svg class="lines" viewBox="0 0 1040 656" aria-hidden="true">
+    <defs>
+      <marker id="gfx-wdr-a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--cobalt-100)"/></marker>
+      <marker id="gfx-wdr-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--red-100)"/></marker>
+    </defs>
+    <g stroke="var(--cobalt-100)" stroke-width="3" fill="none">
+      <path d="M256 180 L336 216" marker-start="url(#gfx-wdr-a)" marker-end="url(#gfx-wdr-a)"/>
+      <path d="M256 356 L336 296" marker-start="url(#gfx-wdr-a)" marker-end="url(#gfx-wdr-a)"/>
+      <path d="M256 532 L336 376" marker-start="url(#gfx-wdr-a)" marker-end="url(#gfx-wdr-a)"/>
+    </g>
+    <path d="M566 488 V528" stroke="var(--grey-80)" stroke-width="3" stroke-dasharray="6 6"/>
+    <path d="M796 296 H900" stroke="var(--red-100)" stroke-width="3" marker-end="url(#gfx-wdr-r)"/>
+    <g stroke="var(--red-100)" stroke-width="4"><path d="M806 282 L834 310"/><path d="M834 282 L806 310"/></g>
+  </svg>
+  <p class="out">Dane nie wychodzą poza urząd</p>
+  <p class="cap">Każdy urząd ma własną instalację. <b>Wystarczy jeden serwer i&nbsp;przeglądarka, bez płatnych licencji.</b></p>
+</div>
+  </div>
+  <div class="foot"><span>Korpus służby cywilnej: ok. 123 tys. osób w ok. 1,7 tys. urzędów (KPRM, opis wyzwania, pkt 1).</span><span class="n"></span></div>
+</section>
+
+<!-- 15. Zamknięcie -->
+<section class="slide" id="s15" data-kind="dark">
+  <div class="top"><b>Co dalej</b><span>mOcena</span></div>
+  <div class="body">
+    <div class="txt">
+      <h2 class="scene">Za dwa lata Marek oceni dwa lata pracy. <em>Nie ostatnie tygodnie.</em></h2>
+      <div class="next">
+        <p class="lbl">Następny krok</p>
+        <p class="lead">Jeden departament, najbliższy cykl ocen. Nowe cykle mają notatki od pierwszego dnia, a terminy liczy przepis.</p>
+      </div>
+    </div>
+    <div class="go">
+      <div class="qrrow">
+        <a class="qr" data-qr="live" href="https://mocena.pietkiewicz-mikolaj.workers.dev" aria-label="Kod QR: wersja pokazowa"></a>
+        <div><p class="lbl">Wersja pokazowa</p><p class="url"><a href="https://mocena.pietkiewicz-mikolaj.workers.dev">mocena.pietkiewicz-mikolaj.workers.dev</a></p><p class="small">„Rozpocznij pokaz” prowadzi przez 5 kroków jednej oceny. Działa w chmurze wyłącznie na danych fikcyjnych.</p></div>
+      </div>
+      <hr>
+      <div class="qrrow">
+        <a class="qr" data-qr="repo" href="https://github.com/Nikospy/mocena" aria-label="Kod QR: kod źródłowy"></a>
+        <div><p class="lbl">Kod źródłowy</p><p class="url"><a href="https://github.com/Nikospy/mocena">github.com/Nikospy/mocena</a></p><p class="small">Kod, dokumentacja i tabela 30 czynności z miejscem w aplikacji.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Dziękuję. <b>Mikołaj Pietkiewicz</b> · kontakt przez repozytorium na GitHubie</span><span>Osoby i zdarzenia w pokazie są fikcyjne.</span></div>
 </section>
 
 </main>
+<template id="qr-live"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 33" shape-rendering="crispEdges"><path stroke="currentColor" d="M0 0.5h7m4 0h1m1 0h1m2 0h6m1 0h1m2 0h7M0 1.5h1m5 0h1m3 0h1m2 0h5m2 0h3m1 0h1m1 0h1m5 0h1M0 2.5h1m1 0h3m1 0h1m1 0h2m2 0h2m1 0h1m1 0h2m2 0h3m2 0h1m1 0h3m1 0h1M0 3.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h1m1 0h1m2 0h2m1 0h3m1 0h1m1 0h3m1 0h1M0 4.5h1m1 0h3m1 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h1m2 0h3m2 0h1m1 0h3m1 0h1M0 5.5h1m5 0h1m1 0h3m2 0h1m1 0h2m3 0h2m2 0h1m1 0h1m5 0h1M0 6.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M8 7.5h2m1 0h1m2 0h2m5 0h2M0 8.5h1m1 0h5m2 0h7m1 0h1m6 0h1m1 0h5M0 9.5h1m1 0h1m6 0h1m1 0h1m4 0h1m2 0h3m1 0h1m2 0h2m1 0h2m1 0h1M2 10.5h1m1 0h4m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m3 0h1m1 0h1m1 0h2M1 11.5h1m1 0h2m2 0h1m1 0h4m1 0h3m2 0h1m1 0h1m3 0h2m1 0h4M3 12.5h1m1 0h4m2 0h2m5 0h2m1 0h1m2 0h2m1 0h3M5 13.5h1m5 0h2m1 0h3m3 0h1m2 0h1m2 0h1m4 0h2M0 14.5h2m3 0h3m1 0h4m1 0h1m2 0h1m1 0h1m2 0h1m1 0h5m2 0h1M1 15.5h1m1 0h2m3 0h3m3 0h1m1 0h1m2 0h3m1 0h1m1 0h3m2 0h1M1 16.5h2m1 0h1m1 0h1m3 0h1m1 0h2m3 0h1m1 0h1m2 0h4m1 0h2m3 0h1M2 17.5h1m5 0h1m1 0h2m1 0h2m1 0h5m1 0h2m2 0h2m1 0h2m1 0h1M0 18.5h1m2 0h2m1 0h1m1 0h4m2 0h4m4 0h1m2 0h1m1 0h2m1 0h2M1 19.5h1m1 0h1m1 0h1m2 0h1m1 0h2m3 0h4m1 0h1m2 0h3m1 0h4M1 20.5h2m1 0h1m1 0h1m2 0h5m2 0h1m3 0h3m1 0h2m2 0h2m1 0h2M0 21.5h1m2 0h1m3 0h2m2 0h3m1 0h1m1 0h2m2 0h1m1 0h4m2 0h1m2 0h1M0 22.5h1m3 0h1m1 0h1m2 0h1m1 0h1m2 0h3m1 0h1m1 0h2m3 0h2m1 0h1m2 0h1M0 23.5h1m6 0h1m2 0h2m3 0h1m5 0h1m1 0h3m2 0h3m1 0h1M0 24.5h1m3 0h3m1 0h1m2 0h5m1 0h1m2 0h1m1 0h1m1 0h6m1 0h2M8 25.5h1m1 0h2m6 0h4m2 0h1m3 0h1m1 0h1m1 0h1M0 26.5h7m2 0h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h2m1 0h2m1 0h1m1 0h1m1 0h2M0 27.5h1m5 0h1m1 0h4m1 0h2m5 0h5m3 0h5M0 28.5h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h3m3 0h1m2 0h1m2 0h6m1 0h2M0 29.5h1m1 0h3m1 0h1m1 0h2m2 0h2m1 0h2m3 0h1m1 0h2m1 0h1m2 0h3m1 0h1M0 30.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h1m2 0h3m1 0h1m1 0h1m2 0h2m1 0h1M0 31.5h1m5 0h1m2 0h1m2 0h2m2 0h1m2 0h5m4 0h3M0 32.5h7m1 0h4m1 0h2m1 0h2m1 0h1m2 0h3m1 0h2m3 0h1"/></svg>
+</template>
+<template id="qr-repo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29" shape-rendering="crispEdges"><path stroke="currentColor" d="M0 0.5h7m4 0h2m2 0h6m1 0h7M0 1.5h1m5 0h1m2 0h1m7 0h1m2 0h1m1 0h1m5 0h1M0 2.5h1m1 0h3m1 0h1m1 0h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h1m1 0h3m1 0h1M0 3.5h1m1 0h3m1 0h1m1 0h2m1 0h1m4 0h2m1 0h1m2 0h1m1 0h3m1 0h1M0 4.5h1m1 0h3m1 0h1m1 0h2m2 0h4m3 0h2m1 0h1m1 0h3m1 0h1M0 5.5h1m5 0h1m1 0h1m1 0h2m1 0h6m1 0h1m1 0h1m5 0h1M0 6.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M8 7.5h3m1 0h2m1 0h1M0 8.5h1m1 0h5m3 0h3m1 0h2m1 0h1m1 0h1m2 0h5M0 9.5h1m1 0h2m1 0h1m9 0h2m2 0h2m1 0h3m3 0h1M3 10.5h6m1 0h1m1 0h1m5 0h1m5 0h1M0 11.5h3m1 0h2m1 0h1m3 0h1m2 0h1m1 0h1m1 0h3m4 0h1m1 0h1M0 12.5h1m1 0h1m1 0h4m1 0h1m1 0h2m4 0h1m1 0h1m5 0h2M4 13.5h2m1 0h1m2 0h1m2 0h3m1 0h1m2 0h5m3 0h1M2 14.5h6m3 0h6m1 0h1m1 0h2m2 0h3M2 15.5h1m1 0h2m7 0h1m1 0h1m3 0h6m2 0h1M1 16.5h2m1 0h1m1 0h2m1 0h4m1 0h2m1 0h3m1 0h1m1 0h1m1 0h2M0 17.5h4m3 0h6m3 0h4m1 0h4m1 0h1m1 0h1M0 18.5h1m2 0h4m2 0h4m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M0 19.5h1m1 0h3m2 0h1m2 0h1m3 0h1m1 0h1m3 0h3m4 0h1M0 20.5h1m3 0h4m3 0h2m4 0h1m1 0h6m1 0h3M8 21.5h7m1 0h3m1 0h1m3 0h5M0 22.5h7m2 0h2m1 0h5m2 0h2m1 0h1m1 0h3M0 23.5h1m5 0h1m1 0h1m2 0h3m1 0h2m2 0h2m3 0h1M0 24.5h1m1 0h3m1 0h1m1 0h4m2 0h2m1 0h1m2 0h5m1 0h2M0 25.5h1m1 0h3m1 0h1m1 0h6m2 0h5m4 0h4M0 26.5h1m1 0h3m1 0h1m1 0h2m4 0h4m1 0h9M0 27.5h1m5 0h1m2 0h3m2 0h1m5 0h2m1 0h1m1 0h1m1 0h1M0 28.5h7m1 0h1m1 0h3m1 0h2m1 0h1m1 0h1m2 0h3m1 0h1"/></svg>
+</template>
+<script>
+// Kody QR z szablonów i twarde spacje po jednoliterowych słowach (polska typografia).
+for (const el of document.querySelectorAll("[data-qr]")) el.append(document.getElementById("qr-" + el.dataset.qr).content.cloneNode(true));
+const walker = document.createTreeWalker(document.querySelector(".deck"), NodeFilter.SHOW_TEXT);
+for (let n = walker.nextNode(); n; n = walker.nextNode()) n.nodeValue = n.nodeValue.replace(/(^|[\s(„])([aiouwzAIOUWZ]) (?=\S)/g, "$1$2 ");
+</script>
 </body>
 </html>

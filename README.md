@@ -8,6 +8,8 @@ Asystent ocen okresowych to nie AI, które pisze ocenę. Przełożony ocenia dwa
 
 Kliknij „Rozpocznij pokaz”: 5 kroków, ok. 3 minut. Każdy widz ma własne dane pokazowe.
 
+**Prezentacja dla jury (PDF, 15 slajdów):** [`docs/pitch/mocena-prezentacja.pdf`](docs/pitch/mocena-prezentacja.pdf)
+
 ## Co robi
 
 Pokaz idzie jedną oceną pracownika od początku cyklu do potwierdzenia zapoznania:
