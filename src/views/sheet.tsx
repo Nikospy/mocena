@@ -216,6 +216,7 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
           <>
             <section class="card sheet-part">
               <h2>Część II</h2>
+              {p2.redoNote ? <p class="st info" id="sheet-redo">{p2.redoNote}</p> : null}
               <div class="sheet-confirms sheet-meta">
                 <SheetField label="Data rozmowy oceniającej">{p2.interviewDate ? formatDate(p2.interviewDate) : null}</SheetField>
                 <SheetField label="Okres podlegania ocenie">

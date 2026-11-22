@@ -1,5 +1,6 @@
+import { formatDate } from "../views/layout";
 import { actsAsAppraiser } from "../substitutions";
-import { assessmentState, objectionRecipientFor, type AssessmentSnapshot } from "../assessment/state";
+import { assessmentInForce, objectionRecipientFor, type AssessmentSnapshot } from "../assessment/state";
 import { cycleById, effectiveDeadline, type Cycle } from "../cycles";
 import { rulesVersion } from "../engine/rules";
 import { visibleEvents } from "../events";
@@ -46,6 +47,8 @@ export type SheetData = {
     appraiseeConfirmation: (Confirmation & { objectionDeadline: string }) | null;
     fiction: { reason: "could_not" | "would_not"; deliveryMethod: "in_person" | "post" | "email"; deliveredOn: string; date: string; appraiserName: string } | null;
     objectionTo: string | null;
+    /** Dopisek przy ocenie sporządzonej po raz drugi po uwzględnieniu sprzeciwu. */
+    redoNote: string | null;
   };
   /** Tylko urzędnik mianowany z dołączonym wnioskiem o kolejny stopień. */
   /** Pisma o zmianie terminu (§ 8 rozporządzenia): kopie dołączane do arkusza. */
@@ -75,7 +78,8 @@ export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetDat
   const ev = visibleEvents(cycleId);
   const submitted = ev.find((e) => e.type === "part1_submitted");
   const confirmed = ev.find((e) => e.type === "part1_confirmed");
-  const st = assessmentState(cycleId);
+  // Druga ocena (art. 83 ust. 4 ustawy) przed zatwierdzeniem: na arkuszu zostaje pierwsza ocena.
+  const st = assessmentInForce(cycleId);
   const snap: AssessmentSnapshot | null = st.snapshot;
 
   const sheet: string | null = snap?.sheet ?? submitted?.payload.sheet ?? cycle.sheet ?? null;
@@ -147,6 +151,7 @@ export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetDat
           }
         : null,
       objectionTo: objectionRecipientFor(sheet, snap?.objectionRecipient),
+      redoNote: snap?.redo ? `Ocena sporządzona po raz drugi po uwzględnieniu sprzeciwu z dnia ${formatDate(snap.redo.objectionFiledOn)} (art. 83 ust. 4 ustawy).` : null,
     },
     deadlineLetters: ev
       .filter((e) => e.type === "deadline_changed")

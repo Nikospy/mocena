@@ -1,4 +1,4 @@
-import { assessmentState } from "../assessment/state";
+import { assessmentInForce } from "../assessment/state";
 import { effectiveDeadline } from "../cycles";
 import { getDb } from "../db";
 import { today } from "../settings";
@@ -14,12 +14,12 @@ export function officeStats(): OfficeStats {
   for (const c of latestCycles()) {
     const step = cycleState(c.id).step;
     byStep[step] = (byStep[step] ?? 0) + 1;
-    if (!assessmentState(c.id).snapshot && effectiveDeadline(c.id).date < today()) overdueOpen++;
+    if (!assessmentInForce(c.id).snapshot && effectiveDeadline(c.id).date < today()) overdueOpen++;
   }
   let onTime = 0;
   let late = 0;
   for (const { id } of getDb().query("SELECT id FROM cycles").all() as { id: string }[]) {
-    const s = assessmentState(id);
+    const s = assessmentInForce(id);
     if (!s.snapshot || !s.approvedOn) continue;
     if (s.approvedOn <= s.snapshot.deadline.date) onTime++;
     else late++;
