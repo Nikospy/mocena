@@ -10,6 +10,16 @@ Wolno zmieniać: `public/style.css`, `public/rodzina.css` (tylko nowe tokeny ró
 
 ## Punkty i progi (liczby z `metrics.json`, wszystkie ekrany, obie szerokości)
 
+Powłoka aplikacji (pierwsza w kolejności; autor: „sam nasz navbar wygląda źle, panel użytkownika itd.”)
+- **N1** Nagłówek aplikacji i panel użytkownika projektujesz od nowa, w duchu rodziny mObywatel i wzorców usług publicznych (GOV.UK header, service navigation). Stan dziś (`src/views/layout.tsx`): znak, trzy odnośniki w jednym rzędzie bez zaznaczenia bieżącej strony (żaden nie dostaje `aria-current`), „Zmień konto” i „Pokaz dla jury” udają nawigację usługi, panel użytkownika to dwa wiersze drobnego tekstu przy prawej krawędzi, na telefonie dolny pasek z trzema napisami bez ikon. Wymagania:
+  - znak usługi z jednozdaniowym opisem roli usługi obok albo pod spodem (na komputerze), wyraźna dolna krawędź nagłówka zamiast cienia;
+  - nawigacja zawiera tylko miejsca usługi właściwe dla roli (np. oceniający: Sprawy, Notatki; kadry: Stan cykli, Pracownicy, Zastępstwa); bieżąca strona zaznaczona `aria-current="page"` i widocznym stanem (grubość i podkreślenie, nie sam kolor);
+  - panel użytkownika: imię i nazwisko, rola, a „Zmień konto” jest jego częścią (menu na `details` albo odnośnik przy nazwisku), nie pozycją nawigacji;
+  - „Pokaz dla jury” i data systemowa należą do paska pokazu (punkt K6), nie do nagłówka usługi;
+  - telefon: nagłówek w jednej linii (znak + panel użytkownika), dolna nawigacja z ikonami (`.ico`, kreska 1,75) i podpisami, cel co najmniej 48 px, bieżąca pozycja zaznaczona;
+  - te same wyrównania co treść: lewa krawędź znaku równa lewej krawędzi `h1`.
+  Zrób dwa warianty nagłówka jako zrzuty (360 i 1440 px, ekran strony głównej oceniającego i kadr), wybierz lepszy według kanonu (jedna linia wyrównania, hierarchia położeniem i grubością, zero ozdób) i wdroż go; drugi zrzut zostaw do porównania dla autora.
+
 Typografia
 - **T1** Treść (opisy kryteriów, notatki, objaśnienia, komórki tabel) ma 16 px i kolor `--text`. 14 px tylko dla metadanych (data, rodzaj, podpis pola). Próg: `under16Pct` mediana ≤ 30, żaden ekran > 50. Dziś: mediana 51–54, Część I 88–91.
 - **T2** Najwyżej 4 rozmiary pisma na ekranie: 14, 16, 20, 28 (telefon: nagłówek strony 24 zamiast 28). Stopnie 12, 18 i 48 wychodzą z ekranów. Próg: `sizeCount` ≤ 4.
@@ -45,6 +55,7 @@ Z zewnętrznego audytu
 
 ## Kolejność
 
+0. Powłoka aplikacji (N1) razem z paskiem pokazu (K6).
 1. Tokeny ról i skala pisma (T1, T2), szerokość tekstu (T3), cienie (K2).
 2. Nagłówek strony i hierarchia (H1, U3), akcja główna i strona główna (H2).
 3. Ramki i notatki (K1), pigułki i podstawy prawne (K3).
