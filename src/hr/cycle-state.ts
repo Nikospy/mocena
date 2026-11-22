@@ -61,7 +61,7 @@ export function cycleState(cycleId: string): CycleState {
       step: "objection_filed",
       text: `Sprzeciw wniesiony ${formatDate(filed.date)} do ${filed.payload.to}`,
       deadline: { date: objectionReviewDeadline(filed.date), basis: [D.objectionReviewDays.basis] },
-      deadlineLabel: "Rozpatrzenie do",
+      deadlineLabel: "Rozpatrzenie sprzeciwu do",
       since: filed.date,
     };
   }
@@ -71,7 +71,7 @@ export function cycleState(cycleId: string): CycleState {
     const f = s.fiction;
     return {
       step: "fiction",
-      text: `Fikcja zapoznania stwierdzona ${formatDate(f.eventDate)} przez oceniającego: oceniany ${REASON_LABEL[f.reason]}. Kopię arkusza doręczono ${METHOD_LABEL[f.deliveryMethod]} ${formatDate(f.deliveredOn)}`,
+      text: `Fikcja zapoznania wpisana ${formatDate(f.eventDate)} przez oceniającego: oceniany ${REASON_LABEL[f.reason]}. Kopię arkusza doręczono ${METHOD_LABEL[f.deliveryMethod]} ${formatDate(f.deliveredOn)}`,
       deadline: { date: f.objectionDeadline, basis: [D.objectionDays.basis] },
       deadlineLabel: "Sprzeciw do",
       since: f.eventDate,
@@ -107,7 +107,7 @@ export function cycleState(cycleId: string): CycleState {
   const p1 = part1Status(cycleId);
   if (p1.state === "confirmed") {
     const d = effectiveDeadline(cycleId);
-    return { step: "in_period", text: "Okres oceny", deadline: d, deadlineLabel: "Termin oceny", overdue: d.date < now, since: p1.confirmedOn };
+    return { step: "in_period", text: "Okres oceny trwa", deadline: d, deadlineLabel: "Termin oceny", overdue: d.date < now, since: p1.confirmedOn };
   }
   if (p1.state === "submitted") {
     const days = p1.waitingDays ?? 0;

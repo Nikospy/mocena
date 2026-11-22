@@ -123,7 +123,7 @@ export function validateForm(f: PersonForm, opts: { personId?: string; hasCycle:
   for (const k of ["hired_on", "prev_on", "grade_on"] as const) {
     if (!f[k]) continue;
     if (!isIsoDate(f[k])) e[k] = "Podaj poprawną datę.";
-    else if (f[k] > now) e[k] = "Data nie może być późniejsza niż dziś.";
+    else if (f[k] > now) e[k] = "Wpisz datę nie późniejszą niż dzisiejsza.";
   }
   if (f.prev_on && !e.prev_on) {
     if (f.prev_outcome !== "positive" && f.prev_outcome !== "negative") e.prev_outcome = "Wybierz wynik oceny: pozytywna albo negatywna.";
@@ -278,7 +278,7 @@ export function lastAssessmentOf(personId: string): { on: string; outcome: "posi
 }
 
 export function employeeDeletionBlock(person: Person): string | null {
-  if (person.role === "hr" || person.role === "admin") return "Tego konta nie można usunąć z listy pracowników.";
+  if (person.role === "hr" || person.role === "admin") return "Konta kadr i administratora nie można usunąć: bez niego nikt nie obsłuży systemu.";
   const db = getDb();
   const supervises = db.query("SELECT 1 FROM people WHERE supervisor_id = ? AND id <> ?").get(person.id, person.id);
   const assesses = db.query("SELECT 1 FROM cycles WHERE appraiser_id = ? AND person_id <> ?").get(person.id, person.id);
@@ -288,7 +288,7 @@ export function employeeDeletionBlock(person: Person): string | null {
       AND (json_extract(e.payload, '$.from_id') = ? OR json_extract(e.payload, '$.to_id') = ?)
   `).get(person.id, person.id, person.id);
   if (supervises || assesses || wasAppraiser) {
-    return "Nie można usunąć tej osoby. Jej dane są potrzebne w cyklach lub kartotekach innych pracowników.";
+    return "Nie można usunąć tej osoby. Jej dane są potrzebne w cyklach albo kartotekach innych pracowników.";
   }
   return null;
 }

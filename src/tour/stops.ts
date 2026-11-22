@@ -85,9 +85,9 @@ const BODY: Record<TourStopId, Body> = {
     look: [
       { text: "Notatki i pola wyboru przy kryteriach.", selector: ".crit-notes .note-list" },
       { text: "Ostrzeżenie, gdy fakty do kryterium są tylko z ostatniego miesiąca.", selector: ".st.warn" },
-      { text: "Po „1” przy Rzetelności wynik jest negatywny mimo średniej powyżej 4, a zatwierdzenie czeka na uzasadnienie i wnioski do programu rozwoju.", selector: "#assessment-result" },
+      { text: "Po „1” przy Rzetelności wynik jest negatywny mimo średniej powyżej 4, a zatwierdzenie czeka na uzasadnienie i wnioski do indywidualnego programu rozwoju zawodowego.", selector: "#assessment-result" },
     ],
-    tryIt: "Postaw „1” przy Rzetelności i kliknij „Wstaw do uzasadnienia”.",
+    tryIt: "Postaw „1” przy Rzetelności, zaznacz notatki i kliknij „Wstaw do uzasadnienia”.",
     note: "„1” stawiamy na pokaz, żeby było widać regułę.",
     basis: basis("§ 11 ust. 1 pkt 4"),
     screen: (c) => `/cycles/${c}/assessment`,
@@ -98,7 +98,7 @@ const BODY: Record<TourStopId, Body> = {
     lead: "Piotr czyta ocenę. Uzasadnienie napisał Marek i wstawił do niego fakty z notatek. Piotr potwierdza zapoznanie. Od tej chwili system liczy 7 dni na sprzeciw.",
     look: [
       { text: "Przycisk potwierdzenia zapoznania.", selector: 'form[action$="/assessment/acknowledge"] button' },
-      { text: "Termin sprzeciwu z przepisem; gdy wypada w dzień wolny, przesuwa się na dzień roboczy.", selector: ".rule" },
+      { text: "Termin sprzeciwu z przepisem; gdy wypada w dzień wolny, przechodzi na następny dzień roboczy.", selector: ".rule" },
     ],
     tryIt: "Potwierdź zapoznanie.",
     basis: basis(d.objectionDays.basis),

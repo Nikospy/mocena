@@ -17,7 +17,7 @@ registerCycleLinks((cycle, viewer) => {
   return links;
 });
 
-registerHomeTasks((person) => (person.role === "hr" ? [{ title: "Stan cykli", href: "/hr", detail: "Stan wszystkich cykli oceny i obowiązki urzędu" }] : []));
+registerHomeTasks((person) => (person.role === "hr" ? [{ title: "Stan cykli", href: "/hr", detail: "Stan wszystkich cykli oceny i obowiązki urzędu." }] : []));
 
 /** Kadry: nieobecności wpisuje się przed terminem oceny, bo od nich zależy termin. Sprawa od okna przed terminem (to samo co „Wystaw ocenę”). */
 registerHomeTasks((person) => {

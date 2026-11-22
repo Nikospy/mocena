@@ -6,7 +6,7 @@ Asystent ocen okresowych to nie AI, które pisze ocenę. Przełożony ocenia dwa
 
 **Zobacz na żywo:** https://mocena.pietkiewicz-mikolaj.workers.dev
 
-Kliknij »Rozpocznij pokaz«: 5 kroków, ok. 3 minut. Każdy widz ma własne dane pokazowe.
+Kliknij „Rozpocznij pokaz”: 5 kroków, ok. 3 minut. Każdy widz ma własne dane pokazowe.
 
 ## Co robi
 
@@ -35,7 +35,7 @@ Z 30 czynności z listy organizatora 15 działa, 12 jest uproszczonych, a 3 są 
 - **Reguły w jednym pliku z wersją:** `rules/regulation-2016-470.json` (wersja `2016-470/1`, obowiązuje od 23.04.2016). Każda ocena zapamiętuje wersję, w której powstała. Ustawienia urzędu są w `rules/office-settings.json` i oznaczone osobno.
 - **Silnik terminów i wyniku:** `src/engine/`. Czyste funkcje na datach, bez bazy: terminy (`deadlines.ts`), nieobecności (`absences.ts`), średnia i wynik (`scoring.ts`, `approval.ts`), stopnie (`grades.ts`).
 - **Adapter podpowiedzi:** `src/suggestions/index.ts` to jedyne wymienne miejsce na podpowiedzi. Dziś działają reguły. Urząd może tu podłączyć model uruchomiony u siebie; model dostaje treść notatki bez nazwisk i nie wykonuje żadnej z czynności zakazanych powyżej.
-- **Dane:** jedna baza SQLite, dostęp przez `getDb()`. Pokaz nie wysyła danych do usług zewnętrznych poza wdrożeniem pokazowym. Dane pokazowe są wgrane z góry.
+- **Dane:** jedna baza SQLite, dostęp przez `getDb()`. Wersja lokalna nie wysyła danych poza komputer. Wersja pokazowa działa w chmurze tylko na czas zawodów. Dane pokazowe są wgrane z góry.
 
 ```mermaid
 %% focus: engine
@@ -59,7 +59,7 @@ bun test
 
 ## Wdrożenie
 
-**W urzędzie (lokalnie, bez chmury).** Aplikacja działa na jednym komputerze urzędu: `bun install` i `bun run dev`, dane w jednym pliku bazy SQLite (`mocena.sqlite`, ścieżkę można zmienić zmienną `MOCENA_DB`). Bez serwera bazy, bez chmury i bez płatnych usług. `bun run seed` służy tylko do danych pokazowych. Co urząd dodaje przy wdrożeniu (logowanie i konta, retencja, administrator danych) oraz jak chronione są dane — opisuje strona `/about` w aplikacji.
+**W urzędzie (lokalnie, bez chmury).** Aplikacja działa na jednym komputerze urzędu: `bun install` i `bun run dev`, dane w jednym pliku bazy SQLite (`mocena.sqlite`, ścieżkę można zmienić zmienną `MOCENA_DB`). Bez serwera bazy, bez chmury i bez płatnych usług. `bun run seed` służy tylko do danych pokazowych. Co urząd dodaje przy wdrożeniu (logowanie i konta, retencja, administrator danych) oraz jak chronione są dane, opisuje w aplikacji strona „Wdrożenie i dane” (`/about`).
 
 **Wdrożenie pokazowe (chmura, tylko na czas zawodów).**
 
