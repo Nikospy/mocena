@@ -893,3 +893,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* review-polish-2-4 */
 .date-words { margin-block: var(--sp-100) 0; font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); overflow-wrap: anywhere; }
 .date-words:empty { display: none; }
+
+/* S-15 deadline-change */
+.dc-cases { border: 0; padding: 0; margin: 0; display: grid; gap: var(--sp-50); min-inline-size: 0; }
+.dc-place { text-align: end; }
+.dc-line { border-block-end: 1px solid var(--border-strong); min-block-size: var(--sp-500); padding-block-start: var(--sp-200); }
+.dc-letter .sheet-part h2 { margin-block-start: var(--sp-200); }

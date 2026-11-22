@@ -18,6 +18,7 @@ import "./reminders";
 import hrPartner from "./routes/hr-partner";
 import admin from "./routes/admin";
 import tour from "./routes/tour";
+import deadlineChange from "./routes/deadline-change";
 import { tourContext } from "./tour/context";
 import { TourEntry } from "./views/tour-entry";
 import { Layout, formatDate } from "./views/layout";
@@ -163,6 +164,7 @@ app.route("/", appraiser);
 app.route("/", hrPartner);
 app.route("/", admin);
 app.route("/", tour);
+app.route("/", deadlineChange);
 
 export const notFoundHandler: NotFoundHandler = (c) => c.html(<NotFoundPage />, 404);
 app.notFound(notFoundHandler);

@@ -45,6 +45,8 @@ export type SheetData = {
     objectionTo: string;
   };
   /** Tylko urzędnik mianowany z dołączonym wnioskiem o kolejny stopień. */
+  /** Pisma o zmianie terminu (§ 8 rozporządzenia): kopie dołączane do arkusza. */
+  deadlineLetters: { id: number; date: string; oldDeadline: string; newDeadline: string; case: number }[];
   part3: {
     name: string;
     appointedYear: number | null;
@@ -138,6 +140,9 @@ export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetDat
         : null,
       objectionTo: sheet === "A" ? "kierownika urzędu" : "dyrektora generalnego urzędu",
     },
+    deadlineLetters: ev
+      .filter((e) => e.type === "deadline_changed")
+      .map((e) => ({ id: e.id, date: e.date, oldDeadline: e.payload.oldDeadline, newDeadline: e.payload.newDeadline, case: e.payload.case })),
     part3:
       appraisee.appointed === 1 && snap?.gradeRequest.attached
         ? {

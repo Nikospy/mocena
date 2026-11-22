@@ -1,5 +1,6 @@
 import { assessmentState } from "../assessment/state";
 import { effectiveDeadline } from "../cycles";
+import { pendingRequest } from "../deadline-change";
 import { part1Status } from "../cycles/part1";
 import { criteriaTalkDeadline, objectionReviewDeadline } from "../engine/deadlines";
 import { rules } from "../engine/rules";
@@ -89,7 +90,7 @@ export function cycleState(cycleId: string): CycleState {
     return { step: "awaiting_acknowledgement", text: "Ocena zatwierdzona, czeka na potwierdzenie zapoznania", since: s.approvedOn ?? undefined };
   }
 
-  const dueChange = last("due_change_requested");
+  const dueChange = pendingRequest(cycleId);
   if (dueChange) {
     const d = effectiveDeadline(cycleId);
     return {

@@ -1,5 +1,6 @@
 import { getDb } from "./db";
 import { visibleEvents } from "./events";
+import { addDays, toWorkingDay } from "./engine/deadlines";
 import { assessmentDeadline, type CycleKind } from "./engine/absences";
 import { rules, rulesVersion } from "./engine/rules";
 import { today } from "./settings";
@@ -23,6 +24,8 @@ export type CycleDeadlineDetails = ReturnType<typeof assessmentDeadline> & {
   kind: CycleKind;
   basis: string[];
   rules: ReturnType<typeof rulesVersion>;
+  /** Ostatnia widoczna zmiana terminu przez oceniającego (art. 81 ust. 8 ustawy); zastępuje termin bazowy. */
+  change: { eventId: number; case: number; from: string; to: string } | null;
 };
 
 /** Jedyne źródło terminu otwartego cyklu: termin bazowy, nieobecności widoczne w `asOf`, podstawy prawne. */
@@ -34,15 +37,22 @@ export function cycleDeadlineDetails(cycleId: string, opts: { asOf?: string } = 
   const absences = visibleAbsences(cycle.person_id, opts).map((a) => ({ id: a.id, from: a.date_from, to: a.date_to, excused: a.excused === 1 }));
   const r = assessmentDeadline({ kind, periodStart: cycle.period_start, previousAcknowledgedOn: p?.previousAcknowledgedOn ?? null }, absences);
   const D = rules.deadlines;
+  const changeEv = kind === "regular" ? visibleEvents(cycleId, opts).filter((e) => e.type === "deadline_changed").pop() : undefined;
+  const change = changeEv ? { eventId: changeEv.id, case: Number(changeEv.payload.case), from: String(changeEv.payload.oldDeadline), to: String(changeEv.payload.newDeadline) } : null;
+  if (change) {
+    const raw = addDays(change.to, r.extensionDays);
+    r.deadline = toWorkingDay(raw);
+    r.movedToWorkingDay = r.deadline !== raw;
+  }
   const basis =
     kind === "after_negative"
       ? [D.reassessmentAfterNegativeMonths.basis]
       : [
-          D.assessmentEveryMonths.basis,
+          change ? `art. 81 ust. 8 pkt ${change.case} ustawy` : D.assessmentEveryMonths.basis,
           ...(r.extensionDays > 0 ? [`${D.longAbsenceOverMonths.basis}: termin przedłużony o czas usprawiedliwionej nieobecności dłuższej niż miesiąc`] : []),
           ...(r.movedToWorkingDay ? ["art. 115 Kodeksu cywilnego"] : []),
         ];
-  return { ...r, kind, basis, rules: rulesVersion() };
+  return { ...r, kind, basis, rules: rulesVersion(), change };
 }
 
 export function effectiveDeadline(cycleId: string, opts: { asOf?: string } = {}): { date: string; basis: string[] } {

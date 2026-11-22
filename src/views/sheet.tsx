@@ -166,6 +166,18 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
               {p1.deadlineNote.label}: <Basis d={p1.deadlineNote.deadline} />
             </p>
           ) : null}
+          {d.deadlineLetters.length ? (
+            <div class="sheet-field">
+              <span class="lbl">Załączniki: pisma o zmianie terminu oceny</span>
+              <ul>
+                {d.deadlineLetters.map((l) => (
+                  <li>
+                    <a href={`/cycles/${d.cycleId}/deadline-change/${l.id}/letter`}>Pismo z {formatDate(l.date)}</a>: z {formatDate(l.oldDeadline)} na {formatDate(l.newDeadline)} (art. 81 ust. 8 pkt {l.case} ustawy)
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <p>Oświadczam, że przeprowadzono rozmowę o kryteriach i terminie oceny (§ 5 ust. 1 rozporządzenia) oraz że oceniany zapoznał się z kryteriami i terminem.</p>
           <div class="sheet-confirms">
             <div>

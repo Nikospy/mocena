@@ -153,6 +153,19 @@
     "basis": "§ 9 ust. 3",
     "rule": "oceny dokonuje się na podstawie wcześniej wybranych kryteriów"
   },
+  "deadlineChange": {
+    "basis": "art. 81 ust. 8 ustawy",
+    "intro": "Oceniający może zmienić termin sporządzenia oceny w przypadku:",
+    "cases": [
+      { "n": 1, "label": "zmiany na stanowisku oceniającego", "text": "art. 81 ust. 8 pkt 1 ustawy: zmiana na stanowisku oceniającego" },
+      { "n": 2, "label": "przewidywanej, dłuższej, usprawiedliwionej nieobecności ocenianego", "text": "art. 81 ust. 8 pkt 2 ustawy: przewidywana, dłuższa, usprawiedliwiona nieobecność ocenianego, która może uniemożliwić przeprowadzenie oceny" },
+      { "n": 3, "label": "przewidywanej, dłuższej, usprawiedliwionej nieobecności oceniającego", "text": "art. 81 ust. 8 pkt 3 ustawy: przewidywana, dłuższa, usprawiedliwiona nieobecność oceniającego" },
+      { "n": 4, "label": "złożenia przez ocenianego wniosku o zmianę terminu", "text": "art. 81 ust. 8 pkt 4 ustawy: złożenie przez ocenianego wniosku o zmianę terminu" }
+    ],
+    "minMonths": 6,
+    "condition": "Zmiana jest dozwolona, gdy od sporządzenia ostatniej oceny minęło więcej niż 6 miesięcy, a przy ocenianym po raz pierwszy okres oceny jest dłuższy niż 6 miesięcy. Inaczej zmiana jest niedozwolona.",
+    "notice": { "basis": "§ 8 rozporządzenia", "text": "Oceniający niezwłocznie zawiadamia ocenianego na piśmie o nowym terminie. Kopię pisma dołącza się do arkusza." }
+  },
   "criteria": [
     {
       "id": "komunikacja",

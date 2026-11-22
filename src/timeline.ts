@@ -15,6 +15,8 @@ export type TimelineEntry = {
   kind: "fact" | "deadline";
   /** Termin bazowy pokazywany przekreślony obok nowego terminu. */
   struck?: string;
+  /** Odnośnik do dokumentu (pismo o zmianie terminu). */
+  href?: string;
 };
 
 /** Oceniany, obecny oceniający i kadry; inni nie. */
@@ -91,6 +93,26 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
         basis: [rules.appraiserChange.basis],
         kind: "fact",
       });
+    } else if (e.type === "due_change_requested") {
+      entries.push({
+        date: e.date,
+        title: "Wniosek ocenianego o zmianę terminu oceny",
+        detail: x.reason,
+        basis: [`${rules.deadlineChange.basis} pkt 4`],
+        kind: "fact",
+      });
+    } else if (e.type === "deadline_changed") {
+      if (!full && viewer.id !== cycle.person_id) continue;
+      entries.push({
+        date: e.date,
+        title: `Zmiana terminu oceny z ${formatDate(x.oldDeadline)} na ${formatDate(x.newDeadline)}`,
+        detail: x.reason,
+        basis: [`art. 81 ust. 8 pkt ${x.case} ustawy`, rules.deadlineChange.notice.basis],
+        kind: "fact",
+        href: `/cycles/${cycle.id}/deadline-change/${e.id}/letter`,
+      });
+    } else if (e.type === "deadline_change_rejected") {
+      entries.push({ date: e.date, title: "Wniosek o zmianę terminu odrzucony", detail: `Powód: ${x.reason}`, basis: [rules.deadlineChange.basis], kind: "fact" });
     } else if (e.type === "part1_submitted") {
       entries.push({ date: e.date, title: "Część I przekazana ocenianemu", detail: "Kryteria oceny i oczekiwania wobec pracownika.", basis: x.criteriaBasis ?? [], kind: "fact" });
     } else if (e.type === "part1_confirmed") {
@@ -123,14 +145,19 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
   if (snap?.date) {
     entries.push({ date: snap.date, title: "Termin oceny", detail: "Termin zamrożony w dniu zatwierdzenia oceny.", basis: snap.basis, kind: "deadline" });
   } else {
+    const changed = details.change !== null;
     const extended = details.deadline !== details.base;
     entries.push({
       date: details.deadline,
       title: "Termin oceny",
-      detail: extended ? `Termin bazowy ${formatDate(details.base)} przedłużony z powodu nieobecności dłuższej niż miesiąc.` : undefined,
+      detail: changed
+        ? `Termin zmieniony przez oceniającego z ${formatDate(details.change!.from)}${details.extensionDays > 0 ? ", dodatkowo przedłużony z powodu nieobecności dłuższej niż miesiąc" : ""}.`
+        : extended
+          ? `Termin bazowy ${formatDate(details.base)} przedłużony z powodu nieobecności dłuższej niż miesiąc.`
+          : undefined,
       basis: details.basis,
       kind: "deadline",
-      struck: extended ? details.base : undefined,
+      struck: changed ? details.change!.from : extended ? details.base : undefined,
     });
   }
   return entries.sort((a, b) => a.date.localeCompare(b.date) || (a.kind === b.kind ? 0 : a.kind === "fact" ? -1 : 1));
