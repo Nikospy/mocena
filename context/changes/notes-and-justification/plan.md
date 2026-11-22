@@ -372,8 +372,8 @@ Każde ma przyjętą wartość domyślną; implementujący nie czeka na odpowied
 
 #### Automated
 
-- [ ] 1.1 Testy odczytów, dostępu, adaptera i danych pokazowych przechodzą: `bun test src/notes src/suggestions src/seed`
-- [ ] 1.2 Dane pokazowe wgrywają się bez błędu i dają 16 notatek, a z `--live-step-2` 15: `bun run seed` i `bun run seed -- --live-step-2`
+- [x] 1.1 Testy odczytów, dostępu, adaptera i danych pokazowych przechodzą: `bun test src/notes src/suggestions src/seed` — 351d627
+- [x] 1.2 Dane pokazowe wgrywają się bez błędu i dają 16 notatek, a z `--live-step-2` 15: `bun run seed` i `bun run seed -- --live-step-2` — 351d627
 
 #### Manual
 
@@ -383,8 +383,8 @@ Każde ma przyjętą wartość domyślną; implementujący nie czeka na odpowied
 
 #### Automated
 
-- [ ] 2.1 Testy tras notatek, dostępu, ostrzeżenia, formatowania, slotów i karty przechodzą: `bun test src/routes/notes.test.ts src/notes`
-- [ ] 2.2 Test DOM „Wstaw” przechodzi: `bun test src/notes/insert-notes.dom.test.ts`
+- [x] 2.1 Testy tras notatek, dostępu, ostrzeżenia, formatowania, slotów i karty przechodzą: `bun test src/routes/notes.test.ts src/notes` — 088fb40
+- [x] 2.2 Test DOM „Wstaw” przechodzi: `bun test src/notes/insert-notes.dom.test.ts` — 088fb40
 
 #### Manual
 
@@ -397,7 +397,7 @@ Każde ma przyjętą wartość domyślną; implementujący nie czeka na odpowied
 
 #### Automated
 
-- [ ] 3.1 Testy informacji zwrotnej, drugiego „Wstaw”, daty i ostrzeżenia skrajnego przechodzą: `bun test src/routes/notes.test.ts src/notes`
+- [x] 3.1 Testy informacji zwrotnej, drugiego „Wstaw”, daty i ostrzeżenia skrajnego przechodzą: `bun test src/routes/notes.test.ts src/notes` — 8b8b51c
 
 #### Manual
 

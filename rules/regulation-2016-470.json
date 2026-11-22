@@ -135,6 +135,11 @@
     "positionChangeMinMonths": {
       "value": 6,
       "basis": "art. 81 ust. 6 ustawy"
+    },
+    "mandatoryGradeDays": {
+      "value": 30,
+      "basis": "art. 89 ust. 2 ustawy",
+      "from": "dzień zapoznania się z oceną"
     }
   },
   "criteria": [
@@ -302,5 +307,11 @@
       "sposób realizowania celów do osiągnięcia w okresie, w którym oceniany podlegał ocenie, jeżeli cele te zostały wyznaczone",
       "kierunki dalszego rozwoju zawodowego i potrzeby ocenianego w zakresie podnoszenia kwalifikacji i doskonalenia umiejętności"
     ]
+  },
+  "approval": {
+    "justification": { "basis": "§ 11 ust. 3" },
+    "developmentConclusions": { "basis": "art. 81 ust. 5 ustawy" },
+    "gradeRequest": { "basis": "§ 11 ust. 5, art. 89 ust. 1 ustawy", "maxGrade": 9 },
+    "acknowledgement": { "basis": "§ 12" }
   }
 }

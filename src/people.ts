@@ -18,6 +18,7 @@ export type Person = {
   grade_awarded_on: string | null;
   position_kind: "head_of_office" | "manager" | "staff" | null;
   duty_types: string;
+  appointed_year: number | null;
 };
 
 export function personById(id: string): Person | null {

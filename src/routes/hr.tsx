@@ -1,0 +1,75 @@
+import { Hono } from "hono";
+import "../hr/links";
+import { cycleLinks } from "../cycle-links";
+import { getDb } from "../db";
+import { recordEvent, visibleEvents } from "../events";
+import { cycleState } from "../hr/cycle-state";
+import { mandatoryGradeOf } from "../hr/history";
+import { latestCycles } from "../hr/latest-cycles";
+import { officeStats } from "../hr/stats";
+import { cycleById } from "../cycles";
+import { currentPerson, personById, type Person } from "../people";
+import { today } from "../settings";
+import { HrOverviewView, type StateRow } from "../views/hr-overview";
+
+const app = new Hono();
+
+export function overviewData(viewer: Person) {
+  const rows: StateRow[] = latestCycles().map((c) => ({
+    cycleId: c.id,
+    personName: personById(c.person_id)?.name ?? c.person_id,
+    appraiserName: personById(c.appraiser_id)?.name ?? c.appraiser_id,
+    sheet: c.sheet,
+    state: cycleState(c.id),
+    today: today(),
+    links: cycleLinks(c, viewer),
+  }));
+  rows.sort((a, b) => (a.state.deadline?.date ?? "9999").localeCompare(b.state.deadline?.date ?? "9999") || a.personName.localeCompare(b.personName));
+  const people = getDb().query("SELECT id, name FROM people WHERE appointed = 1 ORDER BY name").all() as { id: string; name: string }[];
+  const cards = people.flatMap((p) => {
+    const grade = mandatoryGradeOf(p.id);
+    return grade ? [{ personId: p.id, personName: p.name, grade }] : [];
+  });
+  return { rows, cards, stats: officeStats() };
+}
+
+app.get("/hr", (c) => {
+  const viewer = currentPerson(c);
+  if (!viewer) return c.redirect("/account");
+  if (viewer.role !== "hr") return c.text("Ten ekran widzą kadry.", 403);
+  const { rows, cards, stats } = overviewData(viewer);
+  return c.html(<HrOverviewView viewer={viewer} today={today()} cards={cards} rows={rows} stats={stats} />);
+});
+
+const OUTCOMES = ["changed", "redone", "rejected"];
+
+app.post("/hr/grades/:personId", (c) => {
+  const viewer = currentPerson(c);
+  if (!viewer) return c.redirect("/account");
+  if (viewer.role !== "hr") return c.text("Tę czynność wykonują kadry.", 403);
+  const person = personById(c.req.param("personId"));
+  if (!person) return c.text("Nie ma takiej osoby.", 404);
+  const grade = mandatoryGradeOf(person.id);
+  if (!grade || grade.toGrade === null) return c.text("Nie ma obowiązku przyznania stopnia albo został już odnotowany.", 409);
+  recordEvent("mandatory_grade_awarded", grade.cycleId, viewer.id, { personId: person.id, fromGrade: grade.fromGrade, toGrade: grade.toGrade, basis: grade.basis });
+  return c.redirect("/hr", 303);
+});
+
+app.post("/cycles/:id/objection-outcome", async (c) => {
+  const viewer = currentPerson(c);
+  if (!viewer) return c.redirect("/account");
+  if (viewer.role !== "hr") return c.text("Tę czynność wykonują kadry.", 403);
+  const cycle = cycleById(c.req.param("id"));
+  if (!cycle || !visibleEvents(cycle.id).some((e) => e.type === "cycle_started")) return c.text("Nie ma takiego cyklu.", 404);
+  const body = await c.req.parseBody();
+  const outcome = typeof body.outcome === "string" ? body.outcome : "";
+  if (!OUTCOMES.includes(outcome)) return c.text("Nieznane rozstrzygnięcie sprzeciwu.", 422);
+  const ev = visibleEvents(cycle.id);
+  if (!ev.some((e) => e.type === "objection_filed") || ev.some((e) => e.type === "objection_resolved")) {
+    return c.text("Sprzeciw nie czeka na rozstrzygnięcie.", 409);
+  }
+  recordEvent("objection_resolved", cycle.id, viewer.id, { outcome });
+  return c.redirect("/hr", 303);
+});
+
+export default app;

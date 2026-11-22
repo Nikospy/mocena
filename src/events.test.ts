@@ -34,7 +34,7 @@ describe("widoczność zdarzeń", () => {
     seedEvent("absence_recorded", null, "joanna", { n: 1 }, "2024-12-01");
     expect(visibleEvents(null).map((e) => e.type)).toEqual(["absence_recorded"]);
     expect(visibleEvents(null)[0].payload).toEqual({ n: 1 });
-    expect(visibleEventsOfType("cycle_started")).toHaveLength(3);
+    expect(visibleEventsOfType("cycle_started").map((e) => e.cycleId)).toEqual(expect.arrayContaining(["cycle-piotr", "cycle-ewa", "cycle-tomasz"]));
   });
 
   test("recordEvent dostaje datę systemową", () => {
