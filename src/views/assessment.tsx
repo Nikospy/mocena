@@ -378,6 +378,7 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
       </div>
       <aside class="side first" aria-label="Wynik i potwierdzenia">
         <ResultPanel result={s.result} scores={s.criteria} cycleId={p.cycleId} version={s.rulesVersion.version} />
+        <a class="btn" href={`/cycles/${p.cycleId}/assessment/export.json`} download>Pobierz ocenę (JSON)</a>
         {st.objectionDeadline ? <ObjectionClock deadline={st.objectionDeadline} today={p.today} mine={mine} /> : null}
         {p.canAcknowledge ? (
           <form method="post" action={`/cycles/${p.cycleId}/assessment/acknowledge`} class="decide">

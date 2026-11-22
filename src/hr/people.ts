@@ -276,3 +276,55 @@ export function lastAssessmentOf(personId: string): { on: string; outcome: "posi
   if (prev) found.push({ on: prev.on, outcome: prev.outcome });
   return found.sort((a, b) => b.on.localeCompare(a.on))[0] ?? null;
 }
+
+export function employeeDeletionBlock(person: Person): string | null {
+  if (person.role === "hr" || person.role === "admin") return "Tego konta nie można usunąć z listy pracowników.";
+  const db = getDb();
+  const supervises = db.query("SELECT 1 FROM people WHERE supervisor_id = ? AND id <> ?").get(person.id, person.id);
+  const assesses = db.query("SELECT 1 FROM cycles WHERE appraiser_id = ? AND person_id <> ?").get(person.id, person.id);
+  const wasAppraiser = db.query(`
+    SELECT 1 FROM events e JOIN cycles c ON c.id = e.cycle_id
+    WHERE c.person_id <> ? AND e.type = 'appraiser_changed'
+      AND (json_extract(e.payload, '$.from_id') = ? OR json_extract(e.payload, '$.to_id') = ?)
+  `).get(person.id, person.id, person.id);
+  if (supervises || assesses || wasAppraiser) {
+    return "Nie można usunąć tej osoby. Jej dane są potrzebne w cyklach lub kartotekach innych pracowników.";
+  }
+  return null;
+}
+
+/** Usuwa kartotekę i powiązane dane także wtedy, gdy mają datę późniejszą niż data systemowa. */
+export function deleteEmployee(id: string): { status: 404 | 409; reason: string } | null {
+  const db = getDb();
+  return db.transaction(() => {
+    const person = personById(id);
+    if (!person) return { status: 404 as const, reason: "Nie ma takiej osoby." };
+    const blocked = employeeDeletionBlock(person);
+    if (blocked) return { status: 409 as const, reason: blocked };
+    const ownedCycles = "SELECT id FROM cycles WHERE person_id = ?1";
+    const ownedNotes = `SELECT id FROM notes WHERE subject_id = ?1 OR author_id = ?1 OR cycle_id IN (${ownedCycles})`;
+    db.query(`DELETE FROM feedback_messages WHERE recipient_id = ?1 OR author_id = ?1 OR note_id IN (${ownedNotes})`).run(id);
+    db.query(`
+      DELETE FROM events WHERE cycle_id IN (${ownedCycles})
+        OR (type = 'absence_recorded' AND json_extract(payload, '$.absence_id') IN (SELECT id FROM absences WHERE person_id = ?1))
+        OR json_extract(payload, '$.personId') = ?1
+        OR json_extract(payload, '$.subject_id') = ?1
+        OR json_extract(payload, '$.note_id') IN (${ownedNotes})
+        OR json_extract(payload, '$.noteId') IN (${ownedNotes})
+        OR (type = 'substitution_set' AND (json_extract(payload, '$.absent_id') = ?1 OR json_extract(payload, '$.substitute_id') = ?1))
+    `).run(id);
+    db.query(`DELETE FROM notes WHERE id IN (${ownedNotes})`).run(id);
+    db.query(`DELETE FROM cycle_criteria WHERE cycle_id IN (${ownedCycles})`).run(id);
+    db.query("DELETE FROM cycles WHERE person_id = ?").run(id);
+    db.query("DELETE FROM absences WHERE person_id = ?").run(id);
+    db.query("DELETE FROM substitutions WHERE absent_id = ?1 OR substitute_id = ?1").run(id);
+    db.query(`
+      UPDATE events SET actor_id = NULL,
+        payload = CASE type WHEN 'part1_submitted' THEN json_set(payload, '$.appraiserName', 'Usunięte konto') ELSE payload END
+      WHERE actor_id = ?
+    `).run(id);
+    db.query("UPDATE events SET payload = json_remove(payload, '$.on_behalf_of') WHERE json_extract(payload, '$.on_behalf_of') = ?").run(id);
+    db.query("DELETE FROM people WHERE id = ?").run(id);
+    return null;
+  })();
+}

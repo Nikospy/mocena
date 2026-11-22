@@ -152,6 +152,19 @@ app.get("/cycles/:id/assessment", (c) => {
   return render(c, g);
 });
 
+app.get("/cycles/:id/assessment/export.json", (c) => {
+  const g = guard(c);
+  if (!isCtx(g)) return g;
+  if (!isAppraiser(g) && !isAppraisee(g) && g.person.role !== "hr") return c.text("Brak uprawnień do tej oceny.", 403);
+  const { snapshot, acknowledgement, fiction, approvedOn } = assessmentState(g.cycle.id);
+  if (!snapshot) return c.text("Ocena nie jest jeszcze zatwierdzona.", 404);
+  return c.json(
+    { employee: g.appraisee.name, assessment: snapshot, approvedOn, acknowledgement, fiction },
+    200,
+    { "Content-Disposition": "attachment; filename=ocena.json", "Cache-Control": "no-store" },
+  );
+});
+
 const CLOSED = "Ocena nie przyjmuje już zmian: została zatwierdzona albo cykl jest zamknięty.";
 
 /** Wspólny początek tras zapisu oceniającego. Zwraca odpowiedź błędu albo kontekst. */

@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import "../hr/links";
+import { assessmentState } from "../assessment/state";
 import { registerHomeTasks } from "../home-tasks";
 import { cycleLinks } from "../cycle-links";
 import { getDb } from "../db";
@@ -47,7 +48,10 @@ export function overviewData(viewer: Person) {
     sheet: c.sheet,
     state: cycleState(c.id),
     today: today(),
-    links: cycleLinks(c, viewer),
+    links: [
+      ...cycleLinks(c, viewer),
+      ...(assessmentState(c.id).snapshot ? [{ label: "Pobierz ocenę (JSON)", href: `/cycles/${c.id}/assessment/export.json` }] : []),
+    ],
   }));
   // Najpierw cykle wymagające działania, zamknięte (zapoznanie, fikcja, rozpatrzony sprzeciw) na końcu; w grupie od najbliższego terminu.
   const closed = (r: StateRow) => (CLOSED_STEPS.has(r.state.step) ? 1 : 0);
