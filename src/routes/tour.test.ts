@@ -102,6 +102,9 @@ describe("przewodnik pokazu", () => {
     const hr = await html(app, "/hr", cookies(stop));
     expect(hr.text).toMatch(/Rozmowa o kryteriach do:\s*(<[^>]+>)*30\.11\.2026/);
     expect(hr.text).toContain("§ 7 pkt 2");
+    // Krok 5b panelu: data ponownej oceny także na ekranie kadr, z przepisem.
+    expect(hr.text).toMatch(/Ponowna ocena:\s*(<[^>]+>)*23\.05\.2027/);
+    expect(hr.text).toContain("art. 81 ust. 9 ustawy");
     const home = await html(app, "/", "person_id=marek");
     expect(home.text).toContain("Wyznacz kryteria");
     expect(home.text).toContain(`href="/cycles/${cycle.id}/part1"`);
@@ -199,4 +202,23 @@ describe("przewodnik: układ i dostępność", () => {
     expect(plain.text).toMatch(/<aside[^>]*aria-label="Pokaz"/);
     expect(plain.text).toMatch(/dziś \d{1,2} \p{L}+ \d{4}/u);
   });
+});
+
+describe("panel przewodnika: cytowane nazwy istnieją na ekranie przystanku", () => {
+  // Krok 2 cytuje tekst, który wpisuje użytkownik, i pytanie z następnego ekranu; krok 3 pokazuje podsumowanie dopiero po wpisaniu.
+  const quoted = (s = "") => [...s.matchAll(/„([^”]+)”/g)].map((m) => m[1]);
+  for (const id of ["1", "1b", "4", "5", "5b"]) {
+    test(`krok ${id}`, async () => {
+      const { app } = createTestApp();
+      const stop = stopById(id)!;
+      const res = await post(app, `/tour/${id}`);
+      const page = await html(app, res.headers.get("location")!, `${cookies(res)}; person_id=${stop.personId}`);
+      const screen = page.text.replace(/<aside[^>]*id="tour-guide[\s\S]*?<\/aside>/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+      expect(screen).not.toContain(stop.title);
+      // Nazwy przycisków panel cytuje dosłownie.
+      if (id === "5") expect(quoted(stop.tryIt)).toContain("Potwierdzam zapoznanie z oceną");
+      if (id === "1") expect(stop.look.flatMap((l) => quoted(l.text))).toContain("Karta rozmowy o kryteriach");
+      for (const q of [...stop.look.flatMap((l) => quoted(l.text)), ...quoted(stop.tryIt)]) expect(screen).toContain(q);
+    });
+  }
 });

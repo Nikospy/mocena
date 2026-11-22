@@ -244,6 +244,10 @@ const steps: Step[] = [
       includes(absences[0], "06.11.2026", "koniec nieobecności 06.11.2026");
       includes(hr.html, `datetime="${expected.deadline}"`, `nowy termin oceny ${fmt(expected.deadline)} z silnika`);
       includes(hr.html, fmt(expected.base), `dawny termin ${fmt(expected.base)}`);
+      const screen = await s.get(`/cycles/${ctx.cycleId}/absences`);
+      includes(screen.html, 'class="rule abs-sum"', "ekran nieobecności: karta terminu z regułą");
+      includes(screen.html, `Liczone jako jedna: 05.10.2026–06.11.2026`, "ekran nieobecności: scalona nieobecność");
+      includes(screen.html, fmt(expected.deadline), `ekran nieobecności: nowy termin ${fmt(expected.deadline)}`);
       await s.login("piotr");
       const own = await s.get(`/cycles/${ctx.cycleId}/timeline`);
       includes(own.html, `datetime="${expected.deadline}"`, `nowy termin oceny ${fmt(expected.deadline)} u Piotra`);
@@ -492,6 +496,7 @@ const tourStops: TourStopCheck[] = [
       const tl = await s.get("/cycles/cycle-piotr/timeline");
       includes(tl.html, "30.11.2026", "termin sprzeciwu 30.11.2026 po zapoznaniu 22.11.2026");
       includes(r.html, /Rozmowa o kryteriach do:\s*(<[^>]+>)*30\.11\.2026/, "termin kryteriów nowego cyklu Piotra");
+      includes(r.html, /Ponowna ocena:\s*(<[^>]+>)*23\.05\.2027/, "kadry: ponowna ocena Piotra 23.05.2027 w wierszu cyklu");
       await s.login("marek");
       const home = await s.get("/");
       const cycle = cycleIdFor(home.html, "Piotr Wójcik");

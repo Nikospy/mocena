@@ -1,3 +1,4 @@
+import { reassessmentDeadline } from "../hr/cycle-state";
 import { actsAsAppraiser } from "../substitutions";
 import { Hono, type Context } from "hono";
 import "../assessment/home";
@@ -160,6 +161,7 @@ function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; er
       canAcknowledge={isAppraisee(cx) && state.stage === "approved"}
       canFiction={appraiser && state.stage === "approved"}
       shifted={state.stage === "draft" ? shiftedDeadlineSentence(cx.cycle.id) : null}
+      redo={reassessmentDeadline(cx.cycle.id)}
     />,
     status,
   );

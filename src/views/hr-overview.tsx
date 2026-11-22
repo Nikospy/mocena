@@ -148,6 +148,15 @@ function Deadline(props: { r: StateRow }) {
       )}{" "}
       <LegalBasis basis={r.state.deadline.basis} />
       {r.state.overdue ? <span class="hr-late"> Termin minął {formatDate(r.state.deadline.date)}.</span> : null}
+      {r.state.second ? (
+        <>
+          <br />
+          <span>
+            {r.state.second.label}: <b class="tnum">{formatDate(r.state.second.date)}</b>
+          </span>{" "}
+          <LegalBasis basis={r.state.second.basis} />
+        </>
+      ) : null}
     </>
   );
 }

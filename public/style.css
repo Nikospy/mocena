@@ -904,6 +904,8 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 .pl-more[open] > summary .ico { transform: rotate(180deg); }
 .pl-menu { position: absolute; z-index: 6; inset-inline-end: 0; inset-block-start: 100%; min-inline-size: 16rem; display: grid; padding-block: var(--sp-100);
   background: var(--surface); border: 1px solid var(--card-line); border-radius: var(--card-r); box-shadow: var(--elev-2); }
+/* Zamknięte menu nie zajmuje miejsca w układzie (część przeglądarek liczy jego prostokąt mimo zamkniętego details). */
+.pl-more:not([open]) > .pl-menu, details.user:not([open]) > .user-menu { display: none; }
 .page-links .pl-menu a { display: flex; padding-inline: var(--sp-200); min-block-size: var(--hit); }
 /* Część I: termin i akcja w prawej kolumnie, kryteria po lewej */
 .p1-form > * + * { margin-block-start: 0; }
@@ -946,23 +948,35 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 .card.sheet > h2:first-child { padding-block-start: var(--sp-300); padding-inline: 0; }
 /* ocena na telefonie: zwarte kryteria, żeby formularz mieścił się w ok. 4 ekranach */
 @media (max-width: 639px) {
-  #assessment-form .crit { padding-block: var(--sp-200); }
-  #assessment-form .crit-row { gap: var(--sp-100); }
-  #assessment-form .crit-notes { margin-block-start: var(--sp-100); gap: var(--sp-100); }
+  #assessment-form .crit { padding-block: var(--sp-100); }
+  #assessment-form .scorebox { gap: var(--sp-50); }
+  #assessment-form .crit-notes { margin-block-start: 0; }
+  /* pola tekstowe rosną z treścią; puste mają półtorej wysokości pola */
+  #assessment-form textarea.area { field-sizing: content; min-block-size: calc(var(--hit) * 1.5); }
+  #assessment-form .insert-tools { margin-block-end: 0; }
+  #assessment-form [data-insert-status]:empty { display: none; }
+  /* po nieudanym zatwierdzeniu te same braki są już w podsumowaniu błędów nad formularzem */
+  main:has(.err-sum) #assessment-blockers { display: none; }
+  #assessment-form .crit-row { gap: var(--sp-50); }
+  #assessment-form .crit-notes { gap: var(--sp-100); }
   #assessment-form .crit-notes-d > summary { min-block-size: var(--sp-500); }
   #assessment-form .card { padding: var(--sp-200); }
   #assessment-form .card.sheet { padding-block: 0; }
-  #assessment-form .o-main, #assessment-form .o-grid { gap: var(--sp-200); }
+  #assessment-form .o-main, #assessment-form .o-grid, #assessment-form .side { gap: var(--sp-150); }
+  #assessment-form .rule.res { padding: calc(var(--sp-200) - 1px); }
   .insert-tools > .btn { justify-self: stretch; }
 }
 .o-score { display: flex; align-items: baseline; gap: var(--sp-100); }
 @media (min-width: 760px) { .o-score { justify-content: flex-end; text-align: end; } }
 @media (max-width: 639px) {
-  #assessment-form .crit-row > div:first-child { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--sp-100); }
-  #assessment-form .crit-row > div:first-child > .kind { margin-block-start: 0; }
-  #assessment-form .crit-row > div:first-child > .cap { flex-basis: 100%; }
+  /* nazwa kryterium i „obowiązkowe/dodatkowe” w jednym ciągu tekstu, także gdy nazwa się zawija */
+  #assessment-form .crit-row > div:first-child > :is(h3, .kind) { display: inline; }
+  #assessment-form .crit-row > div:first-child > .kind { margin: 0 0 0 var(--sp-100); }
+  #assessment-form .crit-row > div:first-child > .cap { margin-block-start: var(--sp-50); }
   #assessment-form .tx-card { background: none; border: 0; padding: 0; }
-  #assessment-form .tx-card + .tx-card { padding-block-start: var(--sp-200); border-block-start: 1px solid var(--line); }
+  #assessment-form .tx-card + .tx-card { padding-block-start: var(--sp-150); border-block-start: 1px solid var(--line); }
+  #assessment-form .crit-notes-d { margin-block-start: 0; }
+  main:has(> #assessment-form) > * + * { margin-block-start: var(--sp-200); }
 }
 details.crit-notes-d > .note-list { padding-inline-start: 0; max-inline-size: none; gap: 0; }
 /* karty rozmów: trudne sytuacje jako wiersze z kreską ostrzeżenia, bez pomarańczowych pudełek */

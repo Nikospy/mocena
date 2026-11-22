@@ -183,7 +183,9 @@ function writePrevious(cycleId: string, actorId: string, f: PersonForm): void {
 function startCycle(personId: string, appraiserId: string, f: PersonForm, actorId: string): string {
   const cycleId = freeId("cycles", `cycle-${personId}`);
   const start = f.prev_on || f.hired_on;
-  getDb().query("INSERT INTO cycles (id, person_id, appraiser_id, period_start) VALUES (?, ?, ?, ?)").run(cycleId, personId, appraiserId, start);
+  // Arkusz wybrany w formularzu; oceniający potwierdza go w części I.
+  const sheet = f.sheet || suggestSheet(f.position_title);
+  getDb().query("INSERT INTO cycles (id, person_id, appraiser_id, period_start, sheet) VALUES (?, ?, ?, ?, ?)").run(cycleId, personId, appraiserId, start, sheet);
   recordEvent("cycle_started", cycleId, actorId, {
     reason: f.prev_on ? "previous_assessment" : "employment",
     periodStart: start,

@@ -1,7 +1,28 @@
 import type { Absence } from "../cycles";
-import { ErrorSummary, FieldError, PageHeader, invalid } from "./components";
+import { ErrorSummary, FieldError, LegalBasis, PageHeader, invalid } from "./components";
 import type { Person } from "../people";
 import { Layout, formatDate, formatDateLong } from "./layout";
+
+export type AbsenceSummary = {
+  merged: { from: string; to: string; days: number; parts: number; counted: boolean; longerThanMonth: boolean }[];
+  afterNegative: boolean;
+  deadline: string;
+  /** Termin przed przedłużeniem; null, gdy nieobecności go nie zmieniły. */
+  previous: string | null;
+  extensionDays: number;
+  basis: string[];
+};
+
+const dni = (n: number) => (n === 1 ? "1 dzień" : `${n} dni`);
+
+function mergedSentence(m: AbsenceSummary["merged"][number], afterNegative: boolean): string {
+  const range = `${formatDate(m.from)}–${formatDate(m.to)}, ${dni(m.days)}`;
+  const head = m.parts > 1 ? `Liczone jako jedna: ${range}, bo dzielą je tylko dni wolne.` : `${range}.`;
+  if (afterNegative) return `${head} Nie przedłuża terminu ponownej oceny.`;
+  if (m.counted) return `${head} Dłużej niż miesiąc: termin oceny przedłuża się o ${dni(m.days)}.`;
+  if (m.longerThanMonth) return `${head} Dłużej niż miesiąc, ale poza okresem, który zmienia termin.`;
+  return `${head} Nie dłużej niż miesiąc: termin bez zmian.`;
+}
 
 export type AbsenceFormValues = { from: string; to: string; excused: boolean };
 
@@ -13,7 +34,9 @@ export function AbsenceFormView(props: {
   values: AbsenceFormValues;
   errors?: Partial<Record<"from" | "to", string>>;
   absences: Absence[];
+  summary?: AbsenceSummary | null;
 }) {
+  const sum = props.summary;
   const v = props.values;
   const e = props.errors ?? {};
   return (
@@ -71,6 +94,23 @@ export function AbsenceFormView(props: {
             ))}
           </ul>
         )}
+        {sum ? (
+          <>
+            <ul class="plain-list abs-merged">
+              {sum.merged.map((m) => (
+                <li class="st info">{mergedSentence(m, sum.afterNegative)}</li>
+              ))}
+            </ul>
+            <section class="rule abs-sum" aria-labelledby="h-abs-term">
+              <p class="voice rule-v" id="h-abs-term">Reguła · {sum.previous ? "Nowy termin oceny" : sum.afterNegative ? "Termin ponownej oceny" : "Termin oceny"}</p>
+              <p class="term-date">
+                {sum.previous ? <s class="old">{formatDate(sum.previous)}</s> : null}
+                <b class="big">{formatDate(sum.deadline)}</b> <LegalBasis basis={sum.basis.map((b) => b.split(":")[0])} />
+              </p>
+              <p><a href={`/cycles/${props.cycleId}/timeline`}>Zobacz na osi czasu</a></p>
+            </section>
+          </>
+        ) : null}
       </aside>
       </div>
       <script src="/date-words.js" defer></script>

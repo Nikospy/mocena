@@ -148,3 +148,20 @@ describe("termin po zatwierdzeniu oceny", () => {
     expect(await html(app, "piotr", `/cycles/${PIOTR}/timeline`)).toContain("27.11.2026");
   });
 });
+
+describe("ekran nieobecności: podsumowanie z silnika (krok 3 pokazu)", () => {
+  test("po dwóch wpisach ekran pokazuje scaloną nieobecność i nowy termin z przepisem", async () => {
+    const { app } = createTestApp({ today: "2026-11-10", seedOptions: { afterStep1: true } });
+    const before = await html(app, "joanna", `/cycles/${PIOTR}/absences`);
+    expect(before).not.toContain("abs-sum");
+    await call(app, "joanna", `/cycles/${PIOTR}/absences`, FIRST);
+    await call(app, "joanna", `/cycles/${PIOTR}/absences`, SECOND);
+    const page = await html(app, "joanna", `/cycles/${PIOTR}/absences`);
+    expect(page).toContain('class="rule abs-sum"');
+    expect(page).toContain("Nowy termin oceny");
+    expect(page).toContain("30.12.2026");
+    expect(page).toContain("27.11.2026");
+    expect(page).toContain("Liczone jako jedna: 05.10.2026–06.11.2026, 33 dni");
+    expect(page).toContain("art. 81 ust. 7");
+  });
+});
