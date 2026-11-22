@@ -1006,7 +1006,7 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 .pn-who { display: grid; gap: var(--sp-50); min-inline-size: 0; }
 .pn-who span { color: var(--text-2); }
 .person-notes .note-item .btns { margin-block-start: calc(var(--sp-100) * -1); }
-.person-notes .note-item .btn.text { padding-inline: 0; min-block-size: var(--sp-500); font-weight: var(--w-regular); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
+.person-notes .note-item .btn.text { padding-inline: 0; min-block-size: var(--sp-500); border-radius: var(--r-50); font-weight: var(--w-regular); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
 
 /* stany puste i sukces: jedno zdanie, co się stało, i drugie, co dalej */
 .nl-empty { display: grid; gap: var(--sp-50); padding-block: var(--sp-300); max-inline-size: 66ch; }
