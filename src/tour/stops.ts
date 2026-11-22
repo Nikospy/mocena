@@ -1,6 +1,6 @@
 // Treść przystanków przewodnika pokazu. Konto i datę daje state.ts, przepisy i terminy pochodzą z pliku reguł.
 import { getDb } from "../db";
-import { rules } from "../engine/rules";
+import { rules, rulesVersionLabel } from "../engine/rules";
 import { TOUR_STOPS, type TourStop, type TourStopId } from "./state";
 
 export type Look = { text: string; selector?: string };
@@ -20,7 +20,7 @@ export type StopContent = TourStop & {
   screen: (cycleId: string) => string;
 };
 
-const ver = `reguły ${rules.version}`;
+const ver = rulesVersionLabel(rules.version);
 const d = rules.deadlines;
 const basis = (art: string): Basis => ({ art, ver });
 
