@@ -62,7 +62,8 @@ test("Barbara może wybrać konto, rozpatrzyć wniosek Anny i zobaczyć statysty
 
 test("kadry otwierają przygotowany arkusz A kierownika urzędu", async () => {
   const { app } = createTestApp({ today: "2026-11-22" });
-  expect(await html(app, "joanna", "/hr")).toContain('href="/cycles/cycle-office-head/sheet"');
+  expect(await html(app, "joanna", "/hr")).toContain('href="/cycles/cycle-office-head/part1"');
+  expect(await html(app, "joanna", "/cycles/cycle-office-head/part1")).toContain('href="/cycles/cycle-office-head/sheet"');
   const sheet = await html(app, "joanna", "/cycles/cycle-office-head/sheet");
   expect(sheet).toContain("Arkusz A");
   expect(sheet).toContain("Irena Maj");

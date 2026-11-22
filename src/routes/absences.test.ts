@@ -18,9 +18,11 @@ describe("ścieżka kadr: /hr → Wpisz nieobecność → oś → drugi wpis", (
     const { app, db } = createTestApp({ today: "2026-11-10", seedOptions: { afterStep1: true } });
     expect(effectiveDeadline(PIOTR).date).toBe("2026-11-27");
 
-    const hr = await html(app, "joanna", "/hr");
-    expect(hr).toContain(`href="/cycles/${PIOTR}/absences"`);
-    expect(hr).toContain("Wpisz nieobecność");
+    // /hr → nazwisko (część I cyklu) → „Wpisz nieobecność”
+    expect(await html(app, "joanna", "/hr")).toContain(`href="/cycles/${PIOTR}/part1"`);
+    const hub = await html(app, "joanna", `/cycles/${PIOTR}/part1`);
+    expect(hub).toContain(`href="/cycles/${PIOTR}/absences"`);
+    expect(hub).toContain("Wpisz nieobecność");
     expect((await call(app, "joanna", `/cycles/${PIOTR}/absences`)).status).toBe(200);
 
     const r1 = await call(app, "joanna", `/cycles/${PIOTR}/absences`, FIRST);

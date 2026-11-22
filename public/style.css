@@ -908,6 +908,77 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 /* === screens: hr-admin === */
 /* Stan cykli, pracownicy, zastępstwa, statystyki urzędu, źródła podpowiedzi, wdrożenie i dane. */
 /* Reguły tej grupy dopisuj bezpośrednio pod tą linią. */
+/* -- wspólne dla ekranów kadr: tabela, która od 900 px jest tabelą, a niżej listą wierszy z linią (bez kart w karcie) -- */
+.hr-scroll { overflow-x: visible; }
+.hr-none { color: var(--text-2); }
+.hr-late { color: var(--red-200); font-weight: var(--w-bold); }
+.hr-table { min-inline-size: 0; }
+.hr-table thead th { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); vertical-align: bottom; padding-block: 0 var(--sp-150); }
+.hr-table th, .hr-table td { padding: var(--sp-200) var(--sp-200) var(--sp-200) 0; vertical-align: top; }
+.hr-table :is(th, td):last-child { padding-inline-end: 0; }
+.hr-table th[scope="col"]:nth-child(n), .hr-table td:nth-child(n), .hr-state, .hr-due { min-inline-size: 0; }
+.hr-table tbody th { font-weight: var(--w-bold); }
+.hr-table tbody th a { font-weight: var(--w-bold); }
+.hr-table details.disc { margin-block-start: 0; }
+.hr-table details.disc > summary { min-block-size: var(--sp-500); }
+.hr-table .basis { display: block; }
+@media (max-width: 899px) {
+  .hr-table, .hr-table tbody, .hr-table tr, .hr-table th, .hr-table td { display: block; inline-size: 100%; }
+  .hr-table thead { position: absolute; inline-size: 1px; block-size: 1px; overflow: clip; clip-path: inset(50%); }
+  .hr-table .hr-card { padding: var(--sp-200) 0; margin: 0; border: 0; border-block-start: 1px solid var(--line); border-radius: 0; background: none; }
+  .hr-table .hr-card:first-child { border-block-start: 0; padding-block-start: 0; }
+  .hr-table .hr-card:last-child { padding-block-end: 0; }
+  .hr-table .hr-card > th, .hr-table .hr-card > td { padding: 0; border: 0; }
+  .hr-table .hr-card > * + * { margin-block-start: var(--sp-100); }
+  .hr-card > td[data-label]::before { content: attr(data-label); display: block; font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); color: var(--text-2); }
+  .hr-card > td[data-label="Oceniający"], .hr-card > td[data-label="Arkusz"] { display: block; }
+  .hr-card > td[data-label="Stan cyklu"]::before { content: none; }
+  .hr-table tbody th { font-size: var(--f-p); line-height: var(--lh-p); }
+}
+
+/* -- Stan cykli -- */
+.hr-cycles thead th:nth-child(1) { inline-size: 18%; }
+.hr-cycles thead th:nth-child(2) { inline-size: 15%; }
+.hr-cycles thead th:nth-child(3) { inline-size: 27%; }
+.hr-cycles thead th:nth-child(5) { inline-size: 14%; }
+.hr-sheet { display: grid; justify-items: start; gap: var(--sp-50); }
+@media (max-width: 899px) { .hr-table .hr-sheet { display: grid; } }
+.hr-sheet a { display: inline-flex; align-items: center; min-block-size: var(--sp-300); }
+.hr-cyclecard > h2 + * { margin-block-start: var(--sp-300); }
+
+/* obowiązek urzędu: treść po lewej, fakty i jedna akcja po prawej */
+.hr-duty { display: grid; gap: var(--sp-300); }
+.hr-duty > * + * { margin-block-start: 0; }
+.hr-duty-main > * + * { margin-block-start: var(--sp-150); }
+.hr-duty-side { display: grid; gap: var(--sp-300); align-content: start; justify-items: start; }
+.hr-facts { display: grid; gap: var(--sp-150); }
+.hr-facts dt { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--rule-quiet); }
+.hr-facts dd { font-weight: var(--w-bold); color: var(--rule-ink); }
+@media (min-width: 900px) {
+  .hr-duty { grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem); gap: var(--sp-600); }
+  .hr-duty-side { padding-inline-start: var(--sp-300); border-inline-start: 1px solid var(--rule-divider); }
+}
+
+/* sprzeciw do rozpatrzenia: kto i do kiedy po lewej, wybór wyniku i jeden przycisk po prawej */
+.hr-obj-item { display: grid; gap: var(--sp-200); padding-block-start: var(--sp-300); border-block-start: 1px solid var(--line); }
+.hr-obj > h2 + .hr-obj-item { padding-block-start: 0; border: 0; }
+.hr-obj-what > * + * { margin-block-start: var(--sp-100); }
+.hr-obj-what h3 a { font-weight: var(--w-bold); }
+.hr-obj-pick { border: 0; margin: 0; padding: 0; min-inline-size: 0; display: grid; gap: var(--sp-50); justify-items: start; }
+.hr-obj-pick .btn { margin-block-start: var(--sp-150); }
+.hr-obj-pick .cb .box { border-radius: var(--pill-r); }
+.hr-obj-pick .cb input:checked + .box { background: var(--white); box-shadow: inset 0 0 0 var(--sp-50) var(--primary); }
+.hr-obj-pick .cb .cbt { font-weight: var(--w-regular); }
+@media (min-width: 900px) { .hr-obj-item { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp-600); } }
+
+/* terminowość: dwie listy liczb, etykieta po lewej, liczba wyrównana do prawej */
+.hr-statcols { display: grid; gap: var(--sp-300); }
+.hr-statcols h3 { margin-block-end: var(--sp-100); }
+@media (min-width: 900px) { .hr-statcols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-600); align-items: start; } }
+.hr-statcard .hr-stats { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+.hr-statcard .stat { flex-direction: row; justify-content: space-between; align-items: baseline; gap: var(--sp-200); padding-block: var(--sp-100); border-block-start: 1px solid var(--line); max-inline-size: none; }
+.hr-statcard .stat-label { font-size: var(--f-p); line-height: var(--lh-p); color: var(--text); }
+.hr-statcard .stat-n { font-size: var(--f-p); line-height: var(--lh-p); text-align: end; }
 
 /* --- koniec sekcji hr-admin (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
 /* . */

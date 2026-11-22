@@ -3,13 +3,17 @@ import { createTestApp } from "../test-helpers";
 import { approveAndAcknowledgePiotr, call, html } from "./hr-test-helpers";
 
 describe("review-polish-2 faza 2: kadry i fikcja zapoznania", () => {
-  test("/hr: karty cykli i Więcej przy więcej niż 3 odnośnikach", async () => {
+  test("/hr (K5): wiersz cyklu ma jeden odnośnik do cyklu, bez kolumny „Odnośniki” i bez menu „Więcej”", async () => {
     const { app } = createTestApp({ today: "2026-11-22", seedOptions: { afterStep1: true } });
     await approveAndAcknowledgePiotr(app);
     const h = await html(app, "joanna", "/hr");
     expect(h).toContain('class="hr-card"');
-    expect(h).toContain('class="disc hr-more"');
-    expect(h).toMatch(/<summary>Więcej/);
+    expect(h).not.toContain("hr-more");
+    expect(h).not.toMatch(/<summary>Więcej/);
+    expect(h).not.toContain(">Odnośniki<");
+    expect(h).toContain('<th scope="row"><a href="/cycles/cycle-tomasz/part1">Tomasz Kamiński</a></th>');
+    // rozpatrzenie sprzeciwu nad tabelą, ta sama trasa
+    expect(h.indexOf('action="/cycles/cycle-katarzyna/objection-outcome"')).toBeLessThan(h.indexOf('class="hr-table hr-cycles"'));
   });
 
   test("karta stopnia: kropka przed pigułką, bez nawiasu", async () => {
@@ -18,7 +22,7 @@ describe("review-polish-2 faza 2: kadry i fikcja zapoznania", () => {
     const i = h.indexOf("Przyznać do");
     const para = h.slice(i, h.indexOf("</p>", i));
     expect(para).not.toContain("(");
-    expect(para).toMatch(/więc poniedziałek\. <span class="basis">/);
+    expect(para).toMatch(/więc termin przechodzi na poniedziałek\. <span class="basis">/);
   });
 
   test("fikcja: domyślnie Osobiście i dzisiejsza data", async () => {

@@ -21,35 +21,42 @@ export function ReminderCard(props: ReminderProps) {
   const shifted = raw !== g.dueOn;
   const rawDay = [0, 6].includes(dow(raw)) ? DOW_ACC[dow(raw)] : "dzień wolny od pracy";
   return (
-    <section class="card rule" aria-labelledby={`obowiazek-${props.personId}`}>
-      <h2 id={`obowiazek-${props.personId}`}>Obowiązek urzędu: stopień służbowy z mocy prawa</h2>
-      <div class="sheet-field">
-        <span class="lbl">Urzędnik</span>
-        <p>{props.personName}</p>
+    <section class="card rule hr-duty" aria-labelledby={`obowiazek-${props.personId}`}>
+      <div class="hr-duty-main">
+        <h2 id={`obowiazek-${props.personId}`}>Obowiązek urzędu: stopień służbowy z mocy prawa</h2>
+        {g.atMaxGrade ? (
+          <p>Ma najwyższy stopień, kolejnego nie można przyznać.</p>
+        ) : (
+          <>
+            <p>
+              Urząd ma obowiązek przyznać kolejny stopień służbowy, bo od ostatniego stopnia są dwie kolejne oceny pozytywne na jednym z dwóch najwyższych poziomów: {formatDate(g.assessmentDates[0])} i {formatDate(g.assessmentDates[1])}. To obowiązek, nie wniosek.
+            </p>
+            <p>
+              <b>Przyznać do {formatDate(g.dueOn)}</b>: 30 dni od zapoznania z oceną {formatDate(g.acknowledgedOn)}
+              {shifted ? `; 30. dzień wypada w ${rawDay} ${formatDate(raw)}, więc termin przechodzi na ${DOW_ACC[dow(g.dueOn)]}` : ""}.
+              {g.overdue ? ` Termin minął ${formatDate(g.dueOn)}.` : ""} <LegalBasis basis={g.basis} />
+            </p>
+          </>
+        )}
       </div>
-      {g.atMaxGrade ? (
-        <p>Ma najwyższy stopień, kolejnego nie można przyznać.</p>
-      ) : (
-        <>
-          <p>
-            Urząd ma obowiązek przyznać kolejny stopień służbowy, bo od ostatniego stopnia są dwie kolejne oceny pozytywne na jednym z dwóch najwyższych poziomów: {formatDate(g.assessmentDates[0])} i {formatDate(g.assessmentDates[1])}.
-          </p>
-          <p>
-            <b>Przyznać do {formatDate(g.dueOn)}</b>: 30 dni od zapoznania z oceną {formatDate(g.acknowledgedOn)}
-            {shifted ? `, koniec w ${rawDay} ${formatDate(raw)}, więc ${DOW[dow(g.dueOn)]}` : ""}.
-            {g.overdue ? ` Termin minął ${formatDate(g.dueOn)}.` : ""} <LegalBasis basis={g.basis} />
-          </p>
-          <p>
-            <b>Stopień {romanGrade(g.fromGrade)} → {romanGrade(g.toGrade!)}</b>
-          </p>
-          <p class="cap">To obowiązek, nie wniosek.</p>
+      <div class="hr-duty-side">
+        <dl class="hr-facts">
+          <div><dt>Urzędnik mianowany</dt><dd>{props.personName}</dd></div>
+          {g.atMaxGrade ? null : (
+            <>
+              <div><dt>Stopień</dt><dd class="tnum">{romanGrade(g.fromGrade)} → {romanGrade(g.toGrade!)}</dd></div>
+              <div><dt>Przyznać do</dt><dd class="tnum">{formatDate(g.dueOn)}</dd></div>
+            </>
+          )}
+        </dl>
+        {g.atMaxGrade ? null : (
           <form method="post" action={`/hr/grades/${props.personId}`}>
             <button class="btn primary" type="submit">
               Odnotuj przyznanie stopnia
             </button>
           </form>
-        </>
-      )}
+        )}
+      </div>
     </section>
   );
 }
@@ -57,50 +64,61 @@ export function ReminderCard(props: ReminderProps) {
 const STEP_LABEL: Record<CycleStep, string> = {
   criteria_due: "Kryteria do wyznaczenia",
   part1_waiting: "Część I czeka na potwierdzenie",
-  in_period: "Okres oceny",
+  in_period: "Okres oceny trwa",
   awaiting_acknowledgement: "Ocena czeka na potwierdzenie zapoznania",
   acknowledged: "Zapoznanie potwierdzone",
   fiction: "Fikcja zapoznania",
   objection_filed: "Sprzeciw wniesiony",
   objection_resolved: "Sprzeciw rozpatrzony",
-  due_change_requested: "Wniosek o zmianę terminu",
+  due_change_requested: "Wniosek ocenianego o zmianę terminu",
 };
 
 function Chevron() {
   return <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6" /></svg>;
 }
 
-/** Liczby dla całego urzędu, bez nazwisk i bez podziału na komórki. Gdy wszystkie są zerami, jedno zdanie zamiast kafli. */
-export function StatsBlock(props: { stats: OfficeStats }) {
+function StatRow(props: { label: string; n: number }) {
+  return (
+    <li class="stat">
+      <span class="stat-label">{props.label}<span class="vh">:</span></span> <b class="stat-n tnum">{props.n}</b>
+    </li>
+  );
+}
+
+/** Liczby dla całego urzędu, bez nazwisk i bez podziału na komórki. Gdy wszystkie są zerami, jedno zdanie zamiast listy. */
+export function StatsBlock(props: { stats: OfficeStats; title?: string }) {
   const s = props.stats;
+  const title = props.title ?? "Terminowość w urzędzie (bez nazwisk)";
   const total = Object.values(s.byStep).reduce((a, n) => a + (n ?? 0), 0) + s.onTime + s.late + s.overdueOpen;
   if (total === 0) {
     return (
       <section class="card" id="statystyki">
-        <h2>Terminowość w urzędzie (bez nazwisk)</h2>
+        <h2>{title}</h2>
         <p>Nie ma jeszcze cykli ani ocen do policzenia.</p>
       </section>
     );
   }
   return (
-    <section class="card" id="statystyki">
-      <h2>Terminowość w urzędzie (bez nazwisk)</h2>
-      <ul class="hr-stats plain-list">
-        {(Object.keys(STEP_LABEL) as CycleStep[]).map((k) => (
-          <li class="stat">
-            <span class="stat-label">{STEP_LABEL[k]}<span class="vh">:</span></span> <b class="stat-n tnum">{s.byStep[k] ?? 0}</b>
-          </li>
-        ))}
-        <li class="stat">
-          <span class="stat-label">Oceny zatwierdzone w terminie<span class="vh">:</span></span> <b class="stat-n tnum">{s.onTime}</b>
-        </li>
-        <li class="stat">
-          <span class="stat-label">Oceny zatwierdzone po terminie<span class="vh">:</span></span> <b class="stat-n tnum">{s.late}</b>
-        </li>
-        <li class="stat">
-          <span class="stat-label">Cykle otwarte po terminie, bez oceny<span class="vh">:</span></span> <b class="stat-n tnum">{s.overdueOpen}</b>
-        </li>
-      </ul>
+    <section class="card hr-statcard" id="statystyki" aria-labelledby="h-stat">
+      <h2 id="h-stat">{title}</h2>
+      <div class="hr-statcols">
+        <div>
+          <h3>Oceny i cykle po terminie</h3>
+          <ul class="hr-stats plain-list">
+            <StatRow label="Oceny zatwierdzone w terminie" n={s.onTime} />
+            <StatRow label="Oceny zatwierdzone po terminie" n={s.late} />
+            <StatRow label="Cykle otwarte po terminie, bez oceny" n={s.overdueOpen} />
+          </ul>
+        </div>
+        <div>
+          <h3>Cykle według etapu</h3>
+          <ul class="hr-stats plain-list">
+            {(Object.keys(STEP_LABEL) as CycleStep[]).map((k) => (
+              <StatRow label={STEP_LABEL[k]} n={s.byStep[k] ?? 0} />
+            ))}
+          </ul>
+        </div>
+      </div>
     </section>
   );
 }
@@ -115,50 +133,48 @@ export type StateRow = {
   links: CycleLink[];
 };
 
-const VISIBLE_LINKS = 3;
-
-function HrLinks(props: { links: CycleLink[]; printHref: string | null }) {
-  const all = [...props.links.map((l) => ({ href: l.href, label: l.label })), ...(props.printHref ? [{ href: props.printHref, label: "Drukuj / pobierz PDF" }] : [])];
-  const link = (l: { href: string; label: string }) => (
-    <a href={l.href}>
-      {l.label}
-    </a>
-  );
-  const rest = all.slice(VISIBLE_LINKS);
+function Deadline(props: { r: StateRow }) {
+  const r = props.r;
+  if (!r.state.deadline) return <span class="hr-none">brak terminu</span>;
+  const passedObjection = (r.state.step === "acknowledged" || r.state.step === "fiction") && r.state.deadline.date < r.today;
   return (
-    <span class="hr-links">
-      {all.slice(0, VISIBLE_LINKS).map(link)}
-      {rest.length ? (
-        <details class="disc hr-more">
-          <summary>Więcej <Chevron /></summary>
-          <span class="hr-links">{rest.map(link)}</span>
-        </details>
-      ) : null}
-    </span>
+    <>
+      {passedObjection ? (
+        <span>Termin sprzeciwu minął {formatDate(r.state.deadline.date)}</span>
+      ) : (
+        <span>
+          {r.state.deadlineLabel}: <b class="tnum">{formatDate(r.state.deadline.date)}</b>
+        </span>
+      )}{" "}
+      <LegalBasis basis={r.state.deadline.basis} />
+      {r.state.overdue ? <span class="hr-late"> Termin minął {formatDate(r.state.deadline.date)}.</span> : null}
+    </>
   );
 }
 
+/** Tabela stanu cykli: w wierszu jeden odnośnik do cyklu (nazwisko prowadzi do części I, gdzie są wszystkie odnośniki cyklu); w kolumnie arkusza tylko pliki do pobrania. */
 export function CycleStateTable(props: { rows: StateRow[] }) {
   return (
     <div class="hr-scroll">
-      <table class="hr-table">
+      <table class="hr-table hr-cycles">
+        <caption class="vh">Cykle oceny: oceniany, oceniający, stan cyklu, termin i arkusz</caption>
         <thead>
           <tr>
-            <th scope="col">Osoba</th>
+            <th scope="col">Oceniany</th>
             <th scope="col">Oceniający</th>
-            <th scope="col">Arkusz</th>
-            <th scope="col">Stan procesu</th>
+            <th scope="col">Stan cyklu</th>
             <th scope="col">Termin</th>
-            <th scope="col">Odnośniki</th>
+            <th scope="col">Arkusz</th>
           </tr>
         </thead>
         <tbody>
           {props.rows.map((r) => (
             <tr class="hr-card">
-              <th scope="row">{r.personName}</th>
+              <th scope="row">
+                <a href={`/cycles/${r.cycleId}/part1`}>{r.personName}</a>
+              </th>
               <td data-label="Oceniający">{r.appraiserName}</td>
-              <td data-label="Arkusz">{r.sheet ?? "—"}</td>
-              <td data-label="Stan procesu" class="hr-state">
+              <td data-label="Stan cyklu" class="hr-state">
                 {r.state.text}
                 {r.state.more ? (
                   <details class="disc">
@@ -168,44 +184,65 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
                 ) : null}
               </td>
               <td data-label="Termin" class="hr-due">
-                {r.state.deadline ? (
+                <Deadline r={r} />
+              </td>
+              <td data-label="Arkusz" class="hr-sheet">
+                {r.sheet ? (
                   <>
-                    {(r.state.step === "acknowledged" || r.state.step === "fiction") && r.state.deadline.date < r.today ? (
-                      <span>Termin sprzeciwu minął {formatDate(r.state.deadline.date)}</span>
-                    ) : (
-                      <span>
-                        {r.state.deadlineLabel}: {formatDate(r.state.deadline.date)}
-                      </span>
-                    )}{" "}
-                    <LegalBasis basis={r.state.deadline.basis} />
-                    {r.state.overdue ? <small class="cap"> · termin minął {formatDate(r.state.deadline.date)}</small> : null}
+                    <span>Arkusz {r.sheet}</span>
+                    <a href={`/cycles/${r.cycleId}/sheet?print=1`}>Drukuj / pobierz PDF</a>
+                    {r.links.filter((l) => l.href.endsWith("/assessment/export.json")).map((l) => (
+                      <a href={l.href} download>Ocena do systemu kadrowego (JSON)</a>
+                    ))}
                   </>
                 ) : (
-                  "—"
+                  <span class="hr-none">arkusz jeszcze nie przypisany</span>
                 )}
-              </td>
-              <td data-label="Odnośniki">
-                <HrLinks links={r.links} printHref={r.sheet ? `/cycles/${r.cycleId}/sheet?print=1` : null} />
-                {r.state.step === "objection_filed" ? (
-                  <form method="post" action={`/cycles/${r.cycleId}/objection-outcome`} class="hr-actions">
-                    <span class="lbl">Rozstrzygnięcie sprzeciwu:</span>
-                    <button class="btn" type="submit" name="outcome" value="changed">
-                      Uwzględniony: zmiana oceny
-                    </button>
-                    <button class="btn" type="submit" name="outcome" value="redone">
-                      Uwzględniony: ponowne sporządzenie oceny
-                    </button>
-                    <button class="btn" type="submit" name="outcome" value="rejected">
-                      Nieuwzględniony
-                    </button>
-                  </form>
-                ) : null}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
+  );
+}
+
+/** Sprzeciwy czekające na wynik rozpatrzenia: nad tabelą, jeden formularz na sprzeciw (trasa POST /cycles/:id/objection-outcome). */
+export function ObjectionsBlock(props: { rows: StateRow[] }) {
+  const open = props.rows.filter((r) => r.state.step === "objection_filed");
+  if (open.length === 0) return null;
+  return (
+    <section class="card hr-obj" aria-labelledby="h-obj">
+      <h2 id="h-obj">Sprzeciw do rozpatrzenia</h2>
+      {open.map((r) => (
+        <form method="post" action={`/cycles/${r.cycleId}/objection-outcome`} class="hr-obj-item">
+          <div class="hr-obj-what">
+            <h3>
+              <a href={`/cycles/${r.cycleId}/part1`}>{r.personName}</a>
+            </h3>
+            <p>{r.state.text}</p>
+            <p class="hr-obj-due">
+              <Deadline r={r} />
+            </p>
+          </div>
+          <fieldset class="hr-obj-pick">
+            <legend class="lbl">Wynik rozpatrzenia sprzeciwu</legend>
+            {[
+              ["changed", "Uwzględniony: zmiana oceny"],
+              ["redone", "Uwzględniony: ponowne sporządzenie oceny"],
+              ["rejected", "Nieuwzględniony"],
+            ].map(([value, label], i) => (
+              <label class="cb">
+                <input type="radio" name="outcome" value={value} required={i === 0} />
+                <span class="box" aria-hidden="true"></span>
+                <span class="cbt">{label}</span>
+              </label>
+            ))}
+            <button class="btn" type="submit">Odnotuj wynik rozpatrzenia</button>
+          </fieldset>
+        </form>
+      ))}
+    </section>
   );
 }
 
@@ -231,8 +268,9 @@ export function HrOverviewView(props: { viewer: Person; today: string; cards: Re
       {props.cards.map((c) => (
         <ReminderCard {...c} />
       ))}
-      <section class="card">
-        <h2>Cykle oceny</h2>
+      <ObjectionsBlock rows={props.rows} />
+      <section class="card hr-cyclecard" aria-labelledby="h-cycles">
+        <h2 id="h-cycles">Cykle oceny</h2>
         <CycleStateTable rows={props.rows} />
       </section>
       <StatsBlock stats={props.stats} />
