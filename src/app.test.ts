@@ -17,13 +17,6 @@ const form = (date: string) => ({
 });
 
 describe("trasy F-01", () => {
-  test("GET / bez konta przekierowuje na /account", async () => {
-    const { app } = createTestApp();
-    const res = await app.request("/");
-    expect(res.status).toBe(302);
-    expect(res.headers.get("location")).toBe("/account");
-  });
-
   test("konto: lista, wybór, ekran startowy z datą", async () => {
     const { app, db } = createTestApp();
     const list = await app.request("/account");

@@ -1,5 +1,8 @@
 import type { Child } from "hono/jsx";
 import type { Person } from "../people";
+import { currentTour } from "../tour/context";
+import { stopById, stopScreenPath } from "../tour/stops";
+import { TourPanel } from "./tour-panel";
 
 const ROLES: Record<Person["role"], string> = {
   appraiser: "oceniający",
@@ -36,6 +39,8 @@ export function formatDateLong(iso: string): string {
 
 export function Layout(props: { title: string; person: Person | null; today: string | null; children?: Child }) {
   const { person } = props;
+  const tour = currentTour();
+  const tourStop = tour.stop && !tour.path.startsWith("/tour") ? stopById(tour.stop) : null;
   return (
     <html lang="pl">
       <head>
@@ -46,7 +51,7 @@ export function Layout(props: { title: string; person: Person | null; today: str
         <link rel="stylesheet" href="/style.css" />
         <link rel="stylesheet" href="/print.css" media="print" />
       </head>
-      <body>
+      <body class={tourStop ? "tour-on" : undefined}>
         <header class="top">
           <div class="top-in">
             <a class="brand" href="/">
@@ -55,6 +60,7 @@ export function Layout(props: { title: string; person: Person | null; today: str
             <nav class="nav" aria-label="Główna">
               <a href="/">Strona główna</a>
               <a href="/account">Zmień konto</a>
+              {person ? <a href="/tour">Pokaz dla jury</a> : null}
             </nav>
             <p class="who">
               {person ? (
@@ -67,7 +73,7 @@ export function Layout(props: { title: string; person: Person | null; today: str
             </p>
           </div>
         </header>
-        {props.today ? (
+        {props.today && !tourStop ? (
           <form method="post" action="/demo/date" class="demo-bar">
             <b>Pokaz</b>
             <label>
@@ -80,6 +86,12 @@ export function Layout(props: { title: string; person: Person | null; today: str
           </form>
         ) : null}
         <main class="wrap">{props.children}</main>
+        {tourStop ? (
+          <>
+            <TourPanel stop={tourStop} screenPath={stopScreenPath(tourStop)} onScreen={tour.path === stopScreenPath(tourStop)} dateLabel={formatDateLong(tourStop.date)} dateOf={formatDateLong} />
+            <script src="/tour.js" defer />
+          </>
+        ) : null}
       </body>
     </html>
   );
