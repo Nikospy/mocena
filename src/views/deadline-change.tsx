@@ -123,7 +123,7 @@ export function ChangeFormView(props: {
         </section>
       ) : null}
       </div>
-      <aside class="side">
+      <aside class={props.request ? "side first" : "side"}>
         {props.request ? (
           <section class="card ct-request" aria-labelledby="h-request">
             <h2 id="h-request">Wniosek ocenianego z {formatDate(props.request.date)}</h2>
