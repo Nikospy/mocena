@@ -50,7 +50,7 @@ export function assessmentSlots(p: { cycleId: string; viewer: Person }): Slots {
         <button type="button" class="btn" data-target="justification">Wstaw do uzasadnienia</button>
         <p class="cap" role="status" data-insert-status></p>
         <script src="/insert-notes.js" defer></script>
-        <p class="cap">Wstawia zaznaczone notatki z datami na końcu pola. Tekst możesz dalej poprawiać; nic się nie zapisuje, dopóki nie klikniesz „Zapisz”.</p>
+        <p class="cap">Dopisuje zaznaczone notatki z datami na końcu pola. Zapis dopiero po „Zapisz szkic oceny”.</p>
       </div>
     ),
   };
