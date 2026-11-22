@@ -2,7 +2,7 @@
 import { Hono, type Context } from "hono";
 import { redoLoweringErrors } from "../assessment/redo";
 import { assessmentState, type AssessmentSnapshot } from "../assessment/state";
-import { cycleById } from "../cycles";
+import { cycleById, cycleDeadlineDetails, openCycle, previousCycleOf, restartNextCycle } from "../cycles";
 import { getDb } from "../db";
 import { rules } from "../engine/rules";
 import { computeAssessment, POINTS } from "../engine/scoring";
@@ -76,6 +76,15 @@ app.post("/cycles/:id/objection-change", async (c) => {
   };
   const ok = getDb().transaction(() => {
     if (visibleEvents(g.cycleId).some((e) => e.type === "objection_resolved")) return false;
+    if (g.first.result.outcome === "negative" && r.outcome === "positive") {
+      const state = assessmentState(g.cycleId);
+      const acquaintedOn = state.acknowledgement?.eventDate ?? state.fiction?.eventDate;
+      const next = openCycle(g.person.id);
+      const previous = next && previousCycleOf(next.id);
+      if (previous?.id === g.cycleId && state.approvedOn && acquaintedOn && next && cycleDeadlineDetails(next.id).kind === "after_negative") {
+        restartNextCycle(previous, g.viewer.id, state.approvedOn, acquaintedOn, r.outcome, "previous_assessment_changed");
+      }
+    }
     recordEvent("objection_resolved", g.cycleId, g.viewer.id, { outcome: "changed" });
     recordEvent("assessment_changed", g.cycleId, g.viewer.id, changed);
     return true;

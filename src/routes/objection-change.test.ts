@@ -49,3 +49,27 @@ describe("rozstrzygnięcie „zmiana oceny” zmienia ocenę (art. 83 ust. 3 ust
     expect((await call(app, "joanna", `${CYCLE}/objection-change`)).status).toBe(409);
   });
 });
+
+test("zmiana wyniku na pozytywny przestawia istniejący następny cykl", async () => {
+  const { app, db } = createTestApp({ today: "2026-11-22" });
+  const { assessmentState } = await import("../assessment/state");
+  const { cycleById, cycleDeadlineDetails, openCycle, startNextCycle } = await import("../cycles");
+  const id = "cycle-katarzyna";
+  const first = assessmentState(id).snapshot!;
+  const negative = { ...first, scores: Object.fromEntries(ids().map((id) => [id, 1])),
+    criteria: first.criteria.map((criterion) => ({ ...criterion, score: 1 })),
+    result: { ...first.result, mean: 1, outcome: "negative" } };
+  db.query("UPDATE events SET payload = ? WHERE cycle_id = ? AND type = 'assessment_approved'").run(JSON.stringify(negative), id);
+  startNextCycle(cycleById(id)!, "katarzyna", "2026-11-16", "2026-11-17", "negative");
+  const next = openCycle("katarzyna")!;
+  expect(cycleDeadlineDetails(next.id).deadline).toBe("2027-05-18");
+  expect((await call(app, "joanna", `${CYCLE}/objection-change`, form([5, 5, 5, 5, 5]))).status).toBe(303);
+  expect(openCycle("katarzyna")).toMatchObject({ id: next.id, period_start: "2026-11-16" });
+  expect(cycleDeadlineDetails(next.id)).toMatchObject({ kind: "regular", deadline: "2028-11-16" });
+  const home = await html(app, "anna", "/");
+  expect(home).toContain("§ 7 pkt 1");
+  expect(home).not.toContain("Termin ponownej oceny");
+  const csv = await html(app, "joanna", "/hr/export.csv");
+  expect(csv.split("\r\n").find((line) => line.startsWith("Katarzyna Lewandowska;"))?.split(";").slice(5))
+    .toEqual(["16.11.2028", "", "16.11.2026", "pozytywna"]);
+});

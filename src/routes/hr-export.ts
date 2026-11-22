@@ -28,7 +28,8 @@ app.get("/hr/export.csv", (c) => {
     const latest = assessmentState(cycle.id);
     const previous = !latest.snapshot ? previousCycleOf(cycle.id) : null;
     const deadline = latest.snapshot?.deadline ?? effectiveDeadline(cycle.id);
-    const objection = latest.objectionDeadline ?? (previous ? assessmentState(previous.id).objectionDeadline : null);
+    const objectionState = previous ? assessmentState(previous.id) : latest;
+    const objection = objectionState.objection?.resolvedOn ? null : objectionState.objectionDeadline;
     const last = lastAssessmentOf(cycle.person_id);
     return [
       person?.name ?? cycle.person_id,

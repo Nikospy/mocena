@@ -102,11 +102,14 @@ export function startNextCycle(previous: Cycle, actorId: string, assessedOn: str
 }
 
 /**
- * Zapoznanie z oceną sporządzoną po raz drugi (art. 83 ust. 4 ustawy). Następny cykl powstał już przy zapoznaniu z pierwszą oceną:
- * nie zakładamy drugiego, tylko dopisujemy w nim nowe `cycle_started` z datą i wynikiem drugiej oceny i przestawiamy początek okresu.
+ * Po rozstrzygnięciu sprzeciwu następny cykl może już istnieć od zapoznania z pierwszą oceną:
+ * dopisujemy w nim nowe `cycle_started` z datą i obowiązującym wynikiem oraz przestawiamy początek okresu.
  * Wszystkie odczyty biorą ostatnie `cycle_started`, więc termin następnego cyklu liczy się od drugiej oceny. Bez następnego cyklu: zwykły start.
  */
-export function restartNextCycle(previous: Cycle, actorId: string, assessedOn: string, acquaintedOn: string, outcome: "positive" | "negative"): void {
+export function restartNextCycle(
+  previous: Cycle, actorId: string, assessedOn: string, acquaintedOn: string, outcome: "positive" | "negative",
+  reason: "previous_assessment_redone" | "previous_assessment_changed" = "previous_assessment_redone",
+): void {
   const next = (getDb().query("SELECT id FROM cycles WHERE person_id = ?").all(previous.person_id) as { id: string }[]).find((c) =>
     getDb().query("SELECT 1 FROM events WHERE cycle_id = ? AND type = 'cycle_started' AND json_extract(payload, '$.previousCycleId') = ?").get(c.id, previous.id),
   );
@@ -114,7 +117,7 @@ export function restartNextCycle(previous: Cycle, actorId: string, assessedOn: s
   const periodStart = outcome === "negative" ? acquaintedOn : assessedOn;
   getDb().query("UPDATE cycles SET period_start = ? WHERE id = ?").run(periodStart, next.id);
   recordEvent("cycle_started", next.id, actorId, {
-    reason: "previous_assessment_redone",
+    reason,
     periodStart,
     previousAssessmentOn: assessedOn,
     previousAcknowledgedOn: acquaintedOn,
