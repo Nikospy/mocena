@@ -76,3 +76,48 @@ Po każdej grupie: pomiar, obejrzenie zrzutów, `bun test`, commit.
 ## Raport końcowy
 
 Tabela „przed → po” dla progów wyżej (mediana i najgorszy ekran), lista commitów, lista punktów niezrobionych z powodem oraz ścieżki sześciu zrzutów „po” do pokazania autorowi: strona główna, Część I, ocena, przed rozmową, kadry (każdy 1440) i ocena 360. Ostatnia linia: `GOTOWE: final-visual <skrót commita>`.
+
+## Komponenty wspólne (kontrakt dla grup ekranów)
+
+Stan na etap 2 paczki „wygląd”. Klasy żyją w `public/style.css` (sekcje 2–7); grupy ekranów piszą tylko w swojej sekcji na końcu pliku (`/* === screens: … === */`) i nie nadpisują tych klas. Skala pisma: 14 metadane · 16 treść · 20 sekcja, termin, werdykt · 28 `h1` (telefon 24). Cień tylko dla warstw nad treścią (menu konta, kalendarz, panel pokazu). Wszystkie wartości z tokenów.
+
+| Komponent | Klasa / JSX | Do czego |
+|---|---|---|
+| Nagłówek strony | `PageHeader` z `src/views/components.tsx` → `header.page-h` | Jedyny wzór nagłówka: linia kontekstu (`.page-ctx`), `h1` z czynnością i osobą, jedno zdanie (`.page-lead`, do 66 znaków), jeden rząd odnośników tekstowych (`nav.page-links`). Stoi poza kartą, na lewej krawędzi znaku. Opcjonalnie `aside` (krótki stan po prawej od 900 px) i `extra` (np. przycisk drukowania). |
+| Lista spraw | `ul.tasks > li.task` (`.task-link`, `.task-main`, `.task-side`, `.task-due`, `.task-go`) | Wiersze na jednej powierzchni; cały wiersz prowadzi do sprawy (rozciągnięty `a.task-link`). Termin słowami po prawej (`.task-due b`), zaległość: `li.task.late`. Dodatkowe akcje wiersza w `.task-more` (nad odnośnikiem). |
+| Wiersz notatki | `ul.note-list > li.note-item` (`.note-meta-c`, `.note-text`) | Notatka to wiersz z cienką linią u góry, bez własnej ramki i tła. |
+| Podstawa prawna | `LegalBasis` → `span.basis > span.art` | Zwykły tekst 14 px w `--text-2` przy dacie albo wyniku: „art. 81 ust. 7 ustawy”. Dłuższe objaśnienie idzie do zdania obok. Nie pigułka. |
+| Stan | `.st.ok` / `.st.warn` / `.st.bad` / `.st.info` (ikona + `b` + `small`) | Komunikat stanu. Pigułka (`.mark.good`, `.mark.fix`, `.r-chip`) tylko dla stanu, nigdy dla odnośnika ani przepisu. |
+| Przyciski | `.btn.primary` · `.btn` · `.btn.text` | Jedna wysokość 48 px. Wypełniony = jedna główna akcja na ekranie; z obrysem = drugorzędna; tekstowy = poboczna, „Wróć”. `.btn.full` na całą szerokość. Nawigacja między ekranami to zwykły odnośnik, nie przycisk. |
+| Pola formularza | `label.lbl` + `.area` (textarea, `input.area`, `select.area`), `.cb`, `.seg`, `.chips`, `.score` | Etykieta nad polem, pole 48 px (textarea wyżej), obrys 2 px `--border-strong`, błąd przez `aria-invalid` i komunikat pod polem. |
+| Układ 2/3 + 1/3 | `.o-grid > .o-main + aside.side` | Od 1000 px: treść po lewej, po prawej reguła, termin i akcja (kolumna `--side-w`, przyklejona). Poniżej jedna kolumna; `.side.first` przenosi kolumnę nad treść. `.t-grid` (oś czasu) to starszy duplikat – do zastąpienia przez `.o-grid`. |
+| Powierzchnie | `.card` (człowiek), `.rule` (reguła, ciągła obwódka), `.hint` (podpowiedź, przerywana) | Ramka tylko dla karty sekcji i głosu reguły/podpowiedzi; wewnątrz grupuje odstęp i linia, bez kart w kartach. |
+
+Przykład nagłówka strony:
+
+```tsx
+<PageHeader
+  context={<>Ocena okresowa · arkusz {sheet}</>}
+  title={<>Część I oceny: {name}</>}
+  lead="Jedno zdanie, co tu zrobić."
+  linksLabel="Cykl oceny"
+  links={<><a href={`/cycles/${id}/timeline`}>Oś czasu</a><a href={`/cycles/${id}/sheet`}>Arkusz</a></>}
+/>
+```
+
+Przykład wiersza listy spraw:
+
+```html
+<ul class="tasks">
+  <li class="task late">
+    <div class="task-main">
+      <h2><a class="task-link" href="/cycles/x/part1">Część I oceny: Piotr Wójcik</a></h2>
+      <p class="task-detail">Zdanie objaśnienia.</p>
+    </div>
+    <div class="task-side">
+      <p class="task-due"><b>po terminie od 2 dni</b><span>do 27.11.2026 <span class="basis"><span class="art">art. 81 ust. 4 ustawy</span></span></span></p>
+      <span class="task-go" aria-hidden="true">Otwórz</span>
+    </div>
+  </li>
+</ul>
+```

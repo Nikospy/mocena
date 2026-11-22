@@ -2,8 +2,8 @@
 
    Idea: mOcena to kolejna usługa z rodziny mObywatel. Spokojne tło, białe powierzchnie, kobalt jako jedyny akcent.
    Trzy głosy mają trzy materiały, rozpoznawalne bez czytania:
-     człowiek  – biała karta z cieniem i sygnaturą autora (ikona osoby, imię, data),
-     reguła    – kobaltowa powierzchnia z ciągłą obwódką, znak § i pigułka podstawy (przepis + wersja reguł),
+     człowiek  – biała karta z cienką linią i sygnaturą autora (ikona osoby, imię, data),
+     reguła    – kobaltowa powierzchnia z ciągłą obwódką, znak § i podstawa prawna zwykłym tekstem,
      podpowiedź – biała powierzchnia z przerywaną obwódką, etykieta ze źródłem i widoczny sposób odrzucenia.
    Ciągła linia = pewne (policzone z przepisu), przerywana = do przyjęcia albo odrzucenia, brak linii = zapis człowieka.
    Na ekranie jeden bohater i jedna główna akcja.
@@ -45,7 +45,6 @@ a { color: var(--primary); text-underline-offset: .2em; }
 h1, h2, h3 { text-wrap: balance; }
 p, li { text-wrap: pretty; }
 .vh { position: absolute; inline-size: 1px; block-size: 1px; overflow: clip; clip-path: inset(50%); white-space: nowrap; }
-.txt { max-inline-size: 66ch; }
 .tnum { font-variant-numeric: tabular-nums; }
 
 /* ================= 2. Powłoka =================
@@ -303,23 +302,6 @@ p { max-inline-size: 66ch; }
 @media (hover: hover) and (pointer: fine) { .sum:hover { background: var(--cobalt-10); } }
 
 /* kalendarz własny */
-.dt { position: relative; }
-.dt .tok { border: 2px solid var(--border-strong); }
-@media (hover: hover) and (pointer: fine) { .dt .tok:hover { border-color: var(--text-2); } }
-.cal { position: absolute; z-index: 20; inset-block-start: calc(100% + var(--sp-100)); inset-inline-start: 0; inline-size: 336px; max-inline-size: 100%;
-  background: var(--white); border-radius: var(--r-200); box-shadow: var(--elev-2); padding: var(--sp-150); }
-.cal-h { display: flex; align-items: center; justify-content: space-between; margin-block-end: var(--sp-100); }
-.cal-h b { font-size: var(--f-p); }
-.cal-h button { inline-size: var(--hit); block-size: var(--hit); border: 0; border-radius: var(--pill-r); background: var(--cobalt-10); color: var(--primary); cursor: pointer; display: grid; place-items: center; }
-.cal-h button .ico { inline-size: var(--sp-200); block-size: var(--sp-200); }
-.cal-g { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--sp-50); text-align: center; }
-.cal-g .wd { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-3); padding-block: var(--sp-50); }
-.cal-g button { min-block-size: var(--hit); border: 0; background: none; border-radius: var(--pill-r); font-size: var(--f-c1); line-height: var(--lh-c1); cursor: pointer; font-variant-numeric: tabular-nums; }
-.cal-g button.sel { background: var(--primary); color: var(--on-primary); font-weight: var(--w-bold); }
-.cal-g button.we { color: var(--text-3); }
-.cal-g button.sel.we { color: var(--on-primary); }
-.cal-h button:active, .cal-g button:active { background: var(--cobalt-20); }
-@media (hover: hover) and (pointer: fine) { .cal-h button:hover { background: var(--cobalt-20); } .cal-g button:not(.sel):hover { background: var(--cobalt-10); } }
 
 /* ================= 6. Obiekty produktu ================= */
 
@@ -375,15 +357,10 @@ p { max-inline-size: 66ch; }
 .exp { display: grid; grid-template-rows: 0fr; }
 .exp.open { grid-template-rows: 1fr; }
 .exp > div { overflow: clip; min-block-size: 0; }
-.exp-in { padding-block-start: var(--sp-150); }
 
 /* notatka przełożonego (człowiek) */
-.nt, .expect { padding-block: var(--sp-150); border-block-start: 1px solid var(--line); display: grid; gap: var(--sp-50); }
-.nt-h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-100); }
-.nt p, .expect p { max-inline-size: 66ch; }
-.mark { display: inline-flex; align-items: center; min-block-size: var(--sp-300); padding-inline: var(--sp-150); border-radius: var(--pill-r); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); }
-.mark.good { background: var(--green-20); color: var(--green-200); }
-.mark.fix { background: var(--orange-20); color: var(--orange-200); }
+.expect { padding-block: var(--sp-150); border-block-start: 1px solid var(--line); display: grid; gap: var(--sp-50); }
+.expect p { max-inline-size: 66ch; }
 
 /* wynik oceny (reguła, bohater ekranu oceny) */
 .res { padding: calc(var(--sp-400) - 2px) calc(var(--sp-300) - 2px); }
@@ -398,57 +375,19 @@ p { max-inline-size: 66ch; }
 .res.pos .verdict { color: var(--green-200); } .res.pos .verdict .ico { color: var(--green-100); }
 .res.pos .v-neg { display: none; } .res.pos .v-ok { display: block; }
 .reason { color: var(--text); max-inline-size: 52ch; }
-.res-calc { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0 var(--sp-200); padding-block-start: var(--sp-200); border-block-start: 1px solid var(--rule-divider); }
 .res .avg { color: var(--rule-ink); }
 .res .avg-cap { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--rule-quiet); }
 .res .level { grid-column: 1 / -1; font-size: var(--f-p); line-height: var(--lh-p); font-weight: var(--w-bold); color: var(--rule-ink); }
 
 /* termin oceny (reguła, bohater ekranu osi) */
 .term-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: var(--sp-200) var(--sp-400); }
-.term-main > * + * { margin-block-start: var(--sp-100); }
 .term-date { display: grid; justify-items: start; gap: var(--sp-50); }
 .term-date .big { color: var(--rule-ink); }
 .term-date .cmp { display: flex; align-items: center; gap: var(--sp-150); }
 .term-date .cmp:not(:has(:not([hidden]))) { display: none; }
 .term-date .old { font-size: var(--f-h5); line-height: var(--lh-h5); color: var(--rule-quiet); text-decoration: line-through; text-decoration-thickness: 2px; }
 .term-date .delta { font-size: var(--f-h5); line-height: var(--lh-h5); font-weight: var(--w-bold); color: var(--orange-200); background: var(--orange-20); border-radius: var(--pill-r); padding: 0 var(--sp-150); }
-.term-meta { display: grid; justify-items: start; gap: var(--sp-100); }
 
-/* oś czasu cyklu: proporcje czasu zachowane; geometria (--cy, wysokość) zgodna ze stałymi w skrypcie */
-.ax-wrap { margin-block-start: var(--sp-200); }
-.ax { --cy: 140px; position: relative; block-size: 320px; }
-.ax:has(.ax-lab.struck:not(.hid)) { block-size: 408px; }   /* miejsce na termin pierwotny pod osią */
-.ax-in { position: absolute; inset-block: 0; inset-inline: var(--sp-150); }
-.ax-line { position: absolute; inset-inline: 0; inset-block-start: var(--cy); block-size: 2px; margin-block-start: -1px; background: var(--text-3); }
-.ax-line.fill { block-size: 4px; margin-block-start: -2px; border-radius: var(--pill-r); background: var(--cobalt-100); inset-inline-end: auto; }
-.ax-dot { position: absolute; inset-block-start: var(--cy); inline-size: var(--sp-150); block-size: var(--sp-150); margin: calc(var(--sp-150) / -2) 0 0 calc(var(--sp-150) / -2);
-  border-radius: var(--pill-r); background: var(--white); border: 2px solid var(--cobalt-100); z-index: 2; }
-.ax-dot.rule { padding: 0; background: var(--cobalt-100); border: 2px solid var(--cobalt-100); }
-.ax-dot.now { background: var(--grey-300); border-color: var(--white); box-shadow: 0 0 0 2px var(--grey-300); }
-.ax-dot.ghost, .ax-dot.rule.ghost { background: var(--white); border-color: var(--text-3); }
-.ax-dot.term { inline-size: var(--sp-300); block-size: var(--sp-300); margin: calc(var(--sp-150) * -1) 0 0 calc(var(--sp-150) * -1); border: 4px solid var(--white); box-shadow: 0 0 0 2px var(--cobalt-100); }
-.ax-bar { position: absolute; inset-block-start: var(--cy); block-size: var(--sp-150); margin-block-start: calc(var(--sp-150) / -2); border-radius: var(--pill-r);
-  background: var(--white); border: 2px solid var(--cobalt-100); z-index: 1; }
-.ax-lead { position: absolute; inline-size: 0; border-inline-start: 1px solid var(--text-3); z-index: 0; }
-.ax-lead.dash { border-inline-start-style: dashed; }
-.ax-lab { position: absolute; inline-size: 200px; font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--rule-quiet); z-index: 3; }
-.ax-lab b { display: block; color: var(--text); font-size: var(--f-p); line-height: var(--lh-p); }
-.ax-lab.l { text-align: start; padding-inline-start: var(--sp-100); }
-.ax-lab.r { text-align: end; margin-inline-start: -200px; padding-inline-end: var(--sp-100); }
-.ax-lab.c { text-align: center; margin-inline-start: -100px; }
-.ax-lab.bar { inline-size: 300px; margin-inline-start: -300px; }
-.ax-lab.term b { font-size: var(--f-h5); line-height: var(--lh-h5); color: var(--rule-ink); }
-.ax-lab.struck b { text-decoration: line-through; color: var(--rule-quiet); }
-.ax-lab.hid, .ax-dot.hid, .ax-lead.hid, .ax-bar.hid { opacity: 0; pointer-events: none; }
-.ruler { position: absolute; inset-inline: 0; inset-block-end: 0; block-size: var(--sp-400); border-block-start: 1px solid var(--grey-60); }
-.ruler i { position: absolute; inset-block-start: 0; block-size: var(--sp-100); border-inline-start: 1px solid var(--text-3); }
-.ruler span { position: absolute; inset-block-start: var(--sp-100); transform: translateX(-50%); font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--rule-quiet); white-space: nowrap; font-style: normal; }
-.ax-list { display: none; list-style: none; }
-.ax-list li { padding-block: var(--sp-150); border-block-start: 1px solid var(--rule-divider); display: grid; gap: var(--sp-50); }
-.ax-list li:first-child { border-block-start: 0; }
-.ax-list b { display: block; }
-.ax-list .struck { text-decoration: line-through; color: var(--rule-quiet); }
-@media (max-width: 899px) { .ax-wrap .ax { display: none; } .ax-list { display: block; } }
 .legend { display: grid; gap: var(--sp-100); font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--rule-quiet); }
 .legend span { display: inline-flex; align-items: center; gap: var(--sp-100); }
 .legend i { flex: none; display: inline-block; inline-size: var(--sp-150); block-size: var(--sp-150); border-radius: var(--pill-r); border: 2px solid var(--cobalt-100); background: var(--white); }
@@ -507,7 +446,6 @@ p { max-inline-size: 66ch; }
 .n-form { display: flex; flex-direction: column; gap: var(--sp-300); }
 .n-form > .who-block { display: grid; gap: var(--sp-100); }
 .who-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: var(--sp-100); }
-.picker { padding: var(--sp-100); border-radius: var(--r-200); }
 .hero-field { padding: var(--sp-300); }
 .hero-field > * + * { margin-block-start: 0; }
 .hero-field textarea { display: block; inline-size: 100%; border: 0; background: none; resize: none; padding: 0; margin-block-start: var(--sp-100);
@@ -545,13 +483,8 @@ p { max-inline-size: 66ch; }
 
 .miss a { color: inherit; text-decoration-thickness: 1px; }
 .decide { display: grid; gap: var(--sp-150); }
-.after-ok .st { padding: var(--sp-200); }
 
 /* --- oś czasu (komputer) --- */
-.t-grid { display: grid; gap: var(--sp-300); align-items: start; margin-block-start: var(--sp-300); }
-.t-main, .t-side { display: grid; gap: var(--sp-300); min-inline-size: 0; }
-@media (min-width: 1000px) { .t-grid { grid-template-columns: minmax(0, 1fr) var(--side-w); } }
-.term-card { padding: calc(var(--sp-300) - 2px); }
 .form-gap > * + * { margin-block-start: var(--sp-300); }
 .form-gap .lbl + .seg { margin-block-start: 0; }
 .dates { display: grid; gap: var(--sp-100); }
@@ -561,8 +494,8 @@ p { max-inline-size: 66ch; }
 @keyframes rise { from { opacity: 0; transform: translateY(var(--sp-200)); } to { opacity: 1; transform: none; } }
 @keyframes pop { from { opacity: 0; transform: translateY(var(--sp-100)) scale(.98); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: no-preference) {
-  .enter, .after-ok { animation: rise var(--t-scene) var(--ease-out) both; }
-  .flash, .picker, .cal, .abs-row.enter { animation: pop var(--t-scene) var(--ease-out) both; }
+  .enter { animation: rise var(--t-scene) var(--ease-out) both; }
+  .flash, .abs-row.enter { animation: pop var(--t-scene) var(--ease-out) both; }
   .btn, .tok, .chip span, .seg span, .score span, .cb .box, .sum, .area, .hero-field { transition: background-color var(--t), border-color var(--t), color var(--t), box-shadow var(--t), transform var(--t); }
   .cb .box .ico { transition: opacity var(--t); }
   .sum .ico { transition: transform var(--t); }
@@ -570,12 +503,8 @@ p { max-inline-size: 66ch; }
   .exp { transition: grid-template-rows var(--t-scene) var(--ease-out); }
   .verdict, .verdict .ico, .verdict-box { transition: color var(--t-scene), background-color var(--t-scene); }
   .steps5 li::before, .steps5 .dot { transition: background-color var(--t), border-color var(--t), color var(--t); }
-  .ax-dot, .ax-lead { transition: left var(--t-scene) var(--ease-out); }
-  .ax-lab { transition: left var(--t-scene) var(--ease-out), opacity var(--t); }
-  .ax-bar { transition: left var(--t-scene) var(--ease-out), width var(--t-scene) var(--ease-out); }
-  .ax { transition: block-size var(--t-scene) var(--ease-out); }
 }
-@media (prefers-reduced-motion: reduce) { .enter, .flash, .after-ok, .picker, .cal, .abs-row.enter { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .enter, .flash, .abs-row.enter { animation: none; } }
 
 /* Pasek etapów: linia łącząca zawsze pod kółkiem (linia następnego etapu malowała się na kółku poprzedniego). */
 .steps5 { isolation: isolate; }
@@ -586,7 +515,6 @@ p { max-inline-size: 66ch; }
 /* Pasek z główną akcją na telefonie: treść znika pod nim miękko, zamiast być ucięta w pół wiersza. */
 .actionbar::before { content: ""; position: absolute; inset-inline: 0; inset-block-end: 100%; block-size: var(--sp-300); background: linear-gradient(to bottom, transparent, var(--page-bg)); pointer-events: none; }
 /* „Dziś” na osi to pionowa kreska, nie czwarte kółko w tłoku przy końcu osi. */
-.ax-dot.now { inline-size: 2px; block-size: var(--sp-300); margin: calc(var(--sp-150) * -1) 0 0 -1px; border: 0; border-radius: 0; background: var(--grey-300); box-shadow: none; }
 /* Wąskie okno: legenda dotyczy osi, której tam nie ma; data terminu dostaje całą szerokość. */
 @media (max-width: 899px) { .term-top { grid-template-columns: minmax(0, 1fr); } .term-top .legend { display: none; } }
 /* Rodzaj nieobecności: napis w segmencie nie łamie się po zaznaczeniu. */
@@ -597,7 +525,6 @@ p { max-inline-size: 66ch; }
 /* F-01 */
 .plain-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-150); }
 
-.date-switch { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
 
 /* S-02 assessment-and-confirmation */
 .st-none:empty { display: none; }
@@ -915,7 +842,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .gp-f .btn.primary, .gm-bar .btn.primary { white-space: nowrap; padding-inline: var(--sp-200); }
 .gp-f .btn.primary > span { white-space: nowrap; }
 .gpanel:focus, .gmob:focus { outline: none; }
-.demo-today { color: var(--text-2); }
 .e-done { inline-size: 100%; margin-inline: auto; }
 .e-more .btn.text { padding-inline: 0; justify-content: flex-start; }
 .e-more .btn.text:hover { background: none; text-decoration: underline; }
@@ -940,3 +866,21 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 
 /* deadline-change: wybór jednego przypadku wygląda jak radio */
 .dc-cases .box { border-radius: 50%; }
+
+/* ======================================================================
+   Sekcje ekranów. Każda grupa pisze tylko we własnej sekcji, tylko na tokenach (var(--…)),
+   i nie nadpisuje komponentów wspólnych (kontrakt: context/changes/final-polish/visual.md, „Komponenty wspólne”).
+   Gdy brakuje komponentu wspólnego, opisz potrzebę w raporcie zamiast budować własny.
+   ====================================================================== */
+
+/* === screens: cycle === */
+/* Część I, karty rozmów, przed rozmową, oś czasu, ocena, arkusz, zaproszenia, zmiana terminu. */
+
+/* === screens: hr-admin === */
+/* Stan cykli, pracownicy, zastępstwa, zmiana oceniającego, nieobecności, podpowiedzi (administrator). */
+
+/* === screens: home-tour === */
+/* Strona główna, wybór konta, wejście i koniec pokazu, panel przewodnika. */
+
+/* === screens: forms-states === */
+/* Formularze (notatka, informacja zwrotna, osoba) oraz stany: puste, błąd, zapisano, 404 i 500. */
