@@ -123,6 +123,18 @@ describe("przewodnik pokazu", () => {
     expect(text).not.toContain("gpanel");
   });
 
+  test("dodatek fikcji otwiera właściwą ocenę po zapoznaniu i utworzeniu następnego cyklu", async () => {
+    const { app, db } = createTestApp();
+    const stop = await post(app, "/tour/5");
+    const acknowledged = await post(app, "/cycles/cycle-piotr/assessment/acknowledge", cookies(stop));
+    expect(acknowledged.status).toBe(303);
+    expect(db.query("SELECT COUNT(*) AS n FROM cycles WHERE person_id = 'piotr'").get()).toEqual({ n: 3 });
+    const extra = await post(app, "/tour/extra/fiction", cookies(stop));
+    const location = extra.headers.get("location")!;
+    expect(location).toBe("/cycles/cycle-piotr/assessment/fiction");
+    expect((await html(app, location, cookies(extra))).res.status).toBe(200);
+  });
+
   test("dodatki z ekranu końcowego ustawiają konto i otwierają ekran bez przewodnika", async () => {
     const { app } = createTestApp();
     const cases: [string, string, RegExp][] = [
