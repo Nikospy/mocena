@@ -16,7 +16,7 @@ import { currentPerson, DEMO_DIRECTOR_GENERAL_ID, personById, type Person } from
 import { today } from "../settings";
 import { Layout } from "../views/layout";
 import { PageHeader } from "../views/components";
-import { HrOverviewView, StatsBlock, type StateRow } from "../views/hr-overview";
+import { HrOverviewView, StatsBlock, objectionField, type StateRow } from "../views/hr-overview";
 import { errorPage } from "../views/error-page";
 
 const app = new Hono();
@@ -110,7 +110,14 @@ app.post("/cycles/:id/objection-outcome", async (c) => {
   if (!cycle || !visibleEvents(cycle.id).some((e) => e.type === "cycle_started")) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
   const body = await c.req.parseBody();
   const outcome = typeof body.outcome === "string" ? body.outcome : "";
-  if (!OUTCOMES.includes(outcome)) return errorPage(c, "Nieznane rozstrzygnięcie sprzeciwu.", 422);
+  if (!OUTCOMES.includes(outcome)) {
+    // Ten sam ekran z formularzem sprzeciwu, komunikat przy polu wyboru wyniku (422).
+    const { rows, cards, stats } = overviewData(viewer);
+    // Bez formularza tego sprzeciwu na ekranie komunikat stoi tylko w podsumowaniu (klucz „_” nie robi odnośnika).
+    const field = rows.some((r) => r.cycleId === cycle.id && r.state.step === "objection_filed") ? objectionField(cycle.id) : "_outcome";
+    const errors = { [field]: "Wybierz wynik rozpatrzenia sprzeciwu: zmiana oceny, ponowne sporządzenie oceny albo nieuwzględnienie sprzeciwu." };
+    return c.html(<HrOverviewView viewer={viewer} today={today()} cards={cards} rows={rows} stats={stats} errors={errors} />, 422);
+  }
   const ev = visibleEvents(cycle.id);
   if (!ev.some((e) => e.type === "objection_filed") || ev.some((e) => e.type === "objection_resolved")) {
     return errorPage(c, "Ten sprzeciw jest już rozpatrzony albo nie został wniesiony. Wróć do „Stan cykli”.", 409);

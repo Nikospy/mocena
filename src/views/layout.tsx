@@ -130,12 +130,12 @@ function UserMenu(props: { person: Person }) {
 }
 
 /** Pasek pokazu: poza usługą, jedna linia; zmiana daty rozwija się po kliknięciu. */
-function DemoBar(props: { today: string; withTour: boolean }) {
+function DemoBar(props: { today: string; withTour: boolean; dateError?: string }) {
   const tourLink = props.withTour ? <a href="/tour">Pokaz dla jury</a> : null;
   return (
     <aside aria-label="Pokaz" class="demo">
       <div class="demo-in">
-        <details class="demo-date">
+        <details class="demo-date" open={props.dateError ? true : undefined}>
           <summary>
             <span class="demo-line">
               <b>Pokaz</b> <span aria-hidden="true">·</span> dziś {formatDateLong(props.today)} <span aria-hidden="true">·</span>
@@ -145,8 +145,24 @@ function DemoBar(props: { today: string; withTour: boolean }) {
           <form method="post" action="/demo/date" class="demo-form">
             <label>
               <span>Przesuń datę systemową na</span>
-              <input type="date" name="date" value={props.today} min={props.today} required aria-label="Nowa data systemowa" />
+              <input
+                type="date"
+                name="date"
+                id="demo-date"
+                value={props.today}
+                min={props.today}
+                required
+                aria-label="Nowa data systemowa"
+                aria-invalid={props.dateError ? "true" : undefined}
+                aria-describedby={props.dateError ? "date-error" : undefined}
+              />
             </label>
+            {props.dateError ? (
+              <p class="field-err" id="date-error">
+                <span class="vh">Błąd: </span>
+                {props.dateError}
+              </p>
+            ) : null}
             <button class="btn text" type="submit">
               Przesuń datę
             </button>
@@ -159,7 +175,7 @@ function DemoBar(props: { today: string; withTour: boolean }) {
   );
 }
 
-export function Layout(props: { title: string; person: Person | null; today: string | null; children?: Child }) {
+export function Layout(props: { title: string; person: Person | null; today: string | null; children?: Child; demoDateError?: string }) {
   const { person } = props;
   const tour = currentTour();
   const demo = isDemoMode();
@@ -171,7 +187,7 @@ export function Layout(props: { title: string; person: Person | null; today: str
       <body class={tourStop ? "tour-on" : undefined}>
         <a class="skip-link" href="#main">Przejdź do treści</a>
         {tourStop ? <a class="skip-link" href="#tour-guide" data-skip-guide>Przejdź do przewodnika</a> : null}
-        {demo && props.today && !tourStop ? <DemoBar today={props.today} withTour={!!person} /> : null}
+        {demo && props.today && !tourStop ? <DemoBar today={props.today} withTour={!!person} dateError={props.demoDateError} /> : null}
         <header class="top">
           <div class="top-in">
             <a class="brand" href="/">

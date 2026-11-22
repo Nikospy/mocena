@@ -15,7 +15,7 @@ export type CaptureOptions = {
   hover?: string;
   print?: boolean;
   download?: "csv" | "ics" | "json";
-  form?: { action: string; button?: string; fields?: Record<string, string>; omitSubmitter?: boolean; checks?: { selector: string; count: number } };
+  form?: { action: string; button?: string; fields?: Record<string, string>; omitSubmitter?: boolean; noValidate?: boolean; checks?: { selector: string; count: number } };
 };
 
 type Capture = (who: string | null, path: string, name: string, options?: CaptureOptions) => Promise<void>;
@@ -223,7 +223,8 @@ export async function auditScenarios(shot: Capture, post: Post) {
   const objectionCycle = "/cycles/cycle-katarzyna";
   const objection = objectionCycle + "/objection-outcome";
   await roles(objectionCycle + "/assessment", "assessment-objection-filed", [S, H]);
-  await invalid(H, "/hr", "objection-error", objection, { omitSubmitter: true });
+  // Wybór wyniku ma `required`: pomiar wyłącza walidację przeglądarki, żeby trasa zwróciła formularz z błędem (422).
+  await invalid(H, "/hr", "objection-error", objection, { noValidate: true });
   await shot(H, await post(H, objection, { outcome: "rejected" }), "hr-objection-resolved", { check: "Sprzeciw rozpatrzony" });
   await roles(objectionCycle + "/assessment", "assessment-objection-resolved", [S, H]);
   await shot(D, "/office/statistics", "office-statistics-final");
