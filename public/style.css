@@ -931,6 +931,8 @@ main h1[tabindex="-1"]:focus, main h1[tabindex="-1"]:focus-visible { outline: no
   .tasks.quiet .task:has(.task-go.bare) { padding-inline-end: var(--sp-400); }
   .tasks.quiet .task-go.bare { inset-inline-end: 0; }
 }
+/* lista spraw w szerokości czytania: tytuł i termin w jednym spojrzeniu */
+.home, .home-options { max-inline-size: 880px; }
 /* „Twoje możliwości”: drugorzędne wobec spraw – niżej, bez powierzchni karty, same linie podziału */
 .home-options { margin-block-start: var(--sp-600); }
 .home-options > h2 { margin-block-end: var(--sp-100); }
@@ -1031,6 +1033,8 @@ main h1[tabindex="-1"]:focus, main h1[tabindex="-1"]:focus-visible { outline: no
 .g-dots li.cur { background: var(--grey-400); }
 .g-dots li.done { background: var(--grey-80); }
 @media (min-width: 640px) and (max-width: 899px) { .e-h1 { font-size: var(--f-h2); line-height: var(--lh-h2); } }
+/* 900–1199 px z przewodnikiem: węższy panel i znak bez opisu, żeby treść ekranu miała miejsce */
+@media (min-width: 900px) and (max-width: 1199px) { :root { --panel-w: 320px; } body.tour-on .brand-desc { display: none; } }
 body.tour-on { padding-block-end: 140px; }
 @media (min-width: 900px) { body.tour-on { padding-block-end: 0; } }
 

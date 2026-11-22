@@ -42,7 +42,7 @@ const MOB_GAPS: Record<number, string> = { 1: "15 miesięcy notatek", 2: "8 mies
 export function TourEntry() {
   const moments = STOPS.filter((s) => ["1", "2", "3", "4", "5"].includes(s.id));
   return (
-    <TourShell title="Pokaz">
+    <TourShell title="Prowadzi ocenę okresową od pierwszej notatki do arkusza">
       <div class="e-head">
         <p class="e-ctx">Pokaz dla jury · 5 kroków · około 3 minut</p>
         <h1 class="e-h1">Ten asystent prowadzi ocenę od pierwszej notatki do arkusza.</h1>

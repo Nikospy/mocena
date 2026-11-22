@@ -127,8 +127,8 @@ app.get("/", (c) => {
   const options = homeOptions(person);
   const now = today();
   return c.html(
-    <Layout title="Start" person={person} today={today()}>
-      <section>
+    <Layout title="Sprawy do załatwienia" person={person} today={today()}>
+      <section class="home">
         <PageHeader context={person.position_title ?? roleLabel(person)} title="Sprawy do załatwienia" />
         {tasks.length === 0 ? (
           <div class="home-empty">
