@@ -23,8 +23,8 @@ Zgoda na start budowy: wiadomość autora 22.11 ok. 00:30 („Okej, będziemy ru
 
 ## Aktywna praca
 
-Na main i w sieci: F-01, S-01–S-06 oraz poprawki wyglądu czterech grup ekranów (S-07 w toku). Push na GitHub po każdym etapie (decyzja 13g). W toku (subagenci): przegląd wyglądu i przebiegu na żywej stronie; trzy warianty wyglądu przewodnika pokazu do oceny autora.
+Na main i w sieci: F-01, S-01–S-06 oraz poprawki wyglądu czterech grup ekranów (S-07). Joby Caissy (22.11 ok. 01:50, `--candidate-only`, scala król po obejrzeniu zrzutów): `guided-demo-tour` (S-08, przewodnik: wejście V3, krok V2) i `review-polish` (S-09, usterki z przeglądu). Pliki rozdzielone: S-08 ma `layout.tsx`, `index.tsx` i `src/tour/*`, S-09 resztę widoków.
 
 ## Następny ruch
 
-Autor wybiera wariant przewodnika (S-08), potem plan i budowa S-08; równolegle S-09 z listy przeglądu. Potem S-10 (automat pokazu 2x), S-11 (nagranie, PDF, README, teksty zgłoszenia). Granica nowych funkcji 07:00, oddanie 11:00, push najpóźniej 10:30.
+Po obu jobach: scalić, przejść przewodnik w Chromium przy 360 i 1440 px, wdrożyć, push (decyzja 13g). Potem S-10 (automat pokazu 2x na żywej stronie), S-11 (nagranie, PDF, README, teksty zgłoszenia). Granica nowych funkcji 07:00, oddanie 11:00, push najpóźniej 10:30.
