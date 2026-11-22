@@ -10,6 +10,8 @@ import { today } from "../settings";
 import { suggestionMode } from "../suggestions";
 import { CorrectionFormView, CorrectionListView } from "../views/sheet-correction";
 import { SuggestionSourcesView } from "../views/suggestion-sources";
+import { RulesVersionView } from "../views/rules-version";
+import { rules } from "../engine/rules";
 
 registerHomeTasks((person) =>
   person.role === "admin"
@@ -20,6 +22,12 @@ registerHomeTasks((person) =>
           detail: "Poprawienie pola zatwierdzonego arkusza z podaniem powodu. Korekta zostaje w historii arkusza.",
           action: "Otwórz listę arkuszy",
           href: "/admin/corrections",
+        },
+        {
+          title: "Wersja przepisów",
+          detail: `Obowiązuje wersja ${rules.version} z ${rules.effectiveFrom.split("-").reverse().join(".")}. Tu jest opis, jak wgrać nową.`,
+          action: "Zobacz wersję przepisów",
+          href: "/admin/rules",
         },
       ]
     : [],
@@ -32,6 +40,22 @@ app.get("/admin/suggestion-sources", (c) => {
   if (!viewer) return c.redirect("/account");
   if (viewer.role !== "admin") return c.text("Brak uprawnień.", 403);
   return c.html(<SuggestionSourcesView viewer={viewer} today={today()} data={data} modeLabel={data.modes[suggestionMode()]} />);
+});
+
+app.get("/admin/rules", (c) => {
+  const viewer = currentPerson(c);
+  if (!viewer) return c.redirect("/account");
+  if (viewer.role !== "admin") return c.text("Brak uprawnień.", 403);
+  const info = {
+    version: rules.version,
+    effectiveFrom: rules.effectiveFrom,
+    act: rules.source.act,
+    publisher: rules.source.publisher,
+    status: rules.source.status,
+    url: rules.source.url,
+    file: "rules/regulation-2016-470.json",
+  };
+  return c.html(<RulesVersionView viewer={viewer} today={today()} info={info} />);
 });
 
 app.get("/admin/corrections", (c) => {

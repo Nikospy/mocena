@@ -174,3 +174,16 @@ describe("proces 2: przypomnienia słowami przy sprawach z terminem", () => {
     expect(await html(app, "marek", "/")).toContain("Termin minął 3 dni temu.");
   });
 });
+
+describe("proces 2: wersja przepisów na stronie administratora", () => {
+  test("administrator widzi wersję, datę obowiązywania i opis wgrania nowej wersji; inni 403", async () => {
+    const { app } = createTestApp({ today: "2026-11-22" });
+    expect(await html(app, "admin", "/")).toContain('href="/admin/rules"');
+    const h = await html(app, "admin", "/admin/rules");
+    expect(h).toContain("2016-470/1");
+    expect(h).toContain("23.04.2016");
+    expect(h).toContain("Jak wgrać nową wersję przepisów");
+    expect(h).toContain("rules/regulation-2016-470.json");
+    expect((await call(app, "joanna", "/admin/rules")).status).toBe(403);
+  });
+});
