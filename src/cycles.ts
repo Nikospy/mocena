@@ -45,10 +45,16 @@ export function cycleDeadlineDetails(cycleId: string, opts: { asOf?: string } = 
   const changeEv = kind === "regular" ? events.findLast((e) => e.type === "deadline_changed") : undefined;
   const change = changeEv ? { eventId: changeEv.id, case: Number(changeEv.payload.case), from: String(changeEv.payload.oldDeadline), to: String(changeEv.payload.newDeadline) } : null;
   const bounds = { kind, periodStart: cycle.period_start, previousAcknowledgedOn: p?.previousAcknowledgedOn ?? null };
+  // Starsze pisma bez zapisanych identyfikatorów zachowują porównanie według dnia wpisu.
+  const knownIds = Array.isArray(changeEv?.payload.knownAbsenceIds)
+    ? new Set<number>(changeEv.payload.knownAbsenceIds)
+    : null;
   const r = change && changeEv
     ? assessmentDeadline(bounds, absences, {
         date: change.to,
-        knownAbsences: absences.filter((_, index) => rows[index].recorded_on <= changeEv.date),
+        knownAbsences: absences.filter((_, index) => knownIds
+          ? knownIds.has(rows[index].id)
+          : rows[index].recorded_on <= changeEv.date),
       })
     : assessmentDeadline(bounds, absences);
   const basis =

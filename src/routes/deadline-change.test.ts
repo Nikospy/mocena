@@ -165,3 +165,15 @@ test("po piśmie liczy się nieobecność zakończoną po ustawowym końcu, ale 
   const { cycleDeadlineDetails } = await import("../cycles");
   expect(cycleDeadlineDetails(PIOTR)).toMatchObject({ extensionDays: 48, merged: [{ counted: true }] });
 });
+
+test("ta sama data zapisu: pismo uwzględnia kolejność wpisania nieobecności", async () => {
+  const path = `/cycles/${PIOTR}`;
+  for (const beforeLetter of [false, true]) {
+    const { app } = createTestApp({ today: "2026-11-21" });
+    const absence = () => call(app, "joanna", `${path}/absences`, { from: "2026-09-01", to: "2026-10-20", excused: "1" });
+    if (beforeLetter) expect((await absence()).status).toBe(303);
+    expect((await call(app, "marek", `${path}/deadline-change`, { ...CHANGE, newDate: "2027-06-01" })).status).toBe(303);
+    if (!beforeLetter) expect((await absence()).status).toBe(303);
+    expect(effectiveDeadline(PIOTR).date).toBe(beforeLetter ? "2027-06-01" : "2027-07-21");
+  }
+});
