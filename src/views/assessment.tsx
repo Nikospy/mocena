@@ -23,7 +23,7 @@ export type Slots = {
 export const REASON_LABEL = { could_not: "nie mógł potwierdzić", would_not: "nie chciał potwierdzić" } as const;
 export const METHOD_LABEL = { in_person: "osobiście", post: "pocztą", email: "pocztą elektroniczną" } as const;
 
-const LEVELS = new Map<number, string>(rules.partialScale.map((s) => [s.points, s.name]));
+export const LEVELS = new Map<number, string>(rules.partialScale.map((s) => [s.points, s.name]));
 
 export function PersonIco() {
   return (
@@ -447,6 +447,39 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
   );
 }
 
+function Chevron() {
+  return <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6" /></svg>;
+}
+
+/** Ocena sporządzona po raz drugi (art. 83 ust. 4 ustawy): jedno zdanie o stanie i pierwsza ocena zwinięta. */
+function RedoNote(p: AssessmentViewProps & { first: AssessmentStateData }) {
+  const f = p.first.snapshot;
+  const redo = p.state.redo;
+  if (!f || !redo) return null;
+  const { verdict, level } = verdictText(f.result);
+  return (
+    <div class="st info" id="assessment-redo">
+      <div>
+        {p.redo ? (
+          <p>
+            Sprzeciw uwzględniony {formatDate(redo.resolvedOn)}: sporządzasz ocenę po raz drugi do {formatDate(p.redo.date)}; żadna ocena cząstkowa nie może być niższa niż w pierwszej. <LegalBasis basis={[rules.objectionRedo.basis, ...p.redo.basis]} />
+          </p>
+        ) : (
+          <p>Ocena sporządzona po raz drugi po uwzględnieniu sprzeciwu z dnia {formatDate(redo.filedOn)}. <LegalBasis basis={[rules.objectionRedo.basis]} /></p>
+        )}
+        <details class="disc" id="first-assessment">
+          <summary>Pierwsza ocena z dnia {formatDate(p.first.approvedOn ?? f.confirmation.date)} <Chevron /></summary>
+          <ul>
+            <li>{level ? `${verdict}, ${level}` : verdict}, średnia {mean2(f.result.mean)}</li>
+            {f.criteria.map((c) => <li>{c.name}: {c.score}</li>)}
+            <li>Uzasadnienie: {f.justification.trim() ? f.justification : "bez uzasadnienia"}</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+  );
+}
+
 export function AssessmentView(p: AssessmentViewProps) {
   const snap = p.state.snapshot;
   const period = `okres od ${formatDate(snap?.periodFrom ?? p.periodFrom)} do ${formatDate(snap?.periodTo ?? p.today)}`;
@@ -460,13 +493,13 @@ export function AssessmentView(p: AssessmentViewProps) {
           </span>
         </p>
       ) : null}
-      {p.redo ? (
-        <div class="st info" id="assessment-redo">
-          <div>
-            <b>Sprzeciw uwzględniony: ocenę sporządza się po raz drugi do {formatDate(p.redo.date)} <LegalBasis basis={p.redo.basis} /></b>
-            <p>Druga ocena nie może być niższa niż pierwsza ani w żadnym elemencie. Prototyp nie ma jeszcze formularza drugiej oceny: poniżej pierwsza ocena, tylko do odczytu.</p>
-          </div>
-        </div>
+      {p.state.redo ? <RedoNote {...p} first={p.state.redo.first} /> : null}
+      {p.state.snapshot?.changedOnObjection ? (
+        <p class="st info" id="assessment-changed">
+          <span>
+            Ocena zmieniona po uwzględnieniu sprzeciwu z dnia {formatDate(p.state.snapshot.changedOnObjection.objectionFiledOn)}: decyzja {p.state.snapshot.changedOnObjection.decidedBy === rules.deadlines.objectionDays.to ? rules.deadlines.objectionDays.toGenitive : p.state.snapshot.changedOnObjection.decidedBy}, zapisana {formatDate(p.state.snapshot.changedOnObjection.changedOn)} przez kadry. <LegalBasis basis={[rules.deadlines.objectionReviewDays.basis]} />
+          </span>
+        </p>
       ) : null}
       <ErrorSummary errors={p.errors} title={p.errorTitle} />
       {p.mode === "edit" || !snap ? <EditForm {...p} /> : <SnapshotView {...p} snapshot={snap} />}

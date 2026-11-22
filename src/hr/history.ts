@@ -1,5 +1,5 @@
 import { actsAsAppraiser } from "../substitutions";
-import { assessmentState, currentGradeNumber, type AssessmentSnapshot } from "../assessment/state";
+import { assessmentInForce, currentGradeNumber, type AssessmentSnapshot } from "../assessment/state";
 import { getDb } from "../db";
 import { mandatoryGrade, type MandatoryGrade } from "../engine/grades";
 import { visibleEvents } from "../events";
@@ -34,7 +34,7 @@ export function visibleCyclesOf(personId: string): { id: string; appraiser_id: s
 export function assessmentHistory(personId: string): HistoryEntry[] {
   const out: HistoryEntry[] = [];
   for (const c of visibleCyclesOf(personId)) {
-    const s = assessmentState(c.id);
+    const s = assessmentInForce(c.id);
     if (!s.snapshot || !s.approvedOn) continue;
     const closing = s.acknowledgement ?? s.fiction;
     out.push({

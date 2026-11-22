@@ -38,19 +38,22 @@ export type CycleState = {
 
 const D = rules.deadlines;
 
-/** Po rozstrzygnięciu „ponowne sporządzenie oceny”: termin rozpatrzenia sprzeciwu (14 dni od wniesienia, art. 83 ust. 3 ustawy) obejmuje drugą ocenę. */
+/** Po rozstrzygnięciu „ponowne sporządzenie oceny”: termin rozpatrzenia sprzeciwu (14 dni od wniesienia, art. 83 ust. 3 ustawy) obejmuje drugą ocenę. Po jej zatwierdzeniu `null`. */
 export function reassessmentDeadline(cycleId: string): { date: string; basis: string[] } | null {
-  const ev = visibleEvents(cycleId);
-  const resolved = ev.filter((e) => e.type === "objection_resolved").pop();
-  const filed = ev.filter((e) => e.type === "objection_filed").pop();
-  if (!resolved || resolved.payload.outcome !== "redone" || !filed) return null;
-  return { date: objectionReviewDeadline(filed.date), basis: [D.objectionReviewDays.basis] };
+  const s = assessmentState(cycleId);
+  if (!s.redo || s.stage !== "draft") return null;
+  return { date: objectionReviewDeadline(s.redo.filedOn), basis: [D.objectionReviewDays.basis] };
 }
 
 export function cycleState(cycleId: string): CycleState {
-  const ev = visibleEvents(cycleId);
+  const all = visibleEvents(cycleId);
+  const s0 = assessmentState(cycleId);
+  // Po zatwierdzeniu drugiej oceny liczą się tylko zdarzenia po rozstrzygnięciu „ponowne sporządzenie”: pierwszy sprzeciw jest historią.
+  const cut = s0.redo && s0.stage !== "draft" ? all.findLastIndex((e) => e.type === "objection_resolved" && e.payload.outcome === "redone") : -1;
+  const ev = cut >= 0 ? all.slice(cut + 1) : all;
   const last = (type: string) => ev.filter((e) => e.type === type).pop();
   const now = today();
+  const second = s0.redo ? " (ocena sporządzona po raz drugi)" : "";
 
   const resolved = last("objection_resolved");
   if (resolved) {
@@ -84,12 +87,12 @@ export function cycleState(cycleId: string): CycleState {
     };
   }
 
-  const s = assessmentState(cycleId);
+  const s = s0;
   if (s.stage === "fiction" && s.fiction) {
     const f = s.fiction;
     return {
       step: "fiction",
-      text: `Fikcja zapoznania wpisana ${formatDate(f.eventDate)} przez oceniającego: oceniany ${REASON_LABEL[f.reason]}. Kopię arkusza doręczono ${METHOD_LABEL[f.deliveryMethod]} ${formatDate(f.deliveredOn)}`,
+      text: `Fikcja zapoznania wpisana ${formatDate(f.eventDate)} przez oceniającego${second}: oceniany ${REASON_LABEL[f.reason]}. Kopię arkusza doręczono ${METHOD_LABEL[f.deliveryMethod]} ${formatDate(f.deliveredOn)}`,
       deadline: { date: f.objectionDeadline, basis: [D.objectionDays.basis] },
       deadlineLabel: "Sprzeciw do",
       since: f.eventDate,
@@ -98,14 +101,14 @@ export function cycleState(cycleId: string): CycleState {
   if (s.stage === "acknowledged" && s.acknowledgement) {
     return {
       step: "acknowledged",
-      text: `Zapoznanie potwierdzone ${formatDate(s.acknowledgement.eventDate)}`,
+      text: `Zapoznanie potwierdzone ${formatDate(s.acknowledgement.eventDate)}${second}`,
       deadline: { date: s.acknowledgement.objectionDeadline, basis: [D.objectionDays.basis] },
       deadlineLabel: "Sprzeciw do",
       since: s.acknowledgement.eventDate,
     };
   }
   if (s.stage === "approved") {
-    return { step: "awaiting_acknowledgement", text: "Ocena zatwierdzona, czeka na potwierdzenie zapoznania", since: s.approvedOn ?? undefined };
+    return { step: "awaiting_acknowledgement", text: `Ocena zatwierdzona${second}, czeka na potwierdzenie zapoznania`, since: s.approvedOn ?? undefined };
   }
 
   const dueChange = pendingRequest(cycleId);

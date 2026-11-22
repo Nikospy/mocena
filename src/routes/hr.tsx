@@ -53,7 +53,7 @@ export function overviewData(viewer: Person) {
     today: today(),
     links: [
       ...cycleLinks(c, viewer),
-      ...(assessmentState(c.id).snapshot ? [{ label: "Pobierz ocenę do systemu kadrowego (plik JSON)", href: `/cycles/${c.id}/assessment/export.json` }] : []),
+      ...(assessmentState(c.id).snapshot || assessmentState(c.id).redo ? [{ label: "Pobierz ocenę do systemu kadrowego (plik JSON)", href: `/cycles/${c.id}/assessment/export.json` }] : []),
     ],
   }));
   // Najpierw cykle wymagające działania, zamknięte (zapoznanie, fikcja, rozpatrzony sprzeciw) na końcu; w grupie od najbliższego terminu.
@@ -122,6 +122,8 @@ app.post("/cycles/:id/objection-outcome", async (c) => {
   if (!ev.some((e) => e.type === "objection_filed") || ev.some((e) => e.type === "objection_resolved")) {
     return errorPage(c, "Ten sprzeciw jest już rozpatrzony albo nie został wniesiony. Wróć do „Stan cykli”.", 409);
   }
+  // „Zmiana oceny”: rozstrzygnięcie zapisuje się dopiero razem ze zmienionymi ocenami cząstkowymi (`/cycles/:id/objection-change`).
+  if (outcome === "changed") return c.redirect(`/cycles/${cycle.id}/objection-change`, 303);
   recordEvent("objection_resolved", cycle.id, viewer.id, { outcome });
   return c.redirect("/hr", 303);
 });

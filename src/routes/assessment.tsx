@@ -3,8 +3,9 @@ import { actsAsAppraiser } from "../substitutions";
 import { Hono, type Context } from "hono";
 import "../assessment/home";
 import { buildAssessmentSnapshot } from "../assessment/snapshot";
-import { assessmentState, currentGradeNumber, type AssessmentDraft } from "../assessment/state";
-import { visibleCycleById, startNextCycle, type Cycle } from "../cycles";
+import { assessmentInForce, assessmentState, currentGradeNumber, type AssessmentDraft } from "../assessment/state";
+import { visibleCycleById, startNextCycle, restartNextCycle, type Cycle } from "../cycles";
+import { redoLoweringErrors } from "../assessment/redo";
 import { assessmentSlots } from "../notes/assessment-slots";
 import { assessmentPeriodFrom, cycleCriteria } from "../cycles/part1";
 import { getDb } from "../db";
@@ -132,7 +133,11 @@ function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; er
   }
   const appraiser = isAppraiser(cx);
   if (state.stage === "draft" && !appraiser) {
-    return c.html(<AssessmentMessage {...base} text="Ocena nie jest jeszcze zatwierdzona." />, status);
+    const redo = reassessmentDeadline(cx.cycle.id);
+    const text = redo
+      ? `Sprzeciw uwzględniony: oceniający sporządza ocenę po raz drugi do ${formatDate(redo.date)} (art. 83 ust. 4 ustawy).`
+      : "Ocena nie jest jeszcze zatwierdzona.";
+    return c.html(<AssessmentMessage {...base} text={text} />, status);
   }
   const saved = extra.draft ?? state.draft ?? emptyDraft();
   const draft = cx.cycle.sheet === "A" && saved.objectionRecipient === undefined
@@ -161,7 +166,7 @@ function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; er
       canAcknowledge={isAppraisee(cx) && state.stage === "approved"}
       canFiction={appraiser && state.stage === "approved"}
       shifted={state.stage === "draft" ? shiftedDeadlineSentence(cx.cycle.id) : null}
-      redo={reassessmentDeadline(cx.cycle.id)}
+      redo={state.stage === "draft" ? reassessmentDeadline(cx.cycle.id) : null}
     />,
     status,
   );
@@ -180,7 +185,7 @@ app.get("/cycles/:id/assessment/export.json", (c) => {
   const g = guard(c);
   if (!isCtx(g)) return g;
   if (!isAppraiser(g) && !isAppraisee(g) && g.person.role !== "hr") return errorPage(c, "Tę ocenę widzą oceniany, jego oceniający i kadry.", 403);
-  const { snapshot, acknowledgement, fiction, approvedOn } = assessmentState(g.cycle.id);
+  const { snapshot, acknowledgement, fiction, approvedOn } = assessmentInForce(g.cycle.id);
   if (!snapshot) return errorPage(c, "Ocena nie jest jeszcze zatwierdzona. Wróć tu po zatwierdzeniu przez oceniającego.", 404);
   return c.json(
     { employee: g.appraisee.name, assessment: snapshot, approvedOn, acknowledgement, fiction },
@@ -223,15 +228,29 @@ app.post("/cycles/:id/assessment/approve", async (c) => {
   const draft = readDraft(await c.req.parseBody(), g.cycle.sheet);
   const errors = draftErrors(g.cycle.id, draft);
   if (Object.keys(errors).length) return render(c, g, { status: 422, errors, draft });
-  const outcome = getDb().transaction((): "closed" | "blocked" | "ok" => {
-    if (assessmentState(g.cycle.id).stage !== "draft") return "closed";
+  const redo = assessmentState(g.cycle.id).redo;
+  const lowered = redo?.first.snapshot ? redoLoweringErrors(redo.first.snapshot, draft.scores) : {};
+  const outcome = getDb().transaction((): "closed" | "blocked" | "lowered" | "ok" => {
+    const state = assessmentState(g.cycle.id);
+    if (state.stage !== "draft") return "closed";
     recordEvent("assessment_draft_saved", g.cycle.id, g.person.id, draft);
+    if (Object.keys(lowered).length) return "lowered";
     const { blockers } = screenData(g, draft);
     if (blockers.length) return "blocked";
-    recordEvent("assessment_approved", g.cycle.id, g.person.id, buildAssessmentSnapshot(g.cycle.id, draft));
+    const snapshot = buildAssessmentSnapshot(g.cycle.id, draft);
+    const r = state.redo;
+    // Druga ocena: termin to termin rozpatrzenia sprzeciwu (art. 83 ust. 3 ustawy), który ją obejmuje.
+    const due = r ? reassessmentDeadline(g.cycle.id) : null;
+    recordEvent(
+      "assessment_approved",
+      g.cycle.id,
+      g.person.id,
+      r?.first.approvedOn ? { ...snapshot, ...(due ? { deadline: due } : {}), redo: { objectionFiledOn: r.filedOn, firstApprovedOn: r.first.approvedOn } } : snapshot,
+    );
     return "ok";
   })();
   if (outcome === "closed") return render(c, g, { status: 409, errors: { _: CLOSED } });
+  if (outcome === "lowered") return render(c, g, { status: 422, draft, errors: lowered, errorTitle: "Oceny nie można zatwierdzić" });
   if (outcome === "blocked") return render(c, g, { status: 422, draft, errors: blockerErrors(screenData(g, draft).blockers), errorTitle: "Oceny nie można jeszcze zatwierdzić" });
   return c.redirect(`/cycles/${g.cycle.id}/assessment`, 303);
 });
@@ -249,7 +268,7 @@ app.post("/cycles/:id/assessment/acknowledge", (c) => {
       name: g.person.name,
       objectionDeadline: objectionDeadline(today()),
     });
-    startNextCycle(g.cycle, g.person.id, state.approvedOn, today(), state.snapshot.result.outcome);
+    (state.redo ? restartNextCycle : startNextCycle)(g.cycle, g.person.id, state.approvedOn, today(), state.snapshot.result.outcome);
     return true;
   })();
   if (!ok) return render(c, g, { status: 409, errors: { _: "Ocena nie czeka na potwierdzenie zapoznania." } });
@@ -333,7 +352,7 @@ app.post("/cycles/:id/assessment/fiction", async (c) => {
       objectionDeadline: objectionDeadline(today()),
     });
     // Dniem zapoznania jest dzień wpisu fikcji (jak termin sprzeciwu); `deliveredOn` opisuje doręczenie kopii.
-    startNextCycle(g.cycle, g.person.id, state.approvedOn, today(), state.snapshot.result.outcome);
+    (state.redo ? restartNextCycle : startNextCycle)(g.cycle, g.person.id, state.approvedOn, today(), state.snapshot.result.outcome);
     return true;
   })();
   if (!ok) return render(c, g, { status: 409, errors: { _: "Ocena nie czeka na potwierdzenie zapoznania." } });

@@ -101,6 +101,28 @@ export function startNextCycle(previous: Cycle, actorId: string, assessedOn: str
   });
 }
 
+/**
+ * Zapoznanie z oceną sporządzoną po raz drugi (art. 83 ust. 4 ustawy). Następny cykl powstał już przy zapoznaniu z pierwszą oceną:
+ * nie zakładamy drugiego, tylko dopisujemy w nim nowe `cycle_started` z datą i wynikiem drugiej oceny i przestawiamy początek okresu.
+ * Wszystkie odczyty biorą ostatnie `cycle_started`, więc termin następnego cyklu liczy się od drugiej oceny. Bez następnego cyklu: zwykły start.
+ */
+export function restartNextCycle(previous: Cycle, actorId: string, assessedOn: string, acquaintedOn: string, outcome: "positive" | "negative"): void {
+  const next = (getDb().query("SELECT id FROM cycles WHERE person_id = ?").all(previous.person_id) as { id: string }[]).find((c) =>
+    getDb().query("SELECT 1 FROM events WHERE cycle_id = ? AND type = 'cycle_started' AND json_extract(payload, '$.previousCycleId') = ?").get(c.id, previous.id),
+  );
+  if (!next) return startNextCycle(previous, actorId, assessedOn, acquaintedOn, outcome);
+  const periodStart = outcome === "negative" ? acquaintedOn : assessedOn;
+  getDb().query("UPDATE cycles SET period_start = ? WHERE id = ?").run(periodStart, next.id);
+  recordEvent("cycle_started", next.id, actorId, {
+    reason: "previous_assessment_redone",
+    periodStart,
+    previousAssessmentOn: assessedOn,
+    previousAcknowledgedOn: acquaintedOn,
+    previousOutcome: outcome,
+    previousCycleId: previous.id,
+  });
+}
+
 export function previousCycleOf(cycleId: string): Cycle | null {
   const id = visibleEvents(cycleId).find((event) => event.type === "cycle_started")?.payload.previousCycleId;
   return typeof id === "string" ? cycleById(id) : null;

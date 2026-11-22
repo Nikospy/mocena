@@ -18,7 +18,7 @@ Pokaz idzie jedną oceną pracownika od początku cyklu do potwierdzenia zapozna
 4. **Ocena i wynik.** Średnia nie jest zaokrąglana. Jedna ocena cząstkowa „1” daje wynik negatywny, nawet przy wysokiej średniej (§ 11 ust. 1). Przy ocenie negatywnej uzasadnienie jest obowiązkowe (§ 11 ust. 3). Wnioski do indywidualnego programu rozwoju zawodowego są zawsze wymagane (art. 81 ust. 5 ustawy).
 5. **Zapoznanie i sprzeciw.** Oceniany potwierdza zapoznanie z oceną na własnym koncie. Od tego dnia liczy się 7 dni na sprzeciw (art. 83 ust. 1 ustawy). Stopień służbowy z mocy prawa wymaga działania w 30 dni od zapoznania z drugą oceną (art. 89 ust. 2 ustawy).
 
-Z 30 czynności z listy organizatora 26 działa, a 4 jest uproszczonych. Co dokładnie i gdzie to zobaczyć: [`docs/coverage.md`](docs/coverage.md).
+Z 30 czynności z listy organizatora 28 działa, a 2 są uproszczone. Co dokładnie i gdzie to zobaczyć: [`docs/coverage.md`](docs/coverage.md).
 
 ## Czego nie robi
 

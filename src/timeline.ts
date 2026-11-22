@@ -3,6 +3,7 @@ import { actsAsAppraiser } from "./substitutions";
 import { registerCycleLinks } from "./cycle-links";
 import { cycleById, cycleDeadlineDetails, openCycle, visibleAbsences, type Cycle } from "./cycles";
 import { romanGrade } from "./engine/grades";
+import { OBJECTION_OUTCOME_TEXT } from "./assessment/state";
 import { rules, rulesVersion } from "./engine/rules";
 import { visibleEvents } from "./events";
 import { personById, type Person } from "./people";
@@ -133,7 +134,11 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
     } else if (e.type === "invitation_confirmed") {
       entries.push({ date: e.date, title: "Potwierdzenie terminu", detail: "Oceniany potwierdził termin rozmowy.", basis: [], kind: "fact" });
     } else if (e.type === "assessment_approved") {
-      entries.push({ date: e.date, title: "Ocena zatwierdzona przez oceniającego", basis: [], kind: "fact" });
+      entries.push(
+        x.redo
+          ? { date: e.date, title: "Ocena zatwierdzona po raz drugi po uwzględnieniu sprzeciwu", detail: `Pierwsza ocena z dnia ${formatDate(x.redo.firstApprovedOn)} zostaje w historii.`, basis: [rules.objectionRedo.basis], kind: "fact" }
+          : { date: e.date, title: "Ocena zatwierdzona przez oceniającego", basis: [], kind: "fact" },
+      );
     } else if (e.type === "assessment_acknowledged" || e.type === "acknowledgement_fiction") {
       const fiction = e.type === "acknowledgement_fiction";
       entries.push({
@@ -146,6 +151,13 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
       if (x.objectionDeadline) {
         entries.push({ date: x.objectionDeadline, title: "Termin sprzeciwu", basis: [rules.deadlines.objectionDays.basis], kind: "deadline" });
       }
+    } else if (e.type === "assessment_changed") {
+      entries.push({ date: e.date, title: "Ocena zmieniona po uwzględnieniu sprzeciwu", detail: "Decyzję rozpatrującego sprzeciw zapisały kadry; pierwsza ocena zostaje w historii zdarzeń.", basis: [rules.deadlines.objectionReviewDays.basis], kind: "fact" });
+    } else if (e.type === "objection_filed") {
+      entries.push({ date: e.date, title: "Sprzeciw wniesiony", basis: [rules.deadlines.objectionDays.basis], kind: "fact" });
+    } else if (e.type === "objection_resolved") {
+      const text = OBJECTION_OUTCOME_TEXT[x.outcome as keyof typeof OBJECTION_OUTCOME_TEXT];
+      entries.push({ date: e.date, title: `Sprzeciw rozpatrzony: ${text ?? x.outcome}`, basis: [rules.deadlines.objectionReviewDays.basis], kind: "fact" });
     } else if (e.type === "mandatory_grade_awarded") {
       entries.push({
         date: e.date,

@@ -9,8 +9,10 @@ import { assessmentState } from "./state";
  * (termin z silnika, z przesunięciami). Wcześniej nie ma sprawy „Wystaw ocenę” ani odnośników do oceny.
  */
 export function assessmentPhaseOpen(cycle: Cycle): boolean {
-  const stage = assessmentState(cycle.id).stage;
+  const state = assessmentState(cycle.id);
+  const stage = state.stage;
   if (stage === "no_part1") return false;
+  if (state.redo) return true;
   if (stage !== "draft") return true;
   return assessmentWindowReached(cycle);
 }

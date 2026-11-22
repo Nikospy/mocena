@@ -339,6 +339,16 @@
       "kierunki dalszego rozwoju zawodowego i potrzeby ocenianego w zakresie podnoszenia kwalifikacji i doskonalenia umiejętności"
     ]
   },
+  "objectionRedo": {
+    "basis": "art. 83 ust. 4 ustawy",
+    "rule": "Po uwzględnieniu sprzeciwu z nakazem ponownego sporządzenia oceny oceniający sporządza ocenę po raz drugi w tym samym cyklu; od drugiej oceny znów przysługuje sprzeciw.",
+    "notLower": {
+      "kind": "wykładnia",
+      "source": "poradnik dla urzędów o ocenach okresowych (wykładnia, nie brzmienie ustawy)",
+      "rule": "Ocena sporządzona po raz drugi ani ocena zmieniona po uwzględnieniu sprzeciwu nie może być niższa niż pierwsza: ani wynik, ani żadna ocena cząstkowa.",
+      "appliesTo": ["ponowne sporządzenie oceny (art. 83 ust. 4 ustawy)", "zmiana oceny przez rozpatrującego sprzeciw (art. 83 ust. 3 ustawy)"]
+    }
+  },
   "approval": {
     "justification": { "basis": "§ 11 ust. 3" },
     "developmentConclusions": { "basis": "art. 81 ust. 5 ustawy" },

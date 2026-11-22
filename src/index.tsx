@@ -8,6 +8,7 @@ import { isDemoMode, OFFICE_INIT_COMMAND, today } from "./settings";
 import cycleStart from "./routes/cycle-start";
 import assessment from "./routes/assessment";
 import hr from "./routes/hr";
+import objectionChange from "./routes/objection-change";
 import sheet from "./routes/sheet";
 import history from "./routes/history";
 import notes from "./routes/notes";
@@ -283,6 +284,7 @@ app.post("/demo/date", async (c) => {
 app.route("/", cycleStart);
 app.route("/", assessment);
 app.route("/", hr);
+app.route("/", objectionChange);
 app.route("/", sheet);
 app.route("/", history);
 app.route("/", notes);
