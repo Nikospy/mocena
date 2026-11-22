@@ -3,7 +3,7 @@ import { registerCycleLinks } from "./cycle-links";
 import { cycleById, cycleDeadlineDetails, openCycle, visibleAbsences, type Cycle } from "./cycles";
 import { rules, rulesVersion } from "./engine/rules";
 import { visibleEvents } from "./events";
-import type { Person } from "./people";
+import { personById, type Person } from "./people";
 import { formatDate } from "./views/layout";
 
 export type TimelineEntry = {
@@ -78,6 +78,38 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
     }
   }
 
+  for (const e of events) {
+    const x = e.payload ?? {};
+    if (e.type === "appraiser_changed") {
+      if (!full) continue;
+      const name = (id: string) => personById(id)?.name ?? id;
+      entries.push({
+        date: e.date,
+        title: `Zmiana oceniającego: ${name(x.from_id)} → ${name(x.to_id)}. Kryteria bez zmian`,
+        detail: `Nowy oceniający ocenia na podstawie wcześniej wybranych kryteriów.`,
+        basis: [rules.appraiserChange.basis],
+        kind: "fact",
+      });
+    } else if (e.type === "part1_submitted") {
+      entries.push({ date: e.date, title: "Część I przekazana ocenianemu", detail: "Kryteria oceny i oczekiwania wobec pracownika.", basis: x.criteriaBasis ?? [], kind: "fact" });
+    } else if (e.type === "part1_confirmed") {
+      entries.push({ date: e.date, title: "Część I: potwierdzenie zapoznania z kryteriami", basis: [], kind: "fact" });
+    } else if (e.type === "assessment_approved") {
+      entries.push({ date: e.date, title: "Ocena zatwierdzona przez oceniającego", basis: [], kind: "fact" });
+    } else if (e.type === "assessment_acknowledged" || e.type === "acknowledgement_fiction") {
+      const fiction = e.type === "acknowledgement_fiction";
+      entries.push({
+        date: fiction ? (x.deliveredOn ?? e.date) : e.date,
+        title: fiction ? "Uznanie oceny za doręczoną" : "Zapoznanie z oceną",
+        basis: [rules.deadlines.objectionDays.basis],
+        kind: "fact",
+      });
+      if (x.objectionDeadline) {
+        entries.push({ date: x.objectionDeadline, title: "Termin sprzeciwu", basis: [rules.deadlines.objectionDays.basis], kind: "deadline" });
+      }
+    }
+  }
+
   const snap = approved?.payload?.deadline as { date: string; basis: string[] } | undefined;
   if (snap?.date) {
     entries.push({ date: snap.date, title: "Termin oceny", detail: "Termin zamrożony w dniu zatwierdzenia oceny.", basis: snap.basis, kind: "deadline" });
@@ -106,5 +138,6 @@ registerCycleLinks((cycle, viewer) => {
   const links: { label: string; href: string }[] = [];
   if (canViewTimeline(viewer, cycle)) links.push({ label: "Oś czasu", href: `/cycles/${cycle.id}/timeline` });
   if (canRecordAbsence(viewer, cycle)) links.push({ label: "Wpisz nieobecność", href: `/cycles/${cycle.id}/absences` });
+  if (canRecordAbsence(viewer, cycle)) links.push({ label: "Zmień oceniającego", href: `/cycles/${cycle.id}/appraiser` });
   return links;
 });

@@ -5,6 +5,7 @@ import { seedBase } from "./seed/base";
 import { seedPart1 } from "./seed/part1";
 import { seedNotes } from "./seed/notes";
 import { seedAssessments } from "./seed/assessments";
+import { seedAbsences } from "./seed/absences";
 
 export type SeedOptions = { liveStep2?: boolean; afterStep1?: boolean };
 
@@ -16,7 +17,7 @@ export function runSeed(db: Database, options: SeedOptions = {}): void {
   seedPart1(opts);
   seedNotes(opts);
   seedAssessments();
-  // Kolejne plastry dopisują tu swoje moduły: absences.
+  seedAbsences();
 }
 
 if (import.meta.main) {

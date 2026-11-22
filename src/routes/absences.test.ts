@@ -11,7 +11,7 @@ import { approveAndAcknowledgePiotr, call, html } from "./hr-test-helpers";
 const PIOTR = "cycle-piotr";
 const FIRST = { from: "2026-10-05", to: "2026-10-16", excused: "1" };
 const SECOND = { from: "2026-10-19", to: "2026-11-06", excused: "1" };
-const rows = (db: ReturnType<typeof createTestApp>["db"]) => db.query("SELECT * FROM absences").all() as Record<string, unknown>[];
+const rows = (db: ReturnType<typeof createTestApp>["db"]) => db.query("SELECT * FROM absences WHERE person_id = 'piotr'").all() as Record<string, unknown>[];
 
 describe("ścieżka kadr: /hr → Wpisz nieobecność → oś → drugi wpis", () => {
   test("dwa wpisy dają ten sam termin 30.12.2026 w effectiveDeadline, na /hr i na osi", async () => {

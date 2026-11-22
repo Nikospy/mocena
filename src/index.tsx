@@ -13,6 +13,7 @@ import history from "./routes/history";
 import notes from "./routes/notes";
 import absences from "./routes/absences";
 import timeline from "./routes/timeline";
+import appraiser from "./routes/appraiser";
 import { Layout } from "./views/layout";
 
 const app = new Hono();
@@ -116,5 +117,6 @@ app.route("/", history);
 app.route("/", notes);
 app.route("/", absences);
 app.route("/", timeline);
+app.route("/", appraiser);
 
 export default app;

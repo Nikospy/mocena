@@ -67,7 +67,7 @@ describe("stan cyklu", () => {
   });
 
   test("termin oceny po upływie jest oznaczony", () => {
-    fresh("2026-11-22");
+    fresh("2027-06-03");
     expect(cycleState("cycle-ewa").overdue).toBe(true);
   });
 });
