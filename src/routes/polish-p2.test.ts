@@ -22,7 +22,7 @@ describe("2.1 strona główna Joanny przed terminami ocen", () => {
 });
 
 describe("2.3 „Wstaw do uzasadnienia”", () => {
-  test("notatki trafiają jako osobne akapity, każdy z datą", async () => {
+  test("notatki trafiają jako cytaty w osobnych wierszach", async () => {
     const { app } = createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } });
     const page = await html(app, "marek", "/cycles/cycle-piotr/assessment");
     const window = new Window({ url: "http://localhost/" });
@@ -34,10 +34,11 @@ describe("2.3 „Wstaw do uzasadnienia”", () => {
     field.value = "Zdanie wstępne.";
     new Function("document", "Event", readFileSync("public/insert-notes.js", "utf8"))(doc, window.Event);
     (doc.querySelector('button[data-target="justification"]') as unknown as HTMLButtonElement).click();
-    const paragraphs = field.value.split("\n\n");
-    expect(paragraphs).toHaveLength(4);
-    expect(paragraphs[0]).toBe("Zdanie wstępne.");
-    for (const p of paragraphs.slice(1)) expect(p).toMatch(/^\d{2}\.\d{2}\.\d{4}: \S/);
+    const lines = field.value.split("\n");
+    expect(lines).toHaveLength(5);
+    expect(lines[0]).toBe("Zdanie wstępne.");
+    expect(lines[1]).toBe("");
+    for (const line of lines.slice(2)) expect(line).toMatch(/^Notatka z \d{2}\.\d{2}\.\d{4}: „.+”$/);
   });
 });
 
