@@ -1,5 +1,5 @@
 import { Hono, type Context } from "hono";
-import { cycleById, effectiveDeadline, openCycle, visibleAbsences, type Cycle } from "../cycles";
+import { visibleCycleById, effectiveDeadline, openCycle, visibleAbsences, type Cycle } from "../cycles";
 import { addDays } from "../engine/deadlines";
 import { getDb } from "../db";
 import { recordEvent, visibleEvents } from "../events";
@@ -14,7 +14,7 @@ type Ctx = { viewer: Person; cycle: Cycle };
 function guard(c: Context): Response | Ctx {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  const cycle = cycleById(c.req.param("id") ?? "");
+  const cycle = visibleCycleById(c.req.param("id") ?? "");
   if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
   if (viewer.role !== "hr") return c.text("Nieobecności wpisują kadry.", 403);
   return { viewer, cycle };

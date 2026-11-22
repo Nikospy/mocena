@@ -53,7 +53,9 @@ export function InvitationFormView(props: {
       {props.limit ? (
         <p class="st info" role="status">
           <span>
-            <b>Do granicy z § 7: {left} dni (do {formatDate(props.limit)})</b>
+            <b>{left !== null && left < 0
+              ? `Termin rozmowy o kryteriach minął ${formatDate(props.limit)}.`
+              : `Do granicy z § 7: ${left} dni (do ${formatDate(props.limit)})`}</b>
             <small>Rozmowa o kryteriach ma się odbyć w terminie z <LegalBasis basis={props.limitBasis} />.</small>
           </span>
         </p>

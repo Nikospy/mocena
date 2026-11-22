@@ -3,7 +3,7 @@ import { Hono, type Context } from "hono";
 import "../assessment/home";
 import { buildAssessmentSnapshot } from "../assessment/snapshot";
 import { assessmentState, currentGradeNumber, type AssessmentDraft } from "../assessment/state";
-import { cycleById, type Cycle } from "../cycles";
+import { visibleCycleById, startNextCycle, type Cycle } from "../cycles";
 import { assessmentSlots } from "../notes/assessment-slots";
 import { cycleCriteria } from "../cycles/part1";
 import { getDb } from "../db";
@@ -22,7 +22,7 @@ type Ctx = { cycle: Cycle; person: Person; appraisee: Person };
 function guard(c: Context): Response | Ctx {
   const person = currentPerson(c);
   if (!person) return c.redirect("/account");
-  const cycle = cycleById(c.req.param("id") ?? "");
+  const cycle = visibleCycleById(c.req.param("id") ?? "");
   if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
   const appraisee = personById(cycle.person_id);
   if (!appraisee) return c.text("Nie ma takiego cyklu.", 404);
@@ -152,6 +152,19 @@ app.get("/cycles/:id/assessment", (c) => {
   return render(c, g);
 });
 
+app.get("/cycles/:id/assessment/export.json", (c) => {
+  const g = guard(c);
+  if (!isCtx(g)) return g;
+  if (!isAppraiser(g) && !isAppraisee(g) && g.person.role !== "hr") return c.text("Brak uprawnień do tej oceny.", 403);
+  const { snapshot, acknowledgement, fiction, approvedOn } = assessmentState(g.cycle.id);
+  if (!snapshot) return c.text("Ocena nie jest jeszcze zatwierdzona.", 404);
+  return c.json(
+    { employee: g.appraisee.name, assessment: snapshot, approvedOn, acknowledgement, fiction },
+    200,
+    { "Content-Disposition": "attachment; filename=ocena.json", "Cache-Control": "no-store" },
+  );
+});
+
 const CLOSED = "Ocena nie przyjmuje już zmian: została zatwierdzona albo cykl jest zamknięty.";
 
 /** Wspólny początek tras zapisu oceniającego. Zwraca odpowiedź błędu albo kontekst. */
@@ -210,13 +223,15 @@ app.post("/cycles/:id/assessment/acknowledge", (c) => {
   if (!isCtx(g)) return g;
   if (!isAppraisee(g)) return c.text("Tylko oceniany może potwierdzić zapoznanie z oceną.", 403);
   const ok = getDb().transaction(() => {
-    if (assessmentState(g.cycle.id).stage !== "approved") return false;
+    const state = assessmentState(g.cycle.id);
+    if (state.stage !== "approved" || !state.approvedOn || !state.snapshot) return false;
     recordEvent("assessment_acknowledged", g.cycle.id, g.person.id, {
       place: setting("office_city") ?? "",
       date: today(),
       name: g.person.name,
       objectionDeadline: objectionDeadline(today()),
     });
+    startNextCycle(g.cycle, g.person.id, state.approvedOn, today(), state.snapshot.result.outcome);
     return true;
   })();
   if (!ok) return render(c, g, { status: 409, errors: ["Ocena nie czeka na potwierdzenie zapoznania."] });
@@ -290,13 +305,15 @@ app.post("/cycles/:id/assessment/fiction", async (c) => {
   if (!METHODS.includes(values.deliveryMethod) || !dateOk) errors.push("Wpisz, jak i kiedy doręczono kopię arkusza");
   if (errors.length) return fictionScreen(c, g, { status: 422, errors, values });
   const ok = getDb().transaction(() => {
-    if (assessmentState(g.cycle.id).stage !== "approved") return false;
+    const state = assessmentState(g.cycle.id);
+    if (state.stage !== "approved" || !state.approvedOn || !state.snapshot) return false;
     recordEvent("acknowledgement_fiction", g.cycle.id, g.person.id, {
       reason: values.reason,
       deliveryMethod: values.deliveryMethod,
       deliveredOn: values.deliveredOn,
       objectionDeadline: objectionDeadline(today()),
     });
+    startNextCycle(g.cycle, g.person.id, state.approvedOn, values.deliveredOn, state.snapshot.result.outcome);
     return true;
   })();
   if (!ok) return render(c, g, { status: 409, errors: ["Ocena nie czeka już na potwierdzenie zapoznania."] });

@@ -37,7 +37,6 @@ export function assessmentSlots(p: { cycleId: string; viewer: Person }): Slots {
     conclusionsTools: (
       <div class="insert-tools">
         <button type="button" class="btn" data-target="developmentConclusions">Wstaw do wniosków rozwojowych</button>
-        <script src="/insert-notes.js" defer></script>
       </div>
     ),
     justificationTools: (
@@ -53,6 +52,7 @@ export function assessmentSlots(p: { cycleId: string; viewer: Person }): Slots {
           </div>
         ) : null}
         <button type="button" class="btn" data-target="justification">Wstaw do uzasadnienia</button>
+        <p class="cap" role="status" data-insert-status></p>
         <script src="/insert-notes.js" defer></script>
         <p class="cap">Wstawia zaznaczone notatki z datami na końcu pola. Tekst możesz dalej poprawiać; nic się nie zapisuje, dopóki nie klikniesz „Zapisz”.</p>
       </div>

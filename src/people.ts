@@ -4,6 +4,7 @@ import { getDb } from "./db";
 import { visibleEventsOfType } from "./events";
 
 export const PERSON_COOKIE = "person_id";
+export const DEMO_DIRECTOR_GENERAL_ID = "dyrektor-urzedu";
 
 export type Person = {
   id: string;

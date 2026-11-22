@@ -1,3 +1,4 @@
+import { seedEvent } from "../events";
 import { getDb } from "../db";
 import { criterion } from "../engine/scoring";
 
@@ -42,11 +43,14 @@ export function seedNotes(opts: { liveStep2?: boolean; afterStep1?: boolean } = 
     `INSERT INTO notes (author_id, subject_id, cycle_id, criterion_id, date, text, rating, task_change, suggested_task_change, suggestion_source, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, 'none', ?)`,
   );
+  const piotrNoteIds: number[] = [];
   for (const [date, who, crit, rating, taskChange, text] of DEMO_NOTES) {
     if (opts.liveStep2 && date === "2026-03-11") continue;
     const id = ID[crit];
     if (!id || criterion(id).name !== crit) throw new Error(`Notatka pokazowa: kryterium „${crit}” nie zgadza się z plikiem reguł`);
     const cycle = db.query("SELECT id FROM cycles WHERE person_id = ? ORDER BY period_start DESC LIMIT 1").get(who) as { id: string } | null;
-    ins.run(AUTHOR[who], who, cycle?.id ?? null, id, date, text, rating, taskChange, date);
+    const row = ins.run(AUTHOR[who], who, cycle?.id ?? null, id, date, text, rating, taskChange, date);
+    if (who === "piotr") piotrNoteIds.push(Number(row.lastInsertRowid));
   }
+  if (!opts.afterStep1) seedEvent("demo_notes_seeded", "cycle-piotr", null, { noteIds: piotrNoteIds }, "2024-12-09");
 }

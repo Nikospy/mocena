@@ -29,10 +29,39 @@ describe("arkusz /cycles/:id/sheet", () => {
 
   test("kolejność pól wzoru, pouczenie poza no-print, przycisk druku, nigdzie „podpis”", async () => {
     const h = await html(app, "piotr", "/cycles/cycle-piotr/sheet");
-    const at = (s: string) => h.indexOf(s);
-    const order = ["Część I", "Część II", "Uzasadnienie", "Wnioski do indywidualnego programu", "Pouczenie"].map(at);
-    expect(order.every((i) => i >= 0)).toBe(true);
-    expect([...order].sort((a, b) => a - b)).toEqual(order);
+    const items = [
+      "Część I",
+      "Urząd",
+      "Oceniany",
+      "Oceniający",
+      "Kryteria obowiązkowe",
+      "Kryteria dodatkowe",
+      "Termin sporządzenia oceny",
+      "Potwierdzenie oceniającego",
+      "Potwierdzenie ocenianego",
+      "Część II",
+      "Data rozmowy oceniającej",
+      "Okres podlegania ocenie",
+      "Oceny cząstkowe",
+      "Średnia ocen cząstkowych",
+      "Ogólny poziom spełniania kryteriów",
+      "Ocena okresowa",
+      "Uzasadnienie przyznanej oceny",
+      "Wnioski do indywidualnego programu rozwoju zawodowego",
+      "Czy dołączono wniosek o kolejny stopień służbowy",
+      "Dane oceniającego",
+      "Potwierdzenie oceniającego",
+      "Potwierdzenie ocenianego",
+      "Pouczenie",
+    ];
+    let pos = -1;
+    for (const label of items) {
+      const next = h.indexOf(label, pos + 1);
+      expect(next).toBeGreaterThan(pos);
+      pos = next;
+    }
+    expect(h).toContain("od 1 do 2");
+    expect(h).toContain("powyżej 8 do 9");
     const notice = h.slice(h.indexOf('id="pouczenie"'));
     expect(notice).toContain("7 dni");
     expect(notice).toContain("art. 83 ust. 1");
@@ -42,6 +71,29 @@ describe("arkusz /cycles/:id/sheet", () => {
     expect(h.match(/Drukuj/g)).toHaveLength(1);
     expect(h).toContain("Potwierdzenie w systemie: Rzeszów, 22.11.2026, Piotr Wójcik");
     expect(h.toLowerCase()).not.toContain("podpis");
+  });
+
+  test("przewijane tabele arkusza (.sheet-matrix) są dostępne z klawiatury", async () => {
+    const h = await html(app, "piotr", "/cycles/cycle-piotr/sheet");
+    const tables = [...h.matchAll(/<table\b[^>]*class="[^"]*\bsheet-matrix\b[^"]*"[^>]*>/g)].map((m) => m[0]);
+    expect(tables.length).toBe(3);
+    for (const tag of tables) {
+      expect(tag).toContain('tabindex="0"');
+      expect(tag).toMatch(/aria-label="[^"]+"/);
+    }
+  });
+
+  test("styl druku: stopka nie ma position: fixed, tabele wracają do display: table, bez słowa „podpis”", async () => {
+    const css = await Bun.file("public/print.css").text();
+    const footerRule = css.match(/\.print-footer\s*\{[^}]*\}/)?.[0] ?? "";
+    expect(footerRule).not.toBe("");
+    expect(footerRule).not.toMatch(/position\s*:\s*fixed/i);
+    expect(footerRule).toMatch(/position\s*:\s*static/i);
+    expect(css).not.toMatch(/position\s*:\s*fixed/i);
+    expect(css).toMatch(/\.demo\b/);
+    expect(css).toMatch(/\.sheet-matrix\s*\{[^}]*display\s*:\s*table/s);
+    expect(css).toMatch(/\.sheet-matrix\s*\{[^}]*overflow\s*:\s*visible/s);
+    expect(css.toLowerCase()).not.toContain("podpis");
   });
 
   test("termin zatwierdzonej oceny z migawki: późniejsza zmiana nie rusza arkusza", async () => {
@@ -60,9 +112,22 @@ describe("arkusz /cycles/:id/sheet", () => {
     expect(h).toContain("13.11.2026");
   });
 
-  test("część I na cyklu bez części II: pola puste to „—”", async () => {
+  test("część I na cyklu bez części II: pola puste to „—” i miejsce na datę oraz potwierdzenie", async () => {
     const h = await html(app, "joanna", "/cycles/cycle-anna/sheet");
     expect(h).toContain("—");
     expect(h).toContain("Część II");
+    expect(h).toContain("Miejscowość, data i potwierdzenie");
+    expect(h.toLowerCase()).not.toContain("podpis");
+  });
+
+  test("część III idzie po części II z potwierdzeniem oceniającego i bez słowa „podpis”", async () => {
+    db.query(
+      "UPDATE events SET payload = json_set(payload, '$.gradeRequest.attached', json('true'), '$.gradeRequest.motivation', 'Stały wysoki poziom zadań.') WHERE type = 'assessment_approved' AND cycle_id = 'cycle-tomasz'",
+    ).run();
+    const h = await html(app, "joanna", "/cycles/cycle-tomasz/sheet");
+    const order = ["Część I", "Część II", "Pouczenie", "Część III", "Wniosek o przyznanie kolejnego stopnia służbowego", "Stały wysoki poziom zadań."].map((s) => h.indexOf(s));
+    expect(order.every((i) => i >= 0)).toBe(true);
+    expect([...order].sort((a, b) => a - b)).toEqual(order);
+    expect(h.toLowerCase()).not.toContain("podpis");
   });
 });
