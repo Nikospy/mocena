@@ -237,7 +237,7 @@ const DRAW = String.raw`((list) => {
   document.body.append(c);
 })`;
 
-const coverageFile = join(import.meta.dir, "../context/changes/final-polish/coverage.md");
+const coverageFile = join(import.meta.dir, "../context/archive/final-polish/coverage.md");
 const coverage = new Map<string, { route: string; who: string | null }>();
 for (const line of (await Bun.file(coverageFile).text()).split("\n")) {
   const row = /^\| `([^`]+)` \| `([^`]+)` \| [^|]+ \| `([^`]+)` \|/.exec(line);

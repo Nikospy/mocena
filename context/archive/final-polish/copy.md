@@ -2,7 +2,7 @@
 
 Cel: każdy tekst na ekranie jest poprawny, spójny i zgodny ze słownikiem. Zasady wspólne: `change.md`. To przegląd: kodu nie zmieniasz, wynik to jeden plik.
 
-Wolno zmieniać: tylko `context/changes/final-polish/copy-findings.md`.
+Wolno zmieniać: tylko `context/archive/final-polish/copy-findings.md`.
 
 Źródła reguł: `context/domain/glossary.md` (słowo na ekranie, czego nie pisać), `AGENTS.md` (zasady 6 i 7), zasady tekstów interfejsu: przycisk mówi, co się stanie (czasownik + dopełnienie); ta sama rzecz ma zawsze tę samą nazwę; błąd mówi, co się stało i jak to naprawić; nagłówek nazywa czynność; bez żargonu i skrótów bez rozwinięcia; polska typografia („…”, półpauza ze spacjami, twarda spacja po jednoliterowych słowach); zdania krótkie, strona czynna.
 

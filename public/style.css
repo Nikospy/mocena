@@ -881,7 +881,7 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 
 /* ======================================================================
    Sekcje ekranów. Każda grupa pisze tylko we własnej sekcji, tylko na tokenach (var(--…)),
-   i nie nadpisuje komponentów wspólnych (kontrakt: context/changes/final-polish/visual.md, „Komponenty wspólne”).
+   i nie nadpisuje komponentów wspólnych (kontrakt: context/archive/final-polish/visual.md, „Komponenty wspólne”).
    Gdy brakuje komponentu wspólnego, opisz potrzebę w raporcie zamiast budować własny.
    ====================================================================== */
 
