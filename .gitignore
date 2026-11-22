@@ -10,3 +10,6 @@ dist/
 # nagrania pokazu: tylko README
 docs/video/*
 !docs/video/README.md
+
+# dowiązanie do zależności w katalogach roboczych
+node_modules
