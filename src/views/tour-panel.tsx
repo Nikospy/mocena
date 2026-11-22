@@ -13,10 +13,10 @@ export type TourPanelProps = {
 };
 
 function nextHint(p: TourPanelProps): string {
-  if (p.stop.next === "done") return "Otworzy podsumowanie pokazu";
+  if (p.stop.next === "done") return "Następny krok: podsumowanie pokazu";
   const n = stopById(p.stop.next);
   if (!n) return "";
-  return `Przełączy na konto ${personGenitive(n.personId)} i datę ${p.dateOf(n.date)}`;
+  return `Następny krok: konto ${personGenitive(n.personId)}, ${p.dateOf(n.date)}`;
 }
 
 function Head(props: TourPanelProps) {

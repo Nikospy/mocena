@@ -37,31 +37,67 @@ function accounts() {
     Pick<Person, "id" | "name" | "role" | "position_title" | "gender">[];
 }
 
-function AccountScreen(props: { error?: string }) {
+/** Konta z pokazu dla jury idą pierwsze, w kolejności kroków; reszta alfabetycznie. */
+const TOUR_ACCOUNTS = ["marek", "piotr", "joanna"];
+
+const CHEVRON_R = (
+  <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M9 6l6 6-6 6" />
+  </svg>
+);
+
+function AccountRow(props: { a: ReturnType<typeof accounts>[number] }) {
+  const { a } = props;
+  const role = roleLabel(a);
+  const title = a.position_title && a.position_title !== role ? a.position_title : null;
   return (
-    <Layout title="Wybór konta" person={null} today={today()}>
+    <li>
+      <button class="acc" type="submit" name="person_id" value={a.id}>
+        <span class="acc-main"><b>{a.name}</b><span class="cap">{title ? `${title} · ${role}` : role}</span></span>
+        {CHEVRON_R}
+      </button>
+    </li>
+  );
+}
+
+function AccountScreen(props: { error?: string }) {
+  const all = accounts();
+  const tourAccounts = TOUR_ACCOUNTS.map((id) => all.find((a) => a.id === id)).filter((a) => !!a);
+  const others = all.filter((a) => !TOUR_ACCOUNTS.includes(a.id));
+  return (
+    <Layout title="Wybierz konto pokazowe" person={null} today={today()}>
       <section class="account-list">
-        <PageHeader title="Wybierz konto pokazowe" lead="Każde konto pokazuje ekrany jednej osoby w cyklu oceny." />
+        <PageHeader
+          context="Pokaz dla jury"
+          title="Wybierz konto pokazowe"
+          lead="Każde konto pokazuje ekrany jednej osoby w cyklu oceny. Konto zmienisz w każdej chwili w menu przy nazwisku."
+        />
         {props.error ? <p class="st bad" role="alert">{props.error}</p> : null}
-        <form method="post" action="/account">
-          <ul class="acc-grid">
-            {accounts().map((a) => (
-              <li>
-                <button class="card acc" type="submit" name="person_id" value={a.id}>
-                  <b>{a.name}</b>
-                  <span class="cap">{a.position_title ?? roleLabel(a)}</span>
-                  <span class="acc-role">{roleLabel(a)}</span>
-                </button>
-              </li>
-            ))}
+        <form method="post" action="/account" class="acc-form">
+          <h2 class="acc-h" id="acc-tour">Osoby z pokazu</h2>
+          <ul class="acc-grid" aria-labelledby="acc-tour">
+            {tourAccounts.map((a) => <AccountRow a={a} />)}
+          </ul>
+          <h2 class="acc-h" id="acc-other">Pozostałe konta</h2>
+          <ul class="acc-grid" aria-labelledby="acc-other">
+            {others.map((a) => <AccountRow a={a} />)}
           </ul>
         </form>
-        <form method="post" action="/demo/restart" class="again">
-          <button class="btn text" type="submit">Zacznij pokaz od nowa</button>
+        <form method="post" action="/demo/restart" class="acc-again">
+          <button class="btn text" type="submit">Wgraj dane pokazowe od nowa</button>
+          <p class="cap">Usuwa zmiany wprowadzone w pokazie i wraca do tej listy.</p>
         </form>
       </section>
     </Layout>
   );
+}
+
+/** Pusty stan strony głównej: jedno zdanie i jedna akcja właściwa dla roli. */
+function emptyAction(person: Person): { href: string; label: string } | null {
+  if (person.role === "hr") return { href: "/hr", label: "Otwórz stan cykli" };
+  if (person.role === "admin") return { href: "/admin/suggestion-sources", label: "Otwórz źródła podpowiedzi" };
+  if (person.role === "appraiser") return { href: "/notes", label: "Otwórz notatki o zespole" };
+  return { href: `/people/${person.id}/history`, label: "Otwórz historię ocen" };
 }
 
 /** Sprawy z terminem na górze (od najbliższego), potem pozostałe w kolejności dostawców. */
@@ -92,9 +128,15 @@ app.get("/", (c) => {
   return c.html(
     <Layout title="Start" person={person} today={today()}>
       <section>
-        <PageHeader title="Sprawy do załatwienia" />
+        <PageHeader context={person.position_title ?? roleLabel(person)} title="Sprawy do załatwienia" />
         {tasks.length === 0 ? (
-          <p class="empty">Brak spraw do załatwienia.</p>
+          <div class="home-empty">
+            <p>Nie masz teraz spraw do załatwienia.</p>
+            {(() => {
+              const a = emptyAction(person);
+              return a ? <a href={a.href}>{a.label}{CHEVRON_R}</a> : null;
+            })()}
+          </div>
         ) : (
           <ul class="tasks">
             {sortTasks(tasks).map((t) => {
@@ -129,9 +171,9 @@ app.get("/", (c) => {
                         </span>
                       </p>
                     ) : null}
-                    <span class="task-go" aria-hidden="true">
-                      {t.action ?? "Otwórz"}
-                      <svg class="ico s" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></svg>
+                    <span class={t.action ? "task-go" : "task-go bare"} aria-hidden="true">
+                      {t.action ?? null}
+                      {CHEVRON_R}
                     </span>
                   </div>
                 </li>
@@ -152,7 +194,7 @@ app.post("/account", async (c) => {
   const body = await c.req.parseBody();
   const id = typeof body.person_id === "string" ? body.person_id : "";
   const p = personById(id);
-  if (!p || !p.has_account) return c.html(<AccountScreen error="Nie ma takiego konta." />, 422);
+  if (!p || !p.has_account) return c.html(<AccountScreen error="Nie ma takiego konta. Wybierz osobę z listy." />, 422);
   setCookie(c, PERSON_COOKIE, p.id, { path: "/", httpOnly: true, sameSite: "Lax" });
   return c.redirect("/", 303);
 });
