@@ -11,6 +11,11 @@ export function cycleById(id: string): Cycle | null {
   return (getDb().query("SELECT * FROM cycles WHERE id = ?").get(id) as Cycle | null) ?? null;
 }
 
+export function visibleCycleById(id: string): Cycle | null {
+  const cycle = cycleById(id);
+  return cycle && visibleEvents(id).some((event) => event.type === "cycle_started") ? cycle : null;
+}
+
 export type Absence = { id: number; person_id: string; date_from: string; date_to: string; excused: number; recorded_on: string; recorded_by: string };
 
 /** Nieobecności z `recorded_on` nie późniejszym niż `asOf` (domyślnie `today()`), ta sama granica co `visibleEvents`. */

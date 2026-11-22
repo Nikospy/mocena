@@ -3,7 +3,7 @@ import { Hono, type Context } from "hono";
 import "../assessment/home";
 import { buildAssessmentSnapshot } from "../assessment/snapshot";
 import { assessmentState, currentGradeNumber, type AssessmentDraft } from "../assessment/state";
-import { cycleById, startNextCycle, type Cycle } from "../cycles";
+import { visibleCycleById, startNextCycle, type Cycle } from "../cycles";
 import { assessmentSlots } from "../notes/assessment-slots";
 import { cycleCriteria } from "../cycles/part1";
 import { getDb } from "../db";
@@ -22,7 +22,7 @@ type Ctx = { cycle: Cycle; person: Person; appraisee: Person };
 function guard(c: Context): Response | Ctx {
   const person = currentPerson(c);
   if (!person) return c.redirect("/account");
-  const cycle = cycleById(c.req.param("id") ?? "");
+  const cycle = visibleCycleById(c.req.param("id") ?? "");
   if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
   const appraisee = personById(cycle.person_id);
   if (!appraisee) return c.text("Nie ma takiego cyklu.", 404);

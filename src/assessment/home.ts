@@ -75,8 +75,8 @@ registerHomeTasks((person) => {
         detail: "Twój termin oceny:",
         due: d.deadline,
         basis: d.basis.join(", "),
-        action: st.stage === "no_part1" ? "Zobacz część I" : "Zobacz ocenę",
-        href: st.stage === "no_part1" ? `/cycles/${mine.id}/part1` : href,
+        action: "Zobacz część I",
+        href: `/cycles/${mine.id}/part1`,
         quiet: true,
       });
     }

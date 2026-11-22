@@ -1,7 +1,7 @@
 import { actsAsAppraiser } from "../substitutions";
 import { Hono, type Context } from "hono";
 import { card } from "../content";
-import { cycleById, effectiveDeadline, openCycle, type Cycle } from "../cycles";
+import { visibleCycleById, effectiveDeadline, openCycle, type Cycle } from "../cycles";
 import { cycleLinks, registerCycleLinks } from "../cycle-links";
 import { confirmPart1, cycleCriteria, isPart1Locked, part1Status, saveCriteria, submitPart1, type Part1Input } from "../cycles/part1";
 import { sheetForPosition } from "../engine/criteria";
@@ -85,7 +85,7 @@ type Ctx = { cycle: Cycle; person: Person };
 function guard(c: Context, opts: { hrRead?: boolean } = {}): Response | Ctx {
   const person = currentPerson(c);
   if (!person) return c.redirect("/account");
-  const cycle = cycleById(c.req.param("id") ?? "");
+  const cycle = visibleCycleById(c.req.param("id") ?? "");
   if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
   if (!isParty(cycle, person) && !(opts.hrRead && person.role === "hr")) return c.text("Brak uprawnień do tego cyklu.", 403);
   return { cycle, person };
