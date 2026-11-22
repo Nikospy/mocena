@@ -44,9 +44,10 @@ export function NoteFormView(props: {
               </div>
               <label class="tok" for="date">
                 <span class="k">Kiedy</span>
-                <input class="tok-date" type="date" id="date" name="date" max={props.today} value={v.date} />
+                <input class="tok-date" type="date" id="date" name="date" max={props.today} value={v.date} aria-describedby="date-words" />
               </label>
             </div>
+            <p class="date-words" id="date-words" data-date-words-for="date">{v.date ? formatDateLong(v.date) : ""}</p>
             {e.date ? <p class="st bad" role="alert">{e.date}</p> : null}
           </div>
 
@@ -116,6 +117,7 @@ export function NoteFormView(props: {
         <p class="again"><a class="btn text" href="/notes">Notatki o zespole</a></p>
       </section>
       <script src="/note-form.js" defer></script>
+      <script src="/date-words.js" defer></script>
     </Layout>
   );
 }

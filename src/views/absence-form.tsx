@@ -1,6 +1,6 @@
 import type { Absence } from "../cycles";
 import type { Person } from "../people";
-import { Layout, formatDate } from "./layout";
+import { Layout, formatDate, formatDateLong } from "./layout";
 
 export type AbsenceFormValues = { from: string; to: string; excused: boolean };
 
@@ -24,12 +24,14 @@ export function AbsenceFormView(props: {
           <div class="dates">
             <div>
               <label class="lbl" for="from">Od</label>
-              <input class="area" type="date" id="from" name="from" value={v.from} aria-invalid={e.from ? "true" : undefined} />
+              <input class="area" type="date" id="from" name="from" value={v.from} aria-invalid={e.from ? "true" : undefined} aria-describedby="from-words" />
+              <p class="date-words" id="from-words" data-date-words-for="from">{v.from ? formatDateLong(v.from) : ""}</p>
               {e.from ? <p class="st bad" role="alert">{e.from}</p> : null}
             </div>
             <div>
               <label class="lbl" for="to">Do</label>
-              <input class="area" type="date" id="to" name="to" value={v.to} aria-invalid={e.to ? "true" : undefined} />
+              <input class="area" type="date" id="to" name="to" value={v.to} aria-invalid={e.to ? "true" : undefined} aria-describedby="to-words" />
+              <p class="date-words" id="to-words" data-date-words-for="to">{v.to ? formatDateLong(v.to) : ""}</p>
               {e.to ? <p class="st bad" role="alert">{e.to}</p> : null}
             </div>
           </div>
@@ -69,6 +71,7 @@ export function AbsenceFormView(props: {
           </a>
         </p>
       </section>
+      <script src="/date-words.js" defer></script>
     </Layout>
   );
 }

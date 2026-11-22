@@ -890,3 +890,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .e-done { inline-size: 100%; margin-inline: auto; }
 .e-more .btn.text { padding-inline: 0; justify-content: flex-start; }
 .e-more .btn.text:hover { background: none; text-decoration: underline; }
+/* review-polish-2-4 */
+.date-words { margin-block: var(--sp-100) 0; font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); overflow-wrap: anywhere; }
+.date-words:empty { display: none; }
