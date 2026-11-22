@@ -93,7 +93,7 @@ export function seedAssessments(): void {
   startCycle(k);
   part1(k);
   approve(k, MEETS, "2026-11-16", "2026-11-17");
-  seedEvent("objection_filed", k.cycleId, "katarzyna", { to: "dyrektor generalny urzędu" }, "2026-11-20");
+  seedEvent("objection_filed", k.cycleId, "katarzyna", { to: "dyrektora generalnego urzędu" }, "2026-11-20");
 
   // Anna: wniosek o zmianę terminu (jeden z powodów z art. 81 ust. 8 ustawy, bez danych o zdrowiu).
   const a: Chain = { cycleId: "cycle-anna", personId: "anna", appraiserId: "dyrektor-urzedu", periodStart: "2024-12-16", part1On: "2025-01-14", confirmedOn: "2025-01-15" };

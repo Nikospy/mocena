@@ -22,13 +22,13 @@ describe("ekran kadr /hr (krok 5 pokazu)", () => {
 
   test("stany uproszczone: sprzeciw, wniosek o zmianę terminu, zapoznanie Piotra", async () => {
     const h = await html(app, "joanna", "/hr");
-    expect(h).toContain("Sprzeciw wniesiony 20.11.2026 do dyrektor generalny urzędu");
+    expect(h).toContain("Sprzeciw wniesiony 20.11.2026 do dyrektora generalnego urzędu");
     expect(h).toContain("04.12.2026");
     expect(h).toContain("art. 81 ust. 8");
     expect(h).toContain("zawiadamia pracownika pisemnie");
     expect(h).toContain("Zapoznanie potwierdzone 22.11.2026");
     expect(h).toContain("30.11.2026");
-    expect(h).toContain("Statystyki terminowości (widok dyrektora generalnego, bez nazwisk)");
+    expect(h).toContain("Terminowość w urzędzie (bez nazwisk)");
   });
 
   test("zasada 7: ekran nie ma nazw poziomów ani słów pozytywna / negatywna", async () => {

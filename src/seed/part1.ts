@@ -12,6 +12,11 @@ const DUTIES: Record<string, string[]> = {
   ewa: ["client-service"],
 };
 
+const GENDER: Record<string, "f" | "m"> = {
+  anna: "f", ewa: "f", maria: "f", joanna: "f", katarzyna: "f", "dyrektor-urzedu": "f",
+  marek: "m", piotr: "m", tomasz: "m", admin: "m", "poprzedni-naczelnik": "m",
+};
+
 function confirm(cycleId: string, personId: string, date: string): void {
   const db = getDb();
   const place = (db.query("SELECT value FROM settings WHERE key = 'office_city'").get() as { value: string }).value;
@@ -21,11 +26,13 @@ function confirm(cycleId: string, personId: string, date: string): void {
 
 export function seedPart1(opts: { afterStep1: boolean }): void {
   const db = getDb();
-  const upd = db.prepare("UPDATE people SET position_kind = ?, duty_types = ? WHERE id = ?");
+  const upd = db.prepare("UPDATE people SET position_kind = ?, duty_types = ?, gender = ? WHERE id = ?");
   for (const { id } of db.query("SELECT id FROM people").all() as { id: string }[]) {
     const kind = KIND[id];
     if (!kind) throw new Error(`Brak rodzaju stanowiska dla osoby ${id}`);
-    upd.run(kind, JSON.stringify(DUTIES[id] ?? []), id);
+    const gender = GENDER[id];
+    if (!gender) throw new Error(`Brak formy rodzajowej dla osoby ${id}`);
+    upd.run(kind, JSON.stringify(DUTIES[id] ?? []), gender, id);
   }
 
   savePart1("cycle-ewa", "poprzedni-naczelnik", { additional: ["orientacja-na-klienta"], expectations: {} }, "2024-12-02");

@@ -1,10 +1,11 @@
 import type { AssessmentDraft, AssessmentSnapshot, AssessmentStateData } from "../assessment/state";
+import { verdictText } from "../assessment/verdict";
 import type { CycleCriterion } from "../cycles/part1";
 import type { Blocker, GradeRequestOption } from "../engine/approval";
 import { rules, rulesVersion } from "../engine/rules";
 import { criterion, POINTS, type AssessmentResult } from "../engine/scoring";
 import type { Person } from "../people";
-import { ConfirmationBlock, LegalBasis } from "./components";
+import { ConfirmationBlock, LegalBasis, RulesVersion } from "./components";
 import { Layout, formatDate } from "./layout";
 import type { JSX } from "hono/jsx/jsx-runtime";
 
@@ -31,6 +32,11 @@ export function WarnIco() {
 export function OkIco() {
   return <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>;
 }
+/** Kryteria z wpisaną oceną cząstkową: nazwa i punkty (do nazwania przyczyny wyniku). */
+function scoreRows(criteria: { id: string }[], scores: Record<string, number>): { name: string; score: number }[] {
+  return criteria.filter((c) => scores[c.id] !== undefined).map((c) => ({ name: criterion(c.id).name, score: scores[c.id] }));
+}
+
 
 function mean2(n: number): string {
   return n.toFixed(2).replace(".", ",");
@@ -42,7 +48,17 @@ function daysBetween(from: string, to: string): number {
 
 type ResultLike = Pick<AssessmentResult, "mean" | "overallLevel" | "outcome" | "reasons">;
 
-export function ResultPanel(props: { result: ResultLike | null }) {
+/** „Treść zdania (§ 11 ust. 1 pkt 4).” z silnika → treść i przepis osobno (przepis idzie do pigułki). */
+function splitReason(r: string): { text: string; basis: string | null } {
+  const m = /^(.*?)\s*\((§[^)]*)\)\.?$/.exec(r);
+  return m ? { text: m[1], basis: m[2] } : { text: r.replace(/\.$/, ""), basis: null };
+}
+
+/**
+ * Wynik, przyczyna z przepisem, jedna linia o średniej (słowo „średnia” pada raz). Poziom ogólny stoi przy wyniku
+ * tylko wtedy, gdy mu nie przeczy (`verdictText`). `scores` pozwala nazwać kryteria z oceną „1”.
+ */
+export function ResultPanel(props: { result: ResultLike | null; scores?: { name: string; score: number }[]; cycleId?: string; version?: string }) {
   const r = props.result;
   if (!r) {
     return (
@@ -55,8 +71,17 @@ export function ResultPanel(props: { result: ResultLike | null }) {
       </section>
     );
   }
-  const v = rulesVersion();
   const neg = r.outcome === "negative";
+  const { verdict, level } = verdictText(r);
+  const ones = (props.scores ?? []).filter((s) => s.score === 1);
+  const lines = r.reasons.flatMap((raw) => {
+    const x = splitReason(raw);
+    return x.text.startsWith("Ocena cząstkowa") && ones.length > 0
+      ? ones.map((s) => ({ text: `${s.name}: 1, ${LEVELS.get(1) ?? ""}`, basis: x.basis }))
+      : [x];
+  });
+  const meanDoesNotDecide = neg && r.mean > 4;
+  const version = props.version ?? rulesVersion().version;
   return (
     <section class={`rule res ${neg ? "neg" : "pos"}`} id="assessment-result" aria-live="polite">
       <p class="voice rule-v">
@@ -64,16 +89,22 @@ export function ResultPanel(props: { result: ResultLike | null }) {
         <span><b>Wynik oceny</b> · wyliczony z przepisu</span>
       </p>
       <div class="verdict-box">
-        <p class="verdict">{neg ? <WarnIco /> : <OkIco />}<span>{neg ? "Ocena negatywna" : "Ocena pozytywna"}</span></p>
-        <ul class="reason">{r.reasons.map((x) => <li>{x}</li>)}</ul>
+        <p class="verdict">{neg ? <WarnIco /> : <OkIco />}<span>{verdict}</span></p>
+        {level ? <p class="verdict-level">{level}</p> : null}
+        <ul class="reason">
+          {lines.map((x) => (
+            <li>
+              {x.text} {x.basis ? <LegalBasis basis={x.basis} /> : null}
+            </li>
+          ))}
+        </ul>
       </div>
-      <div class="res-calc">
-        <p class="big avg">{mean2(r.mean)}</p>
-        <p class="avg-cap">średnia ocen cząstkowych</p>
-        <p class="level">{r.overallLevel}</p>
-      </div>
+      <p class="avg-line">
+        <b>Średnia {mean2(r.mean)}</b>
+        {meanDoesNotDecide ? " — nie zmienia wyniku" : null}
+      </p>
       <p class="cap">
-        {rules.source.publisher}, reguły {v.version}
+        <RulesVersion version={version} href={props.cycleId ? `/cycles/${props.cycleId}/timeline` : undefined} />
       </p>
     </section>
   );
@@ -123,13 +154,16 @@ export function ObjectionClock(props: { deadline: string; today: string; mine: b
   );
 }
 
-export function AssessmentMessage(props: { viewer: Person; person: Person; today: string; text: string; status?: number }) {
+export function AssessmentMessage(props: { viewer: Person; person: Person; today: string; text: string; status?: number; action?: { label: string; href: string } }) {
   return (
     <Layout title="Ocena" person={props.viewer} today={props.today}>
       <section class="card">
         <h1>Ocena okresowa: {props.person.name}</h1>
         <p class="st info">{props.text}</p>
-        <div class="btns"><a class="btn" href="/">Wróć na stronę główną</a></div>
+        <div class="btns">
+          {props.action ? <a class="btn primary" href={props.action.href}>{props.action.label}</a> : null}
+          <a class="btn" href="/">Wróć na stronę główną</a>
+        </div>
       </section>
     </Layout>
   );
@@ -154,6 +188,8 @@ export type AssessmentViewProps = {
   errors?: string[];
   canAcknowledge?: boolean;
   canFiction?: boolean;
+  /** Termin przesunięty przez nieobecność (silnik): zdanie i odnośnik do osi czasu. */
+  shifted?: { text: string } | null;
 };
 
 function Header(p: { person: Person; sheet: string; period: string }) {
@@ -199,12 +235,12 @@ function EditForm(p: AssessmentViewProps) {
                           <div class="score" role="radiogroup" aria-label={`Ocena cząstkowa: ${cr.name}`}>
                             {POINTS.map((n) => (
                               <label>
-                                <input type="radio" name={`score[${c.id}]`} value={String(n)} checked={val === n} aria-label={String(n)} />
+                                <input type="radio" name={`score[${c.id}]`} value={String(n)} checked={val === n} aria-label={String(n)} data-level={LEVELS.get(n) ?? ""} />
                                 <span>{n}</span>
                               </label>
                             ))}
                           </div>
-                          <p class="lvl">{val !== undefined ? (LEVELS.get(val) ?? "") : ""}</p>
+                          <p class="lvl" aria-live="polite">{val !== undefined ? `Wybrano ${val}: ${LEVELS.get(val) ?? ""}` : ""}</p>
                         </div>
                       </div>
                       {slots.criterionAside ? slots.criterionAside(c.id) : null}
@@ -272,7 +308,7 @@ function EditForm(p: AssessmentViewProps) {
           </div>
 
           <aside class="side" aria-label="Wynik i zatwierdzenie">
-            <ResultPanel result={p.result} />
+            <ResultPanel result={p.result} scores={scoreRows(p.criteria, d.scores)} cycleId={p.cycleId} />
             <BlockerList blockers={p.blockers} />
             <div class="decide">
               <button type="submit" class="btn full">Zapisz</button>
@@ -284,6 +320,7 @@ function EditForm(p: AssessmentViewProps) {
         </div>
       </form>
       <script src="/assessment.js" defer></script>
+      <script src="/score-caption.js" defer></script>
     </>
   );
 }
@@ -328,8 +365,20 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
           </section>
         ) : null}
       </div>
-      <aside class="side" aria-label="Wynik i potwierdzenia">
-        <ResultPanel result={s.result} />
+      <aside class="side first" aria-label="Wynik i potwierdzenia">
+        <ResultPanel result={s.result} scores={s.criteria} cycleId={p.cycleId} version={s.rulesVersion.version} />
+        {st.objectionDeadline ? <ObjectionClock deadline={st.objectionDeadline} today={p.today} mine={mine} /> : null}
+        {p.canAcknowledge ? (
+          <form method="post" action={`/cycles/${p.cycleId}/assessment/acknowledge`} class="decide">
+            <p class="cap">Potwierdzenie zapoznania z oceną: {rules.approval.acknowledgement.basis}</p>
+            <button type="submit" class="btn primary full">Potwierdzam zapoznanie z oceną</button>
+          </form>
+        ) : null}
+        {p.canFiction ? (
+          <div class="decide">
+            <a class="btn full" href={`/cycles/${p.cycleId}/assessment/fiction`}>Stwierdź fikcję zapoznania</a>
+          </div>
+        ) : null}
         <section class="card b-facts">
           <p>
             Okres oceny: {formatDate(s.periodFrom)} – {formatDate(s.periodTo)}
@@ -356,18 +405,6 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
             <ConfirmationBlock kind="confirmation" />
           )}
         </section>
-        {st.objectionDeadline ? <ObjectionClock deadline={st.objectionDeadline} today={p.today} mine={mine} /> : null}
-        {p.canAcknowledge ? (
-          <form method="post" action={`/cycles/${p.cycleId}/assessment/acknowledge`} class="decide">
-            <p class="cap">Potwierdzenie zapoznania z oceną: {rules.approval.acknowledgement.basis}</p>
-            <button type="submit" class="btn primary full">Potwierdzam zapoznanie z oceną</button>
-          </form>
-        ) : null}
-        {p.canFiction ? (
-          <div class="decide">
-            <a class="btn full" href={`/cycles/${p.cycleId}/assessment/fiction`}>Stwierdź fikcję zapoznania</a>
-          </div>
-        ) : null}
       </aside>
     </div>
   );
@@ -379,6 +416,13 @@ export function AssessmentView(p: AssessmentViewProps) {
   return (
     <Layout title="Ocena" person={p.viewer} today={p.today}>
       <Header person={p.person} sheet={snap?.sheet ?? p.sheet} period={period} />
+      {p.shifted ? (
+        <p class="st info" id="deadline-shift">
+          <span>
+            {p.shifted.text}. <a href={`/cycles/${p.cycleId}/timeline`}>Zobacz oś czasu</a>
+          </span>
+        </p>
+      ) : null}
       {p.errors?.length ? (
         <div class="st bad" role="alert">
           <ul>{p.errors.map((e) => <li>{e}</li>)}</ul>

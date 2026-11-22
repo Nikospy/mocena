@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { cycleById, openCycle } from "../cycles";
 import { currentPerson, personById } from "../people";
 import { today } from "../settings";
-import { buildTimeline, canRecordAbsence, canViewTimeline, timelineRulesText } from "../timeline";
+import { buildTimeline, canRecordAbsence, canViewTimeline, timelineRulesVersion } from "../timeline";
 import { TimelineView } from "../views/timeline";
 
 const app = new Hono();
@@ -27,7 +27,7 @@ app.get("/cycles/:id/timeline", (c) => {
       cycleId={cycle.id}
       personName={person?.name ?? cycle.person_id}
       entries={buildTimeline(cycle.id, viewer)}
-      rulesText={timelineRulesText(cycle.id)}
+      rulesVersion={timelineRulesVersion(cycle.id)}
       notice={viewer.role === "hr" && saved ? notices[saved] : undefined}
       canAddAbsence={canRecordAbsence(viewer, cycle) && openCycle(cycle.person_id)?.id === cycle.id}
     />,

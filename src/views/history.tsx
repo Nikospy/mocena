@@ -1,5 +1,6 @@
 import type { HistoryEntry } from "../hr/history";
 import type { Person } from "../people";
+import { RulesVersion } from "./components";
 import { Layout, formatDate } from "./layout";
 
 type Entry = HistoryEntry & { canOpenSheet: boolean };
@@ -25,7 +26,7 @@ export function HistoryList(props: { entries: Entry[] }) {
                   ? `Fikcja zapoznania stwierdzona ${formatDate(h.acknowledgedOn)}`
                   : `Zapoznanie potwierdzone ${formatDate(h.acknowledgedOn)}`
                 : "Zapoznanie jeszcze niepotwierdzone"}
-              {" · "}wersja reguł {h.rulesVersion.version} z {formatDate(h.rulesVersion.effectiveFrom)}
+              {" · "}<RulesVersion version={h.rulesVersion.version} effectiveFrom={h.rulesVersion.effectiveFrom} />
             </p>
             {h.canOpenSheet ? <a class="btn link-chip" href={`/cycles/${h.cycleId}/sheet`}>Arkusz</a> : null}
           </li>

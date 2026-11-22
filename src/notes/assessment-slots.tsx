@@ -1,7 +1,6 @@
 import { assessmentState } from "../assessment/state";
 import { cycleById } from "../cycles";
 import { cycleCriteria } from "../cycles/part1";
-import { criterion } from "../engine/scoring";
 import { officeSettings } from "../office-settings";
 import type { Person } from "../people";
 import { today } from "../settings";
@@ -47,7 +46,7 @@ export function assessmentSlots(p: { cycleId: string; viewer: Person }): Slots {
             <h3>Notatki przy innych kryteriach</h3>
             <ul class="note-list">
               {others.map((n) => (
-                <NoteItem note={n} insert={formatNoteForInsert(n, criterion(n.criterion_id).name)} />
+                <NoteItem note={n} insert={formatNoteForInsert(n)} />
               ))}
             </ul>
           </div>

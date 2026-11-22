@@ -683,6 +683,55 @@ h2, h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w
 .src-cols { display: grid; gap: var(--sp-300); }
 @media (min-width: 900px) { .src-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } .src-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; } }
 
+/* review-polish */
+/* 1.3 wynik oceny: poziom pod werdyktem tylko gdy nie przeczy wynikowi, jedna linia o średniej */
+.verdict-level { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w-bold); }
+.res.neg .verdict-level { color: var(--red-200); }
+.res.pos .verdict-level { color: var(--green-200); }
+.reason { list-style: none; padding-inline-start: 0; display: grid; gap: var(--sp-100); }
+.verdict-box .reason { padding-inline-start: 0; }
+.reason .basis { vertical-align: baseline; }
+.avg-line { padding-block-start: var(--sp-200); border-block-start: 1px solid var(--rule-divider); color: var(--rule-ink); font-size: var(--f-h6); line-height: var(--lh-h6); }
+.avg-line b { font-weight: var(--w-bold); }
+/* 1.4 podpis wybranego poziomu tuż pod rzędem cyfr, bez pustego marginesu */
+.scorebox .lvl { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+.scorebox .lvl:empty { display: none; }
+/* 1.5 ocena u ocenianego na wąskim ekranie: wynik, termin sprzeciwu i przycisk zapoznania przed listą kryteriów */
+@media (max-width: 999px) { .o-grid > .side.first { order: -1; } }
+/* 1.6 termin przesunięty */
+#deadline-shift a { color: inherit; }
+/* 1.7 rozwijanie jak w makietach (chevron, bez surowego trójkąta); oczekiwanie tylko przy zaznaczonym kryterium */
+details.disc { margin-block-start: var(--sp-50); }
+details.disc > summary { list-style: none; display: inline-flex; align-items: center; gap: var(--sp-100); min-block-size: var(--hit); padding-inline: var(--sp-100);
+  margin-inline-start: calc(var(--sp-100) * -1); border-radius: var(--ctl-r); font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); cursor: pointer; }
+details.disc > summary::-webkit-details-marker { display: none; }
+details.disc > summary .ico { color: var(--primary); }
+details.disc[open] > summary .ico { transform: rotate(180deg); }
+details.disc > summary:active { background: var(--cobalt-10); }
+@media (hover: hover) and (pointer: fine) { details.disc > summary:hover { background: var(--cobalt-10); } }
+details.disc > ul { padding-inline-start: var(--sp-250); display: grid; gap: var(--sp-50); font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+details.disc > .area { margin-block-start: var(--sp-50); }
+.crit:has(input[name="additional"]:not(:checked)) .exp-field { display: none; }
+/* 1.8 odnośniki cyklu na telefonie: jeden rząd chipów przewijany w poziomie; przycisk potwierdzenia części I przyklejony */
+@media (max-width: 640px) {
+  .hdr .hdr-links, .hdr-top.many .hdr-links { display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: var(--sp-100); overflow-x: auto; margin-inline: 0; margin-block-start: 0; padding-block-end: var(--sp-50); }
+  .hdr .hdr-links .btn { flex: none; min-block-size: var(--sp-500); padding-inline: var(--sp-150); font-size: var(--f-c1); line-height: var(--lh-c1); white-space: nowrap;
+    border: 1px solid var(--cobalt-30); border-radius: var(--pill-r); background: var(--secondary); }
+}
+@media (min-width: 900px) { .part1-confirm { inset-block-end: var(--sp-200); } }
+/* 1.9 pytanie o zmianę zadań: cytat notatki, skutki odpowiedzi, przyciski na całą szerokość na telefonie */
+.note-quote { margin: 0; padding: var(--sp-150) var(--sp-200); border-inline-start: var(--sp-50) solid var(--cobalt-30); border-radius: var(--ctl-r); background: var(--grey-10); }
+.note-quote > * + * { margin-block-start: var(--sp-50); }
+.outcomes { color: var(--text-2); font-size: var(--f-c1); line-height: var(--lh-c1); }
+@media (max-width: 640px) { .q-hero .btns { flex-direction: column; } .q-hero .btns .btn { inline-size: 100%; } .q-hero .b-later { inline-size: 100%; } }
+/* 1.11 lista kadr: pigułka terminu w szerszej kolumnie, nie łamie się na kilka linii */
+.hr-table td:nth-child(5) { min-inline-size: 15rem; }
+.hr-table .basis .art { white-space: normal; overflow-wrap: break-word; }
+.hr-table details.disc > summary { min-block-size: var(--sp-500); }
+/* 2.2 zdanie wspólne pod listą pozycji */
+.shared-prompt { margin-block-start: var(--sp-100); }
+/* 2.5 pigułki przepisów w liście braków nie łamią linii w środku */
+.miss .basis .art { white-space: nowrap; }
 /* guided-demo-tour */
 /* numery i obwódki "Na co patrzeć" na ekranie aplikacji (nadaje je tour.js) */
 [data-look] { position: relative; }

@@ -38,7 +38,8 @@ describe("arkusz /cycles/:id/sheet", () => {
     expect(notice).toContain("art. 83 ust. 1");
     expect(h.slice(h.lastIndexOf("<section", h.indexOf('id="pouczenie"')), h.indexOf('id="pouczenie"'))).not.toContain("no-print");
     expect(h).toContain('onclick="window.print()"');
-    expect(h).toContain("Drukuj część I");
+    expect(h).not.toContain("Drukuj część I");
+    expect(h.match(/Drukuj/g)).toHaveLength(1);
     expect(h).toContain("Potwierdzenie w systemie: Rzeszów, 22.11.2026, Piotr Wójcik");
     expect(h.toLowerCase()).not.toContain("podpis");
   });

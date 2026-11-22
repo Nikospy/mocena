@@ -94,7 +94,7 @@ describe("ekran „Przed rozmową”", () => {
     expect(res.status).toBe(200);
     const html = await res.text();
     expect(html).toContain("Przed rozmową z Piotrem");
-    expect(html).toContain("Zaznaczyłeś zmianę zadań w notatce z 11.03.2026.");
+    expect(html).toContain("Zaznaczono zmianę zadań w notatce z 11.03.2026.");
     expect(html).toContain("To stała zmiana zadań?");
     expect(html).toContain('action="/notes/10/task-change"');
     expect(html).toContain("O Marii nie masz jeszcze żadnej notatki.");
@@ -111,9 +111,9 @@ describe("ekran „Przed rozmową”", () => {
     expect((await call(app, "marek", loc, { answer: "yes" })).status).toBe(303);
     expect((await call(app, "marek", "/demo/date", { date: "2026-11-21" })).status).toBe(303);
     const html = await (await call(app, "marek", "/cycles/cycle-piotr/before-meeting")).text();
-    expect(html).toContain("Zaznaczyłeś zmianę zadań w notatce z 11.03.2026.");
+    expect(html).toContain("Zaznaczono zmianę zadań w notatce z 11.03.2026.");
     expect(html.match(/zmiana zadań/g)).toHaveLength(1);
-    expect(html).not.toContain("nie odpowiedziałeś");
+    expect(html).not.toContain("czeka na odpowiedź");
   });
 
   test("odnośniki: oceniający ma „Przed rozmową” i „Docenienie”, inni nie", () => {
@@ -131,7 +131,7 @@ describe("docenienie", () => {
     const { app } = createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } });
     expect(homeTasks(personById("marek")!).some((t) => t.href === "/cycles/cycle-piotr/appreciation")).toBe(true);
     const home = await (await call(app, "marek", "/")).text();
-    expect(home).toContain("nie przekazałeś Piotrowi żadnej informacji zwrotnej");
+    expect(home).toContain("brak zapisanej informacji zwrotnej dla Piotra");
     const res = await call(app, "marek", "/cycles/cycle-piotr/appreciation");
     expect(res.status).toBe(200);
     const html = await res.text();

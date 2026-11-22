@@ -1,4 +1,17 @@
+import { rulesVersionLabel } from "../engine/rules";
 import { formatDate } from "./layout";
+
+/** Wersja zasad po ludzku („Zasady z rozporządzenia z 2016 r., wersja 1”); identyfikator zostaje w `title`. */
+export function RulesVersion(props: { version: string; effectiveFrom?: string; href?: string }) {
+  const title = `Identyfikator wersji: ${props.version}`;
+  const label = rulesVersionLabel(props.version);
+  return (
+    <>
+      {props.href ? <a href={props.href} title={title}>{label}</a> : <span title={title}>{label}</span>}
+      {props.effectiveFrom ? `, obowiązują od ${formatDate(props.effectiveFrom)}` : null}
+    </>
+  );
+}
 
 /** Dopisek z przepisem przy dacie albo wartości. */
 export function LegalBasis(props: { basis: string | string[] }) {

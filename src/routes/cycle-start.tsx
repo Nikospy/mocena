@@ -2,13 +2,14 @@ import { Hono, type Context } from "hono";
 import { card } from "../content";
 import { cycleById, effectiveDeadline, openCycle, type Cycle } from "../cycles";
 import { cycleLinks, registerCycleLinks } from "../cycle-links";
-import { confirmPart1, cycleCriteria, isPart1Locked, part1Status, saveCriteria, submitPart1, waitingDaysText, type Part1Input } from "../cycles/part1";
+import { confirmPart1, cycleCriteria, isPart1Locked, part1Status, saveCriteria, submitPart1, type Part1Input } from "../cycles/part1";
 import { sheetForPosition } from "../engine/criteria";
 import { criteriaTalkDeadline } from "../engine/deadlines";
 import { rules } from "../engine/rules";
-import { selectableCriteria, type Sheet } from "../engine/scoring";
+import { mandatoryCriteria, selectableCriteria, type Sheet } from "../engine/scoring";
 import { visibleEvents } from "../events";
 import { registerHomeTasks, type HomeTask } from "../home-tasks";
+import { nameForm } from "../hr-partner/partner";
 import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
 import { suggestCriteria } from "../suggestions";
@@ -32,11 +33,13 @@ registerHomeTasks((person) => {
     for (const personId of appraiseeIds(person.id)) {
       const cycle = openCycle(personId);
       if (!cycle || cycle.appraiser_id !== person.id) continue;
-      const { state, waitingDays } = part1Status(cycle.id);
+      const { state } = part1Status(cycle.id);
       if (state === "submitted") {
+        const submittedOn = part1Status(cycle.id).submittedOn;
+        const name = personById(cycle.person_id)?.name ?? "";
         tasks.push({
-          title: `Część I czeka na potwierdzenie ${waitingDaysText(waitingDays ?? 0)}`,
-          detail: `Pracownik: ${personById(cycle.person_id)?.name}`,
+          title: `Część I czeka na potwierdzenie ${nameForm(name, "gen") ?? name}`,
+          detail: submittedOn ? `Przekazano ${formatDate(submittedOn)}.` : undefined,
           href: `/cycles/${cycle.id}/part1`,
           action: "Otwórz część I",
         });
@@ -114,6 +117,10 @@ function renderPart1(c: Context, cx: Ctx, extra: { errors?: string[]; input?: Pa
     ? { label: "Termin przekazany w części I", date: submitted.payload.dueDate as string, basis: submitted.payload.dueDateBasis as string[] }
     : { label: "Termin oceny", ...effectiveDeadline(cycle.id) };
   const confirmed = visibleEvents(cycle.id).find((e) => e.type === "part1_confirmed");
+  const appraisee = personById(cycle.person_id)?.name ?? "";
+  const storedMandatory = criteria.filter((x) => x.kind === "mandatory");
+  // Przed zapisem kryteriów w bazie nie ma jeszcze wierszy: obowiązkowe biorą się z arkusza.
+  const mandatory = storedMandatory.length ? storedMandatory : mandatoryCriteria(sheet).map((id) => ({ id, expectation: null }));
   return c.html(
     <Part1View
       viewer={person}
@@ -125,7 +132,7 @@ function renderPart1(c: Context, cx: Ctx, extra: { errors?: string[]; input?: Pa
       sheet={sheet}
       sheetBasis={basis}
       state={status.state}
-      mandatory={criteria.filter((x) => x.kind === "mandatory")}
+      mandatory={mandatory}
       additional={criteria.filter((x) => x.kind === "additional")}
       suggestions={suggestCriteria(sheet, duties).items}
       selectable={selectableCriteria(sheet)}
@@ -135,7 +142,11 @@ function renderPart1(c: Context, cx: Ctx, extra: { errors?: string[]; input?: Pa
       confirmation={confirmed ? { name: confirmed.payload.appraiseeName, place: confirmed.payload.place, date: confirmed.date } : undefined}
       links={cycleLinks(cycle, person)}
       errors={extra.errors}
-      waiting={cycle.appraiser_id === person.id && status.state === "submitted" ? waitingDaysText(status.waitingDays ?? 0) : undefined}
+      waiting={
+        cycle.appraiser_id === person.id && status.state === "submitted" && status.submittedOn
+          ? { submittedOn: status.submittedOn, appraiseeGenitive: nameForm(appraisee, "gen") ?? appraisee }
+          : undefined
+      }
     />,
     extra.status ?? 200,
   );

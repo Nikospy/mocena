@@ -27,7 +27,7 @@ describe("krok 1 pokazu", () => {
     expect(r.status).toBe(302);
     expect(r.headers.get("location")).toBe(`/cycles/${piotr}/part1`);
     const html = await (await as(app, "marek", `/cycles/${piotr}/part1`)).text();
-    expect(html).toContain("Arkusz C");
+    expect(html).toContain("arkusz C");
     expect(html).toContain("§ 3 ust. 4");
     expect(html.match(/bo w opisie stanowiska jest obowiązek/g)).toHaveLength(3);
     expect(html).toContain("ustawienie urzędu");
@@ -108,10 +108,10 @@ describe("krok 1 pokazu", () => {
   test("oczekiwanie: Marek widzi „od 2 dni”; kadry czytają, nie zapisują, mają odnośnik „Część I”", async () => {
     const { app } = createTestApp({ today: "2024-12-09" });
     await as(app, "marek", `/cycles/${piotr}/part1/submit`, good);
-    expect(await (await as(app, "marek", `/cycles/${piotr}/part1`)).text()).toContain("od dziś");
+    expect(await (await as(app, "marek", `/cycles/${piotr}/part1`)).text()).toContain("Przekazano 09.12.2024. Czeka na potwierdzenie Piotra.");
     await app.request("/demo/date", { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded", cookie: "person_id=marek" }, body: "date=2024-12-11" });
-    expect(await (await as(app, "marek", `/cycles/${piotr}/part1`)).text()).toContain("Część I czeka na potwierdzenie od 2 dni");
-    expect(await (await as(app, "marek", "/")).text()).toContain("od 2 dni");
+    expect(await (await as(app, "marek", `/cycles/${piotr}/part1`)).text()).toContain("Przekazano 09.12.2024. Czeka na potwierdzenie Piotra.");
+    expect(await (await as(app, "marek", "/")).text()).toContain("Część I czeka na potwierdzenie Piotra");
     const hr = await as(app, "joanna", `/cycles/${piotr}/part1`);
     expect(hr.status).toBe(200);
     expect(await hr.text()).not.toContain("part1/criteria");
@@ -125,7 +125,7 @@ describe("krok 1 pokazu", () => {
     const card = await (await as(app, "marek", `/cycles/${piotr}/cards/opening`)).text();
     expect(card).toContain("Trudne sytuacje");
     expect(card).toContain("Pytania");
-    expect(await (await as(app, "marek", `/cycles/${piotr}/part1`)).text()).toContain("<details>");
+    expect(await (await as(app, "marek", `/cycles/${piotr}/part1`)).text()).toContain('<details class="disc">');
   });
 
   test("dane pokazowe: Ewa i Tomasz mają potwierdzoną część I", () => {

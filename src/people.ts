@@ -19,7 +19,21 @@ export type Person = {
   position_kind: "head_of_office" | "manager" | "staff" | null;
   duty_types: string;
   appointed_year: number | null;
+  /** Forma gramatyczna roli w procesie: „f” (oceniająca, oceniana) albo „m”. */
+  gender: "f" | "m" | null;
 };
+
+const PROCESS_ROLE: Record<"appraiser" | "employee", Record<"f" | "m", string>> = {
+  appraiser: { f: "oceniająca", m: "oceniający" },
+  employee: { f: "oceniana", m: "oceniany" },
+};
+
+/** Rola w procesie oceny w formie zgodnej z osobą (pole `gender`); kadry i administrator bez zmian. */
+export function roleLabel(p: Pick<Person, "role" | "gender">): string {
+  if (p.role === "hr") return "kadry";
+  if (p.role === "admin") return "administrator";
+  return PROCESS_ROLE[p.role][p.gender ?? "m"];
+}
 
 export function personById(id: string): Person | null {
   return (getDb().query("SELECT * FROM people WHERE id = ?").get(id) as Person | null) ?? null;

@@ -382,7 +382,7 @@ describe("S-04: notatki w formularzu oceny", () => {
   test("krok 4: notatki przy kryteriach, jedno ostrzeżenie, karta rozmowy i odnośniki", async () => {
     const app = fresh();
     const html = await (await call(app, "marek", `/cycles/${piotr}/assessment`)).text();
-    expect(html).toContain("Orientacja na klienta/interesanta, 04.08.2025: Interesant dzwonił");
+    expect(html).toContain("04.08.2025: Interesant dzwonił");
     expect(html).toContain("<h1>Piotr Wójcik</h1>");
     expect(html).toContain('data-target="developmentConclusions"');
     expect(html.match(/Wszystkie notatki przy tym kryterium są z ostatniego miesiąca/g)).toHaveLength(1);

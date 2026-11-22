@@ -2,8 +2,9 @@ import { Hono } from "hono";
 import "../hr/links";
 import { cycleLinks } from "../cycle-links";
 import { getDb } from "../db";
-import { recordEvent, visibleEvents } from "../events";
-import { cycleState } from "../hr/cycle-state";
+import { recordEvent, visibleEvents, visibleEventsOfType } from "../events";
+import { cycleState, type CycleStep } from "../hr/cycle-state";
+import { fullNameForm } from "../hr-partner/partner";
 import { mandatoryGradeOf } from "../hr/history";
 import { latestCycles } from "../hr/latest-cycles";
 import { officeStats } from "../hr/stats";
@@ -14,6 +15,7 @@ import { HrOverviewView, type StateRow } from "../views/hr-overview";
 
 const app = new Hono();
 
+const CLOSED_STEPS = new Set<CycleStep>(["acknowledged", "fiction", "objection_resolved"]);
 export function overviewData(viewer: Person) {
   const rows: StateRow[] = latestCycles().map((c) => ({
     cycleId: c.id,
@@ -24,7 +26,14 @@ export function overviewData(viewer: Person) {
     today: today(),
     links: cycleLinks(c, viewer),
   }));
-  rows.sort((a, b) => (a.state.deadline?.date ?? "9999").localeCompare(b.state.deadline?.date ?? "9999") || a.personName.localeCompare(b.personName));
+  // Najpierw cykle wymagające działania, zamknięte (zapoznanie, fikcja, rozpatrzony sprzeciw) na końcu; w grupie od najbliższego terminu.
+  const closed = (r: StateRow) => (CLOSED_STEPS.has(r.state.step) ? 1 : 0);
+  rows.sort(
+    (a, b) =>
+      closed(a) - closed(b) ||
+      (a.state.deadline?.date ?? "9999").localeCompare(b.state.deadline?.date ?? "9999") ||
+      a.personName.localeCompare(b.personName),
+  );
   const people = getDb().query("SELECT id, name FROM people WHERE appointed = 1 ORDER BY name").all() as { id: string; name: string }[];
   const cards = people.flatMap((p) => {
     const grade = mandatoryGradeOf(p.id);
@@ -38,7 +47,15 @@ app.get("/hr", (c) => {
   if (!viewer) return c.redirect("/account");
   if (viewer.role !== "hr") return c.text("Ten ekran widzą kadry.", 403);
   const { rows, cards, stats } = overviewData(viewer);
-  return c.html(<HrOverviewView viewer={viewer} today={today()} cards={cards} rows={rows} stats={stats} />);
+  // Komunikat po „Odnotuj przyznanie stopnia”: tylko gdy taki wpis naprawdę istnieje.
+  const awardedId = c.req.query("awarded");
+  const awardedPerson = awardedId ? personById(awardedId) : null;
+  const awardedEvent = awardedPerson ? visibleEventsOfType("mandatory_grade_awarded").filter((e) => e.payload.personId === awardedPerson.id).pop() : undefined;
+  const awarded =
+    awardedPerson && awardedEvent
+      ? { dative: fullNameForm(awardedPerson.name, "dat") ?? awardedPerson.name, date: awardedEvent.date }
+      : undefined;
+  return c.html(<HrOverviewView viewer={viewer} today={today()} cards={cards} rows={rows} stats={stats} awarded={awarded} />);
 });
 
 const OUTCOMES = ["changed", "redone", "rejected"];
@@ -52,7 +69,7 @@ app.post("/hr/grades/:personId", (c) => {
   const grade = mandatoryGradeOf(person.id);
   if (!grade || grade.toGrade === null) return c.text("Nie ma obowiązku przyznania stopnia albo został już odnotowany.", 409);
   recordEvent("mandatory_grade_awarded", grade.cycleId, viewer.id, { personId: person.id, fromGrade: grade.fromGrade, toGrade: grade.toGrade, basis: grade.basis });
-  return c.redirect("/hr", 303);
+  return c.redirect(`/hr?awarded=${person.id}`, 303);
 });
 
 app.post("/cycles/:id/objection-outcome", async (c) => {

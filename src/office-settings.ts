@@ -29,3 +29,11 @@ export function officeSettings(): OfficeSettings {
   }
   return data as OfficeSettings;
 }
+
+/** Na ile dni przed terminem oceny pojawia się sprawa „Wystaw ocenę” i przypomnienie o terminie (założenie produktu: ustawienie urzędu). */
+const DEFAULT_ASSESSMENT_WINDOW_DAYS = 30;
+
+export function assessmentWindowDays(): { value: number; label: string } {
+  const d = officeSettings().assessmentReminderDays;
+  return { value: d?.value ?? DEFAULT_ASSESSMENT_WINDOW_DAYS, label: d?.label ?? "ustawienie urzędu" };
+}

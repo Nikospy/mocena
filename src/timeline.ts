@@ -1,6 +1,7 @@
 // Oś czasu cyklu oceny: fakty z widocznych wpisów i terminy wyliczone z przepisów (te widać także w przyszłości).
 import { registerCycleLinks } from "./cycle-links";
 import { cycleById, cycleDeadlineDetails, openCycle, visibleAbsences, type Cycle } from "./cycles";
+import { romanGrade } from "./engine/grades";
 import { rules, rulesVersion } from "./engine/rules";
 import { visibleEvents } from "./events";
 import { personById, type Person } from "./people";
@@ -107,6 +108,14 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
       if (x.objectionDeadline) {
         entries.push({ date: x.objectionDeadline, title: "Termin sprzeciwu", basis: [rules.deadlines.objectionDays.basis], kind: "deadline" });
       }
+    } else if (e.type === "mandatory_grade_awarded") {
+      entries.push({
+        date: e.date,
+        title: `Przyznano stopień służbowy ${romanGrade(x.toGrade)}`,
+        detail: "Obowiązek urzędu: stopień z mocy prawa, odnotowany przez kadry.",
+        basis: [x.basis],
+        kind: "fact",
+      });
     }
   }
 
@@ -128,10 +137,9 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
 }
 
 /** Wersja reguł: z części I, gdy jest przekazana, inaczej bieżąca. */
-export function timelineRulesText(cycleId: string): string {
+export function timelineRulesVersion(cycleId: string): { version: string; effectiveFrom: string } {
   const sent = visibleEvents(cycleId).find((e) => e.type === "part1_submitted")?.payload?.rulesVersion;
-  const v = sent?.version ? sent : rulesVersion();
-  return `Reguły: ${v.version}, obowiązują od ${formatDate(v.effectiveFrom)}`;
+  return sent?.version ? sent : rulesVersion();
 }
 
 registerCycleLinks((cycle, viewer) => {

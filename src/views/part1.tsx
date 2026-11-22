@@ -27,10 +27,15 @@ export type Part1ViewProps = {
   links: CycleLink[];
   errors?: string[];
   notice?: string;
-  waiting?: string;
+  /** Oceniający widzi, że przekazana część I czeka na ocenianego: data przekazania i osoba w dopełniaczu. */
+  waiting?: { submittedOn: string; appraiseeGenitive: string };
 };
 
-function CriterionRow(props: { id: string; kind: string; expectation: string; editable: boolean; extra?: string; checkbox?: { checked: boolean } }) {
+function Chevron() {
+  return <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6" /></svg>;
+}
+
+function CriterionRow(props: { id: string; kind?: string; expectation: string; editable: boolean; extra?: string; checkbox?: { checked: boolean } }) {
   const c = criterion(props.id);
   return (
     <div class="crit">
@@ -48,18 +53,18 @@ function CriterionRow(props: { id: string; kind: string; expectation: string; ed
           ) : (
             <h3>{c.name}</h3>
           )}
-          <p class="kind">{props.kind}</p>
-          <details>
-            <summary>Opis kryterium</summary>
+          {props.kind ? <p class="kind">{props.kind}</p> : null}
+          <details class="disc">
+            <summary>Opis kryterium <Chevron /></summary>
             <ul>{c.description.map((d) => <li>{d}</li>)}</ul>
           </details>
         </div>
       </div>
       {props.editable ? (
-        <label class="lbl">
-          Oczekiwanie oceniającego
-          <textarea class="area" name={`expectation[${props.id}]`} rows={2}>{props.expectation}</textarea>
-        </label>
+        <details class="disc exp-field" open={props.expectation !== ""}>
+          <summary>Oczekiwanie oceniającego <Chevron /></summary>
+          <textarea class="area" name={`expectation[${props.id}]`} rows={2} aria-label={`Oczekiwanie oceniającego: ${c.name}`}>{props.expectation}</textarea>
+        </details>
       ) : props.expectation ? (
         <div class="expect">
           <p class="sign">Oczekiwanie oceniającego</p>
@@ -96,12 +101,18 @@ export function Part1View(p: Part1ViewProps) {
   const rest = p.selectable.filter((id) => !suggested.has(id));
   const exp = (id: string) => p.expectations[id] ?? "";
   const stepIdx = p.state === "confirmed" ? 1 : 0;
+  const mandatoryHead = (
+    <div class="list-h">
+      <h2>Kryteria obowiązkowe <LegalBasis basis="§ 4" /></h2>
+      <p class="cap">Wynikają z arkusza {p.sheet}, który system dobrał do stanowiska ocenianego. Oceniający ich nie wybiera.</p>
+    </div>
+  );
   return (
     <Layout title="Część I oceny" person={p.viewer} today={p.today}>
       <section class="card hdr" aria-label="Cykl oceny">
         <div class={p.links.length > 3 ? "hdr-top many" : "hdr-top"}>
           <div class="hdr-id">
-            <p class="cap">Część I oceny · Arkusz {p.sheet} <LegalBasis basis={p.sheetBasis} /></p>
+            <p class="cap">Część I oceny · arkusz {p.sheet} <LegalBasis basis={p.sheetBasis} /></p>
             <h1>{p.employeeName}</h1>
           </div>
           {p.links.length ? (
@@ -120,7 +131,7 @@ export function Part1View(p: Part1ViewProps) {
         </p>
       </section>
       {p.notice ? <p class="st info">{p.notice}</p> : null}
-      {p.waiting ? <p class="st info">Część I czeka na potwierdzenie {p.waiting}.</p> : null}
+      {p.waiting ? <p class="st info">Przekazano {formatDate(p.waiting.submittedOn)}. Czeka na potwierdzenie {p.waiting.appraiseeGenitive}.</p> : null}
       {p.errors?.length ? (
         <div class="st bad" role="alert">
           <ul>{p.errors.map((e) => <li>{e}</li>)}</ul>
@@ -130,18 +141,17 @@ export function Part1View(p: Part1ViewProps) {
       {edit ? (
         <form class="p1-form" method="post" action={`/cycles/${p.cycleId}/part1/criteria`}>
           <section class="card sheet">
-            <div class="list-h"><h2>Kryteria obowiązkowe <LegalBasis basis="§ 4" /></h2></div>
+            {mandatoryHead}
             {p.mandatory.map((m) => <CriterionRow id={m.id} kind="obowiązkowe" expectation={exp(m.id)} editable />)}
           </section>
           <div class="list-h"><h2>Kryteria dodatkowe (do 3) <LegalBasis basis="§ 5 ust. 2" /></h2></div>
           {p.suggestions.length ? (
             <section class="hint">
               <p class="voice hint-v">Podpowiedź · ustawienie urzędu</p>
-              <p class="cap">Podpowiedzi z tabeli urzędu „rodzaj obowiązku → kryterium” ({office.label}, nie przepis). Nie zaznaczysz — nie trafią do oceny.</p>
+              <p class="cap">Podpowiedzi z tabeli urzędu „rodzaj obowiązku → kryterium” ({office.label}, nie przepis). Do oceny trafią tylko zaznaczone.</p>
               {p.suggestions.map((s) => (
                 <CriterionRow
                   id={s.criterionId}
-                  kind="Podpowiedź · ustawienie urzędu"
                   extra={because.get(s.criterionId)}
                   expectation={exp(s.criterionId)}
                   editable
@@ -164,7 +174,7 @@ export function Part1View(p: Part1ViewProps) {
         </form>
       ) : (
         <section class="card sheet">
-          <div class="list-h"><h2>Kryteria obowiązkowe <LegalBasis basis="§ 4" /></h2></div>
+          {mandatoryHead}
           {p.mandatory.map((m) => <CriterionRow id={m.id} kind="obowiązkowe" expectation={m.expectation ?? ""} editable={false} />)}
           <div class="list-h"><h2>Kryteria dodatkowe</h2></div>
           {p.additional.length === 0 ? <p>Brak kryteriów dodatkowych.</p> : null}
@@ -176,13 +186,13 @@ export function Part1View(p: Part1ViewProps) {
         <section class="card">
           <h2>Potwierdzenie części I</h2>
           <ConfirmationBlock kind="confirmation" {...p.confirmation} />
-          {p.canConfirm ? (
-            <form method="post" action={`/cycles/${p.cycleId}/part1/confirm`}>
-              <button class="btn primary full" type="submit">Potwierdzam rozmowę, kryteria i termin oceny</button>
-              <p class="cap">Miejscowość, data i Twoje imię i nazwisko wpiszą się same.</p>
-            </form>
-          ) : null}
+          {p.canConfirm ? <p class="cap">Miejscowość, data i Twoje imię i nazwisko wpiszą się same.</p> : null}
         </section>
+      ) : null}
+      {p.canConfirm ? (
+        <form method="post" action={`/cycles/${p.cycleId}/part1/confirm`} class="actionbar part1-confirm">
+          <button class="btn primary full" type="submit">Potwierdzam rozmowę, kryteria i termin oceny</button>
+        </form>
       ) : null}
     </Layout>
   );

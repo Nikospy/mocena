@@ -41,7 +41,7 @@ describe("ścieżka kadr: /hr → Wpisz nieobecność → oś → drugi wpis", (
     expect(tl).toContain("(33 dni)");
     expect(tl).toContain("dłużej niż miesiąc");
     expect(tl).toContain("art. 81 ust. 7");
-    expect(tl).toContain("Reguły: 2016-470/1, obowiązują od 23.04.2016");
+    expect(tl.replace(/<[^>]+>/g, "")).toContain("Zasady z rozporządzenia z 2016 r., wersja 1, obowiązują od 23.04.2016");
 
     const sheet = await html(app, "joanna", `/cycles/${PIOTR}/sheet`);
     expect(sheet).toContain("30.12.2026");

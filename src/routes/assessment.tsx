@@ -8,8 +8,9 @@ import { cycleCriteria } from "../cycles/part1";
 import { getDb } from "../db";
 import { approvalBlockers, gradeRequestOptions } from "../engine/approval";
 import { objectionDeadline } from "../engine/deadlines";
-import { computeAssessment, POINTS } from "../engine/scoring";
+import { computeAssessment, criterion, POINTS } from "../engine/scoring";
 import { recordEvent } from "../events";
+import { shiftedDeadlineSentence } from "../deadline-shift";
 import { currentPerson, personById, type Person } from "../people";
 import { setting, today } from "../settings";
 import { AssessmentMessage, AssessmentView, BlockerList, ResultPanel } from "../views/assessment";
@@ -107,7 +108,7 @@ function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; er
   const status = extra.status ?? 200;
   const base = { viewer: cx.person, person: cx.appraisee, today: today() };
   if (state.stage === "no_part1") {
-    return c.html(<AssessmentMessage {...base} text="Ocena nie może powstać bez potwierdzonej części I." />, status);
+    return c.html(<AssessmentMessage {...base} text="Ocena nie może powstać bez potwierdzonej części I." action={{ label: "Przejdź do części I", href: `/cycles/${cx.cycle.id}/part1` }} />, status);
   }
   const appraiser = isAppraiser(cx);
   if (state.stage === "draft" && !appraiser) {
@@ -135,6 +136,7 @@ function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; er
       errors={extra.errors}
       canAcknowledge={isAppraisee(cx) && state.stage === "approved"}
       canFiction={appraiser && state.stage === "approved"}
+      shifted={state.stage === "draft" ? shiftedDeadlineSentence(cx.cycle.id) : null}
     />,
     status,
   );
@@ -224,10 +226,15 @@ app.post("/cycles/:id/assessment/preview", async (c) => {
   const g = guard(c);
   if (!isCtx(g)) return g;
   if (!isAppraiser(g)) return c.text("Tylko oceniający może zobaczyć podgląd wyniku.", 403);
-  const d = screenData(g, readDraft(await c.req.parseBody()));
+  const draft = readDraft(await c.req.parseBody());
+  const d = screenData(g, draft);
   return c.html(
     <div>
-      <ResultPanel result={d.result} />
+      <ResultPanel
+        result={d.result}
+        scores={d.criteria.filter((x) => draft.scores[x.id] !== undefined).map((x) => ({ name: criterion(x.id).name, score: draft.scores[x.id] }))}
+        cycleId={g.cycle.id}
+      />
       <BlockerList blockers={d.blockers} />
     </div>,
   );

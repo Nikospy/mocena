@@ -4,7 +4,7 @@ import type { Person } from "../people";
 import { Layout, formatDate } from "./layout";
 import { RATING_LABEL } from "./components/note-item";
 
-export type NoteGroup = { person: Person; notes: Note[]; canWrite: boolean };
+export type NoteGroup = { person: Person; notes: Note[]; canWrite: boolean; cycleHref?: string };
 
 const OK_ICON = <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>;
 
@@ -46,6 +46,7 @@ export function NotesListView(props: { viewer: Person; today: string; groups: No
                   Dopisz notatkę
                 </a>
               ) : null}
+              {g.cycleHref ? <a class="btn text" href={g.cycleHref}>Cykl oceny</a> : null}
             </div>
             {g.notes.length > 0 ? (
               <ul class="note-list">

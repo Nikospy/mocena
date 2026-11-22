@@ -32,10 +32,6 @@ function daysBetween(from: string, to: string): number {
   return Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000);
 }
 
-export function waitingDaysText(days: number): string {
-  return days <= 0 ? "od dziś" : days === 1 ? "od 1 dnia" : `od ${days} dni`;
-}
-
 export function isPart1Locked(cycleId: string): boolean {
   const s = part1Status(cycleId).state;
   return s === "submitted" || s === "confirmed";

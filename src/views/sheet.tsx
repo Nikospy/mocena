@@ -20,18 +20,13 @@ export function SheetField(props: { label: string; children?: unknown }) {
   );
 }
 
-export function PrintButton(props: { part1Href?: string }) {
+export function PrintButton() {
   return (
     <div class="no-print sheet-actions">
       <div class="btns">
         <button class="btn primary" type="button" onclick="window.print()">
           Drukuj / pobierz PDF
         </button>
-        {props.part1Href ? (
-          <a class="btn" href={props.part1Href}>
-            Drukuj część I
-          </a>
-        ) : null}
       </div>
       <p class="cap">Zapis do PDF wybierasz w oknie druku.</p>
     </div>
@@ -110,7 +105,7 @@ export function SheetFooter(props: { d: SheetData }) {
   );
 }
 
-export function SheetView(props: { viewer: Person; today: string; data: SheetData; links: CycleLink[] }) {
+export function SheetView(props: { viewer: Person; today: string; data: SheetData; links: CycleLink[]; autoPrint?: boolean }) {
   const d = props.data;
   const p1 = d.part1;
   const p2 = d.part2;
@@ -123,12 +118,10 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
           <h1>Arkusz oceny okresowej {d.sheet ? `(arkusz ${d.sheet})` : ""}</h1>
           <p class="cap">{d.officeName}</p>
           <div class="no-print">
-            <PrintButton part1Href={only1 ? undefined : `${sheetHref}?part=1`} />
-            {only1 ? (
-              <a class="btn link-chip" href={sheetHref}>
-                Cały arkusz
-              </a>
-            ) : null}
+            <PrintButton />
+            <a class="btn link-chip" href={only1 ? sheetHref : `${sheetHref}?part=1`}>
+              {only1 ? "Cały arkusz" : "Tylko część I"}
+            </a>
             {props.links.length ? (
               <p class="hr-links">
                 {props.links.map((l) => (
@@ -284,6 +277,7 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
           </section>
         )}
         <SheetFooter d={d} />
+        {props.autoPrint ? <script src="/auto-print.js" defer></script> : null}
       </article>
     </Layout>
   );

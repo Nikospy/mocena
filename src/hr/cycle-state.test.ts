@@ -62,7 +62,8 @@ describe("stan cyklu", () => {
     fresh("2026-11-22");
     const s = cycleState("cycle-anna");
     expect(s.step).toBe("due_change_requested");
-    expect(s.text).toContain("zawiadamia pracownika pisemnie");
+    expect(s.text).toContain("czeka na rozpatrzenie");
+    expect(s.more).toContain("zawiadamia pracownika pisemnie");
     expect(s.deadline?.basis).toContain("art. 81 ust. 8 ustawy");
   });
 

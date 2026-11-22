@@ -17,7 +17,7 @@ app.get("/cycles/:id/sheet", (c) => {
   if (!cycle || !visibleEvents(cycle.id).some((e) => e.type === "cycle_started")) return c.text("Nie ma takiego cyklu.", 404);
   if (!canViewSheet(person, cycle)) return c.text("Ten arkusz widzi oceniany, oceniający i kadry.", 403);
   const data = sheetData(cycle.id, c.req.query("part") === "1" ? { part: 1 } : {});
-  return c.html(<SheetView viewer={person} today={today()} data={data} links={cycleLinks(cycle, person)} />);
+  return c.html(<SheetView viewer={person} today={today()} data={data} links={cycleLinks(cycle, person)} autoPrint={c.req.query("print") === "1"} />);
 });
 
 export default app;

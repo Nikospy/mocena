@@ -1,4 +1,5 @@
 // Logika HR partnera: reguły, daty i pola notatek. System nie czyta treści notatek (AGENTS.md, zasada 4).
+import fullNameForms from "../../content/full-name-forms.json";
 import nameForms from "../../content/name-forms.json";
 import { card } from "../content";
 import type { AppEvent } from "../events";
@@ -25,6 +26,11 @@ function text(cardId: string, key: string): string {
 export function nameForm(fullName: string, kase: NameCase): string | null {
   const first = fullName.split(/\s+/)[0] ?? "";
   return (nameForms as Record<string, Record<NameCase, string>>)[first]?.[kase] ?? null;
+}
+
+/** Pełne imię i nazwisko w przypadku zależnym; `null`, gdy nie ma wpisu w `content/full-name-forms.json`. */
+export function fullNameForm(fullName: string, kase: NameCase): string | null {
+  return (fullNameForms as Record<string, Record<NameCase, string>>)[fullName]?.[kase] ?? null;
 }
 
 /** Pierwsza forma z katalogu pasująca do kryterium; inaczej jedyna forma z `default: true`. */
@@ -119,7 +125,7 @@ export function beforeMeetingSummary(i: BeforeMeetingInput): BeforeMeetingSummar
   const boundary = taskChangeBoundary(notes, i.events, i.periodStart, i.today);
   const before = boundary ? notes.filter((n) => n.date < boundary) : [];
   const after = boundary ? notes.filter((n) => n.date >= boundary) : [];
-  const dat = nameForm(i.subject.name, "dat") ?? i.subject.name;
+  const gen = nameForm(i.subject.name, "gen") ?? i.subject.name;
 
   const bothSides: Item[] = [];
   if (boundary) {
@@ -145,13 +151,13 @@ export function beforeMeetingSummary(i: BeforeMeetingInput): BeforeMeetingSummar
 
   const feedback: Item = i.lastFeedback
     ? {
-        text: fillTemplate(text("beforeMeeting", "feedbackLast"), { dat, date: fmt(i.lastFeedback) }),
+        text: fillTemplate(text("beforeMeeting", "feedbackLast"), { gen, date: fmt(i.lastFeedback) }),
         prompt: "Czy informacja zwrotna była pomocna?",
       }
     : {
-        text: fillTemplate(text("beforeMeeting", "feedbackNever"), { dat }),
+        text: fillTemplate(text("beforeMeeting", "feedbackNever"), { gen }),
         prompt: "O jakim dobrym fakcie możesz powiedzieć?",
-        action: { label: "Docenienie", href: `/cycles/${i.cycleId}/appreciation` },
+        action: { label: "Karta docenienia", href: `/cycles/${i.cycleId}/appreciation` },
       };
 
   return {
@@ -185,10 +191,10 @@ export function appreciationReminder(i: {
 }): AppreciationReminder | null {
   const since = i.lastFeedback && i.lastFeedback > i.talkDate ? i.lastFeedback : i.talkDate;
   if (daysBetween(since, i.today) < i.reminderDays) return null;
-  const dat = nameForm(i.subjectName, "dat") ?? i.subjectName;
+  const gen = nameForm(i.subjectName, "gen") ?? i.subjectName;
   return {
     since,
-    sentence: fillTemplate(text("beforeMeeting", "reminder"), { date: fmt(since), dat }),
+    sentence: fillTemplate(text("beforeMeeting", "reminder"), { date: fmt(since), gen }),
     goodNotes: i.notes.filter((n) => n.rating === "good" && n.date > since && n.date <= i.today),
   };
 }

@@ -1,6 +1,6 @@
 import type { Person } from "../people";
 import type { TimelineEntry } from "../timeline";
-import { LegalBasis } from "./components";
+import { LegalBasis, RulesVersion } from "./components";
 import { Layout, formatDate } from "./layout";
 
 export function TimelineView(props: {
@@ -9,7 +9,7 @@ export function TimelineView(props: {
   cycleId: string;
   personName: string;
   entries: TimelineEntry[];
-  rulesText: string;
+  rulesVersion: { version: string; effectiveFrom: string };
   notice?: string;
   canAddAbsence: boolean;
 }) {
@@ -57,7 +57,7 @@ export function TimelineView(props: {
             </li>
           ))}
         </ol>
-        <p class="cap">{props.rulesText}</p>
+        <p class="cap"><RulesVersion version={props.rulesVersion.version} effectiveFrom={props.rulesVersion.effectiveFrom} /></p>
       </section>
       {props.canAddAbsence ? (
         <p class="btns">

@@ -8,26 +8,35 @@ import { criterion } from "../engine/scoring";
 import { WarnIco } from "./assessment";
 
 /** Formularz pytania; używany też na ekranie „Przed rozmową” przy zaległej odpowiedzi. */
-export function TaskChangeForm(props: { note: Note; question?: string }) {
+export function TaskChangeForm(props: { note: Note }) {
   return (
     <form method="post" action={`/notes/${props.note.id}/task-change`} class="btns">
-      <button class="btn primary" type="submit" name="answer" value="yes">Tak</button>
-      <button class="btn" type="submit" name="answer" value="no">Nie</button>
+      <button class="btn primary" type="submit" name="answer" value="yes">Tak, stała zmiana</button>
+      <button class="btn" type="submit" name="answer" value="no">Nie, chwilowe zastępstwo</button>
     </form>
   );
 }
 
-export function TaskChangeQuestionView(props: { viewer: Person; today: string; note: Note; error?: string }) {
+export function TaskChangeQuestionView(props: { viewer: Person; today: string; note: Note; card: Card; subjectGenitive: string; error?: string }) {
   const n = props.note;
+  const { ifYes, ifNo } = props.card.texts ?? {};
   return (
     <Layout title="To stała zmiana zadań?" person={props.viewer} today={props.today}>
       <section class="card q-hero">
-        <p class="voice src">Pytanie o notatkę</p>
+        <p class="voice src">Notatka z {formatDate(n.date)}</p>
         <h1>To stała zmiana zadań?</h1>
-        <p>Zaznaczyłeś przy notatce z {formatDate(n.date)} ({criterion(n.criterion_id).name}) zmianę zadań pracownika.</p>
+        <p>W tej notatce zaznaczono zmianę zadań {props.subjectGenitive}.</p>
+        <blockquote class="note-quote">
+          <p class="note-text">{n.text}</p>
+          <p class="cap">{criterion(n.criterion_id).name} · {formatDate(n.date)}</p>
+        </blockquote>
+        <ul class="plain-list outcomes">
+          {ifYes ? <li>{ifYes}</li> : null}
+          {ifNo ? <li>{ifNo}</li> : null}
+        </ul>
         {props.error ? <p class="req" role="alert">{props.error}</p> : null}
         <TaskChangeForm note={n} />
-        <a class="btn text b-later" href="/notes">Odpowiem później</a>
+        <a class="btn text b-later" href="/notes">Zdecyduję później</a>
       </section>
     </Layout>
   );
@@ -64,7 +73,7 @@ export function TaskChangeCardView(props: { viewer: Person; today: string; note:
         <p class="cap">{card.texts?.formIntro}</p>
         <p><b>{form.name}</b></p>
         <p>{form.description}</p>
-        <div class="btns"><a class="btn" href="/notes">Moje notatki</a></div>
+        <div class="btns"><a class="btn" href="/notes">Zamknij</a></div>
       </section>
     </Layout>
   );

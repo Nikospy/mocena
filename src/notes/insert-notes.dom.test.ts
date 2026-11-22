@@ -28,7 +28,7 @@ test("„Wstaw do uzasadnienia” dopisuje zaznaczone notatki i niczego nie zapi
   new Function("document", "Event", readFileSync("public/insert-notes.js", "utf8"))(doc, window.Event);
   (doc.querySelector('button[data-target="justification"]') as unknown as HTMLButtonElement).click();
 
-  expect(field.value).toBe(`${a.getAttribute("data-insert")}\n${b.getAttribute("data-insert")}`);
+  expect(field.value).toBe(`${a.getAttribute("data-insert")}\n\n${b.getAttribute("data-insert")}`);
   expect(field.value).not.toContain(skipped.getAttribute("data-insert")!);
   expect(inputEvents).toBe(1);
   field.value += " Poprawka.";

@@ -2,20 +2,26 @@ import type { Card } from "../content";
 import type { Person } from "../people";
 import type { BeforeMeetingSummary, Item } from "../hr-partner/partner";
 import { NoteItem } from "./components/note-item";
-import { Layout } from "./layout";
+import { Layout, formatDate } from "./layout";
 import { TaskChangeForm } from "./task-change";
 
+/** To samo pytanie przy kilku pozycjach pada raz, pod listą; przy jednej pozycji stoi przy niej. */
 function Items(props: { items: Item[]; label: string }) {
+  const prompts = new Set(props.items.map((it) => it.prompt).filter((p): p is string => !!p));
+  const shared = props.items.length > 1 && prompts.size === 1 ? [...prompts][0] : null;
   return (
-    <ul class="note-list" aria-label={props.label}>
-      {props.items.map((it) => (
-        <li class="note-item">
-          <p>{it.text}</p>
-          {it.prompt ? <p class="cap">{it.prompt}</p> : null}
-          {it.action ? <div class="btns"><a class="btn" href={it.action.href}>{it.action.label}</a></div> : null}
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul class="note-list" aria-label={props.label}>
+        {props.items.map((it) => (
+          <li class="note-item">
+            <p>{it.text}</p>
+            {it.prompt && !shared ? <p class="cap">{it.prompt}</p> : null}
+            {it.action ? <div class="btns"><a class="btn" href={it.action.href}>{it.action.label}</a></div> : null}
+          </li>
+        ))}
+      </ul>
+      {shared ? <p class="cap shared-prompt">{shared}</p> : null}
+    </>
   );
 }
 
@@ -49,7 +55,7 @@ export function BeforeMeetingView(props: {
       {s.pendingQuestion ? (
         <section class="card q-hero">
           <h2>{s.pendingQuestion.prompt}</h2>
-          <p class="cap">Zaznaczyłeś zmianę zadań przy jednej z notatek, ale nie odpowiedziałeś na to pytanie.</p>
+          <p class="cap">W notatce z {formatDate(s.pendingQuestion.note.date)} zaznaczono zmianę zadań, a pytanie czeka na odpowiedź.</p>
           <TaskChangeForm note={s.pendingQuestion.note} />
         </section>
       ) : null}
