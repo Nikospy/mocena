@@ -87,7 +87,7 @@ describe("kody odpowiedzi i zasady", () => {
     const { app, db } = createTestApp({ today: "2026-11-10", seedOptions: { afterStep1: true } });
     const r = await call(app, "joanna", `/cycles/${PIOTR}/absences`, { from: "2026-10-20", to: "2026-10-19", excused: "1" });
     expect(r.status).toBe(422);
-    expect(await r.text()).toContain("Data końca nie może być wcześniejsza niż data początku");
+    expect(await r.text()).toContain("Wybierz datę końca równą dacie początku albo późniejszą.");
     expect((await call(app, "joanna", `/cycles/${PIOTR}/absences`, { from: "", to: "2026-10-19" })).status).toBe(422);
     expect(rows(db)).toHaveLength(0);
   });
