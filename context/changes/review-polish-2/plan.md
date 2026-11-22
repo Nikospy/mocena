@@ -87,7 +87,7 @@ Testy: `src/routes/polish2-d.test.ts`: formularze zawierają datę słownie dla 
 
 #### Automated
 
-- [ ] 2.1 Testy fazy i cały zestaw: `bun test src/routes/polish2-b.test.ts`, `bun test`
+- [x] 2.1 Testy fazy i cały zestaw: `bun test src/routes/polish2-b.test.ts`, `bun test` — 49a620e
 
 ### Phase 3: Przewodnik, układ, nagranie
 
