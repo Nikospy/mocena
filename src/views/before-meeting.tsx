@@ -30,14 +30,15 @@ export function BeforeMeetingView(props: {
   const s = props.summary;
   return (
     <Layout title="Przed rozmową z pracownikiem" person={props.viewer} today={props.today}>
-      <section class="card">
+      <section class="card hdr">
+        <p class="voice src">Przygotowanie do rozmowy · z Twoich notatek</p>
         <h1>Przed rozmową z {props.titleName}</h1>
-        <p>{props.card.purpose}</p>
+        <p class="cap">{props.card.purpose}</p>
       </section>
       {s.boundary ? (
-        <section class="card">
+        <section class="card b-sec">
           <h2>Zmiana zadań</h2>
-          <p>{s.boundarySentence}</p>
+          <div class="st info"><div><b>{s.boundarySentence}</b></div></div>
           <h3>Notatki sprzed zmiany zadań</h3>
           {s.before.length ? <ul class="note-list">{s.before.map((n) => <NoteItem note={n} />)}</ul> : <p class="cap">Brak notatek sprzed zmiany.</p>}
           <h3>Notatki po zmianie zadań</h3>
@@ -46,29 +47,29 @@ export function BeforeMeetingView(props: {
         </section>
       ) : null}
       {s.pendingQuestion ? (
-        <section class="card">
+        <section class="card q-hero">
           <h2>{s.pendingQuestion.prompt}</h2>
           <p class="cap">Zaznaczyłeś zmianę zadań przy jednej z notatek, ale nie odpowiedziałeś na to pytanie.</p>
           <TaskChangeForm note={s.pendingQuestion.note} />
         </section>
       ) : null}
       {s.criteriaWithoutNotes.length ? (
-        <section class="card">
+        <section class="card b-sec">
           <h2>Kryteria bez notatek</h2>
           <Items items={s.criteriaWithoutNotes} label="Kryteria bez notatek" />
         </section>
       ) : null}
-      <section class="card">
+      <section class="card b-sec">
         <h2>Informacja zwrotna</h2>
         <Items items={[s.feedback]} label="Informacja zwrotna" />
       </section>
       {s.team.length ? (
-        <section class="card">
+        <section class="card b-sec">
           <h2>Zespół</h2>
           <Items items={s.team} label="Zespół" />
         </section>
       ) : null}
-      <a class="btn text" href={`/cycles/${props.cycleId}/part1`}>Wróć do cyklu</a>
+      <div class="btns"><a class="btn" href={`/cycles/${props.cycleId}/part1`}>Wróć do cyklu</a></div>
     </Layout>
   );
 }

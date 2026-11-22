@@ -18,8 +18,11 @@ export function FictionView(p: FictionViewProps) {
   const v = p.values ?? { reason: "", deliveryMethod: "", deliveredOn: "" };
   return (
     <Layout title="Fikcja zapoznania" person={p.viewer} today={p.today}>
-      <section class="card">
+      <section class="card hdr">
+        <p class="voice src">Ocena okresowa · zapoznanie</p>
         <h1>Stwierdzenie fikcji zapoznania: {p.person.name}</h1>
+      </section>
+      <section class="card b-sec">
         <div class="st info">
           <div>
             <b>
@@ -67,7 +70,7 @@ export function FictionView(p: FictionViewProps) {
           <input class="area" type="date" id="deliveredOn" name="deliveredOn" min={p.approvedOn} max={p.today} value={v.deliveredOn} />
           <div class="btns">
             <button type="submit" class="btn primary">Zapisz wpis</button>
-            <a class="btn text" href={`/cycles/${p.cycleId}/assessment`}>Wróć bez zapisu</a>
+            <a class="btn" href={`/cycles/${p.cycleId}/assessment`}>Wróć bez zapisu</a>
           </div>
         </form>
       </section>

@@ -5,6 +5,7 @@ import type { Person } from "../people";
 import { LegalBasis } from "./components";
 import { Layout, formatDate } from "./layout";
 import { criterion } from "../engine/scoring";
+import { WarnIco } from "./assessment";
 
 /** Formularz pytania; używany też na ekranie „Przed rozmową” przy zaległej odpowiedzi. */
 export function TaskChangeForm(props: { note: Note; question?: string }) {
@@ -20,12 +21,13 @@ export function TaskChangeQuestionView(props: { viewer: Person; today: string; n
   const n = props.note;
   return (
     <Layout title="To stała zmiana zadań?" person={props.viewer} today={props.today}>
-      <section class="card">
+      <section class="card q-hero">
+        <p class="voice src">Pytanie o notatkę</p>
         <h1>To stała zmiana zadań?</h1>
         <p>Zaznaczyłeś przy notatce z {formatDate(n.date)} ({criterion(n.criterion_id).name}) zmianę zadań pracownika.</p>
         {props.error ? <p class="req" role="alert">{props.error}</p> : null}
         <TaskChangeForm note={n} />
-        <a class="btn text" href="/notes">Odpowiem później</a>
+        <a class="btn text b-later" href="/notes">Odpowiem później</a>
       </section>
     </Layout>
   );
@@ -35,27 +37,34 @@ export function TaskChangeCardView(props: { viewer: Person; today: string; note:
   const { card, form } = props;
   return (
     <Layout title={card.title} person={props.viewer} today={props.today}>
-      <section class="card">
+      <section class="card hdr">
+        <p class="voice src">Karta rozmowy</p>
         <h1>{card.title}</h1>
-        <p>{card.purpose}</p>
-        {card.legal ? (
-          <p>
-            {card.legal.text} <LegalBasis basis={card.legal.basis} />
-          </p>
-        ) : null}
+        <p class="cap">{card.purpose}</p>
+      </section>
+      {card.legal ? (
+        <section class="rule">
+          <p class="voice rule-v"><span class="pg" aria-hidden="true">§</span><span><b>Co mówi przepis</b></span></p>
+          <p>{card.legal.text}</p>
+          <p><LegalBasis basis={card.legal.basis} /></p>
+        </section>
+      ) : null}
+      <section class="card b-sec">
         <h2>Pytania</h2>
-        <ul>{card.questions?.map((q) => <li>{q}</li>)}</ul>
+        <ul class="note-list">{card.questions?.map((q) => <li class="note-item"><p>{q}</p></li>)}</ul>
         {card.hardSituations?.length ? (
           <>
             <h2>Trudna sytuacja</h2>
-            <ul>{card.hardSituations.map((h) => <li><b>{h.situation}</b> {h.whatToDo}</li>)}</ul>
+            <ul class="plain-list">{card.hardSituations.map((h) => <li class="st warn"><WarnIco /><div><b>{h.situation}</b><small>{h.whatToDo}</small></div></li>)}</ul>
           </>
         ) : null}
+      </section>
+      <section class="card dev">
         <h2>Forma rozwoju</h2>
         <p class="cap">{card.texts?.formIntro}</p>
         <p><b>{form.name}</b></p>
         <p>{form.description}</p>
-        <a class="btn text" href="/notes">Moje notatki</a>
+        <div class="btns"><a class="btn" href="/notes">Moje notatki</a></div>
       </section>
     </Layout>
   );
@@ -64,10 +73,10 @@ export function TaskChangeCardView(props: { viewer: Person; today: string; note:
 export function TaskChangeNoView(props: { viewer: Person; today: string; card: Card }) {
   return (
     <Layout title="Zmiana zadań" person={props.viewer} today={props.today}>
-      <section class="card">
+      <section class="card q-hero">
         <h1>Dziękujemy</h1>
         <p>{props.card.texts?.no}</p>
-        <a class="btn text" href="/notes">Moje notatki</a>
+        <div class="btns"><a class="btn" href="/notes">Moje notatki</a></div>
       </section>
     </Layout>
   );
