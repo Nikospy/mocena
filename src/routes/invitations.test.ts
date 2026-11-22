@@ -22,7 +22,7 @@ describe("zaproszenia na rozmowy", () => {
 
     const home = await html(app, "piotr", "/");
     expect(home).toContain("Zaproszenie na rozmowę o kryteriach: 12.12.2024, 10:00, pokój 214");
-    expect(home).toContain("główne obowiązki wynikające z opisu stanowiska");
+    expect(home).toContain("4 tematy z przepisu (§ 5 ust. 1)");
     expect(home).toContain("Potwierdzam termin");
     expect(home).toContain(`/cycles/${PIOTR}/invitations/${ev.id}.ics`);
 

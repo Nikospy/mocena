@@ -27,7 +27,7 @@ registerHomeTasks((person) => {
     const shifted = shiftedDeadlineSentence(c.id);
     const own = c.person_id === person.id;
     const name = personById(c.person_id)?.name;
-    if (shifted) tasks.push({ title: shifted.text, person: own ? undefined : name, detail: `Nieobecność dłuższa niż miesiąc zmienia termin oceny (${shifted.basis.join("; ")}). Daty na osi czasu.`, action: "Zobacz oś czasu", href: `/cycles/${c.id}/timeline` });
+    if (shifted) tasks.push({ title: shifted.text, person: own ? undefined : name, detail: shifted.byAppraiser ? `Decyzja oceniającego z pismem do ocenianego (${shifted.basis.join("; ")}). Pismo i daty na osi czasu.` : `Nieobecność dłuższa niż miesiąc zmienia termin oceny (${shifted.basis.join("; ")}). Daty na osi czasu.`, action: "Zobacz oś czasu", href: `/cycles/${c.id}/timeline` });
     if (now < addDays(d.deadline, -window) || now > d.deadline) continue;
     tasks.push({
       title: own ? `Twój termin oceny: ${formatDate(d.deadline)}` : `Termin oceny ${name}: ${formatDate(d.deadline)}`,

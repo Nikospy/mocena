@@ -908,3 +908,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .people-tools .link-chip[aria-current="true"] { background: var(--primary); color: var(--on-primary); }
 .hr-tools .btn { text-decoration: none; }
 fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
+
+/* deadline-change: wybór jednego przypadku wygląda jak radio */
+.dc-cases .box { border-radius: 50%; }
+.dc-letter .hdr.slim { grid-template-columns: minmax(0, 1fr); align-items: start; }

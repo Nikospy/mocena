@@ -18,7 +18,7 @@ function Check() {
   );
 }
 
-export function RuleCard(props: { id: string }) {
+export function RuleCard(props: { id: string; cases?: boolean }) {
   return (
     <section class="rule" aria-labelledby={props.id}>
       <div class="voice rule-v">
@@ -27,14 +27,14 @@ export function RuleCard(props: { id: string }) {
           <h2 id={props.id}>Kiedy można zmienić termin</h2>
         </div>
       </div>
-      <p>{DC.intro}</p>
-      <ul class="plain-list">
+      {props.cases === false ? null : <p>{DC.intro}</p>}
+      {props.cases === false ? null : <ul class="plain-list">
         {DC.cases.map((c) => (
           <li>
             <LegalBasis basis={`art. 81 ust. 8 pkt ${c.n}`} /> {c.label}
           </li>
         ))}
-      </ul>
+      </ul>}
       <p class="cap">{DC.condition}</p>
     </section>
   );
@@ -76,7 +76,7 @@ export function ChangeFormView(props: {
           </div>
         ) : null}
       </section>
-      <RuleCard id="h-dc-rule" />
+      {props.blocked ? null : <RuleCard id="h-dc-rule" cases={false} />}
       <section class="card form-card">
         <form method="post" action={`/cycles/${props.cycleId}/deadline-change`} class="abs-form">
           {props.request ? <input type="hidden" name="requestId" value={String(props.request.id)} /> : null}

@@ -36,7 +36,7 @@ registerHomeTasks((person) => {
       tasks.push({
         title: invitationHeadline(i),
         href: `/cycles/${mine.id}/invitations/${i.id}`,
-        detail: `Tematy: ${INVITATION_KINDS[i.kind].topics.join("; ")}`,
+        detail: `${INVITATION_KINDS[i.kind].topics.length} tematy z przepisu (${INVITATION_KINDS[i.kind].basis}). Pełna lista w zaproszeniu.`,
         action: "Zobacz zaproszenie",
         post: { label: "Potwierdzam termin", action: `/cycles/${mine.id}/invitations/${i.id}/confirm` },
         secondary: { label: "Pobierz do kalendarza", href: `/cycles/${mine.id}/invitations/${i.id}.ics` },
