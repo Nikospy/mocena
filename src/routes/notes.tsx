@@ -17,6 +17,8 @@ import { FeedbackView } from "../views/feedback";
 import { AssessmentCardView } from "../views/assessment-card";
 import { NoteFormView, type CriteriaGroup, type NoteFormValues } from "../views/note-form";
 import { NotesListView, type NoteGroup } from "../views/notes-list";
+import { activeInvitations, canInvite } from "../invitations";
+import { InvitationBlock } from "../views/invitation";
 
 /** Adres przekierowania po zapisie notatki. Notatka ze zmianą zadań prowadzi na pytanie S-05. */
 export function afterNoteSaved(note: Note): string {
@@ -193,6 +195,9 @@ app.get("/cycles/:id/cards/assessment-conversation", (c) => {
       card={card("assessment")}
       basis={rules.assessmentConversation.basis}
       topics={rules.assessmentConversation.topics}
+      invitation={
+        canInvite(viewer, cycle) ? <InvitationBlock cycle={cycle} kind="assessment" active={activeInvitations(cycle.id).find((i) => i.kind === "assessment") ?? null} /> : undefined
+      }
     />,
   );
 });

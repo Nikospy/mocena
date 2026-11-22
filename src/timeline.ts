@@ -6,6 +6,7 @@ import { rules, rulesVersion } from "./engine/rules";
 import { visibleEvents } from "./events";
 import { personById, type Person } from "./people";
 import { formatDate } from "./views/layout";
+import { invitationHeadline } from "./invitations";
 
 export type TimelineEntry = {
   date: string;
@@ -95,6 +96,10 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
       entries.push({ date: e.date, title: "Część I przekazana ocenianemu", detail: "Kryteria oceny i oczekiwania wobec pracownika.", basis: x.criteriaBasis ?? [], kind: "fact" });
     } else if (e.type === "part1_confirmed") {
       entries.push({ date: e.date, title: "Część I: potwierdzenie zapoznania z kryteriami", basis: [], kind: "fact" });
+    } else if (e.type === "invitation_sent") {
+      entries.push({ date: e.date, title: invitationHeadline({ ...x, id: e.id, sentOn: e.date, confirmedOn: null }), basis: [], kind: "fact" });
+    } else if (e.type === "invitation_confirmed") {
+      entries.push({ date: e.date, title: "Potwierdzenie terminu", detail: "Oceniany potwierdził termin rozmowy.", basis: [], kind: "fact" });
     } else if (e.type === "assessment_approved") {
       entries.push({ date: e.date, title: "Ocena zatwierdzona przez oceniającego", basis: [], kind: "fact" });
     } else if (e.type === "assessment_acknowledged" || e.type === "acknowledgement_fiction") {

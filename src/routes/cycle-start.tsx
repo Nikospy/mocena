@@ -16,6 +16,8 @@ import { suggestCriteria } from "../suggestions";
 import { OpeningCardView, Part1View } from "../views/part1";
 import { getDb } from "../db";
 import { formatDate } from "../views/layout";
+import { activeInvitations, canInvite } from "../invitations";
+import { InvitationBlock } from "../views/invitation";
 
 const isParty = (c: Cycle, p: Person) => c.appraiser_id === p.id || c.person_id === p.id;
 
@@ -200,6 +202,9 @@ app.get("/cycles/:id/cards/opening", (c) => {
       card={card("opening")}
       basis={rules.criteriaConversation.basis}
       topics={rules.criteriaConversation.topics}
+      invitation={
+        canInvite(g.person, g.cycle) ? <InvitationBlock cycle={g.cycle} kind="opening" active={activeInvitations(g.cycle.id).find((i) => i.kind === "opening") ?? null} /> : undefined
+      }
     />,
   );
 });

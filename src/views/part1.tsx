@@ -1,3 +1,4 @@
+import type { Child } from "hono/jsx";
 import type { CycleLink } from "../cycle-links";
 import type { Person } from "../people";
 import type { Card } from "../content";
@@ -205,6 +206,7 @@ export function OpeningCardView(props: {
   card: Card;
   basis: string;
   topics: string[];
+  invitation?: Child;
 }) {
   const { questions, hardSituations } = props.card;
   return (
@@ -239,6 +241,7 @@ export function OpeningCardView(props: {
           </>
         ) : null}
       </section>
+      {props.invitation}
     </Layout>
   );
 }

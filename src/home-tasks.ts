@@ -4,7 +4,21 @@ import type { Person } from "./people";
  * Pola `heading`, `person`, `due`, `basis`, `action` są tylko do wyglądu karty sprawy (opcjonalne).
  * `quiet`: karta informacyjna, pokazywana tylko wtedy, gdy nie ma żadnej innej sprawy.
  */
-export type HomeTask = { title: string; href: string; detail?: string; heading?: string; person?: string; due?: string; basis?: string; action?: string; quiet?: boolean };
+export type HomeTask = {
+  title: string;
+  href: string;
+  detail?: string;
+  heading?: string;
+  person?: string;
+  due?: string;
+  basis?: string;
+  action?: string;
+  quiet?: boolean;
+  /** Drugi przycisk karty: odnośnik. */
+  secondary?: { label: string; href: string };
+  /** Przycisk karty wysyłający POST (bez treści). */
+  post?: { label: string; action: string };
+};
 type Provider = (person: Person) => HomeTask[];
 
 const providers: Provider[] = [];
