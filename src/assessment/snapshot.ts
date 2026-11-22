@@ -1,5 +1,5 @@
 import { cycleById, effectiveDeadline } from "../cycles";
-import { cycleCriteria } from "../cycles/part1";
+import { assessmentPeriodFrom, cycleCriteria } from "../cycles/part1";
 import { rulesVersion } from "../engine/rules";
 import { computeAssessment, criterion } from "../engine/scoring";
 import { personById } from "../people";
@@ -36,7 +36,7 @@ export function buildAssessmentSnapshot(cycleId: string, draft: AssessmentDraft,
       reasons: result.reasons,
       justificationRequired: result.justificationRequired,
     },
-    periodFrom: cycle.period_start,
+    periodFrom: assessmentPeriodFrom(cycleId, cycle.period_start),
     periodTo: date,
     deadline: effectiveDeadline(cycleId, { asOf: date }),
     grade,

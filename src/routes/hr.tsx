@@ -6,6 +6,7 @@ import { cycleLinks } from "../cycle-links";
 import { getDb } from "../db";
 import { recordEvent, visibleEvents, visibleEventsOfType } from "../events";
 import { cycleState, type CycleStep } from "../hr/cycle-state";
+import "../hr/reassessment-task";
 import { fullNameForm } from "../hr-partner/partner";
 import { mandatoryGradeOf } from "../hr/history";
 import { latestCycles } from "../hr/latest-cycles";
@@ -55,7 +56,7 @@ export function overviewData(viewer: Person) {
     ],
   }));
   // Najpierw cykle wymagające działania, zamknięte (zapoznanie, fikcja, rozpatrzony sprzeciw) na końcu; w grupie od najbliższego terminu.
-  const closed = (r: StateRow) => (CLOSED_STEPS.has(r.state.step) ? 1 : 0);
+  const closed = (r: StateRow) => (CLOSED_STEPS.has(r.state.step) && !(r.state.step === "objection_resolved" && r.state.deadline) ? 1 : 0);
   rows.sort(
     (a, b) =>
       closed(a) - closed(b) ||
