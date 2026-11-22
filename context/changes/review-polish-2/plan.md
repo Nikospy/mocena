@@ -81,7 +81,7 @@ Testy: `src/routes/polish2-d.test.ts`: formularze zawierają datę słownie dla 
 
 #### Automated
 
-- [ ] 1.1 Testy fazy i cały zestaw: `bun test src/routes/polish2-a.test.ts`, `bun test`
+- [x] 1.1 Testy fazy i cały zestaw: `bun test src/routes/polish2-a.test.ts`, `bun test` — c5edf52
 
 ### Phase 2: Kadry i fikcja zapoznania
 
