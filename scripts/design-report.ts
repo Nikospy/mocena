@@ -41,6 +41,9 @@ const numeric = [
 ] as const satisfies readonly (keyof Metrics)[];
 
 const mobile = (width: number) => width <= 360;
+/** Progi pisma i układu ekranu, które nie mają sensu dla wydruku A4 mierzonego w punktach. */
+const SCREEN_ONLY = ["T1", "T2", "K1", "L2", "T3"];
+export const PRINT_NOTE = `wydruk: poza progami ekranu (${SCREEN_ONLY.join(", ")})`;
 
 function failedThresholds({ width, metrics: m, focus, kind }: Sample): string[] {
   if (kind === "download") return []; // Podgląd treści technicznej, bez interfejsu aplikacji.
@@ -69,7 +72,7 @@ function failedThresholds({ width, metrics: m, focus, kind }: Sample): string[] 
   check(m.unlabeled > 0, "Etykiety", `${m.unlabeled} pól bez etykiety`);
   check(m.controlsUnder48 > 0, "F1", `${m.controlsUnder48} kontrolek poniżej 48 px`);
   check(focus?.visible === false, "F6", "brak widocznego fokusu");
-  return failures;
+  return kind === "print" ? failures.filter((f) => !SCREEN_ONLY.includes(f.split(" ")[0])) : failures;
 }
 
 export async function readReport(dir: string) {
@@ -104,7 +107,7 @@ export async function readReport(dir: string) {
       const artifact = Bun.file(join(dir, file));
       if (!(await artifact.exists()) || artifact.size === 0) problems.push(`Brak pliku lub pusty plik: ${file}`);
     }
-    if (sample.kind !== "download" && m.under16PctMain !== null) {
+    if (sample.kind === "screen" && m.under16PctMain !== null) {
       const text = textByWidth.get(sample.width) ?? [];
       text.push(m.under16PctMain);
       textByWidth.set(sample.width, text);
@@ -129,7 +132,10 @@ if (import.meta.main) {
   try {
     const { rows, medians, problems } = await readReport(dir);
     console.log("| Ekran | Szerokość | Niespełnione progi |\n| --- | ---: | --- |");
-    for (const row of rows) console.log(`| ${row.name} | ${row.width} | ${row.failures.join("; ") || "—"} |`);
+    for (const row of rows) {
+      const cell = [row.failures.join("; "), row.kind === "print" ? PRINT_NOTE : ""].filter(Boolean).join("; ");
+      console.log(`| ${row.name} | ${row.width} | ${cell || "—"} |`);
+    }
     console.log("\n| Szerokość | T1 · mediana tekstu w main poniżej 16 px | Próg ≤ 30% |\n| ---: | ---: | --- |");
     for (const { width, median, pass } of medians) console.log(`| ${width} | ${median}% | ${pass ? "przechodzi" : "nie przechodzi"} |`);
     for (const problem of problems) console.error(problem);

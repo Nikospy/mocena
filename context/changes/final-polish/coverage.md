@@ -20,7 +20,8 @@ Identyfikator zrzutu daje plik `<identyfikator>-<szerokość>.jpg`. Eksporty CSV
 | `/` | `joanna` | sprawy kadr | `home-hr` | nie przechodzi · 320 — T1 / 360 — T1 / 768 — T1, T2 / 1024 — przechodzi / 1440 — przechodzi |
 | `/` | `admin` | sprawy administratora | `home-admin` | nie przechodzi · 320 — T1 / 360 — T1 / 768 — T1, T2 / 1024 — T1 / 1440 — T1 |
 | `/` | `dyrektor-urzedu` | sprawy dyrektora generalnego | `home-director` | nie przechodzi · 320 — T1 / 360 — T1 / 768 — T1, T2 / 1024 — przechodzi / 1440 — przechodzi |
-| `/` | `maria` | brak spraw | `home-empty` | nie przechodzi · 320 — T1 / 360 — T1 / 768 — T1, T2 / 1024 — przechodzi / 1440 — przechodzi |
+| `/` | `piotr` | brak spraw (przed wyznaczeniem kryteriów) | `home-empty` | nowy wiersz (final-routes-errors), bez pomiaru wyjściowego (wcześniej konto `maria` włączane tylko do pomiaru) |
+| `/account` | `anonim` | pierwsze uruchomienie: pusta baza, bez trybu pokazu | `first-run` | nowy wiersz (final-routes-errors), bez pomiaru wyjściowego |
 | `/account` | `anonim` | wybór konta | `account` | nie przechodzi · 320 — przechodzi / 360 — przechodzi / 768 — T2 / 1024 — przechodzi / 1440 — przechodzi |
 | `/account` | `anonim` | 422 · nieznane konto | `account-error` | nie przechodzi · 320 — przechodzi / 360 — przechodzi / 768 — T2 / 1024 — przechodzi / 1440 — przechodzi |
 | `/account` | `marek` | wybór konta po zalogowaniu | `account-marek` | nie przechodzi · 320 — przechodzi / 360 — przechodzi / 768 — T2 / 1024 — przechodzi / 1440 — przechodzi |
@@ -193,6 +194,9 @@ Identyfikator zrzutu daje plik `<identyfikator>-<szerokość>.jpg`. Eksporty CSV
 | `/hr/people` | `admin` | lista pracowników | `people-admin` | nie przechodzi · 320 — K1 / 360 — K1 / 768 — T2 / 1024 — przechodzi / 1440 — przechodzi |
 | `/hr/people` | `joanna` | brak wyników wyszukiwania | `people-empty-joanna` | nie przechodzi · 320 — T1 / 360 — T1 / 768 — T1, T2 / 1024 — przechodzi / 1440 — przechodzi |
 | `/hr/people` | `admin` | brak wyników wyszukiwania | `people-empty-admin` | nie przechodzi · 320 — T1 / 360 — T1 / 768 — T1, T2 / 1024 — przechodzi / 1440 — przechodzi |
+| `/hr/people/import` | `joanna` | import CSV · pusty formularz | `people-import` | nowy wiersz (final-routes-errors), bez pomiaru wyjściowego |
+| `/hr/people/import` | `joanna` | import CSV · podgląd wierszy (POST, 200) | `people-import-preview` | nowy wiersz (final-routes-errors), bez pomiaru wyjściowego |
+| `/hr/people/import` | `joanna` | 422 · zły nagłówek pliku | `people-import-error` | nowy wiersz (final-routes-errors), bez pomiaru wyjściowego |
 | `/hr/people` | `joanna` | lista pracowników (nazwa z pierwszego pomiaru) | `hr-people` | nie przechodzi · 320 — K1 / 360 — K1 / 768 — T2 / 1024 — przechodzi / 1440 — przechodzi |
 | `/hr/people` | `joanna` | po utworzeniu | `people-saved` | nie przechodzi · 320 — K1 / 360 — K1 / 768 — T2 / 1024 — przechodzi / 1440 — przechodzi |
 | `/hr/people` | `joanna` | po edycji | `people-updated` | nie przechodzi · 320 — K1 / 360 — K1 / 768 — T2 / 1024 — przechodzi / 1440 — przechodzi |
@@ -243,6 +247,13 @@ Identyfikator zrzutu daje plik `<identyfikator>-<szerokość>.jpg`. Eksporty CSV
 | `/cycles/:id/appreciation` | `piotr` | 403 · odmowa | `appreciation-403` | nie przechodzi · 320 — T1, T2, H1, L4 / 360 — T1, T2, H1, H3, L4 / 768 — T1, T2, H1, L4 / 1024 — T1, T2, H1, L4 / 1440 — T1, T2, H1, L4 |
 | `/cycles/:id/appreciation` | `marek` | 404 · brak zasobu | `appreciation-404` | nie przechodzi · 320 — T1, T2, H1, L4 / 360 — T1, T2, H1, H3, L4 / 768 — T1, T2, H1, L4 / 1024 — T1, T2, H1, L4 / 1440 — T1, T2, H1, L4 |
 | `/admin/suggestion-sources` | `admin` | źródła podpowiedzi | `suggestion-sources` | nie przechodzi · 320 — K1 / 360 — K1 / 768 — T2, K1 / 1024 — K1 / 1440 — K1 |
+| `/admin/rules` | `admin` | wersja przepisów | `admin-rules` | nowy wiersz (final-routes-errors), bez pomiaru wyjściowego |
+| `/admin/rules` | `joanna` | 403 · odmowa | `admin-rules-403` | nowy wiersz (final-routes-errors), bez pomiaru wyjściowego |
+| `/admin/corrections` | `admin` | lista arkuszy do korekty | `admin-corrections` | nowy wiersz (final-routes-errors), bez pomiaru wyjściowego |
+| `/cycles/:id/sheet/correction` | `admin` | korekta arkusza · formularz | `sheet-correction` | nowy wiersz (final-routes-errors), bez pomiaru wyjściowego |
+| `/cycles/:id/sheet/correction` | `admin` | 422 · korekta bez pól | `sheet-correction-error` | nowy wiersz (final-routes-errors), bez pomiaru wyjściowego |
+| `/cycles/:id/sheet/correction` | `marek` | 403 · odmowa | `sheet-correction-403` | nowy wiersz (final-routes-errors), bez pomiaru wyjściowego |
+| `/cycles/:id/sheet/correction` | `admin` | 404 · brak cyklu | `sheet-correction-404` | nowy wiersz (final-routes-errors), bez pomiaru wyjściowego |
 | `/admin/suggestion-sources` | `piotr` | 403 · odmowa | `sources-403` | nie przechodzi · 320 — T1, T2, H1, L4 / 360 — T1, T2, H1, H3, L4 / 768 — T1, T2, H1, L4 / 1024 — T1, T2, H1, L4 / 1440 — T1, T2, H1, L4 |
 | `/tour` | `anonim` | wejście do przewodnika | `tour-entry` | nie przechodzi · 320 — T1, H2 / 360 — T1, H2 / 768 — T1, T2, H2 / 1024 — T1, H2 / 1440 — T1, H2 |
 | `/tour` | `marek` | wejście po zalogowaniu | `tour` | nie przechodzi · 320 — T1, H2 / 360 — T1, H2 / 768 — T1, T2, H2 / 1024 — T1, H2 / 1440 — T1, H2 |

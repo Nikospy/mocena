@@ -160,7 +160,8 @@ app.get("/cycles/:id/invitations/:eventId{[0-9]+\\.ics}", (c) => {
   if (g instanceof Response) return g;
   const id = Number(c.req.param("eventId").replace(/\.ics$/, ""));
   const found = invitationById(g.cycle.id, id);
-  if (!found) return c.text("Nie ma takiego zaproszenia.", 404);
+  // Odnośnik do pliku otwiera człowiek w przeglądarce: brak zaproszenia to strona 404, nie goły tekst.
+  if (!found) return errorPage(c, "Nie ma takiego zaproszenia. Pobierz plik z aktualnego zaproszenia.", 404);
   // Zastąpione zaproszenie też da się pobrać: dane są w zdarzeniu.
   const sent = found.invitation;
   const k = INVITATION_KINDS[sent.kind];

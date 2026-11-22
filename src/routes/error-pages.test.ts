@@ -30,10 +30,10 @@ describe("strony błędów tras", () => {
     await page(await call(app, "joanna", "/hr/grades/nie-ma", {}), 404, "Nie ma takiej strony", "Nie ma takiej osoby w danych urzędu.");
   });
 
-  test("plik .ics i podgląd dla fetch zostają tekstem", async () => {
+  test("brak pliku .ics to strona 404; podgląd dla fetch zostaje tekstem", async () => {
     const ics = await call(app, "marek", "/cycles/cycle-piotr/invitations/999999.ics");
     expect(ics.status).toBe(404);
-    expect(ics.headers.get("content-type")).toContain("text/plain");
+    expect(ics.headers.get("content-type")).toContain("text/html");
     const preview = await call(app, "piotr", "/cycles/cycle-piotr/assessment/preview", {});
     expect(preview.status).toBe(403);
     expect(preview.headers.get("content-type")).toContain("text/plain");

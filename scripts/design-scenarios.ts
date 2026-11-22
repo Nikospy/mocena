@@ -76,13 +76,15 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await shot(D, "/", "home-director", { check: "Terminowość w urzędzie" });
   await shot(D, "/office/statistics", "office-statistics-initial");
   await denied("/office/statistics", "office-statistics", H);
-  // Maria nie ma cyklu ani konta w danych pokazu. Konto włączamy tylko do pomiaru pustej listy.
-  const mariaAccount = getDb().query("UPDATE people SET has_account = ? WHERE id = 'maria'");
-  mariaAccount.run(1);
+  // Pusta lista spraw na prawdziwym koncie: Piotr przed wyznaczeniem kryteriów nie ma nic do załatwienia.
+  await shot(P, "/", "home-empty", { check: "Teraz nie masz spraw do załatwienia" });
+  // Pierwsze uruchomienie: bez trybu pokazu i bez kont (chwilowo, w punkcie zapisu bazy pomiarowej).
+  const firstRun = getDb();
+  firstRun.exec("SAVEPOINT audit_first_run; DELETE FROM settings WHERE key = 'demo_date'; UPDATE people SET has_account = 0");
   try {
-    await shot("maria", "/", "home-empty", { check: "Brak spraw do załatwienia." });
+    await shot(null, "/account", "first-run", { check: "Pierwsze uruchomienie" });
   } finally {
-    mariaAccount.run(0);
+    firstRun.exec("ROLLBACK TO audit_first_run; RELEASE audit_first_run");
   }
   await roles(cycle, "cycle", [M, P], { redirect: part1 });
   await shot(M, part1, "part1-edit", { selector: ".p1-form" });
@@ -232,6 +234,16 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await shot(H, "/hr", "hover-link", { hover: "a.brand" });
   await shot(H, await post(H, "/hr/grades/tomasz"), "hr-awarded");
   await roles(people, "people", [H, A]);
+  const peopleImport = people + "/import";
+  const importCsv = [
+    "Osoba;Stanowisko;Komórka;Oceniający;Stan cyklu;Termin oceny;Termin sprzeciwu;Data ostatniej oceny;Wynik ostatniej oceny",
+    "Jan Nowicki;Specjalista;Wydział Kadr i Szkoleń;Marek Zieliński;;;;10.03.2025;pozytywna",
+    "Piotr Wójcik;Starszy specjalista;Wydział Organizacyjny;Marek Zieliński;Okres oceny;27.11.2026;;27.11.2024;pozytywna",
+    "Ola Bez;Referent;Wydział Nieistniejący;Marek Zieliński;;;;10.03.2025;pozytywna",
+  ].join("\n");
+  await shot(H, peopleImport, "people-import");
+  await invalid(H, peopleImport, "people-import-preview", peopleImport, { fields: { csv: importCsv } }, 200);
+  await invalid(H, peopleImport, "people-import-error", peopleImport, { fields: { csv: "Imię;Nazwisko\nJan;Nowak" } });
   await shot(H, people, "hr-people");
   await roles(people + "?q=brak-wynikow-audyt", "people-empty", [H, A]);
   await roles(exportCsv, "export", [H, A], { download: "csv" });
@@ -269,6 +281,14 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await invalid(H, newAppraiser, "appraiser-error", newAppraiser);
   await shot(H, closed + "/appraiser", "appraiser-closed");
   await shot(A, sources, "suggestion-sources");
+  await shot(A, "/admin/rules", "admin-rules", { check: "Obowiązuje teraz" });
+  await shot(A, "/admin/corrections", "admin-corrections");
+  const correction = "/cycles/cycle-tomasz/sheet/correction";
+  await shot(A, correction, "sheet-correction");
+  await invalid(A, correction, "sheet-correction-error", correction);
+  await denied(correction, "sheet-correction", M);
+  await shot(A, missing + "/sheet/correction", "sheet-correction-404", { status: 404 });
+  await denied("/admin/rules", "admin-rules", H);
   await denied(cycle, "cycle", A, missing);
   await denied(part1, "part1", A, missing + "/part1");
   await denied(opening, "opening", A, missing + "/cards/opening");
