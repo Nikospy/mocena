@@ -228,9 +228,9 @@ Trasy przez `app.request()` z ciasteczkami. Stany danych przez funkcje domenowe 
 
 #### Automated
 
-- [ ] 1.1 Testy stanów danych przystanków przechodzą: `bun test src/tour/state.test.ts`
-- [ ] 1.2 Testy tras przewodnika przechodzą: `bun test src/routes/tour.test.ts`
-- [ ] 1.3 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run`
+- [x] 1.1 Testy stanów danych przystanków przechodzą: `bun test src/tour/state.test.ts` — df035f9
+- [x] 1.2 Testy tras przewodnika przechodzą: `bun test src/routes/tour.test.ts` — 17f807d
+- [x] 1.3 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — 17f807d
 
 #### Manual
 
@@ -241,8 +241,8 @@ Trasy przez `app.request()` z ciasteczkami. Stany danych przez funkcje domenowe 
 
 #### Automated
 
-- [ ] 2.1 Testy wejścia z przystankami i skryptu przechodzą: `bun test src/routes/tour.test.ts`
-- [ ] 2.2 Cały zestaw testów przechodzi: `bun test`
+- [x] 2.1 Testy wejścia z przystankami i skryptu przechodzą: `bun test src/routes/tour.test.ts` — 17f807d
+- [x] 2.2 Cały zestaw testów przechodzi: `bun test` — 17f807d
 
 #### Manual
 
