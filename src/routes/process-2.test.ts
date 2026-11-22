@@ -121,6 +121,12 @@ describe("proces 2: termin i sprawa po rozstrzygnięciu „ponowne sporządzenie
     expect(home).toContain("Ponowne sporządzenie oceny");
     expect(home).toContain("/cycles/cycle-katarzyna/sheet");
     expect(home).toContain("04.12.2026");
+    // Wariant minimalny: uczciwe zdanie zamiast ślepej ścieżki.
+    expect(home).toContain("Prototyp nie ma jeszcze formularza drugiej oceny");
+    const screen = await html(app, "anna", "/cycles/cycle-katarzyna/assessment");
+    expect(screen).toContain('id="assessment-redo"');
+    expect(screen).toContain("Prototyp nie ma jeszcze formularza drugiej oceny");
+    expect(screen).toContain("04.12.2026");
   });
 
   test("inne rozstrzygnięcia nie dają terminu ani sprawy", async () => {

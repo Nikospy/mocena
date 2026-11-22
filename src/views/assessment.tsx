@@ -203,6 +203,8 @@ export type AssessmentViewProps = {
   canFiction?: boolean;
   /** Termin przesunięty przez nieobecność (silnik): zdanie i odnośnik do osi czasu. */
   shifted?: { text: string } | null;
+  /** Sprzeciw uwzględniony z nakazem ponownego sporządzenia oceny: termin drugiej oceny. */
+  redo?: { date: string; basis: string[] } | null;
 };
 
 function Header(p: { person: Person; sheet: string; period: string; links?: JSX.Element }) {
@@ -446,6 +448,14 @@ export function AssessmentView(p: AssessmentViewProps) {
             {p.shifted.text}. <a href={`/cycles/${p.cycleId}/timeline`}>Zobacz oś czasu</a>
           </span>
         </p>
+      ) : null}
+      {p.redo ? (
+        <div class="st info" id="assessment-redo">
+          <div>
+            <b>Sprzeciw uwzględniony: ocenę sporządza się po raz drugi do {formatDate(p.redo.date)} <LegalBasis basis={p.redo.basis} /></b>
+            <p>Druga ocena nie może być niższa niż pierwsza ani w żadnym elemencie. Prototyp nie ma jeszcze formularza drugiej oceny: poniżej pierwsza ocena, tylko do odczytu.</p>
+          </div>
+        </div>
       ) : null}
       <ErrorSummary errors={p.errors} title={p.errorTitle} />
       {p.mode === "edit" || !snap ? <EditForm {...p} /> : <SnapshotView {...p} snapshot={snap} />}

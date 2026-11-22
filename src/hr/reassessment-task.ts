@@ -16,7 +16,7 @@ registerHomeTasks((person) => {
         title: `Ponowne sporządzenie oceny: ${name}`,
         heading: "Ponowne sporządzenie oceny",
         person: name,
-        detail: `Sprzeciw uwzględniono z nakazem ponownego sporządzenia oceny. Termin ${formatDate(d.date)} obejmuje sporządzenie oceny po raz drugi. Ponowna ocena nie może być niższa niż pierwsza ani w żadnym elemencie.`,
+        detail: `Sprzeciw uwzględniono z nakazem ponownego sporządzenia oceny. Termin ${formatDate(d.date)} obejmuje sporządzenie oceny po raz drugi. Ponowna ocena nie może być niższa niż pierwsza ani w żadnym elemencie. Prototyp nie ma jeszcze formularza drugiej oceny: sporządzasz ją poza systemem, tu widać pierwszą.`,
         due: d.date,
         basis: d.basis.join(", "),
         action: "Zobacz arkusz pierwszej oceny",
