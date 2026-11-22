@@ -40,8 +40,8 @@ export function HistoryList(props: { entries: Entry[] }) {
 export function HistoryView(props: { viewer: Person; today: string; person: Person; entries: Entry[]; previous?: PreviousAssessment[] }) {
   const previous = props.previous ?? [];
   return (
-    <Layout title="Historia ocen" person={props.viewer} today={props.today}>
-      <PageHeader context={props.person.name} title="Historia ocen" />
+    <Layout title={`Historia ocen: ${props.person.name}`} person={props.viewer} today={props.today}>
+      <PageHeader title={<>Historia ocen: {props.person.name}</>} />
       {props.entries.length > 0 || previous.length === 0 ? <HistoryList entries={props.entries} /> : null}
       {previous.length > 0 ? (
         <section class="ct-prev" aria-labelledby="h-prev">
