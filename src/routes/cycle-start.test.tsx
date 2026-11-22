@@ -151,4 +151,19 @@ describe("część I: stany formularza", () => {
     expect(html).toContain('href="#p1-extra-h"');
     expect(html).toContain("Odznacz pozostałe.");
   });
+
+  test("brak rodzaju stanowiska: 422 ze zdaniem, odnośnik do kartoteki tylko u kadr", async () => {
+    const { app, db } = createTestApp({ today: "2024-12-09" });
+    db.query("UPDATE people SET position_kind = NULL WHERE id = 'piotr'").run();
+    const r = await as(app, "marek", `/cycles/${piotr}/part1`);
+    expect(r.status).toBe(422);
+    const html = await r.text();
+    expect(html).toContain("nie ma rodzaju stanowiska");
+    expect(html).toContain("Nie zapisano zmian");
+    expect(html).not.toContain("arkusz C");
+    expect(html).not.toContain("/hr/people/piotr/edit");
+    const hr = await as(app, "joanna", `/cycles/${piotr}/part1`);
+    expect(hr.status).toBe(422);
+    expect(await hr.text()).toContain('href="/hr/people/piotr/edit"');
+  });
 });
