@@ -1,6 +1,7 @@
 import type { Person } from "./people";
 
-export type HomeTask = { title: string; href: string; detail?: string };
+/** Pola `heading`, `person`, `due`, `basis`, `action` są tylko do wyglądu karty sprawy (opcjonalne). */
+export type HomeTask = { title: string; href: string; detail?: string; heading?: string; person?: string; due?: string; basis?: string; action?: string };
 type Provider = (person: Person) => HomeTask[];
 
 const providers: Provider[] = [];

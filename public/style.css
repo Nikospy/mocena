@@ -623,3 +623,26 @@ h2, h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w
 .sheet-doc { max-inline-size: 52rem; margin-inline: auto; }
 .sheet-doc .no-print > * + * { margin-block-start: var(--sp-150); }
 .tl-card + .btns, .tl-card + .st { margin-block-start: var(--sp-200); }
+/* design-a */
+.wrap > * + * { margin-block-start: var(--sp-300); }
+.tasks, .acc-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-200); }
+.task { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--sp-200); }
+.task-main > * + * { margin-block-start: var(--sp-50); }
+.task h2 { font-size: var(--f-h6); line-height: var(--lh-h6); }
+.task-due { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
+.task-due b { color: var(--rule-ink); }
+@media (max-width: 640px) { .task { grid-template-columns: 1fr; } .task .btn { inline-size: 100%; } }
+.acc-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); margin-block: var(--sp-200); }
+.acc { inline-size: 100%; block-size: 100%; display: grid; align-content: start; justify-items: start; gap: var(--sp-50); text-align: start; font: inherit; color: var(--text); cursor: pointer; }
+.acc > * + * { margin-block-start: 0; }
+.acc:hover { border-color: var(--primary); }
+.acc:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.acc-role { margin-block-start: var(--sp-100); padding: var(--sp-50) var(--sp-150); border-radius: var(--pill-r); background: var(--cobalt-20); color: var(--primary); font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); }
+.hdr-id .cap { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
+.list-h h2 { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100); }
+.term-date { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-150); }
+.hint .crit { background: var(--white); }
+.topics { padding-inline-start: var(--sp-300); display: grid; gap: var(--sp-100); }
+.p1-form > * + * { margin-block-start: var(--sp-300); }
+.hdr-top.many { grid-template-columns: 1fr; }
+.hdr-top.many .hdr-links { display: flex; flex-wrap: wrap; justify-content: flex-start; margin-inline: calc(var(--sp-200) * -1) 0; margin-block-start: 0; }

@@ -22,7 +22,7 @@ describe("krok 1 pokazu", () => {
   test("Marek: sprawa, przekierowanie, ekran części I, karta rozmowy", async () => {
     const { app } = createTestApp({ today: "2024-12-09" });
     const home = await (await as(app, "marek", "/")).text();
-    expect(home).toContain("Wyznacz kryteria oceny: Piotr Wójcik, do 27.12.2024 (§ 7 pkt 1)");
+    for (const t of ["Wyznacz kryteria oceny", "Piotr Wójcik", "27.12.2024", "§ 7 pkt 1"]) expect(home).toContain(t);
     const r = await as(app, "marek", `/cycles/${piotr}`);
     expect(r.status).toBe(302);
     expect(r.headers.get("location")).toBe(`/cycles/${piotr}/part1`);

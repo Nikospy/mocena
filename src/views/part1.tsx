@@ -70,6 +70,24 @@ function CriterionRow(props: { id: string; kind: string; expectation: string; ed
   );
 }
 
+const STEPS = ["Kryteria", "Okres oceny", "Rozmowa", "Ocena", "Zapoznanie"];
+
+function Steps(props: { current: number }) {
+  return (
+    <ol class="steps5" aria-label="Etapy cyklu oceny">
+      {STEPS.map((label, i) => (
+        <li class={i < props.current ? "done" : i === props.current ? "cur" : ""} aria-current={i === props.current ? "step" : undefined}>
+          <span class="dot">
+            <span class="n">{i + 1}</span>
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+          </span>
+          <span>{label}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 export function Part1View(p: Part1ViewProps) {
   const edit = p.mode === "edit";
   const office = officeSettings();
@@ -77,48 +95,64 @@ export function Part1View(p: Part1ViewProps) {
   const because = new Map(p.suggestions.map((s) => [s.criterionId, s.because]));
   const rest = p.selectable.filter((id) => !suggested.has(id));
   const exp = (id: string) => p.expectations[id] ?? "";
+  const stepIdx = p.state === "confirmed" ? 1 : 0;
   return (
     <Layout title="Część I oceny" person={p.viewer} today={p.today}>
-      <section class="card">
-        <h1>Część I oceny: {p.employeeName}</h1>
-        <p>
-          Arkusz {p.sheet} <LegalBasis basis={p.sheetBasis} />
-        </p>
-        <p>
-          {p.deadline.label}: <b>{formatDate(p.deadline.date)}</b> <LegalBasis basis={p.deadline.basis} />
-        </p>
-        {p.notice ? <p class="st info">{p.notice}</p> : null}
-        {p.waiting ? <p class="st info">Część I czeka na potwierdzenie {p.waiting}.</p> : null}
-        {p.errors?.length ? (
-          <div class="st bad" role="alert">
-            <ul>{p.errors.map((e) => <li>{e}</li>)}</ul>
+      <section class="card hdr" aria-label="Cykl oceny">
+        <div class={p.links.length > 3 ? "hdr-top many" : "hdr-top"}>
+          <div class="hdr-id">
+            <p class="cap">Część I oceny · Arkusz {p.sheet} <LegalBasis basis={p.sheetBasis} /></p>
+            <h1>{p.employeeName}</h1>
           </div>
-        ) : null}
-        {p.links.length ? (
-          <ul class="plain-list">
-            {p.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
-          </ul>
-        ) : null}
+          {p.links.length ? (
+            <div class="hdr-links">
+              {p.links.map((l) => <a class="btn text" href={l.href}>{l.label}</a>)}
+            </div>
+          ) : null}
+        </div>
+        <Steps current={stepIdx} />
       </section>
 
+      <section class="rule">
+        <p class="voice rule-v">Reguła · {p.deadline.label}</p>
+        <p class="term-date">
+          <b class="big">{formatDate(p.deadline.date)}</b> <LegalBasis basis={p.deadline.basis} />
+        </p>
+      </section>
+      {p.notice ? <p class="st info">{p.notice}</p> : null}
+      {p.waiting ? <p class="st info">Część I czeka na potwierdzenie {p.waiting}.</p> : null}
+      {p.errors?.length ? (
+        <div class="st bad" role="alert">
+          <ul>{p.errors.map((e) => <li>{e}</li>)}</ul>
+        </div>
+      ) : null}
+
       {edit ? (
-        <form method="post" action={`/cycles/${p.cycleId}/part1/criteria`}>
+        <form class="p1-form" method="post" action={`/cycles/${p.cycleId}/part1/criteria`}>
           <section class="card sheet">
-            <h2>Kryteria obowiązkowe <LegalBasis basis="§ 4" /></h2>
+            <div class="list-h"><h2>Kryteria obowiązkowe <LegalBasis basis="§ 4" /></h2></div>
             {p.mandatory.map((m) => <CriterionRow id={m.id} kind="obowiązkowe" expectation={exp(m.id)} editable />)}
-            <h2>Kryteria dodatkowe (do 3) <LegalBasis basis="§ 5 ust. 2" /></h2>
-            {p.suggestions.length ? (
-              <p class="cap">Podpowiedzi z tabeli urzędu „rodzaj obowiązku → kryterium” ({office.label}, nie przepis).</p>
-            ) : null}
-            {[...p.suggestions.map((s) => s.criterionId), ...rest].map((id) => (
-              <CriterionRow
-                id={id}
-                kind={suggested.has(id) ? "Podpowiedź · ustawienie urzędu" : "do wyboru"}
-                extra={because.get(id)}
-                expectation={exp(id)}
-                editable
-                checkbox={{ checked: p.selected.includes(id) }}
-              />
+          </section>
+          <div class="list-h"><h2>Kryteria dodatkowe (do 3) <LegalBasis basis="§ 5 ust. 2" /></h2></div>
+          {p.suggestions.length ? (
+            <section class="hint">
+              <p class="voice hint-v">Podpowiedź · ustawienie urzędu</p>
+              <p class="cap">Podpowiedzi z tabeli urzędu „rodzaj obowiązku → kryterium” ({office.label}, nie przepis). Nie zaznaczysz — nie trafią do oceny.</p>
+              {p.suggestions.map((s) => (
+                <CriterionRow
+                  id={s.criterionId}
+                  kind="Podpowiedź · ustawienie urzędu"
+                  extra={because.get(s.criterionId)}
+                  expectation={exp(s.criterionId)}
+                  editable
+                  checkbox={{ checked: p.selected.includes(s.criterionId) }}
+                />
+              ))}
+            </section>
+          ) : null}
+          <section class="card sheet">
+            {rest.map((id) => (
+              <CriterionRow id={id} kind="do wyboru" expectation={exp(id)} editable checkbox={{ checked: p.selected.includes(id) }} />
             ))}
           </section>
           <div class="btns">
@@ -130,9 +164,9 @@ export function Part1View(p: Part1ViewProps) {
         </form>
       ) : (
         <section class="card sheet">
-          <h2>Kryteria obowiązkowe <LegalBasis basis="§ 4" /></h2>
+          <div class="list-h"><h2>Kryteria obowiązkowe <LegalBasis basis="§ 4" /></h2></div>
           {p.mandatory.map((m) => <CriterionRow id={m.id} kind="obowiązkowe" expectation={m.expectation ?? ""} editable={false} />)}
-          <h2>Kryteria dodatkowe</h2>
+          <div class="list-h"><h2>Kryteria dodatkowe</h2></div>
           {p.additional.length === 0 ? <p>Brak kryteriów dodatkowych.</p> : null}
           {p.additional.map((m) => <CriterionRow id={m.id} kind="dodatkowe" expectation={m.expectation ?? ""} editable={false} />)}
         </section>
@@ -165,11 +199,23 @@ export function OpeningCardView(props: {
   const { questions, hardSituations } = props.card;
   return (
     <Layout title="Karta rozmowy rozpoczynającej" person={props.viewer} today={props.today}>
+      <section class="card hdr">
+        <div class="hdr-top">
+          <div class="hdr-id">
+            <p class="cap">Karta rozmowy</p>
+            <h1>{props.card.title}</h1>
+            <p>{props.card.purpose}</p>
+          </div>
+          <div class="hdr-links">
+            <a class="btn text" href={`/cycles/${props.cycleId}/part1`}>Wróć do części I</a>
+          </div>
+        </div>
+      </section>
+      <section class="rule">
+        <p class="voice rule-v">Reguła · Tematy rozmowy <LegalBasis basis={props.basis} /></p>
+        <ol class="topics">{props.topics.map((t) => <li>{t}</li>)}</ol>
+      </section>
       <section class="card">
-        <h1>{props.card.title}</h1>
-        <p>{props.card.purpose}</p>
-        <h2>Tematy rozmowy <LegalBasis basis={props.basis} /></h2>
-        <ol>{props.topics.map((t) => <li>{t}</li>)}</ol>
         {questions?.length ? (
           <>
             <h2>Pytania</h2>
@@ -182,7 +228,6 @@ export function OpeningCardView(props: {
             <ul>{hardSituations.map((h) => <li><b>{h.situation}</b> {h.whatToDo}</li>)}</ul>
           </>
         ) : null}
-        <a class="btn text" href={`/cycles/${props.cycleId}/part1`}>Wróć do części I</a>
       </section>
     </Layout>
   );
