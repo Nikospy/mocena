@@ -214,3 +214,22 @@ test("fikcja zapoznania z drugą oceną odmienia opis według ocenianej", async 
   expect(assessment).toContain("24.11.2026");
   expect(assessment).toContain("01.12.2026");
 });
+
+test("część I zachowuje przekazany termin i pokazuje bieżący po zapoznaniu z drugą oceną", async () => {
+  const { cycleById, openCycle, startNextCycle } = await import("../cycles");
+  const app = await redone();
+  startNextCycle(cycleById("cycle-katarzyna")!, "katarzyna", "2026-11-16", "2026-11-17", "positive");
+  const part1 = `/cycles/${openCycle("katarzyna")!.id}/part1`;
+  expect((await call(app, "anna", `${part1}/submit`, {})).status).toBe(303);
+  expect((await call(app, "katarzyna", `${part1}/confirm`, {})).status).toBe(303);
+  const before = await html(app, "katarzyna", part1);
+  expect(before).toContain("16.11.2028");
+  expect(before).not.toContain("Termin bieżący");
+
+  expect((await call(app, "anna", `${CYCLE}/assessment/approve`, form([5, 5, 5, 5, 5]))).status).toBe(303);
+  setToday("2026-11-24");
+  expect((await call(app, "katarzyna", `${CYCLE}/assessment/acknowledge`, {})).status).toBe(303);
+  const after = await html(app, "katarzyna", part1);
+  expect(after).toMatch(/Termin przekazany w części I[\s\S]*16\.11\.2028/);
+  expect(after).toMatch(/Termin bieżący[\s\S]*22\.11\.2028/);
+});
