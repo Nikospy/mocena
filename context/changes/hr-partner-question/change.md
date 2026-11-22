@@ -1,7 +1,7 @@
 ---
 change_id: hr-partner-question
 title: Pytanie HR partnera i przypomnienie o docenianiu
-status: planned
+status: implementing
 created: 2026-11-21
 updated: 2026-11-22
 archived_at: null
