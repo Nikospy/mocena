@@ -1,5 +1,5 @@
 import { registerCycleLinks } from "./cycle-links";
-import { getDb } from "./db";
+import { actsAsAppraiser, personsAppraisedBy } from "./substitutions";
 import { canChangeDeadline, canRequestChange, deadlineChangeBlocked, pendingRequest, requestState } from "./deadline-change";
 import { openCycle } from "./cycles";
 import { registerHomeTasks, type HomeTask } from "./home-tasks";
@@ -16,10 +16,9 @@ registerCycleLinks((cycle, viewer) => {
 
 registerHomeTasks((person) => {
   const tasks: HomeTask[] = [];
-  const rows = getDb().query("SELECT DISTINCT person_id FROM cycles WHERE appraiser_id = ?").all(person.id) as { person_id: string }[];
-  for (const { person_id } of rows) {
+  for (const person_id of personsAppraisedBy(person.id)) {
     const cycle = openCycle(person_id);
-    if (!cycle || cycle.appraiser_id !== person.id) continue;
+    if (!cycle || !actsAsAppraiser(cycle.appraiser_id, person.id)) continue;
     const pending = pendingRequest(cycle.id);
     if (!pending) continue;
     const name = personById(person_id)?.name;

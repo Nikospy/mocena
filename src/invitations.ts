@@ -1,3 +1,4 @@
+import { actsAsAppraiser } from "./substitutions";
 // Zaproszenia na rozmowy (S-16): zdarzenia `invitation_sent` i `invitation_confirmed`. Zaproszenie to wygoda stron, nie wymóg przepisu.
 import { openCycle, type Cycle } from "./cycles";
 import { addDays, criteriaTalkDeadline } from "./engine/deadlines";
@@ -66,10 +67,10 @@ export function invitationById(cycleId: string, eventId: number): { invitation: 
 
 /** Wysłać może tylko bieżący oceniający otwartego cyklu. */
 export function canInvite(viewer: Person, cycle: Cycle): boolean {
-  return viewer.id === cycle.appraiser_id && openCycle(cycle.person_id)?.id === cycle.id;
+  return actsAsAppraiser(cycle.appraiser_id, viewer.id) && openCycle(cycle.person_id)?.id === cycle.id;
 }
 
-export const isParty = (cycle: Cycle, p: Person) => p.id === cycle.appraiser_id || p.id === cycle.person_id;
+export const isParty = (cycle: Cycle, p: Person) => actsAsAppraiser(cycle.appraiser_id, p.id) || p.id === cycle.person_id;
 
 export type InvitationInput = { kind: InvitationKind; date: string; time: string; place: string; note: string };
 export type InvitationErrors = Partial<Record<"date" | "time" | "place" | "note", string>>;

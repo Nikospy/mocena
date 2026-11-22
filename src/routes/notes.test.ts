@@ -142,3 +142,20 @@ describe("faza 3", () => {
     expect(db.query("SELECT date, created_at FROM notes ORDER BY id DESC LIMIT 1").get()).toEqual({ date: "2026-11-10", created_at: "2026-11-21" });
   });
 });
+
+describe("informacja zwrotna: limit jak w notatce (ustalenie 10 audytu)", () => {
+  test("tekst dłuższy niż 2000 znaków: 422, formularz z komunikatem i wpisanym tekstem; nic się nie zapisuje", async () => {
+    const { app, db } = createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } });
+    const note = db.query("SELECT id FROM notes WHERE author_id = 'marek' AND date <= '2026-11-21' ORDER BY id LIMIT 1").get() as { id: number };
+    const before = (db.query("SELECT COUNT(*) AS n FROM feedback_messages").get() as { n: number }).n;
+    const long = "a".repeat(2001);
+    const r = await call(app, "marek", `/notes/${note.id}/feedback`, { text: long });
+    expect(r.status).toBe(422);
+    const body = await r.text();
+    expect(body).toContain("najwyżej 2000 znaków");
+    expect(body).toContain('class="field-err"');
+    expect(body).toContain(long);
+    expect((db.query("SELECT COUNT(*) AS n FROM feedback_messages").get() as { n: number }).n).toBe(before);
+    expect((await call(app, "marek", `/notes/${note.id}/feedback`, { text: "a".repeat(2000) })).status).toBe(303);
+  });
+});

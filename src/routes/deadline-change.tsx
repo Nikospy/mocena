@@ -1,3 +1,4 @@
+import { actsAsAppraiser } from "../substitutions";
 import { Hono, type Context } from "hono";
 import { visibleCycleById, effectiveDeadline, type Cycle } from "../cycles";
 import { deadlineCase, deadlineChangeBlocked, newDeadlineError, pendingRequest, requestState } from "../deadline-change";
@@ -19,7 +20,7 @@ function guard(c: Context, who: "appraiser" | "appraisee"): Response | Ctx {
   if (!viewer) return c.redirect("/account");
   const cycle = visibleCycleById(c.req.param("id") ?? "");
   if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
-  if (who === "appraiser" && viewer.id !== cycle.appraiser_id) return errorPage(c, "Termin zmienia oceniający tego cyklu.", 403);
+  if (who === "appraiser" && !actsAsAppraiser(cycle.appraiser_id, viewer.id)) return errorPage(c, "Termin zmienia oceniający tego cyklu.", 403);
   if (who === "appraisee" && viewer.id !== cycle.person_id) return errorPage(c, "Wniosek o zmianę terminu składa oceniany.", 403);
   return { viewer, cycle };
 }
@@ -141,7 +142,7 @@ app.get("/cycles/:id/deadline-change/:eventId/letter", (c) => {
   if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
   const event = visibleEvents(cycle.id).find((e) => e.type === "deadline_changed" && String(e.id) === c.req.param("eventId"));
   if (!event) return errorPage(c, "Nie ma takiego pisma.", 404);
-  if (viewer.id !== cycle.person_id && viewer.id !== cycle.appraiser_id && viewer.role !== "hr") return errorPage(c, "Pismo widzą oceniany, jego oceniający i kadry.", 403);
+  if (viewer.id !== cycle.person_id && !actsAsAppraiser(cycle.appraiser_id, viewer.id) && viewer.role !== "hr") return errorPage(c, "Pismo widzą oceniany, jego oceniający i kadry.", 403);
   const appraiser = personById(cycle.appraiser_id);
   return c.html(
     <LetterView

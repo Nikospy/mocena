@@ -44,7 +44,11 @@ export function cycleDeadlineDetails(cycleId: string, opts: { asOf?: string } = 
   const D = rules.deadlines;
   const changeEv = kind === "regular" ? visibleEvents(cycleId, opts).filter((e) => e.type === "deadline_changed").pop() : undefined;
   const change = changeEv ? { eventId: changeEv.id, case: Number(changeEv.payload.case), from: String(changeEv.payload.oldDeadline), to: String(changeEv.payload.newDeadline) } : null;
-  if (change) {
+  if (change && changeEv) {
+    // Data z pisma zastępuje termin (art. 81 ust. 8): nieobecności wliczone już w termin sprzed zmiany nie doliczają się drugi raz.
+    const before = absences.filter((a) => visibleAbsences(cycle.person_id, { asOf: changeEv.date }).some((v) => v.id === a.id));
+    const counted = assessmentDeadline({ kind, periodStart: cycle.period_start, previousAcknowledgedOn: p?.previousAcknowledgedOn ?? null }, before).extensionDays;
+    r.extensionDays = Math.max(0, r.extensionDays - counted);
     const raw = addDays(change.to, r.extensionDays);
     r.deadline = toWorkingDay(raw);
     r.movedToWorkingDay = r.deadline !== raw;

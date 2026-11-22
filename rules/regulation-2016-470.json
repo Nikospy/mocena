@@ -126,7 +126,8 @@
       "value": 7,
       "basis": "art. 83 ust. 1 ustawy",
       "from": "dzień zapoznania się z oceną",
-      "to": "dyrektor generalny urzędu"
+      "to": "dyrektor generalny urzędu",
+      "toGenitive": "dyrektora generalnego urzędu"
     },
     "objectionReviewDays": {
       "value": 14,

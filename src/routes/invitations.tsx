@@ -86,7 +86,7 @@ function guard(c: Context, access: "send" | "party"): Response | Ctx {
   if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
   if (access === "send") {
     if (!canInvite(viewer, cycle)) return errorPage(c, "Zaproszenie wysyła oceniający otwartego cyklu.", 403);
-  } else if (!isParty(cycle, viewer)) return errorPage(c, "Ten cykl oceny widzą oceniany, jego oceniający i kadry.", 403);
+  } else if (!isParty(cycle, viewer)) return errorPage(c, "Zaproszenie widzą oceniany i jego oceniający, a w czasie zastępstwa także zastępca oceniającego.", 403);
   return { viewer, cycle };
 }
 

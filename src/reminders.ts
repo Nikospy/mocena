@@ -2,6 +2,7 @@ import { assessmentState } from "./assessment/state";
 import { cycleDeadlineDetails, openCycle, type Cycle } from "./cycles";
 import { shiftedDeadlineSentence } from "./deadline-shift";
 import { getDb } from "./db";
+import { actsAsAppraiser, personsAppraisedBy } from "./substitutions";
 import { addDays } from "./engine/deadlines";
 import { registerHomeTasks, type HomeTask } from "./home-tasks";
 import { assessmentWindowDays } from "./office-settings";
@@ -13,11 +14,10 @@ import { formatDate } from "./views/layout";
 
 registerHomeTasks((person) => {
   const { value: window, label } = assessmentWindowDays();
-  const rows = getDb().query("SELECT DISTINCT person_id FROM cycles WHERE appraiser_id = ?").all(person.id) as { person_id: string }[];
   const cycles: Cycle[] = [];
-  for (const id of new Set([...rows.map((r) => r.person_id), person.id])) {
+  for (const id of new Set([...personsAppraisedBy(person.id), person.id])) {
     const c = openCycle(id);
-    if (c && (c.appraiser_id === person.id || c.person_id === person.id)) cycles.push(c);
+    if (c && (actsAsAppraiser(c.appraiser_id, person.id) || c.person_id === person.id)) cycles.push(c);
   }
   const now = today();
   const tasks: HomeTask[] = [];

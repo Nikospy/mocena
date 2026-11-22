@@ -126,3 +126,17 @@ describe("zawijanie linii iCalendar", () => {
     expect(parts.map((l, i) => (i ? l.slice(1) : l)).join("")).toBe(`DESCRIPTION:${"zażółć gęślą jaźń ".repeat(12)}`);
   });
 });
+
+describe("odmowa wglądu w zaproszenie (ustalenie 9 audytu)", () => {
+  test("zdanie odmowy wymienia tylko ocenianego i oceniającego", async () => {
+    const { app, db } = createTestApp();
+    await call(app, "marek", `/cycles/${PIOTR}/invitations`, OPENING);
+    const [ev] = sent(db);
+    const r = await call(app, "joanna", `/cycles/${PIOTR}/invitations/${ev.id}`);
+    expect(r.status).toBe(403);
+    const body = await r.text();
+    const lead = body.match(/<p class="page-lead">([^<]*)<\/p>/)?.[1] ?? "";
+    expect(lead).not.toContain("kadry");
+    expect(lead).toContain("oceniany i jego oceniający");
+  });
+});

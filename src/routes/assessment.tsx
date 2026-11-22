@@ -332,7 +332,8 @@ app.post("/cycles/:id/assessment/fiction", async (c) => {
       deliveredOn: values.deliveredOn,
       objectionDeadline: objectionDeadline(today()),
     });
-    startNextCycle(g.cycle, g.person.id, state.approvedOn, values.deliveredOn, state.snapshot.result.outcome);
+    // Dniem zapoznania jest dzień wpisu fikcji (jak termin sprzeciwu); `deliveredOn` opisuje doręczenie kopii.
+    startNextCycle(g.cycle, g.person.id, state.approvedOn, today(), state.snapshot.result.outcome);
     return true;
   })();
   if (!ok) return render(c, g, { status: 409, errors: { _: "Ocena nie czeka na potwierdzenie zapoznania." } });

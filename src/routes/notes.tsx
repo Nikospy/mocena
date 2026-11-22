@@ -1,3 +1,4 @@
+import { actsAsAppraiser } from "../substitutions";
 import { Hono, type Context } from "hono";
 import { assessmentPhaseOpen } from "../assessment/phase";
 import { card } from "../content";
@@ -28,7 +29,7 @@ export function afterNoteSaved(note: Note): string {
 }
 
 registerCycleLinks((cycle, person) =>
-  cycle.appraiser_id === person.id && assessmentPhaseOpen(cycle)
+  actsAsAppraiser(cycle.appraiser_id, person.id) && assessmentPhaseOpen(cycle)
     ? [{ label: "Karta rozmowy oceniającej", href: `/cycles/${cycle.id}/cards/assessment-conversation` }]
     : [],
 );
@@ -143,7 +144,7 @@ app.get("/notes", (c) => {
     if (own.length === 0 && !canWrite) continue;
     const cycle = openCycle(id);
     const needsCriteria = cycle && ["not_started", "draft"].includes(part1Status(cycle.id).state);
-    groups.push({ person, notes: own, canWrite, cycleAction: needsCriteria ? "Wyznacz kryteria" : undefined, cycleHref: cycle && cycle.appraiser_id === viewer.id ? `/cycles/${cycle.id}` : undefined });
+    groups.push({ person, notes: own, canWrite, cycleAction: needsCriteria ? "Wyznacz kryteria" : undefined, cycleHref: cycle && actsAsAppraiser(cycle.appraiser_id, viewer.id) ? `/cycles/${cycle.id}` : undefined });
   }
   // Oceniany bez zespołu i bez własnych notatek nie ma tu czego oglądać: strona odmowy z wyjściem do jego spraw.
   if (groups.length === 0 && viewer.role !== "appraiser") return errorPage(c, "Notatki o zespole prowadzą oceniający i przełożeni. Twoje sprawy są na liście spraw.", 403);
@@ -175,6 +176,7 @@ app.post("/notes/:id/feedback", async (c) => {
   if (g instanceof Response) return g;
   const text = str((await c.req.parseBody()).text).trim();
   if (!text) return c.html(<FeedbackFormView {...g} today={today()} text="" error="Wpisz tekst dla pracownika." />, 422);
+  if (text.length > 2000) return c.html(<FeedbackFormView {...g} today={today()} text={text} error="Informacja zwrotna może mieć najwyżej 2000 znaków." />, 422);
   sendFeedback({ noteId: g.note.id, authorId: g.viewer.id, text });
   return c.redirect("/notes?sent=1", 303);
 });
@@ -191,7 +193,7 @@ app.get("/cycles/:id/cards/assessment-conversation", (c) => {
   if (!viewer) return c.redirect("/account");
   const cycle = visibleCycleById(c.req.param("id") ?? "");
   if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
-  if (cycle.appraiser_id !== viewer.id) return errorPage(c, "Ten ekran widzi oceniający tego cyklu.", 403);
+  if (!actsAsAppraiser(cycle.appraiser_id, viewer.id)) return errorPage(c, "Ten ekran widzi oceniający tego cyklu.", 403);
   return c.html(
     <AssessmentCardView
       viewer={viewer}

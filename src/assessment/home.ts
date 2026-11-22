@@ -1,6 +1,8 @@
+import { objectionFactsText } from "../views/assessment";
 import { cycleDeadlineDetails, openCycle, previousCycleOf } from "../cycles";
 import { registerCycleLinks } from "../cycle-links";
 import { getDb } from "../db";
+import { actsAsAppraiser, personsAppraisedBy } from "../substitutions";
 import { rules } from "../engine/rules";
 import { registerHomeTasks, type HomeTask } from "../home-tasks";
 import { visibleCyclesOf } from "../hr/history";
@@ -13,10 +15,9 @@ import { verdictText } from "./verdict";
 
 registerHomeTasks((person) => {
   const tasks: HomeTask[] = [];
-  const subordinates = getDb().query("SELECT DISTINCT person_id FROM cycles WHERE appraiser_id = ?").all(person.id) as { person_id: string }[];
-  for (const { person_id } of subordinates) {
+  for (const person_id of personsAppraisedBy(person.id)) {
     const cycle = openCycle(person_id);
-    if (!cycle || cycle.appraiser_id !== person.id) continue;
+    if (!cycle || !actsAsAppraiser(cycle.appraiser_id, person.id)) continue;
     const stage = assessmentState(cycle.id).stage;
     const name = personById(person_id)?.name;
     if (stage === "draft" && assessmentPhaseOpen(cycle)) {
@@ -59,11 +60,13 @@ registerHomeTasks((person) => {
       const { verdict, level } = verdictText(st.snapshot.result);
       const recipient = objectionRecipientFor(st.snapshot.sheet, st.snapshot.objectionRecipient);
       const addressee = recipient ? ` do ${recipient}` : "";
-      const open = st.objectionDeadline >= today();
+      const open = !st.objection && st.objectionDeadline >= today();
       tasks.push({
         title: "Ocena okresowa",
         person: level ? `${verdict}, ${level}` : verdict,
-        detail: open ? `Sprzeciw${addressee} możesz złożyć w ustawowym terminie.` : `Termin sprzeciwu minął ${formatDate(st.objectionDeadline)}.`,
+        detail: st.objection
+          ? objectionFactsText(st.objection, recipient)
+          : open ? `Sprzeciw${addressee} możesz złożyć w ustawowym terminie.` : `Termin sprzeciwu minął ${formatDate(st.objectionDeadline)}.`,
         due: open ? st.objectionDeadline : undefined,
         basis: open ? rules.deadlines.objectionDays.basis : undefined,
         action: "Otwórz ocenę",
@@ -87,7 +90,7 @@ registerHomeTasks((person) => {
 
 registerCycleLinks((cycle, person) => {
   const href = `/cycles/${cycle.id}/assessment`;
-  if (cycle.appraiser_id === person.id) return assessmentPhaseOpen(cycle) ? [{ label: "Ocena", href }] : [];
+  if (actsAsAppraiser(cycle.appraiser_id, person.id)) return assessmentPhaseOpen(cycle) ? [{ label: "Ocena", href }] : [];
   if (cycle.person_id === person.id && assessmentState(cycle.id).stage !== "draft" && assessmentState(cycle.id).stage !== "no_part1") {
     return [{ label: "Ocena", href }];
   }

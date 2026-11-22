@@ -1,3 +1,4 @@
+import { actsAsAppraiser } from "./substitutions";
 // Zmiana terminu oceny (art. 81 ust. 8 ustawy), pismo (§ 8 rozporządzenia), wniosek ocenianego i jego rozpatrzenie.
 import { openCycle, type Cycle } from "./cycles";
 import { addMonths } from "./engine/deadlines";
@@ -66,7 +67,7 @@ export function pendingRequest(cycleId: string): AppEvent | null {
   return s && !s.decision ? s.request : null;
 }
 
-export const canChangeDeadline = (viewer: Person, cycle: Cycle): boolean => viewer.id === cycle.appraiser_id && deadlineChangeBlocked(cycle) === null;
+export const canChangeDeadline = (viewer: Person, cycle: Cycle): boolean => actsAsAppraiser(cycle.appraiser_id, viewer.id) && deadlineChangeBlocked(cycle) === null;
 export const canRequestChange = (viewer: Person, cycle: Cycle): boolean =>
   viewer.id === cycle.person_id && deadlineChangeBlocked(cycle) === null && pendingRequest(cycle.id) === null;
 

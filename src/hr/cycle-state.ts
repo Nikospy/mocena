@@ -1,4 +1,4 @@
-import { assessmentState } from "../assessment/state";
+import { OBJECTION_OUTCOME_TEXT as OUTCOME_TEXT, assessmentState } from "../assessment/state";
 import { effectiveDeadline } from "../cycles";
 import { pendingRequest } from "../deadline-change";
 import { part1Status } from "../cycles/part1";
@@ -35,11 +35,6 @@ export type CycleState = {
   more?: string;
 };
 
-const OUTCOME_TEXT = {
-  changed: "uwzględniony, zmiana oceny",
-  redone: "uwzględniony, ponowne sporządzenie oceny",
-  rejected: "nieuwzględniony",
-} as const;
 
 const D = rules.deadlines;
 
