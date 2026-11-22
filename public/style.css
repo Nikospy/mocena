@@ -1216,6 +1216,25 @@ section[aria-labelledby="h-dev"] > h3 { margin-block-start: var(--sp-300); paddi
 .side.subs-side .card > h2 + * { margin-block-start: var(--sp-200); }
 :is(.hr-facts, .hr-steps, .hr-doc) code { overflow-wrap: anywhere; }
 
+/* -- Skąd biorą się podpowiedzi: jedna tabela miejsc zamiast sześciu ramek -- */
+.src-table thead th:nth-child(1) { inline-size: 22%; }
+.src-table thead th:nth-child(3) { inline-size: 30%; }
+.src-table tbody th::first-letter { text-transform: uppercase; }
+.src-off { color: var(--text-2); }
+.src-on { font-weight: var(--w-bold); }
+@media (max-width: 899px) { .src-table .hr-card > td[data-label="Model w tle"]::before { content: none; } }
+
+/* -- Wdrożenie i dane: strona tekstowa jak dokument (bez ramek, śródtytuły 20 px, wiersz do 66 znaków) -- */
+.hr-docpage { max-inline-size: 48rem; }
+.hr-docpage > section { margin-block-start: var(--sp-600); }
+.hr-docpage > .page-h + section { margin-block-start: var(--sp-500); }
+.hr-docpage > section > * + * { margin-block-start: var(--sp-150); }
+.hr-docpage > section > h2 + * { margin-block-start: var(--sp-200); }
+.hr-docpage > section > h3 { margin-block-start: var(--sp-300); }
+.hr-docpage ul { padding-inline-start: var(--sp-300); display: grid; gap: var(--sp-100); }
+.hr-docpage :is(p, li) { max-inline-size: 66ch; }
+.hr-docpage code { overflow-wrap: anywhere; }
+
 /* --- koniec sekcji hr-admin (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
 /* . */
 /* . */

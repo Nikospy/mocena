@@ -16,7 +16,7 @@ import { rules } from "../engine/rules";
 registerHomeTasks((person) =>
   person.role === "admin"
     ? [
-        { title: "Skąd biorą się podpowiedzi", href: "/admin/suggestion-sources" },
+        { title: "Skąd biorą się podpowiedzi", action: "Otwórz źródła podpowiedzi", href: "/admin/suggestion-sources" },
         {
           title: "Korekta błędów w zatwierdzonych arkuszach",
           detail: "Poprawienie pola zatwierdzonego arkusza z podaniem powodu. Korekta zostaje w historii arkusza.",
@@ -26,7 +26,7 @@ registerHomeTasks((person) =>
         {
           title: "Wersja przepisów",
           detail: `Obowiązuje wersja ${rules.version} z ${rules.effectiveFrom.split("-").reverse().join(".")}. Tu jest opis, jak wgrać nową.`,
-          action: "Zobacz wersję przepisów",
+          action: "Otwórz wersję przepisów",
           href: "/admin/rules",
         },
       ]
