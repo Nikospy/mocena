@@ -3,6 +3,7 @@
   "scripts": {
     "dev": "bun run --hot src/local.tsx",
     "seed": "bun run src/seed-cli.ts",
+    "demo-check": "bun run scripts/demo-check.ts",
     "deploy": "wrangler deploy",
     "test": "bun test"
   },
