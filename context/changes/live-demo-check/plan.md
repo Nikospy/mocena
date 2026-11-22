@@ -79,7 +79,7 @@ Równolegle powstają S-08 (`guided-demo-tour`, pliki `src/tour/*`, `layout.tsx`
 
 #### Automated
 
-- [ ] 2.1 Test obejmuje przewodnik: `bun test src/demo-check/run.test.ts`
+- [x] 2.1 Test obejmuje przewodnik: `bun test src/demo-check/run.test.ts` — 5091572
 
 #### Manual
 
