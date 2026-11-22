@@ -59,3 +59,14 @@ test("kadry otwierają przygotowany arkusz A kierownika urzędu", async () => {
   expect(sheet).toContain("Irena Maj");
   expect(sheet).toContain("Zarządzanie strategiczne");
 });
+
+test("zestawienie rozdziela terminy, a lista pracowników pomija konto techniczne", async () => {
+  const { app } = createTestApp({ today: "2026-11-22" });
+  const csv = await (await call(app, "joanna", "/hr/export.csv")).text();
+  expect(csv).toContain("Termin oceny;Termin sprzeciwu");
+  const tomasz = csv.split("\r\n").find((row) => row.startsWith("Tomasz Kamiński;"))!.split(";");
+  expect(tomasz.slice(5, 7)).toEqual(["12.11.2026", "19.11.2026"]);
+  expect(await html(app, "joanna", "/hr/people")).not.toContain("/hr/people/admin/edit");
+  const accounts = await (await app.request("/account")).text();
+  expect(accounts).toMatch(/value="tomasz"><b>Tomasz Kamiński<\/b><span class="cap">Naczelnik wydziału<\/span><span class="acc-role">oceniany<\/span>/);
+});

@@ -3,7 +3,7 @@ import { deleteCookie, setCookie } from "hono/cookie";
 import { getDb } from "./db";
 import { runSeed } from "./seed";
 import { homeTasks } from "./home-tasks";
-import { PERSON_COOKIE, currentPerson, personById } from "./people";
+import { PERSON_COOKIE, currentPerson, personById, roleLabel, type Person } from "./people";
 import { today } from "./settings";
 import cycleStart from "./routes/cycle-start";
 import assessment from "./routes/assessment";
@@ -29,17 +29,11 @@ import { Layout, formatDate } from "./views/layout";
 import { NotFoundPage, ServerErrorPage } from "./views/error-page";
 import { LegalBasis } from "./views/components";
 
-const ROLE_LABEL: Record<string, string> = { appraiser: "oceniający", employee: "pracownik", hr: "kadry", admin: "administrator" };
-
 const app = new Hono();
 
 function accounts() {
-  return getDb().query("SELECT id, name, role, position_title FROM people WHERE has_account = 1 ORDER BY name").all() as {
-    id: string;
-    name: string;
-    role: string;
-    position_title: string | null;
-  }[];
+  return getDb().query("SELECT id, name, role, position_title, gender FROM people WHERE has_account = 1 ORDER BY name").all() as
+    Pick<Person, "id" | "name" | "role" | "position_title" | "gender">[];
 }
 
 function AccountScreen(props: { error?: string }) {
@@ -57,8 +51,8 @@ function AccountScreen(props: { error?: string }) {
               <li>
                 <button class="card acc" type="submit" name="person_id" value={a.id}>
                   <b>{a.name}</b>
-                  <span class="cap">{a.position_title ?? ROLE_LABEL[a.role] ?? a.role}</span>
-                  <span class="acc-role">{ROLE_LABEL[a.role] ?? a.role}</span>
+                  <span class="cap">{a.position_title ?? roleLabel(a)}</span>
+                  <span class="acc-role">{roleLabel(a)}</span>
                 </button>
               </li>
             ))}

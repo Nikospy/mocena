@@ -228,7 +228,7 @@ export type Sort = "name" | "deadline" | "unit";
 const lower = (s: string) => s.toLocaleLowerCase("pl");
 
 export function listPeople(q: string, sort: Sort): PersonRow[] {
-  const all = getDb().query("SELECT * FROM people ORDER BY name").all() as Person[];
+  const all = getDb().query("SELECT * FROM people WHERE role <> 'admin' ORDER BY name").all() as Person[];
   const needle = lower(q.trim());
   const rows = all
     .filter((p) => !needle || lower(p.name).includes(needle) || lower(p.position_title ?? "").includes(needle))

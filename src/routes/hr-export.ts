@@ -1,4 +1,6 @@
 import { Hono } from "hono";
+import { assessmentState } from "../assessment/state";
+import { effectiveDeadline, previousCycleOf } from "../cycles";
 import { cycleState } from "../hr/cycle-state";
 import { latestCycles } from "../hr/latest-cycles";
 import { lastAssessmentOf, OUTCOME_LABEL } from "../hr/people";
@@ -8,7 +10,7 @@ import { hrGuard } from "./hr-people";
 
 const app = new Hono();
 
-const HEADER = ["Osoba", "Stanowisko", "Komórka", "Oceniający", "Stan procesu", "Termin", "Data ostatniej oceny", "Wynik ostatniej oceny"];
+const HEADER = ["Osoba", "Stanowisko", "Komórka", "Oceniający", "Stan procesu", "Termin oceny", "Termin sprzeciwu", "Data ostatniej oceny", "Wynik ostatniej oceny"];
 
 /** Pole CSV z separatorem `;`: cudzysłów przy `;`, `"` i końcach linii, a komórka zaczynająca się od `=`, `+`, `-`, `@` nie jest formułą w arkuszu. */
 function field(v: string): string {
@@ -22,6 +24,10 @@ app.get("/hr/export.csv", (c) => {
   const rows = latestCycles().map((cycle) => {
     const person = personById(cycle.person_id);
     const state = cycleState(cycle.id);
+    const latest = assessmentState(cycle.id);
+    const previous = !latest.snapshot ? previousCycleOf(cycle.id) : null;
+    const deadline = latest.snapshot?.deadline ?? effectiveDeadline(cycle.id);
+    const objection = latest.objectionDeadline ?? (previous ? assessmentState(previous.id).objectionDeadline : null);
     const last = lastAssessmentOf(cycle.person_id);
     return [
       person?.name ?? cycle.person_id,
@@ -29,7 +35,8 @@ app.get("/hr/export.csv", (c) => {
       person?.unit ?? "",
       personById(cycle.appraiser_id)?.name ?? cycle.appraiser_id,
       state.text,
-      state.deadline ? formatDate(state.deadline.date) : "",
+      formatDate(deadline.date),
+      objection ? formatDate(objection) : "",
       last ? formatDate(last.on) : "",
       last?.outcome ? OUTCOME_LABEL[last.outcome] : "",
     ];
