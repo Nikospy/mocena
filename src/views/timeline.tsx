@@ -1,3 +1,4 @@
+import type { CycleLink } from "../cycle-links";
 import type { Person } from "../people";
 import type { TimelineEntry } from "../timeline";
 import { LegalBasis, RulesVersion } from "./components";
@@ -12,13 +13,21 @@ export function TimelineView(props: {
   rulesVersion: { version: string; effectiveFrom: string };
   notice?: string;
   canAddAbsence: boolean;
+  links?: CycleLink[];
 }) {
   return (
     <Layout title={`Oś czasu: ${props.personName}`} person={props.viewer} today={props.today}>
       <section class="card hdr slim" aria-label="Cykl oceny">
-        <div class="hdr-id">
-          <p class="cap">Oś czasu cyklu oceny</p>
-          <h1>{props.personName}</h1>
+        <div class="hdr-top">
+          <div class="hdr-id">
+            <p class="cap">Oś czasu cyklu oceny</p>
+            <h1>{props.personName}</h1>
+          </div>
+          {props.links?.length ? (
+            <div class="hdr-links">
+              {props.links.map((l) => <a class="btn text" href={l.href}>{l.label}</a>)}
+            </div>
+          ) : null}
         </div>
       </section>
       {props.notice ? (

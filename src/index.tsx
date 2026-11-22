@@ -2,7 +2,7 @@ import { Hono, type NotFoundHandler } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { getDb } from "./db";
 import { runSeed } from "./seed";
-import { homeTasks } from "./home-tasks";
+import { homeOptions, homeTasks } from "./home-tasks";
 import { PERSON_COOKIE, currentPerson, personById, roleLabel, type Person } from "./people";
 import { today } from "./settings";
 import cycleStart from "./routes/cycle-start";
@@ -73,6 +73,7 @@ app.get("/", (c) => {
   const person = currentPerson(c);
   if (!person) return c.html(<TourEntry />);
   const tasks = homeTasks(person);
+  const options = homeOptions(person);
   return c.html(
     <Layout title="Start" person={person} today={today()}>
       <section>
@@ -113,6 +114,24 @@ app.get("/", (c) => {
           </ul>
         )}
       </section>
+      {options.length ? (
+        <section aria-labelledby="h-options">
+          <div class="list-h">
+            <h2 id="h-options">Twoje możliwości</h2>
+          </div>
+          <ul class="tasks">
+            {options.map((t) => (
+              <li class="card task">
+                <div class="task-main">
+                  <h3>{t.heading ?? t.title}</h3>
+                  {t.detail ? <p class="cap">{t.detail}</p> : null}
+                </div>
+                <a class="btn" href={t.href}>{t.action ?? "Otwórz"}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </Layout>,
   );
 });
