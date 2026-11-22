@@ -48,6 +48,14 @@ Prawo i dostępność
 - **L4** Każdy ekran ma jeden widoczny `h1` (`h1Count` = 1; dziś arkusz przy 1440 ma 0).
 - Bez zmian muszą zostać: kontrast (`contrastFails` = 0), etykiety pól (`unlabeled` = 0).
 
+Stany i ekrany, których pierwszy przegląd nie objął (autor: „co jeszcze pominąłeś?”)
+- **F1 Kontrolki.** Jedna wysokość pól i przycisków (48 px) i trzy postaci przycisku: wypełniony (akcja główna), z obrysem (drugorzędna), tekstowy. Małe pigułkowe przyciski („Szukaj”, „Dodaj pracownika”, „Edytuj”, „Historia ocen”, sortowanie w kadrach) znikają. Pasek akcji przyklejony do dołu zostaje tylko na telefonie; na komputerze przycisk stoi w przepływie formularza i nie zasłania pól (dziś „Zapisz notatkę” leży na żetonach kryteriów).
+- **F2 Stany formularzy.** Błąd walidacji: podsumowanie błędów nad formularzem z odnośnikami do pól i komunikat przy polu (wzór GOV.UK error summary i error message), pola zachowują wpisane wartości. Stan pusty i komunikat sukcesu w tym samym języku wizualnym. Dodaj do pomiaru zrzuty po wysłaniu pustego formularza notatki, nieobecności i oceny.
+- **F3 Tryb pokazu.** To główna ścieżka jury. Dodaj do pomiaru każdy krok pokazu z włączonym panelem przewodnika (360 i 1440) i doprowadź panel do tych samych reguł (pismo, przyciski, brak cienia poza samą warstwą panelu, nic nie zasłania treści).
+- **F4 Pierwsze wrażenie.** Ekran wyboru konta (`/account`) i wejście do pokazu (`/tour`): hierarchia, jedna akcja główna, role jako zwykły tekst albo stan.
+- **F5 Ekrany spoza pokazu.** Przejdź wszystkie trasy GET (`/hr/people/new`, edycja pracownika, `/hr/substitutions`, historia ocen, zaproszenia, docenienie, informacja zwrotna, zmiana terminu, fikcja zapoznania, `/admin/suggestion-sources`, strona błędu) i sprawdź na zrzutach, że używają tych samych wzorców nagłówka, kontrolek i odstępów.
+- **F6 Szerokości i klawiatura.** Zrzuty przy 768 i 1024 px dla strony głównej, oceny i kadr (układ nie może się rozsypać między telefonem a komputerem). Fokus klawiatury widoczny na każdej kontrolce (zrzut po kilku naciśnięciach Tab).
+
 Z zewnętrznego audytu
 - W trybie pokazu (`/tour`, kolejne kroki) wokół nagłówka pojawia się czarna ramka: `public/tour.js` ustawia fokus na `h1`. Odtwórz na zrzucie w trybie pokazu i usuń ramkę (fokus zostaje dla czytników).
 - Panel pokazu na komputerze zasłania tabelę kadr. Treść ma się mieścić obok panelu albo panel ma się zwijać.
@@ -60,7 +68,8 @@ Z zewnętrznego audytu
 2. Nagłówek strony i hierarchia (H1, U3), akcja główna i strona główna (H2).
 3. Ramki i notatki (K1), pigułki i podstawy prawne (K3).
 4. Układ szerokiego ekranu (U1), pasek pokazu i telefon (K6, H3, K4).
-5. Kadry (K5), drobne (L2, L3, L4), tryb pokazu, stopka.
+5. Kadry (K5), kontrolki i stany formularzy (F1, F2), drobne (L2, L3, L4), stopka.
+6. Tryb pokazu i pierwsze wrażenie (F3, F4), ekrany spoza pokazu (F5), szerokości pośrednie i fokus (F6).
 
 Po każdej grupie: pomiar, obejrzenie zrzutów, `bun test`, commit.
 
