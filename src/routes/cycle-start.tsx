@@ -8,7 +8,7 @@ import { criteriaTalkDeadline } from "../engine/deadlines";
 import { rules } from "../engine/rules";
 import { selectableCriteria, type Sheet } from "../engine/scoring";
 import { visibleEvents } from "../events";
-import { registerHomeTasks } from "../home-tasks";
+import { registerHomeTasks, type HomeTask } from "../home-tasks";
 import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
 import { suggestCriteria } from "../suggestions";
@@ -27,7 +27,7 @@ registerCycleLinks((cycle, person) =>
 );
 
 registerHomeTasks((person) => {
-  const tasks: { title: string; href: string; detail?: string }[] = [];
+  const tasks: HomeTask[] = [];
   if (person.role === "appraiser") {
     for (const personId of appraiseeIds(person.id)) {
       const cycle = openCycle(personId);
@@ -38,6 +38,7 @@ registerHomeTasks((person) => {
           title: `Część I czeka na potwierdzenie ${waitingDaysText(waitingDays ?? 0)}`,
           detail: `Pracownik: ${personById(cycle.person_id)?.name}`,
           href: `/cycles/${cycle.id}/part1`,
+          action: "Otwórz część I",
         });
       }
       if (state !== "not_started" && state !== "draft") continue;
@@ -47,13 +48,18 @@ registerHomeTasks((person) => {
       const basis = negative ? rules.deadlines.criteriaTalkAfterNegativeDays.basis : rules.deadlines.criteriaTalkDays.basis;
       tasks.push({
         title: `Wyznacz kryteria oceny: ${personById(cycle.person_id)?.name}, do ${formatDate(due)} (${basis})`,
+        heading: "Wyznacz kryteria oceny",
+        person: personById(cycle.person_id)?.name,
+        due,
+        basis,
+        action: "Wyznacz kryteria",
         href: `/cycles/${cycle.id}/part1`,
       });
     }
   }
   const own = openCycle(person.id);
   if (own && part1Status(own.id).state === "submitted") {
-    tasks.push({ title: "Potwierdź część I oceny", href: `/cycles/${own.id}/part1` });
+    tasks.push({ title: "Potwierdź część I oceny", href: `/cycles/${own.id}/part1`, action: "Przejdź do potwierdzenia" });
   }
   return tasks;
 });

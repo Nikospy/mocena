@@ -17,7 +17,10 @@ import appraiser from "./routes/appraiser";
 import "./reminders";
 import hrPartner from "./routes/hr-partner";
 import admin from "./routes/admin";
-import { Layout } from "./views/layout";
+import { Layout, formatDate } from "./views/layout";
+import { LegalBasis } from "./views/components";
+
+const ROLE_LABEL: Record<string, string> = { appraiser: "oceniający", employee: "pracownik", hr: "kadry", admin: "administrator" };
 
 const app = new Hono();
 
@@ -33,22 +36,26 @@ function accounts() {
 function AccountScreen(props: { error?: string }) {
   return (
     <Layout title="Wybór konta" person={null} today={today()}>
-      <section class="card account-list">
-        <h1>Wybierz konto pokazowe</h1>
-        {props.error ? <p class="req" role="alert">{props.error}</p> : null}
+      <section class="account-list">
+        <div class="list-h">
+          <h1>Wybierz konto pokazowe</h1>
+          <p class="cap">Każde konto pokazuje ekrany jednej osoby w cyklu oceny.</p>
+        </div>
+        {props.error ? <p class="st bad" role="alert">{props.error}</p> : null}
         <form method="post" action="/account">
-          <ul class="plain-list">
+          <ul class="acc-grid">
             {accounts().map((a) => (
               <li>
-                <button class="btn" type="submit" name="person_id" value={a.id}>
-                  {a.name}
+                <button class="card acc" type="submit" name="person_id" value={a.id}>
+                  <b>{a.name}</b>
+                  <span class="cap">{a.position_title ?? ROLE_LABEL[a.role] ?? a.role}</span>
+                  <span class="acc-role">{ROLE_LABEL[a.role] ?? a.role}</span>
                 </button>
-                <p class="cap">{a.position_title ?? a.role}</p>
               </li>
             ))}
           </ul>
         </form>
-        <form method="post" action="/demo/restart">
+        <form method="post" action="/demo/restart" class="again">
           <button class="btn text" type="submit">Zacznij pokaz od nowa</button>
         </form>
       </section>
@@ -62,16 +69,27 @@ app.get("/", (c) => {
   const tasks = homeTasks(person);
   return c.html(
     <Layout title="Start" person={person} today={today()}>
-      <section class="card">
-        <h1>Sprawy do załatwienia</h1>
+      <section>
+        <div class="list-h">
+          <h1>Sprawy do załatwienia</h1>
+        </div>
         {tasks.length === 0 ? (
-          <p>Brak spraw do załatwienia.</p>
+          <p class="card">Brak spraw do załatwienia.</p>
         ) : (
-          <ul class="plain-list">
+          <ul class="tasks">
             {tasks.map((t) => (
-              <li>
-                <a href={t.href}>{t.title}</a>
-                {t.detail ? <p class="cap">{t.detail}</p> : null}
+              <li class="card task">
+                <div class="task-main">
+                  <h2>{t.heading ?? t.title}</h2>
+                  {t.person ? <p>{t.person}</p> : null}
+                  {t.detail ? <p class="cap">{t.detail}</p> : null}
+                  {t.due ? (
+                    <p class="task-due">
+                      do <b>{formatDate(t.due)}</b> {t.basis ? <LegalBasis basis={t.basis} /> : null}
+                    </p>
+                  ) : null}
+                </div>
+                <a class="btn primary" href={t.href}>{t.action ?? "Otwórz"}</a>
               </li>
             ))}
           </ul>
