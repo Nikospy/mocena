@@ -70,8 +70,8 @@ const BODY: Record<TourStopId, Body> = {
     short: "ocena",
     lead: "Joanna wpisuje dwie nieobecności Piotra rozdzielone weekendem. System liczy je jako jedną, dłuższą niż miesiąc, i sam przesuwa termin oceny.",
     look: [
-      { text: "Jedna ciągła nieobecność od 05.10 do 06.11.2026.", selector: 'section[aria-labelledby="h-abs"]' },
-      { text: "Nowy termin oceny z przepisem.", selector: ".rule" },
+      { text: "Jedna ciągła nieobecność od 05.10 do 06.11.2026.", selector: ".abs-merged" },
+      { text: "Nowy termin oceny z przepisem.", selector: ".abs-sum" },
       { text: "Na osi czasu kropka pełna to przepis, a pusta to wpis człowieka." },
     ],
     tryIt: "Wpisz 05.10–16.10.2026 i 19.10–06.11.2026, potem otwórz oś czasu.",

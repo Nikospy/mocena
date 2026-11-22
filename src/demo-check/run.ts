@@ -244,6 +244,10 @@ const steps: Step[] = [
       includes(absences[0], "06.11.2026", "koniec nieobecności 06.11.2026");
       includes(hr.html, `datetime="${expected.deadline}"`, `nowy termin oceny ${fmt(expected.deadline)} z silnika`);
       includes(hr.html, fmt(expected.base), `dawny termin ${fmt(expected.base)}`);
+      const screen = await s.get(`/cycles/${ctx.cycleId}/absences`);
+      includes(screen.html, 'class="rule abs-sum"', "ekran nieobecności: karta terminu z regułą");
+      includes(screen.html, `Liczone jako jedna: 05.10.2026–06.11.2026`, "ekran nieobecności: scalona nieobecność");
+      includes(screen.html, fmt(expected.deadline), `ekran nieobecności: nowy termin ${fmt(expected.deadline)}`);
       await s.login("piotr");
       const own = await s.get(`/cycles/${ctx.cycleId}/timeline`);
       includes(own.html, `datetime="${expected.deadline}"`, `nowy termin oceny ${fmt(expected.deadline)} u Piotra`);

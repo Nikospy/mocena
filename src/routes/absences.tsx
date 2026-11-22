@@ -1,11 +1,11 @@
 import { Hono, type Context } from "hono";
-import { visibleCycleById, effectiveDeadline, openCycle, visibleAbsences, type Cycle } from "../cycles";
+import { visibleCycleById, effectiveDeadline, cycleDeadlineDetails, openCycle, visibleAbsences, type Cycle } from "../cycles";
 import { addDays } from "../engine/deadlines";
 import { getDb } from "../db";
 import { recordEvent, visibleEvents } from "../events";
 import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
-import { AbsenceFormView, type AbsenceFormValues } from "../views/absence-form";
+import { AbsenceFormView, type AbsenceFormValues, type AbsenceSummary } from "../views/absence-form";
 import { errorPage } from "../views/error-page";
 
 const app = new Hono();
@@ -40,9 +40,24 @@ function render(c: Context, cx: Ctx, values: AbsenceFormValues, errors: Partial<
       values={values}
       errors={errors}
       absences={visibleAbsences(cx.cycle.person_id)}
+      summary={isOpen(cx.cycle) ? summaryOf(cx.cycle) : null}
     />,
     status,
   );
+}
+
+/** Podsumowanie z silnika: scalone nieobecności i termin oceny po nich (art. 81 ust. 7 ustawy). */
+function summaryOf(cycle: Cycle): AbsenceSummary | null {
+  const d = cycleDeadlineDetails(cycle.id);
+  if (d.merged.length === 0) return null;
+  return {
+    merged: d.merged.map((m) => ({ from: m.from, to: m.to, days: m.days, parts: m.parts.length, counted: m.counted, longerThanMonth: m.longerThanMonth })),
+    afterNegative: d.kind === "after_negative",
+    deadline: d.deadline,
+    previous: d.extensionDays > 0 ? d.base : null,
+    extensionDays: d.extensionDays,
+    basis: d.basis,
+  };
 }
 
 const closed = (c: Context) => errorPage(c, "Cykl jest zamknięty. Nieobecność wpisuje się tylko w otwartym cyklu.", 409);
