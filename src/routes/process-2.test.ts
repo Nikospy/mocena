@@ -83,3 +83,23 @@ describe("proces 2: korekta błędów w zatwierdzonym arkuszu przez administrato
     expect(db.query("SELECT COUNT(*) AS n FROM events WHERE type = 'sheet_corrected'").get()).toEqual({ n: 0 });
   });
 });
+
+describe("proces 2: część rozwojowa na karcie rozmowy oceniającej", () => {
+  test("cytaty z notatek Marka według jego pola „dobrze / do poprawy”, pogrupowane po kryteriach, bez etykiet przy nazwisku", async () => {
+    const { app, db } = createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } });
+    const h = await html(app, "marek", "/cycles/cycle-piotr/cards/assessment-conversation");
+    const dev = h.slice(h.indexOf('id="h-dev"'));
+    const good = dev.slice(dev.indexOf("Co szło dobrze"), dev.indexOf("Co do poprawy"));
+    const bad = dev.slice(dev.indexOf("Co do poprawy"));
+    const notes = db.query("SELECT text, rating FROM notes WHERE subject_id = 'piotr' AND author_id = 'marek' AND rating IS NOT NULL").all() as { text: string; rating: string }[];
+    expect(notes.length).toBeGreaterThan(3);
+    for (const n of notes) {
+      expect(n.rating === "good" ? good : bad).toContain(`„${n.text}”`);
+      expect(n.rating === "good" ? bad : good).not.toContain(n.text);
+    }
+    expect(good).toContain("<h4>Współpraca</h4>");
+    expect(bad).toContain("<h4>Rzetelność</h4>");
+    expect(dev).not.toMatch(/punkt(y|ów)? \d|\d+ pkt/);
+    expect((await call(app, "piotr", "/cycles/cycle-piotr/cards/assessment-conversation")).status).toBe(403);
+  });
+});
