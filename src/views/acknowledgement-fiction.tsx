@@ -19,18 +19,9 @@ export function FictionView(p: FictionViewProps) {
   return (
     <Layout title="Fikcja zapoznania" person={p.viewer} today={p.today}>
       <PageHeader context="Ocena okresowa · zapoznanie" title={<>Stwierdzenie fikcji zapoznania: {p.person.name}</>} />
+      <div class="o-grid">
+        <div class="o-main">
       <section class="card b-sec">
-        <div class="st info">
-          <div>
-            <b>
-              Urząd przyjmuje dzisiejszy dzień jako dzień zapoznania. Od dziś system liczy {rules.deadlines.objectionDays.value} dni na sprzeciw.
-            </b>
-            <small>
-              Koniec terminu na sprzeciw: {formatDate(p.deadline)} <LegalBasis basis={rules.deadlines.objectionDays.basis} />
-            </small>
-            <small>Kadry zobaczą ten wpis.</small>
-          </div>
-        </div>
         {p.errors?.length ? (
           <div class="st bad" role="alert">
             <ul>{p.errors.map((e) => <li>{e}</li>)}</ul>
@@ -63,14 +54,24 @@ export function FictionView(p: FictionViewProps) {
               <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Pocztą elektroniczną</span>
             </label>
           </div>
-          <label class="lbl" for="deliveredOn">Kiedy</label>
+          <label class="lbl" for="deliveredOn">Data doręczenia kopii arkusza</label>
           <input class="area date-field" type="date" id="deliveredOn" name="deliveredOn" min={p.approvedOn} max={p.today} value={v.deliveredOn} />
           <div class="btns">
-            <button type="submit" class="btn primary">Zapisz wpis</button>
+            <button type="submit" class="btn primary">Zapisz fikcję zapoznania</button>
             <a class="btn" href={`/cycles/${p.cycleId}/assessment`}>Wróć bez zapisu</a>
           </div>
         </form>
       </section>
+        </div>
+        <aside class="side first" aria-label="Skutek wpisu">
+          <section class="rule">
+            <p class="voice rule-v"><span class="pg" aria-hidden="true">§</span><span><b>Skutek wpisu</b> · z przepisu</span></p>
+            <p>Urząd przyjmuje dzisiejszy dzień jako dzień zapoznania. Od dziś system liczy {rules.deadlines.objectionDays.value} dni na sprzeciw.</p>
+            <p>Koniec terminu na sprzeciw: <b>{formatDate(p.deadline)}</b> <LegalBasis basis={rules.deadlines.objectionDays.basis} /></p>
+            <p class="cap">Kadry zobaczą ten wpis.</p>
+          </section>
+        </aside>
+      </div>
     </Layout>
   );
 }

@@ -25,11 +25,7 @@ export function assessmentSlots(p: { cycleId: string; viewer: Person }): Slots {
   const windowMonths = officeSettings().recentFactsWindowMonths;
 
   return {
-    beforeForm: (
-      <p>
-        <a class="btn text" href={`/cycles/${p.cycleId}/cards/assessment-conversation`}>Karta rozmowy oceniającej</a>
-      </p>
-    ),
+    headerLinks: <a href={`/cycles/${p.cycleId}/cards/assessment-conversation`}>Karta rozmowy oceniającej</a>,
     criterionAside: (criterionId) => {
       const own = byCriterion(criterionId);
       return <CriterionNotes criterionId={criterionId} notes={own} warnings={criterionWarnings({ notes: own, score: scores[criterionId], today: now, windowMonths })} />;

@@ -2,11 +2,11 @@
   "intro": "Prototyp działa na regułach. W tych sześciu miejscach urząd może włączyć model uruchomiony u siebie jako wsparcie w tle.",
   "places": [
     { "place": "zapis notatki", "model": "wstępnie zaznacza pole „Zmiana zadań pracownika”", "prototype": "działa na liście słów" },
-    { "place": "zapis notatki", "model": "ostrzega, że notatka zawiera dane o zdrowiu", "prototype": "tylko pokazane jako miejsce" },
-    { "place": "zapis notatki", "model": "podpowiada kryterium, którego notatka dotyczy", "prototype": "tylko pokazane jako miejsce" },
-    { "place": "zapis notatki", "model": "„podobna notatka już jest”", "prototype": "tylko pokazane jako miejsce" },
+    { "place": "zapis notatki", "model": "ostrzega, że notatka zawiera dane o zdrowiu", "prototype": "jeszcze nie działa, to tylko miejsce na model" },
+    { "place": "zapis notatki", "model": "podpowiada kryterium, którego notatka dotyczy", "prototype": "jeszcze nie działa, to tylko miejsce na model" },
+    { "place": "zapis notatki", "model": "ostrzega, że podobna notatka już jest", "prototype": "jeszcze nie działa, to tylko miejsce na model" },
     { "place": "karta rozmowy", "model": "dopasowuje formę rozwoju z katalogu", "prototype": "działa na katalogu form rozwoju" },
-    { "place": "uzasadnienie oceny", "model": "wskazuje zbyt trudne zdania, niczego nie przepisuje", "prototype": "tylko pokazane jako miejsce" }
+    { "place": "uzasadnienie oceny", "model": "wskazuje zbyt trudne zdania, niczego nie przepisuje", "prototype": "jeszcze nie działa, to tylko miejsce na model" }
   ],
   "never": [
     "nie proponuje punktów",
@@ -17,7 +17,7 @@
   "conditions": [
     "model tylko przygotowuje albo porządkuje",
     "wynik to pozycja z zamkniętej listy albo wskazanie fragmentu",
-    "przełożony poprawia jednym dotknięciem",
+    "przełożony poprawia jednym kliknięciem",
     "ekran działa także bez modelu",
     "do modelu nie trafiają nazwiska"
   ],

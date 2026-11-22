@@ -7,9 +7,8 @@ export function rulesVersion(): { version: string; effectiveFrom: string; act: s
   return { version: data.version, effectiveFrom: data.effectiveFrom, act: data.source.act };
 }
 
-/** „Zasady z rozporządzenia z 2016 r., wersja 1”: opis wersji dla człowieka; identyfikator „2016-470/1” zostaje w `title`. */
+/** „Wersja reguł 1”: opis wersji dla człowieka; identyfikator „2016-470/1” zostaje w `title`, data obowiązywania dokleja się w widoku. */
 export function rulesVersionLabel(version: string): string {
-  const [year, rest = ""] = version.split("-");
-  const n = rest.split("/")[1] ?? "";
-  return `Zasady z rozporządzenia z ${year} r., wersja ${n}`;
+  const n = version.split("-")[1]?.split("/")[1] ?? "";
+  return `Wersja reguł ${n}`;
 }
