@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import { Window } from "happy-dom";
 import { createTestApp } from "../test-helpers";
+import { stopById } from "../tour/stops";
 import { TOUR_STOP_IDS } from "../tour/state";
 
 function cookies(res: Response): string {
@@ -52,6 +54,24 @@ describe("przewodnik pokazu", () => {
     expect(text).toContain('action="/tour/5"');
     expect(text).toContain('src="/tour.js"');
     expect(text).not.toContain('action="/demo/date"');
+  });
+
+  test("przystanki wskazują widoczny termin i notatki przy kryteriach", async () => {
+    const { app } = createTestApp();
+    const window = new Window();
+    for (const [id, expected] of [["1", "Termin oceny"], ["4", "Notatki:"]]) {
+      const res = await post(app, `/tour/${id}`);
+      const page = await html(app, res.headers.get("location")!, cookies(res));
+      window.document.body.innerHTML = page.text;
+      const look = stopById(id)!.look[0];
+      const element = window.document.querySelector(`main ${look.selector}`)!;
+      expect(id === "1" ? element.textContent : element.getAttribute("aria-label")).toContain(expected);
+      if (id === "4") expect(element.querySelector("input[data-insert]")).not.toBeNull();
+    }
+    const note = await post(app, "/tour/2");
+    const page = await html(app, note.headers.get("location")!, cookies(note));
+    expect(page.text).not.toContain("§ 9 ust. 1");
+    await window.close();
   });
 
   test("zwykły ekran bez ciasteczka nie ma karty ani skryptu", async () => {
