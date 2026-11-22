@@ -1,6 +1,7 @@
 import rulesJson from "../../rules/regulation-2016-470.json";
 import { CODE_LICENSE } from "../content";
 import type { Person } from "../people";
+import { PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
 /** Treść strony „Wdrożenie i dane”: tylko fakty z repo (README, tech-stack, decisions, plik reguł). */
@@ -8,10 +9,7 @@ export function AboutPage(props: { person: Person | null; today: string }) {
   return (
     <Layout title="Wdrożenie i dane" person={props.person} today={props.today}>
       <section class="n-state">
-        <div class="list-h">
-          <h1>Wdrożenie i dane</h1>
-          <p class="cap">Jak uruchomić mOcenę w urzędzie, jakie dane przetwarza, kto je widzi i czego w prototypie nie ma.</p>
-        </div>
+        <PageHeader title="Wdrożenie i dane" lead="Jak uruchomić mOcenę w urzędzie, jakie dane przetwarza, kto je widzi i czego w prototypie nie ma." />
 
         <section class="card">
           <h2>Uruchomienie u siebie</h2>

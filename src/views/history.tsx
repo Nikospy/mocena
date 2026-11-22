@@ -1,7 +1,7 @@
 import { OUTCOME_LABEL, type PreviousAssessment } from "../hr/people";
 import type { HistoryEntry } from "../hr/history";
 import type { Person } from "../people";
-import { RulesVersion } from "./components";
+import { RulesVersion, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
 type Entry = HistoryEntry & { canOpenSheet: boolean };
@@ -29,7 +29,7 @@ export function HistoryList(props: { entries: Entry[] }) {
                 : "Zapoznanie jeszcze niepotwierdzone"}
               {" · "}<RulesVersion version={h.rulesVersion.version} effectiveFrom={h.rulesVersion.effectiveFrom} />
             </p>
-            {h.canOpenSheet ? <a class="btn link-chip" href={`/cycles/${h.cycleId}/sheet`}>Arkusz</a> : null}
+            {h.canOpenSheet ? <a href={`/cycles/${h.cycleId}/sheet`}>Arkusz</a> : null}
           </li>
         );
       })}
@@ -41,10 +41,7 @@ export function HistoryView(props: { viewer: Person; today: string; person: Pers
   const previous = props.previous ?? [];
   return (
     <Layout title="Historia ocen" person={props.viewer} today={props.today}>
-      <section class="card hdr slim">
-        <h1>Historia ocen</h1>
-        <p class="cap">Osoba: {props.person.name}</p>
-      </section>
+      <PageHeader context={props.person.name} title="Historia ocen" />
       {props.entries.length > 0 || previous.length === 0 ? <HistoryList entries={props.entries} /> : null}
       {previous.length > 0 ? (
         <section aria-labelledby="h-prev">

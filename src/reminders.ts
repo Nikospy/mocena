@@ -2,7 +2,6 @@ import { assessmentState } from "./assessment/state";
 import { cycleDeadlineDetails, openCycle, type Cycle } from "./cycles";
 import { shiftedDeadlineSentence } from "./deadline-shift";
 import { getDb } from "./db";
-import { dueWords } from "./due-words";
 import { addDays } from "./engine/deadlines";
 import { registerHomeTasks, type HomeTask } from "./home-tasks";
 import { assessmentWindowDays } from "./office-settings";
@@ -33,7 +32,8 @@ registerHomeTasks((person) => {
     tasks.push({
       title: own ? `Twój termin oceny: ${formatDate(d.deadline)}` : `Termin oceny ${name}: ${formatDate(d.deadline)}`,
       href: `/cycles/${c.id}/timeline`,
-      detail: `${dueWords(d.deadline, now) ? `${dueWords(d.deadline, now)} ` : ""}${d.basis.join("; ")}. Przypomnienie na ${window} dni przed terminem: ${label}.`,
+      detail: `${d.basis.join("; ")}. Przypomnienie na ${window} dni przed terminem: ${label}.`,
+      due: d.deadline,
     });
   }
   return tasks;

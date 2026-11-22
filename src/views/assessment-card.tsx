@@ -2,7 +2,7 @@ import type { Child } from "hono/jsx";
 import type { Card } from "../content";
 import type { DevelopmentGroup, DevelopmentSummary } from "../notes/development";
 import type { Person } from "../people";
-import { LegalBasis } from "./components";
+import { LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 import { WarnIco } from "./assessment";
 
@@ -19,11 +19,7 @@ export function AssessmentCardView(props: {
   const { questions, hardSituations } = props.card;
   return (
     <Layout title="Karta rozmowy oceniającej" person={props.viewer} today={props.today}>
-      <section class="card hdr">
-        <p class="voice src">Karta rozmowy</p>
-        <h1>{props.card.title}</h1>
-        <p class="cap">{props.card.purpose}</p>
-      </section>
+      <PageHeader context="Karta rozmowy" title={props.card.title} lead={props.card.purpose} />
       <section class="rule">
         <p class="voice rule-v"><span class="pg" aria-hidden="true">§</span><span><b>Tematy rozmowy</b> · z przepisu</span></p>
         <ol class="b-ol">{props.topics.map((t) => <li>{t}</li>)}</ol>

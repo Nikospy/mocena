@@ -4,7 +4,7 @@ import type { Person } from "../people";
 import type { Card } from "../content";
 import { officeSettings } from "../office-settings";
 import { criterion } from "../engine/scoring";
-import { ConfirmationBlock, LegalBasis } from "./components";
+import { ConfirmationBlock, LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
 export type Part1ViewProps = {
@@ -110,20 +110,13 @@ export function Part1View(p: Part1ViewProps) {
   );
   return (
     <Layout title="Część I oceny" person={p.viewer} today={p.today}>
-      <section class="card hdr" aria-label="Cykl oceny">
-        <div class={p.links.length > 3 ? "hdr-top many" : "hdr-top"}>
-          <div class="hdr-id">
-            <p class="cap">Część I oceny · arkusz {p.sheet} <LegalBasis basis={p.sheetBasis} /></p>
-            <h1>{p.employeeName}</h1>
-          </div>
-          {p.links.length ? (
-            <div class="hdr-links">
-              {p.links.map((l) => <a class="btn text" href={l.href}>{l.label}</a>)}
-            </div>
-          ) : null}
-        </div>
-        <Steps current={stepIdx} />
-      </section>
+      <PageHeader
+        context={<>Ocena okresowa · arkusz {p.sheet} <LegalBasis basis={p.sheetBasis} /></>}
+        title={<>Część I oceny: {p.employeeName}</>}
+        linksLabel="Cykl oceny"
+        links={p.links.length ? p.links.map((l) => <a href={l.href}>{l.label}</a>) : undefined}
+      />
+      <Steps current={stepIdx} />
 
       <section class="rule">
         <p class="voice rule-v">Reguła · {p.deadline.label}</p>
@@ -211,18 +204,12 @@ export function OpeningCardView(props: {
   const { questions, hardSituations } = props.card;
   return (
     <Layout title="Karta rozmowy rozpoczynającej" person={props.viewer} today={props.today}>
-      <section class="card hdr">
-        <div class="hdr-top">
-          <div class="hdr-id">
-            <p class="cap">Karta rozmowy</p>
-            <h1>{props.card.title}</h1>
-            <p>{props.card.purpose}</p>
-          </div>
-          <div class="hdr-links">
-            <a class="btn text" href={`/cycles/${props.cycleId}/part1`}>Wróć do części I</a>
-          </div>
-        </div>
-      </section>
+      <PageHeader
+        context="Karta rozmowy"
+        title={props.card.title}
+        lead={props.card.purpose}
+        links={<a href={`/cycles/${props.cycleId}/part1`}>Wróć do części I</a>}
+      />
       <section class="rule">
         <p class="voice rule-v">Reguła · Tematy rozmowy <LegalBasis basis={props.basis} /></p>
         <ol class="topics">{props.topics.map((t) => <li>{t}</li>)}</ol>

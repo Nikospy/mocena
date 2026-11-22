@@ -1,4 +1,5 @@
 import type { Note } from "../notes/repo";
+import { PageHeader } from "./components";
 import type { Person } from "../people";
 import { Layout, formatDate } from "./layout";
 import { criterion } from "../engine/scoring";
@@ -8,7 +9,7 @@ export function FeedbackFormView(props: { viewer: Person; subject: Person; note:
   return (
     <Layout title="Przekaż pracownikowi" person={props.viewer} today={props.today}>
       <section class="enter">
-        <h1 class="n-title">Przekaż pracownikowi: {props.subject.name}</h1>
+        <PageHeader title={<>Przekaż pracownikowi: {props.subject.name}</>} />
         <div class="card fb-src">
           <p class="note-meta-c"><b>{formatDate(props.note.date)}</b><span>{name}</span></p>
           <p class="note-text">{props.note.text}</p>

@@ -269,12 +269,12 @@ describe("lista spraw, odnośniki, etykiety", () => {
     expect(edit).toContain('id="assessment-result"');
     expect(outside(edit)).not.toMatch(/Ocena (negatywna|pozytywna)|średnia|6,14/);
     const header = /<h1>[^<]*<\/h1>/.exec(edit)![0];
-    expect(header).toBe("<h1>Piotr Wójcik</h1>");
+    expect(header).toBe("<h1>Ocena okresowa: Piotr Wójcik</h1>");
     await approvePiotr(app);
     const view = await (await call(app, "piotr", `/cycles/${piotr}/assessment`)).text();
     expect(outside(view)).not.toMatch(/Ocena (negatywna|pozytywna)|6,14/);
     const home = await (await call(app, "marek", "/")).text();
-    expect(home).toContain("<h2>Czeka na potwierdzenie zapoznania: Piotr Wójcik</h2>");
+    expect(home).toMatch(/<h2><a class="task-link" href="[^"]+">Czeka na potwierdzenie zapoznania: Piotr Wójcik<\/a><\/h2>/);
     expect(home).toContain('href="/cycles/cycle-piotr/assessment"');
     expect(home).not.toMatch(/Ocena (negatywna|pozytywna)|6,14/);
     const part1 = await (await call(app, "marek", `/cycles/${piotr}/part1`)).text();
@@ -401,7 +401,7 @@ describe("S-04: notatki w formularzu oceny", () => {
     const app = fresh();
     const html = await (await call(app, "marek", `/cycles/${piotr}/assessment`)).text();
     expect(html).toContain("Notatka z 04.08.2025: „Interesant dzwonił");
-    expect(html).toContain("<h1>Piotr Wójcik</h1>");
+    expect(html).toContain("<h1>Ocena okresowa: Piotr Wójcik</h1>");
     expect(html).toContain('data-target="developmentConclusions"');
     expect(html.match(/Wszystkie notatki przy tym kryterium są z ostatniego miesiąca/g)).toHaveLength(1);
     const think = html.slice(html.indexOf('data-crit="myslenie-analityczne"'));

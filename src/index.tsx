@@ -2,7 +2,6 @@ import { Hono, type NotFoundHandler } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { getDb } from "./db";
 import { runSeed } from "./seed";
-import { dueWords } from "./due-words";
 import { homeOptions, homeTasks } from "./home-tasks";
 import { PERSON_COOKIE, currentPerson, personById, roleLabel, type Person } from "./people";
 import { today } from "./settings";
@@ -29,7 +28,7 @@ import { TourEntry } from "./views/tour-entry";
 import { Layout, formatDate } from "./views/layout";
 import { NotFoundPage, ServerErrorPage } from "./views/error-page";
 import { AboutPage } from "./views/about";
-import { LegalBasis } from "./views/components";
+import { LegalBasis, PageHeader } from "./views/components";
 
 const app = new Hono();
 
@@ -42,10 +41,7 @@ function AccountScreen(props: { error?: string }) {
   return (
     <Layout title="Wybór konta" person={null} today={today()}>
       <section class="account-list">
-        <div class="list-h">
-          <h1>Wybierz konto pokazowe</h1>
-          <p class="cap">Każde konto pokazuje ekrany jednej osoby w cyklu oceny.</p>
-        </div>
+        <PageHeader title="Wybierz konto pokazowe" lead="Każde konto pokazuje ekrany jednej osoby w cyklu oceny." />
         {props.error ? <p class="st bad" role="alert">{props.error}</p> : null}
         <form method="post" action="/account">
           <ul class="acc-grid">
@@ -68,6 +64,24 @@ function AccountScreen(props: { error?: string }) {
   );
 }
 
+/** Sprawy z terminem na górze (od najbliższego), potem pozostałe w kolejności dostawców. */
+function sortTasks<T extends { due?: string }>(tasks: T[]): T[] {
+  return tasks
+    .map((t, i) => ({ t, i }))
+    .sort((a, b) => (a.t.due && b.t.due ? a.t.due.localeCompare(b.t.due) : a.t.due ? -1 : b.t.due ? 1 : a.i - b.i))
+    .map((x) => x.t);
+}
+
+/** Termin słowami: „za 6 dni”, „jutro”, „dziś”, „po terminie od 3 dni”. */
+function dueWords(due: string, now: string): { text: string; late: boolean } {
+  const days = Math.round((Date.parse(due) - Date.parse(now)) / 86_400_000);
+  const n = (k: number) => (k === 1 ? "1 dzień" : `${k} dni`);
+  if (days < 0) return { text: `po terminie od ${-days === 1 ? "1 dnia" : `${-days} dni`}`, late: true };
+  if (days === 0) return { text: "termin dziś", late: false };
+  if (days === 1) return { text: "termin jutro", late: false };
+  return { text: `za ${n(days)}`, late: false };
+}
+
 app.use("*", tourContext);
 
 app.get("/", (c) => {
@@ -75,60 +89,78 @@ app.get("/", (c) => {
   if (!person) return c.html(<TourEntry />);
   const tasks = homeTasks(person);
   const options = homeOptions(person);
+  const now = today();
   return c.html(
     <Layout title="Start" person={person} today={today()}>
       <section>
-        <div class="list-h">
-          <h1>Sprawy do załatwienia</h1>
-        </div>
+        <PageHeader title="Sprawy do załatwienia" />
         {tasks.length === 0 ? (
-          <p class="card">Brak spraw do załatwienia.</p>
+          <p class="empty">Brak spraw do załatwienia.</p>
         ) : (
           <ul class="tasks">
-            {tasks.map((t) => (
-              <li class="card task">
-                <div class="task-main">
-                  <h2>{t.heading ?? t.title}</h2>
-                  {t.person ? <p>{t.person}</p> : null}
-                  {t.detail ? <p class="cap">{t.detail}</p> : null}
-                  {t.due ? (
-                    <p class="task-due">
-                      {t.due < today() ? "po terminie od" : "do"} <b>{formatDate(t.due)}</b> {t.basis ? <LegalBasis basis={t.basis} /> : null}
-                    </p>
-                  ) : null}
-                  {t.due && dueWords(t.due, today()) ? <p class="cap" role="note">{dueWords(t.due, today())}</p> : null}
-                </div>
-                {t.post || t.secondary ? (
-                  <div class="btns">
-                    <a class="btn primary" href={t.href}>{t.action ?? "Otwórz"}</a>
-                    {t.post ? (
-                      <form method="post" action={t.post.action}>
-                        <button class="btn" type="submit">{t.post.label}</button>
-                      </form>
+            {sortTasks(tasks).map((t) => {
+              const when = t.due ? dueWords(t.due, now) : null;
+              return (
+                <li class={when?.late ? "task late" : "task"}>
+                  <div class="task-main">
+                    <h2>
+                      <a class="task-link" href={t.href}>
+                        {t.heading ?? t.title}
+                      </a>
+                    </h2>
+                    {t.person ? <p class="task-person">{t.person}</p> : null}
+                    {t.detail ? <p class="task-detail">{t.detail}</p> : null}
+                    {t.post || t.secondary ? (
+                      <div class="task-more">
+                        {t.post ? (
+                          <form method="post" action={t.post.action}>
+                            <button class="btn outline" type="submit">{t.post.label}</button>
+                          </form>
+                        ) : null}
+                        {t.secondary ? <a class="btn text" href={t.secondary.href}>{t.secondary.label}</a> : null}
+                      </div>
                     ) : null}
-                    {t.secondary ? <a class="btn" href={t.secondary.href}>{t.secondary.label}</a> : null}
                   </div>
-                ) : (
-                  <a class="btn primary" href={t.href}>{t.action ?? "Otwórz"}</a>
-                )}
-              </li>
-            ))}
+                  <div class="task-side">
+                    {t.due && when ? (
+                      <p class="task-due">
+                        <b>{when.text}</b>
+                        <span>
+                          {when.late ? "termin minął" : "do"} {formatDate(t.due)} {t.basis ? <LegalBasis basis={t.basis} /> : null}
+                        </span>
+                      </p>
+                    ) : null}
+                    <span class="task-go" aria-hidden="true">
+                      {t.action ?? "Otwórz"}
+                      <svg class="ico s" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></svg>
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
       {options.length ? (
         <section aria-labelledby="h-options">
-          <div class="list-h">
-            <h2 id="h-options">Twoje możliwości</h2>
-          </div>
+          <h2 id="h-options">Twoje możliwości</h2>
           <ul class="tasks">
             {options.map((t) => (
-              <li class="card task">
+              <li class="task">
                 <div class="task-main">
-                  <h3>{t.heading ?? t.title}</h3>
-                  {t.detail ? <p class="cap">{t.detail}</p> : null}
+                  <h3>
+                    <a class="task-link" href={t.href}>
+                      {t.heading ?? t.title}
+                    </a>
+                  </h3>
+                  {t.detail ? <p class="task-detail">{t.detail}</p> : null}
                 </div>
-                <a class="btn" href={t.href}>{t.action ?? "Otwórz"}</a>
+                <div class="task-side">
+                  <span class="task-go" aria-hidden="true">
+                    {t.action ?? "Otwórz"}
+                    <svg class="ico s" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></svg>
+                  </span>
+                </div>
               </li>
             ))}
           </ul>
@@ -173,8 +205,8 @@ app.post("/demo/date", async (c) => {
     const person = currentPerson(c);
     return c.html(
       <Layout title="Data systemowa" person={person} today={today()}>
+        <PageHeader title="Nie zmieniono daty" />
         <section class="card">
-          <h1>Nie zmieniono daty</h1>
           <p class="req" role="alert">Data systemowa może tylko przesuwać się do przodu: podaj datę późniejszą niż bieżąca.</p>
           <a class="btn text" href="/">Wróć na stronę główną</a>
         </section>
