@@ -166,6 +166,6 @@ describe("przewodnik: układ i dostępność", () => {
 
     const plain = await html(app, "/account");
     expect(plain.text).toMatch(/<aside[^>]*aria-label="Pokaz"/);
-    expect(plain.text).toMatch(/Dziś: \d{1,2} \p{L}+ \d{4}/u);
+    expect(plain.text).toMatch(/dziś \d{1,2} \p{L}+ \d{4}/u);
   });
 });
