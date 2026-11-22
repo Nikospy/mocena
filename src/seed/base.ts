@@ -17,6 +17,8 @@ const people: P[] = [
   ["joanna", "Joanna Mazur", "hr", "Główny specjalista ds. kadr", null, 1],
   ["admin", "Administrator", "admin", "Administrator systemu", null, 1],
   ["poprzedni-naczelnik", "Jerzy Malinowski", "appraiser", "Były naczelnik Wydziału Organizacyjnego", null, 0],
+  ["office-head", "Irena Maj", "employee", "Kierownik urzędu", "office-head-supervisor", 0],
+  ["office-head-supervisor", "Jan Krawiec", "appraiser", "Przełożony kierownika urzędu", null, 0],
   [DEMO_DIRECTOR_GENERAL_ID, "Barbara Szymańska", "appraiser", "Dyrektor generalny urzędu", null, 1],
 ];
 

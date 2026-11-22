@@ -56,7 +56,7 @@ describe("dodawanie i edycja", () => {
     const h = await r.text();
     expect(h).toContain("Wpisz imię i nazwisko.");
     expect(h).toContain("Podaj datę zatrudnienia na czas nieokreślony albo datę i wynik ostatniej oceny");
-    expect(getDb().query("SELECT COUNT(*) AS n FROM people").get()).toEqual({ n: 11 });
+    expect(getDb().query("SELECT 1 FROM people WHERE name = ?").get("")).toBeNull();
   });
 
   test("edycja stanowiska zapisuje się", async () => {
