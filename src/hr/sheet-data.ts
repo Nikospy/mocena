@@ -19,7 +19,7 @@ export type SheetData = {
   part1: {
     appraisee: { name: string; positionTitle: string | null; unit: string | null };
     appraiser: { name: string; positionTitle: string | null; unit: string | null };
-    mandatory: { id: string; name?: string }[];
+    mandatory: { id: string }[];
     additional: { id: string; expectation: string | null }[];
     dueDate: Deadline | null;
     /** Gdy termin inny niż przekazany w części I: „Termin bieżący” (cykl otwarty) albo „Termin w dniu zatwierdzenia”. */
@@ -44,6 +44,15 @@ export type SheetData = {
     fiction: { reason: "could_not" | "would_not"; deliveryMethod: "in_person" | "post" | "email"; deliveredOn: string; date: string; appraiserName: string } | null;
     objectionTo: string;
   };
+  /** Tylko urzędnik mianowany z dołączonym wnioskiem o kolejny stopień. */
+  part3: {
+    name: string;
+    appointedYear: number | null;
+    grade: number | null;
+    gradeAwardedOn: string | null;
+    motivation: string;
+    appraiserConfirmation: Confirmation;
+  } | null;
 };
 
 /** Widzą: oceniany, oceniający cyklu, kadry. */
@@ -61,7 +70,6 @@ export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetDat
   const confirmed = ev.find((e) => e.type === "part1_confirmed");
   const st = assessmentState(cycleId);
   const snap: AssessmentSnapshot | null = st.snapshot;
-  const closing = st.acknowledgement ?? st.fiction;
 
   const sheet: string | null = snap?.sheet ?? submitted?.payload.sheet ?? cycle.sheet ?? null;
   const version = snap?.rulesVersion ?? submitted?.payload.rulesVersion ?? rulesVersion();
@@ -130,5 +138,16 @@ export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetDat
         : null,
       objectionTo: sheet === "A" ? "kierownika urzędu" : "dyrektora generalnego urzędu",
     },
+    part3:
+      appraisee.appointed === 1 && snap?.gradeRequest.attached
+        ? {
+            name: appraisee.name,
+            appointedYear: appraisee.appointed_year,
+            grade: snap.grade,
+            gradeAwardedOn: snap.gradeAwardedOn,
+            motivation: snap.gradeRequest.motivation,
+            appraiserConfirmation: snap.confirmation,
+          }
+        : null,
   };
 }

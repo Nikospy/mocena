@@ -2,7 +2,8 @@ import type { CycleLink } from "../cycle-links";
 import { addDays } from "../engine/deadlines";
 import { rules } from "../engine/rules";
 import { romanGrade, type MandatoryGrade } from "../engine/grades";
-import type { CycleState } from "../hr/cycle-state";
+import type { CycleState, CycleStep } from "../hr/cycle-state";
+import type { OfficeStats } from "../hr/stats";
 import type { Person } from "../people";
 import { LegalBasis } from "./components";
 import { Layout, formatDate } from "./layout";
@@ -42,8 +43,45 @@ export function ReminderCard(props: ReminderProps) {
             <b>Stopień {romanGrade(g.fromGrade)} → {romanGrade(g.toGrade!)}</b>
           </p>
           <p class="cap">To obowiązek, nie wniosek.</p>
+          <form method="post" action={`/hr/grades/${props.personId}`}>
+            <button class="btn primary" type="submit">
+              Odnotuj przyznanie stopnia
+            </button>
+          </form>
         </>
       )}
+    </section>
+  );
+}
+
+const STEP_LABEL: Record<CycleStep, string> = {
+  criteria_due: "Kryteria do wyznaczenia",
+  part1_waiting: "Część I czeka na potwierdzenie",
+  in_period: "Okres oceny",
+  awaiting_acknowledgement: "Ocena czeka na potwierdzenie zapoznania",
+  acknowledged: "Zapoznanie potwierdzone",
+  fiction: "Fikcja zapoznania",
+  objection_filed: "Sprzeciw wniesiony",
+  objection_resolved: "Sprzeciw rozpatrzony",
+  due_change_requested: "Wniosek o zmianę terminu",
+};
+
+/** Liczby dla całego urzędu, bez nazwisk i bez podziału na komórki. */
+export function StatsBlock(props: { stats: OfficeStats }) {
+  const s = props.stats;
+  return (
+    <section class="card" id="statystyki">
+      <h2>Statystyki terminowości (widok dyrektora generalnego, bez nazwisk)</h2>
+      <ul class="hr-stats plain-list">
+        {(Object.keys(STEP_LABEL) as CycleStep[]).map((k) => (
+          <li>
+            {STEP_LABEL[k]}: {s.byStep[k] ?? 0}
+          </li>
+        ))}
+        <li>Oceny zatwierdzone w terminie: {s.onTime}</li>
+        <li>Oceny zatwierdzone po terminie: {s.late}</li>
+        <li>Cykle otwarte po terminie, bez oceny: {s.overdueOpen}</li>
+      </ul>
     </section>
   );
 }
@@ -98,6 +136,19 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
                     <a href={l.href}>{l.label}</a>
                   ))}
                 </span>
+                {r.state.step === "objection_filed" ? (
+                  <form method="post" action={`/cycles/${r.cycleId}/objection-outcome`} class="hr-actions">
+                    <button class="btn text" type="submit" name="outcome" value="changed">
+                      Uwzględniony: zmiana oceny
+                    </button>
+                    <button class="btn text" type="submit" name="outcome" value="redone">
+                      Uwzględniony: ponowne sporządzenie oceny
+                    </button>
+                    <button class="btn text" type="submit" name="outcome" value="rejected">
+                      Nieuwzględniony
+                    </button>
+                  </form>
+                ) : null}
               </td>
             </tr>
           ))}
@@ -107,7 +158,7 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
   );
 }
 
-export function HrOverviewView(props: { viewer: Person; today: string; cards: ReminderProps[]; rows: StateRow[] }) {
+export function HrOverviewView(props: { viewer: Person; today: string; cards: ReminderProps[]; rows: StateRow[]; stats: OfficeStats }) {
   return (
     <Layout title="Stan cykli" person={props.viewer} today={props.today}>
       <section class="hdr slim">
@@ -121,9 +172,7 @@ export function HrOverviewView(props: { viewer: Person; today: string; cards: Re
         <h2>Cykle oceny</h2>
         <CycleStateTable rows={props.rows} />
       </section>
-      <section class="card">
-        <p class="cap">Statystyki: poza prototypem</p>
-      </section>
+      <StatsBlock stats={props.stats} />
     </Layout>
   );
 }

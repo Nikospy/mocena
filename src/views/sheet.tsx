@@ -1,5 +1,6 @@
 import type { CycleLink } from "../cycle-links";
 import { METHOD_LABEL, REASON_LABEL } from "./assessment";
+import { romanGrade } from "../engine/grades";
 import { rules } from "../engine/rules";
 import { criterion } from "../engine/scoring";
 import type { SheetData } from "../hr/sheet-data";
@@ -262,6 +263,23 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
               </section>
             </section>
           </>
+        )}
+        {only1 || !d.part3 ? null : (
+          <section class="card sheet-part">
+            <h2>Część III</h2>
+            <h3>Wniosek o przyznanie kolejnego stopnia służbowego</h3>
+            <SheetField label="Imię i nazwisko">{d.part3.name}</SheetField>
+            <SheetField label="Rok mianowania">{d.part3.appointedYear}</SheetField>
+            <SheetField label="Posiadany stopień służbowy">
+              {d.part3.grade === null ? null : `${romanGrade(d.part3.grade)}${d.part3.gradeAwardedOn ? `, przyznany ${formatDate(d.part3.gradeAwardedOn)}` : ""}`}
+            </SheetField>
+            <p>Wnoszę o przyznanie kolejnego stopnia służbowego (art. 89 ust. 1 ustawy).</p>
+            <SheetField label="Umotywowanie wniosku">{d.part3.motivation}</SheetField>
+            <div>
+              <span class="lbl">Potwierdzenie oceniającego</span>
+              <Confirm c={d.part3.appraiserConfirmation} />
+            </div>
+          </section>
         )}
         <SheetFooter d={d} />
       </article>

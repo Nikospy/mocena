@@ -28,7 +28,7 @@ describe("ekran kadr /hr (krok 5 pokazu)", () => {
     expect(h).toContain("zawiadamia pracownika pisemnie");
     expect(h).toContain("Zapoznanie potwierdzone 22.11.2026");
     expect(h).toContain("30.11.2026");
-    expect(h).toContain("Statystyki: poza prototypem");
+    expect(h).toContain("Statystyki terminowości (widok dyrektora generalnego, bez nazwisk)");
   });
 
   test("zasada 7: ekran nie ma nazw poziomów ani słów pozytywna / negatywna", async () => {
