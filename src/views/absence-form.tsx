@@ -1,5 +1,5 @@
 import type { Absence } from "../cycles";
-import { PageHeader } from "./components";
+import { ErrorSummary, FieldError, PageHeader, invalid } from "./components";
 import type { Person } from "../people";
 import { Layout, formatDate, formatDateLong } from "./layout";
 
@@ -23,18 +23,19 @@ export function AbsenceFormView(props: {
       <div class="o-main">
       <section class="card form-card ct-form">
         <form method="post" action={`/cycles/${props.cycleId}/absences`} class="abs-form">
+          <ErrorSummary errors={{ from: e.from, to: e.to }} />
           <div class="dates">
-            <div>
+            <div class="field">
               <label class="lbl" for="from">Od</label>
-              <input class="area" type="date" id="from" name="from" value={v.from} aria-invalid={e.from ? "true" : undefined} aria-describedby="from-words" />
+              <FieldError id="from" errors={e} />
+              <input class="area" type="date" id="from" name="from" value={v.from} {...invalid("from", e, "from-words")} />
               <p class="date-words" id="from-words" data-date-words-for="from">{v.from ? formatDateLong(v.from) : ""}</p>
-              {e.from ? <p class="st bad" role="alert">{e.from}</p> : null}
             </div>
-            <div>
+            <div class="field">
               <label class="lbl" for="to">Do</label>
-              <input class="area" type="date" id="to" name="to" value={v.to} aria-invalid={e.to ? "true" : undefined} aria-describedby="to-words" />
+              <FieldError id="to" errors={e} />
+              <input class="area" type="date" id="to" name="to" value={v.to} {...invalid("to", e, "to-words")} />
               <p class="date-words" id="to-words" data-date-words-for="to">{v.to ? formatDateLong(v.to) : ""}</p>
-              {e.to ? <p class="st bad" role="alert">{e.to}</p> : null}
             </div>
           </div>
           <label class="cb">

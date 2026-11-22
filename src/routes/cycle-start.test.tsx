@@ -134,3 +134,21 @@ describe("krok 1 pokazu", () => {
     expect(part1Status("cycle-tomasz").state).toBe("confirmed");
   });
 });
+
+describe("część I: stany formularza", () => {
+  test("zapis szkicu daje komunikat sukcesu; za dużo kryteriów dodatkowych: podsumowanie błędów z odnośnikiem", async () => {
+    const { app } = createTestApp({ today: "2024-12-09" });
+    const saved = await app.request(`/cycles/${piotr}/part1/criteria`, { method: "POST", body: new URLSearchParams(), headers: { cookie: "person_id=marek" } });
+    expect(saved.status).toBe(303);
+    expect(saved.headers.get("location")).toBe(`/cycles/${piotr}/part1?saved=1`);
+    expect(await (await as(app, "marek", `/cycles/${piotr}/part1?saved=1`)).text()).toContain("Zapisano szkic części I");
+    const body = new URLSearchParams();
+    for (const id of ["kreatywnosc", "negocjowanie", "myslenie-analityczne", "sytuacje-kryzysowe"]) body.append("additional", id);
+    const bad = await app.request(`/cycles/${piotr}/part1/criteria`, { method: "POST", body, headers: { cookie: "person_id=marek" } });
+    expect(bad.status).toBe(422);
+    const html = await bad.text();
+    expect(html).toContain("Popraw wybór kryteriów dodatkowych");
+    expect(html).toContain('href="#p1-extra-h"');
+    expect(html).toContain("Odznacz pozostałe.");
+  });
+});

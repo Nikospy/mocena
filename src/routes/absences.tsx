@@ -63,9 +63,9 @@ app.post("/cycles/:id/absences", async (c) => {
   const to = typeof body.to === "string" ? body.to : "";
   const excused = body.excused !== undefined;
   const errors: Partial<Record<"from" | "to", string>> = {};
-  if (!validDate(from)) errors.from = "Podaj poprawną datę początku nieobecności";
-  if (!validDate(to)) errors.to = "Podaj poprawną datę końca nieobecności";
-  else if (!errors.from && to < from) errors.to = "Data końca nie może być wcześniejsza niż data początku";
+  if (!validDate(from)) errors.from = "Wybierz z kalendarza datę początku nieobecności.";
+  if (!validDate(to)) errors.to = "Wybierz z kalendarza datę końca nieobecności.";
+  else if (!errors.from && to < from) errors.to = "Wybierz datę końca równą dacie początku albo późniejszą.";
   if (errors.from || errors.to) return render(c, g, { from, to, excused }, errors, 422);
 
   const before = effectiveDeadline(cycle.id).date;

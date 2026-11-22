@@ -62,16 +62,16 @@ export type CorrectionErrors = Partial<Record<"field" | "value" | "reason", stri
 export function validateCorrection(input: CorrectionInput, current: Record<CorrectableField, string>): { ok: true; field: CorrectableField; value: string } | { ok: false; errors: CorrectionErrors } {
   const errors: CorrectionErrors = {};
   let value = input.value.trim();
-  if (!isCorrectableField(input.field)) errors.field = "Wybierz pole do poprawienia";
+  if (!isCorrectableField(input.field)) errors.field = "Wybierz pole do poprawienia.";
   else {
     if (CORRECTABLE_FIELDS[input.field].kind === "date") {
       const m = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
       if (m) value = `${m[3]}-${m[2]}-${m[1]}`;
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(value)) || new Date(value).toISOString().slice(0, 10) !== value) errors.value = "Podaj datę w postaci DD.MM.RRRR";
-    } else if (!value) errors.value = "Wpisz poprawną treść pola";
-    if (!errors.value && value === current[input.field]) errors.value = "Nowa wartość jest taka sama jak obecna";
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(value)) || new Date(value).toISOString().slice(0, 10) !== value) errors.value = "Wpisz datę w postaci DD.MM.RRRR, na przykład 21.11.2026.";
+    } else if (!value) errors.value = "Wpisz poprawną treść pola.";
+    if (!errors.value && value === current[input.field]) errors.value = "Nowa wartość jest taka sama jak obecna. Wpisz poprawioną wartość.";
   }
-  if (input.reason.trim().length < 5) errors.reason = "Podaj powód korekty (co było błędem)";
+  if (input.reason.trim().length < 5) errors.reason = "Podaj powód korekty: co było błędem (co najmniej 5 znaków).";
   if (Object.keys(errors).length) return { ok: false, errors };
   return { ok: true, field: input.field as CorrectableField, value };
 }

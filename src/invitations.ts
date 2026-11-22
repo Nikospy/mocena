@@ -86,11 +86,11 @@ function validDate(s: string): boolean {
 
 export function validateInvitation(v: InvitationInput): InvitationErrors {
   const e: InvitationErrors = {};
-  if (!validDate(v.date)) e.date = "Podaj poprawną datę rozmowy";
-  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(v.time)) e.time = "Podaj godzinę, na przykład 10:00";
-  if (!v.place) e.place = "Podaj miejsce, na przykład „pokój 214” albo „wideo”";
-  else if (v.place.length > 120) e.place = "Miejsce może mieć najwyżej 120 znaków";
-  if (v.note.length > 500) e.note = "Notatka może mieć najwyżej 500 znaków";
+  if (!validDate(v.date)) e.date = "Wybierz datę rozmowy z kalendarza.";
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(v.time)) e.time = "Podaj godzinę, na przykład 10:00.";
+  if (!v.place) e.place = "Podaj miejsce, na przykład „pokój 214” albo „wideo”.";
+  else if (v.place.length > 120) e.place = "Miejsce może mieć najwyżej 120 znaków.";
+  if (v.note.length > 500) e.note = "Wiadomość może mieć najwyżej 500 znaków.";
   return e;
 }
 

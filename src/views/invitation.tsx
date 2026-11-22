@@ -1,7 +1,7 @@
 import { INVITATION_KINDS, daysBetween, invitationMailto, invitationStatus, type Invitation, type InvitationErrors, type InvitationInput, type InvitationKind } from "../invitations";
 import type { Cycle } from "../cycles";
 import type { Person } from "../people";
-import { LegalBasis, PageHeader } from "./components";
+import { ErrorSummary, FieldError, LegalBasis, PageHeader, invalid } from "./components";
 import { Layout, formatDate, formatDateLong } from "./layout";
 
 /** „Na rozmowę o kryteriach zostało 18 dni – do 27.12.2024.” z odmianą przez liczby. */
@@ -67,28 +67,29 @@ export function InvitationFormView(props: {
       <section class="card form-card ct-form">
         <form method="post" action={`/cycles/${props.cycleId}/invitations`} class="abs-form">
           <input type="hidden" name="kind" value={v.kind} />
+          <ErrorSummary errors={{ date: e.date, time: e.time, place: e.place, note: e.note }} />
           <div class="dates">
-            <div>
+            <div class="field">
               <label class="lbl" for="date">Data rozmowy</label>
-              <input class="area" type="date" id="date" name="date" value={v.date} aria-invalid={e.date ? "true" : undefined} aria-describedby="date-words" />
+              <FieldError id="date" errors={e} />
+              <input class="area" type="date" id="date" name="date" value={v.date} {...invalid("date", e, "date-words")} />
               <p class="date-words" id="date-words" data-date-words-for="date">{v.date && !e.date ? formatDateLong(v.date) : ""}</p>
-              {e.date ? <p class="st bad" role="alert">{e.date}</p> : null}
             </div>
-            <div>
+            <div class="field">
               <label class="lbl" for="time">Godzina</label>
-              <input class="area" type="time" id="time" name="time" value={v.time} aria-invalid={e.time ? "true" : undefined} />
-              {e.time ? <p class="st bad" role="alert">{e.time}</p> : null}
+              <FieldError id="time" errors={e} />
+              <input class="area" type="time" id="time" name="time" value={v.time} {...invalid("time", e)} />
             </div>
           </div>
-          <div>
+          <div class="field">
             <label class="lbl" for="place">Miejsce</label>
-            <input class="area" type="text" id="place" name="place" value={v.place} maxlength={120} placeholder="pokój 214 albo wideo" aria-invalid={e.place ? "true" : undefined} />
-            {e.place ? <p class="st bad" role="alert">{e.place}</p> : null}
+            <FieldError id="place" errors={e} />
+            <input class="area" type="text" id="place" name="place" value={v.place} maxlength={120} placeholder="pokój 214 albo wideo" {...invalid("place", e)} />
           </div>
-          <div>
+          <div class="field">
             <label class="lbl" for="note">Wiadomość dla ocenianego (nieobowiązkowa)</label>
-            <textarea class="area" id="note" name="note" rows={3} maxlength={500} aria-invalid={e.note ? "true" : undefined}>{v.note}</textarea>
-            {e.note ? <p class="st bad" role="alert">{e.note}</p> : null}
+            <FieldError id="note" errors={e} />
+            <textarea class="area" id="note" name="note" rows={3} maxlength={500} {...invalid("note", e)}>{v.note}</textarea>
           </div>
           <p class="ct-actions">
             <button class="btn primary" type="submit">Wyślij zaproszenie</button>

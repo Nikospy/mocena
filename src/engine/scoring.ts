@@ -38,14 +38,14 @@ export function validateAdditionalCriteria(sheet: Sheet, ids: string[]): string[
   const problems: string[] = [];
   const mandatory = new Set(mandatoryCriteria(sheet));
   if (ids.length > rules.maxAdditionalCriteria) {
-    problems.push(`Można wybrać najwyżej ${rules.maxAdditionalCriteria} kryteria dodatkowe (§ 5 ust. 2).`);
+    problems.push(`Wybierz najwyżej ${rules.maxAdditionalCriteria} kryteria dodatkowe (§ 5 ust. 2). Odznacz pozostałe.`);
   }
   if (new Set(ids).size !== ids.length) {
-    problems.push("To samo kryterium dodatkowe wybrano dwa razy.");
+    problems.push("To samo kryterium dodatkowe wybrano dwa razy. Zaznacz je tylko raz.");
   }
   for (const id of ids) {
     if (!CRITERIA.some((c) => c.id === id)) problems.push(`Kryterium „${id}” nie ma w załączniku nr 1.`);
-    else if (mandatory.has(id)) problems.push(`Kryterium „${criterion(id).name}” jest już obowiązkowe w arkuszu ${sheet}.`);
+    else if (mandatory.has(id)) problems.push(`Kryterium „${criterion(id).name}” jest już obowiązkowe w arkuszu ${sheet}. Odznacz je na liście dodatkowych.`);
   }
   return problems;
 }

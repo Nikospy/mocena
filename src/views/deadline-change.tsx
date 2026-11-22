@@ -1,12 +1,12 @@
 import { DC, type Blocked, type RequestState } from "../deadline-change";
 import type { AppEvent } from "../events";
 import type { Person } from "../people";
-import { LegalBasis, PageHeader } from "./components";
+import { ErrorSummary, FieldError, LegalBasis, PageHeader, invalid } from "./components";
 import { Layout, formatDate, formatDateLong } from "./layout";
 import { PrintButton, SheetField } from "./sheet";
 
 export type ChangeFormValues = { case: string; newDate: string; reason: string };
-export type ChangeFormErrors = Partial<Record<"case" | "newDate" | "reason", string>>;
+export type ChangeFormErrors = Partial<Record<"case" | "newDate" | "reason" | "reject-reason", string>>;
 
 function Check() {
   return (
@@ -70,13 +70,15 @@ export function ChangeFormView(props: {
       <section class="card form-card ct-form">
         <form method="post" action={`/cycles/${props.cycleId}/deadline-change`} class="abs-form">
           {props.request ? <input type="hidden" name="requestId" value={String(props.request.id)} /> : null}
-          <fieldset class="dc-cases" disabled={off}>
+          <ErrorSummary errors={{ case: e.case, newDate: e.newDate, reason: e.reason }} />
+          <fieldset class="dc-cases" disabled={off} aria-describedby={e.case ? "case-error" : undefined}>
             <legend class="lbl">Przypadek z art. 81 ust. 8 ustawy</legend>
+            <FieldError id="case" errors={e} />
             {DC.cases.map((c) => {
               const unavailable = c.n === 4 && !props.request;
               return (
                 <label class="cb">
-                  <input type="radio" name="case" value={String(c.n)} checked={v.case === String(c.n)} disabled={unavailable} />
+                  <input type="radio" name="case" id={c.n === DC.cases.find((x) => x.n !== 4 || props.request)?.n ? "case" : undefined} value={String(c.n)} checked={v.case === String(c.n)} disabled={unavailable} />
                   <Check />
                   <span class="cbt">
                     pkt {c.n}: {c.label}
@@ -85,19 +87,18 @@ export function ChangeFormView(props: {
                 </label>
               );
             })}
-            {e.case ? <p class="st bad" role="alert">{e.case}</p> : null}
           </fieldset>
-          <div>
+          <div class="field">
             <label class="lbl" for="newDate">Nowy termin oceny</label>
-            <input class="area" type="date" id="newDate" name="newDate" value={v.newDate} disabled={off} aria-invalid={e.newDate ? "true" : undefined} aria-describedby="newDate-words" />
+            <FieldError id="newDate" errors={e} />
+            <input class="area" type="date" id="newDate" name="newDate" value={v.newDate} disabled={off} {...invalid("newDate", e, "newDate-words")} />
             <p class="date-words" id="newDate-words" data-date-words-for="newDate">{v.newDate ? formatDateLong(v.newDate) : ""}</p>
-            {e.newDate ? <p class="st bad" role="alert">{e.newDate}</p> : null}
             <p class="cap">Termin w dzień wolny przechodzi na następny dzień roboczy.</p>
           </div>
-          <div>
+          <div class="field">
             <label class="lbl" for="reason">Uzasadnienie</label>
-            <textarea class="area" id="reason" name="reason" rows={4} disabled={off} aria-invalid={e.reason ? "true" : undefined}>{v.reason}</textarea>
-            {e.reason ? <p class="st bad" role="alert">{e.reason}</p> : null}
+            <FieldError id="reason" errors={e} />
+            <textarea class="area" id="reason" name="reason" rows={4} disabled={off} {...invalid("reason", e)}>{v.reason}</textarea>
           </div>
           <div class="ct-actions">
             <button class="btn primary" type="submit" disabled={off}>
@@ -112,9 +113,11 @@ export function ChangeFormView(props: {
           <h2 id="h-reject">Odrzuć wniosek</h2>
           <form method="post" action={`/cycles/${props.cycleId}/deadline-change/reject`} class="abs-form">
             <input type="hidden" name="requestId" value={String(props.request.id)} />
-            <div>
+            <ErrorSummary errors={{ "reject-reason": e["reject-reason"] }} />
+            <div class="field">
               <label class="lbl" for="reject-reason">Powód odrzucenia</label>
-              <textarea class="area" id="reject-reason" name="reason" rows={3}></textarea>
+              <FieldError id="reject-reason" errors={e} />
+              <textarea class="area" id="reject-reason" name="reason" rows={3} {...invalid("reject-reason", e)}></textarea>
             </div>
             <p class="ct-actions">
               <button class="btn" type="submit">Odrzuć wniosek</button>
@@ -191,16 +194,17 @@ export function RequestFormView(props: {
         <h2 id="h-req-form">Złóż wniosek</h2>
         <p>Wniosek rozpatruje oceniający: może zmienić termin albo odrzucić wniosek z podaniem powodu.</p>
         <form method="post" action={`/cycles/${props.cycleId}/deadline-change/request`} class="abs-form">
-          <div>
+          <ErrorSummary errors={{ reason: e.reason, requestedDate: e.requestedDate }} />
+          <div class="field">
             <label class="lbl" for="reason">Uzasadnienie wniosku</label>
-            <textarea class="area" id="reason" name="reason" rows={4} disabled={off} aria-invalid={e.reason ? "true" : undefined}>{props.values.reason}</textarea>
-            {e.reason ? <p class="st bad" role="alert">{e.reason}</p> : null}
+            <FieldError id="reason" errors={e} />
+            <textarea class="area" id="reason" name="reason" rows={4} disabled={off} {...invalid("reason", e)}>{props.values.reason}</textarea>
           </div>
-          <div>
+          <div class="field">
             <label class="lbl" for="requestedDate">Proponowany termin (nieobowiązkowo)</label>
-            <input class="area" type="date" id="requestedDate" name="requestedDate" value={props.values.requestedDate} disabled={off} aria-invalid={e.requestedDate ? "true" : undefined} aria-describedby="requestedDate-words" />
+            <FieldError id="requestedDate" errors={e} />
+            <input class="area" type="date" id="requestedDate" name="requestedDate" value={props.values.requestedDate} disabled={off} {...invalid("requestedDate", e, "requestedDate-words")} />
             <p class="date-words" id="requestedDate-words" data-date-words-for="requestedDate">{props.values.requestedDate ? formatDateLong(props.values.requestedDate) : ""}</p>
-            {e.requestedDate ? <p class="st bad" role="alert">{e.requestedDate}</p> : null}
           </div>
           <p class="ct-actions">
             <button class="btn primary" type="submit" disabled={off}>
