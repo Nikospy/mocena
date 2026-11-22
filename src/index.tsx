@@ -96,7 +96,7 @@ app.get("/", (c) => {
                   {t.detail ? <p class="cap">{t.detail}</p> : null}
                   {t.due ? (
                     <p class="task-due">
-                      do <b>{formatDate(t.due)}</b> {t.basis ? <LegalBasis basis={t.basis} /> : null}
+                      {t.due < today() ? "po terminie od" : "do"} <b>{formatDate(t.due)}</b> {t.basis ? <LegalBasis basis={t.basis} /> : null}
                     </p>
                   ) : null}
                 </div>

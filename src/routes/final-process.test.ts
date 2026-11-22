@@ -19,3 +19,10 @@ test("samodzielny pokaz pokazuje tylko widoczne dane i prowadzi do części I", 
   expect(invite).toContain("Termin rozmowy o kryteriach minął 27.12.2024.");
   expect(invite).not.toMatch(/-\d+ dni/);
 });
+
+test("sprawa wskazuje słownie przekroczony termin dopiero następnego dnia", async () => {
+  const { app } = createTestApp({ today: "2024-12-27" });
+  expect(await html(app, "marek", "/")).toContain("do <b>27.12.2024</b>");
+  await call(app, "marek", "/demo/date", { date: "2024-12-28" });
+  expect(await html(app, "marek", "/")).toContain("po terminie od <b>27.12.2024</b>");
+});
