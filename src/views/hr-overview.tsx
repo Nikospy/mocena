@@ -156,8 +156,7 @@ function Deadline(props: { r: StateRow }) {
 export function CycleStateTable(props: { rows: StateRow[] }) {
   return (
     <div class="hr-scroll">
-      <table class="hr-table hr-cycles">
-        <caption class="vh">Cykle oceny: oceniany, oceniający, stan cyklu, termin i arkusz</caption>
+      <table class="hr-table hr-cycles" aria-labelledby="h-cycles">
         <thead>
           <tr>
             <th scope="col">Oceniany</th>
@@ -186,15 +185,15 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
               <td data-label="Termin" class="hr-due">
                 <Deadline r={r} />
               </td>
-              <td data-label="Arkusz" class="hr-sheet">
+              <td data-label="Arkusz">
                 {r.sheet ? (
-                  <>
+                  <div class="hr-sheet">
                     <span>Arkusz {r.sheet}</span>
                     <a href={`/cycles/${r.cycleId}/sheet?print=1`}>Drukuj / pobierz PDF</a>
                     {r.links.filter((l) => l.href.endsWith("/assessment/export.json")).map((l) => (
                       <a href={l.href} download>Ocena do systemu kadrowego (JSON)</a>
                     ))}
-                  </>
+                  </div>
                 ) : (
                   <span class="hr-none">arkusz jeszcze nie przypisany</span>
                 )}

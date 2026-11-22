@@ -932,7 +932,9 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
   .hr-table .hr-card > * + * { margin-block-start: var(--sp-100); }
   .hr-card > td[data-label]::before { content: attr(data-label); display: block; font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); color: var(--text-2); }
   .hr-card > td[data-label="Oceniający"], .hr-card > td[data-label="Arkusz"] { display: block; }
-  .hr-card > td[data-label="Stan cyklu"]::before { content: none; }
+  .hr-card > td[data-label="Stan cyklu"]::before, .hr-cycles .hr-card > td:is([data-label="Arkusz"], [data-label="Termin"])::before { content: none; }
+  .hr-cycles .hr-card > td[data-label="Oceniający"]::before { content: attr(data-label) ": "; display: inline; font-size: var(--f-p); line-height: var(--lh-p); font-weight: var(--w-regular); }
+  .hr-cycles .hr-card > td[data-label="Oceniający"] { color: var(--text-2); margin-block-start: 0; }
   .hr-table tbody th { font-size: var(--f-p); line-height: var(--lh-p); }
 }
 
@@ -942,7 +944,6 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 .hr-cycles thead th:nth-child(3) { inline-size: 27%; }
 .hr-cycles thead th:nth-child(5) { inline-size: 14%; }
 .hr-sheet { display: grid; justify-items: start; gap: var(--sp-50); }
-@media (max-width: 899px) { .hr-table .hr-sheet { display: grid; } }
 .hr-sheet a { display: inline-flex; align-items: center; min-block-size: var(--sp-300); }
 .hr-cyclecard > h2 + * { margin-block-start: var(--sp-300); }
 
@@ -952,10 +953,12 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 .hr-duty-main > * + * { margin-block-start: var(--sp-150); }
 .hr-duty-side { display: grid; gap: var(--sp-300); align-content: start; justify-items: start; }
 .hr-facts { display: grid; gap: var(--sp-150); }
+@media (min-width: 600px) and (max-width: 899px) { .hr-facts { grid-template-columns: repeat(3, auto); justify-content: start; gap: var(--sp-200) var(--sp-500); } }
 .hr-facts dt { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--rule-quiet); }
 .hr-facts dd { font-weight: var(--w-bold); color: var(--rule-ink); }
 @media (min-width: 900px) {
-  .hr-duty { grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem); gap: var(--sp-600); }
+  .hr-duty { grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem); gap: var(--sp-600); }
+  .hr-duty-side .btn { white-space: nowrap; }
   .hr-duty-side { padding-inline-start: var(--sp-300); border-inline-start: 1px solid var(--rule-divider); }
 }
 
@@ -979,6 +982,78 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 .hr-statcard .stat { flex-direction: row; justify-content: space-between; align-items: baseline; gap: var(--sp-200); padding-block: var(--sp-100); border-block-start: 1px solid var(--line); max-inline-size: none; }
 .hr-statcard .stat-label { font-size: var(--f-p); line-height: var(--lh-p); color: var(--text); }
 .hr-statcard .stat-n { font-size: var(--f-p); line-height: var(--lh-p); text-align: end; }
+
+/* -- Pracownicy: akcje w nagłówku, wyszukiwanie i kolejność w jednym rzędzie (pola 48 px) -- */
+.people-add { margin-block-start: var(--sp-100); }
+.people-list > h2 + * { margin-block-start: var(--sp-200); }
+.people-find { display: grid; gap: var(--sp-200); align-items: end; }
+.people-find .lbl { margin-block-end: var(--sp-100); }
+.people-find input.area, .people-find select.area { block-size: var(--hit); min-block-size: var(--hit); padding-block: 0; }
+.people-go { display: flex; flex-wrap: wrap; gap: var(--sp-100); }
+@media (min-width: 768px) { .people-find { grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem) auto; } }
+.people-find + * { margin-block-start: var(--sp-300); }
+.people-none > * + * { margin-block-start: var(--sp-100); }
+.people-table .basis { display: block; }
+.people-table thead th:nth-child(1) { inline-size: 18%; }
+.people-table thead th:nth-child(5) { inline-size: 7%; }
+.people-table thead th:nth-child(6) { inline-size: 18%; }
+@media (max-width: 899px) {
+  .people-table .hr-card > td[data-label="Stanowisko"]::before, .people-table .hr-card > td[data-label="Komórka"]::before { content: none; }
+  .people-table .hr-card > td[data-label="Stanowisko"] { margin-block-start: var(--sp-50); }
+  .people-table .hr-card > td[data-label="Komórka"] { margin-block-start: 0; color: var(--text-2); }
+}
+
+/* -- formularz pracownika: sekcje kartami, etykieta przy polu, błąd pod polem, akcje w przepływie -- */
+.person-form { display: grid; gap: var(--sp-300); max-inline-size: 48rem; }
+.person-sec > h2 + * { margin-block-start: var(--sp-300); }
+.person-sec > * + * { margin-block-start: var(--sp-300); }
+.person-field input.area, .person-field select.area { block-size: var(--hit); min-block-size: var(--hit); padding-block: 0; }
+.person-field .lbl { color: var(--text); font-size: var(--f-p); line-height: var(--lh-p); }
+.hr-hint { color: var(--text-2); margin-block-end: var(--sp-100); }
+.hr-err { margin-block-start: var(--sp-100); color: var(--red-200); font-weight: var(--w-bold); }
+.person-field:has(.hr-err) { padding-inline-start: var(--sp-200); border-inline-start: var(--sp-50) solid var(--red-100); }
+.area[aria-invalid="true"] { border-color: var(--red-100); }
+.person-sec .dates { gap: var(--sp-300); }
+@media (min-width: 640px) { .person-sec .dates { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.person-prev { border: 0; margin: 0; padding: var(--sp-300) 0 0; min-inline-size: 0; border-block-start: 1px solid var(--line); }
+.person-prev > * + * { margin-block-start: var(--sp-200); }
+.person-prev legend { float: left; inline-size: 100%; padding: 0; }
+.person-prev legend + * { clear: both; margin-block-start: var(--sp-100); }
+.person-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-150); }
+@media (max-width: 639px) { .person-actions .btn.primary { inline-size: 100%; } }
+.person-danger { max-inline-size: 48rem; padding-block-start: var(--sp-300); border-block-start: 1px solid var(--line); }
+.wrap > .person-danger { margin-block-start: var(--sp-600); }
+.person-danger > * + * { margin-block-start: var(--sp-100); }
+.person-danger a { color: var(--red-200); font-weight: var(--w-bold); }
+.person-del { margin-block-start: var(--sp-300); }
+
+/* podsumowanie błędów nad formularzem */
+.hr-errsum h2 { font-size: var(--f-p); line-height: var(--lh-p); color: inherit; }
+.hr-errsum ul { list-style: none; padding: 0; margin-block-start: var(--sp-100); display: grid; gap: var(--sp-50); }
+.hr-errsum a { color: inherit; font-weight: var(--w-bold); }
+.hr-errsum:focus-visible { box-shadow: var(--focus); }
+
+/* -- Zastępstwa: formularz po lewej, lista po prawej (od 1000 px) -- */
+.subs-form > h2 + * { margin-block-start: var(--sp-300); }
+.subs-form .person-form { max-inline-size: none; }
+@media (min-width: 640px) { .subs-dates { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-300); } }
+.subs-side { display: grid; gap: var(--sp-300); align-content: start; }
+.subs-side > * + * { margin-block-start: 0; }
+.subs-list { list-style: none; padding: 0; }
+.subs-list li { padding-block: var(--sp-200); border-block-start: 1px solid var(--line); }
+.subs-list li:first-child { padding-block-start: 0; border: 0; }
+.subs-list li > * + * { margin-block-start: var(--sp-50); }
+.subs-src { color: var(--text-2); }
+
+/* cele kliknięcia odnośników w tekście tych ekranów: co najmniej 24 px wysokości */
+:is(.hr-table, .hr-obj-what, .person-danger, .hr-errsum, .people-none, .subs-side, .person-del, .hr-doc) a { display: inline-flex; align-items: center; min-block-size: var(--sp-300); }
+.hr-table tbody th a { display: inline; padding-block: var(--sp-50); line-height: var(--lh-p); }
+
+.hr-errsum { max-inline-size: 48rem; }
+
+/* działanie nieodwracalne: przycisk w kolorze błędu (wzór „warning button”) */
+.person-del .btn.primary { background: var(--red-200); border-color: var(--red-200); }
+@media (hover: hover) and (pointer: fine) { .person-del .btn.primary:not(:disabled):hover { background: var(--red-100); border-color: var(--red-100); } }
 
 /* --- koniec sekcji hr-admin (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
 /* . */

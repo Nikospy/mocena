@@ -104,7 +104,7 @@ test("kadry usuwają dane jednej osoby dopiero po potwierdzeniu", async () => {
   await approveAndAcknowledgePiotr(app);
   const deletion = "/hr/people/piotr/delete";
   expect(await html(app, "joanna", "/hr/people/piotr/edit")).toContain(`href="${deletion}"`);
-  expect(await html(app, "joanna", deletion)).toContain("Potwierdzenie usunięcia danych");
+  expect(await html(app, "joanna", deletion)).toContain("Usuwanie danych pracownika");
   expect((await call(app, "piotr", deletion, { confirmed: "1" })).status).toBe(403);
   expect((await call(app, "admin", deletion, { confirmed: "1" })).status).toBe(403);
   expect((await call(app, "joanna", deletion, {})).status).toBe(422);

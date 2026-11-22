@@ -114,7 +114,7 @@ describe("zastępstwa", () => {
     expect((await sub("2024-12-20", "2024-12-10")).status).toBe(422);
     const same = await call(app, "joanna", "/hr/substitutions", { absent_id: "marek", substitute_id: "marek", date_from: "2024-12-09", date_to: "2024-12-10" });
     expect(same.status).toBe(422);
-    expect(await html(app, "joanna", "/hr/substitutions")).toContain("To praktyka z poradnika KPRM, nie przepis.");
+    expect(await html(app, "joanna", "/hr/substitutions")).toContain("praktyka z poradnika Kancelarii Prezesa Rady Ministrów (KPRM), nie przepis.");
   });
 });
 

@@ -5,6 +5,7 @@ import { EXPORT_HEADER, planImport } from "../hr/csv-import";
 import { ImportView } from "../views/hr-import";
 import { createPerson, deleteEmployee, employeeDeletionBlock, emptyForm, formFromPerson, listPeople, readForm, supervisorCandidates, unitOptions, updatePerson, validateForm, type FormErrors, type PersonForm, type Sort } from "../hr/people";
 import { currentPerson, personById, type Person } from "../people";
+import { fullNameForm } from "../hr-partner/partner";
 import { today } from "../settings";
 import { Layout } from "../views/layout";
 import { PageHeader } from "../views/components";
@@ -79,7 +80,7 @@ app.post("/hr/people/import", async (c) => {
 app.get("/hr/people/new", (c) => {
   const viewer = hrGuard(c);
   if (viewer instanceof Response) return viewer;
-  return renderForm(c, viewer, { title: "Nowy pracownik", action: "/hr/people", values: emptyForm() });
+  return renderForm(c, viewer, { title: "Dodaj pracownika", action: "/hr/people", values: emptyForm() });
 });
 
 app.post("/hr/people", async (c) => {
@@ -87,7 +88,7 @@ app.post("/hr/people", async (c) => {
   if (viewer instanceof Response) return viewer;
   const values = readForm(await c.req.parseBody());
   const errors = validateForm(values, { hasCycle: false, needsSupervisor: true });
-  if (Object.keys(errors).length > 0) return renderForm(c, viewer, { title: "Nowy pracownik", action: "/hr/people", values, errors, status: 422 });
+  if (Object.keys(errors).length > 0) return renderForm(c, viewer, { title: "Dodaj pracownika", action: "/hr/people", values, errors, status: 422 });
   const { personId } = createPerson(values, viewer.id);
   return c.redirect(`/hr/people?saved=${personId}`, 303);
 });
@@ -103,7 +104,7 @@ function editGuard(c: Context): { viewer: Person; person: Person } | Response {
 app.get("/hr/people/:id/edit", (c) => {
   const g = editGuard(c);
   if (g instanceof Response) return g;
-  return renderForm(c, g.viewer, { title: `Edycja: ${g.person.name}`, action: `/hr/people/${g.person.id}/edit`, values: formFromPerson(g.person), person: g.person });
+  return renderForm(c, g.viewer, { title: `Dane pracownika: ${g.person.name}`, action: `/hr/people/${g.person.id}/edit`, values: formFromPerson(g.person), person: g.person });
 });
 
 app.post("/hr/people/:id/edit", async (c) => {
@@ -115,7 +116,7 @@ app.post("/hr/people/:id/edit", async (c) => {
   const hasCycle = visibleCyclesOf(person.id).length > 0;
   const errors = validateForm(values, { personId: person.id, hasCycle, needsSupervisor: open !== null || (!hasCycle && !!(values.hired_on || values.prev_on)) });
   if (Object.keys(errors).length > 0) {
-    return renderForm(c, viewer, { title: `Edycja: ${person.name}`, action: `/hr/people/${person.id}/edit`, values, errors, person, status: 422 });
+    return renderForm(c, viewer, { title: `Dane pracownika: ${person.name}`, action: `/hr/people/${person.id}/edit`, values, errors, person, status: 422 });
   }
   const result = updatePerson(person, values, viewer.id);
   if (result.appraiserChange) return c.redirect(`/cycles/${result.appraiserChange.cycleId}/appraiser?to=${result.appraiserChange.to}`, 303);
@@ -134,19 +135,26 @@ app.get("/hr/people/:id/delete", (c) => {
   if (g instanceof Response) return g;
   const blocked = employeeDeletionBlock(g.person);
   return c.html(
-    <Layout title="Potwierdzenie usunięcia danych" person={g.viewer} today={today()}>
+    <Layout title="Usuwanie danych pracownika" person={g.viewer} today={today()}>
       <PageHeader
-        title={<>Usunąć dane pracownika {g.person.name}?</>}
+        context={<a href={`/hr/people/${g.person.id}/edit`}>Dane pracownika: {g.person.name}</a>}
+        title={blocked ? <>Danych pracownika {fullNameForm(g.person.name, "gen") ?? g.person.name} nie można usunąć</> : <>Usunąć dane pracownika {fullNameForm(g.person.name, "gen") ?? g.person.name}?</>}
         lead={blocked ? undefined : "Usuniesz kartotekę, oceny, notatki i pozostałe dane tej osoby. Tego działania nie można cofnąć."}
       />
-      <section>
-        {blocked ? <p class="st bad" role="alert">{blocked}</p> : <>
-          <form method="post" action={`/hr/people/${g.person.id}/delete`} class="btns">
-            <button type="submit" name="confirmed" value="1" class="btn primary">Usuń dane pracownika</button>
-            <a class="btn" href={`/hr/people/${g.person.id}/edit`}>Anuluj</a>
-          </form>
-        </>}
-      </section>
+      {blocked ? (
+        <>
+          <div class="st bad" role="alert">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.5v.01" /></svg>
+            <div>{blocked}</div>
+          </div>
+          <p><a href={`/hr/people/${g.person.id}/edit`}>Wróć do danych pracownika</a></p>
+        </>
+      ) : (
+        <form method="post" action={`/hr/people/${g.person.id}/delete`} class="btns person-del">
+          <button type="submit" name="confirmed" value="1" class="btn primary">Usuń dane pracownika</button>
+          <a class="btn text" href={`/hr/people/${g.person.id}/edit`}>Anuluj</a>
+        </form>
+      )}
     </Layout>,
     blocked ? 409 : 200,
   );
