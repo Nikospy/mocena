@@ -1,7 +1,7 @@
 ---
 change_id: deadline-change
 title: Zmiana terminu oceny i wniosek ocenianego
-status: planning
+status: implementing
 created: 2026-11-22
 updated: 2026-11-22
 archived_at: null
