@@ -37,7 +37,7 @@ const BODY: Record<TourStopId, Body> = {
     look: [
       { text: "Termin oceny z przepisem.", selector: ".rule" },
       { text: "Podpowiedzi kryteriów: przerywana ramka i powód. Nic nie jest zaznaczone z góry.", selector: ".hint" },
-      { text: "Karta rozmowy o kryteriach z tematami z przepisu.", selector: 'a[href$="/cards/opening"]' },
+      { text: "„Karta rozmowy o kryteriach” z tematami z przepisu.", selector: 'a[href$="/cards/opening"]' },
     ],
     tryIt: "Zaznacz „Orientacja na klienta/interesanta” i „Myślenie analityczne”, potem kliknij „Potwierdzam rozmowę i przekazuję część I”.",
     basis: basis(d.criteriaTalkDays.basis),
@@ -59,7 +59,7 @@ const BODY: Record<TourStopId, Body> = {
     lead: "Marek zapisuje fakt w dniu, w którym się zdarzył, a nie po dwóch latach z pamięci. Asystent nie ocenia notatki. Zauważa tylko słowo „przejął” i pyta, czy to stała zmiana zadań.",
     look: [
       { text: "Po wpisaniu słowa „przejął” pole „Zmiana zadań pracownika” zaznacza się samo jako podpowiedź. Można je odznaczyć.", selector: ".hint" },
-      { text: "Po zapisie pytanie „To stała zmiana zadań?”, a po „Tak” karta rozmowy i forma rozwoju." },
+      { text: "Po zapisie pytanie „To stała zmiana zadań?”, a po „Tak, stała zmiana” karta rozmowy i forma rozwoju." },
       { text: "Przy nazwisku Piotra nie ma punktów ani etykiet." },
     ],
     tryIt: "Wpisz „Piotr przejął kolejkę wniosków po odejściu kolegi”, wybierz kryterium Rzetelność i zapisz.",
@@ -97,10 +97,10 @@ const BODY: Record<TourStopId, Body> = {
     short: "kadry",
     lead: "Piotr czyta ocenę. Uzasadnienie napisał Marek i wstawił do niego fakty z notatek. Piotr potwierdza zapoznanie. Od tej chwili system liczy 7 dni na sprzeciw.",
     look: [
-      { text: "Przycisk potwierdzenia zapoznania.", selector: 'form[action$="/assessment/acknowledge"] button' },
+      { text: "Przycisk „Potwierdzam zapoznanie z oceną”.", selector: 'form[action$="/assessment/acknowledge"] button' },
       { text: "Termin sprzeciwu z przepisem; gdy wypada w dzień wolny, przechodzi na następny dzień roboczy.", selector: ".rule" },
     ],
-    tryIt: "Potwierdź zapoznanie.",
+    tryIt: "Kliknij „Potwierdzam zapoznanie z oceną”.",
     basis: basis(d.objectionDays.basis),
     screen: (c) => `/cycles/${c}/assessment`,
   },

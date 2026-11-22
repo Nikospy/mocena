@@ -2,9 +2,15 @@
 (function () {
   var first = null;
   document.querySelectorAll("[data-look-selector]").forEach(function (li) {
-    var el = null;
-    try { el = document.querySelector(li.getAttribute("data-look-selector")); } catch (e) { el = null; }
-    if (!el || el.closest(".gpanel, .gmob")) return;
+    // Pierwszy widoczny element: ten sam odnośnik bywa w wersji na komputer i na telefon.
+    var el = null, all = [];
+    try { all = document.querySelectorAll(li.getAttribute("data-look-selector")); } catch (e) { all = []; }
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].closest(".gpanel, .gmob")) continue;
+      var r = all[i].getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) { el = all[i]; break; }
+    }
+    if (!el) return;
     el.setAttribute("data-look", li.getAttribute("data-look-n"));
     if (!first) first = el;
   });
