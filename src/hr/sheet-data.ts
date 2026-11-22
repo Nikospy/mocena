@@ -7,6 +7,7 @@ import { personById, type Person } from "../people";
 import { setting, today } from "../settings";
 import { assessmentHistory } from "./history";
 import { assessmentPeriodFrom } from "../cycles/part1";
+import { sheetCorrections, type SheetCorrection } from "../assessment/corrections";
 
 type Confirmation = { place: string; date: string; name: string };
 type Deadline = { date: string; basis: string[] };
@@ -49,6 +50,8 @@ export type SheetData = {
   /** Tylko urzędnik mianowany z dołączonym wnioskiem o kolejny stopień. */
   /** Pisma o zmianie terminu (§ 8 rozporządzenia): kopie dołączane do arkusza. */
   deadlineLetters: { id: number; date: string; oldDeadline: string; newDeadline: string; case: number }[];
+  /** Korekty błędów wprowadzone przez administratora po zatwierdzeniu (kto, kiedy, co, dlaczego). */
+  corrections: SheetCorrection[];
   part3: {
     name: string;
     appointedYear: number | null;
@@ -98,6 +101,9 @@ export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetDat
     ? snap.criteria.map((c) => ({ id: c.id, kind: c.kind, score: c.score }))
     : criteria.map((c) => ({ id: c.id, kind: c.kind, score: null }));
 
+  const corrections = snap ? sheetCorrections(cycleId, ev) : [];
+  const corrected = (field: SheetCorrection["field"], value: string | null): string | null => corrections.filter((c) => c.field === field).pop()?.to ?? value;
+
   return {
     cycleId,
     sheet,
@@ -116,15 +122,15 @@ export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetDat
       appraiseeConfirmation: confirmed ? { place: confirmed.payload.place, date: confirmed.date, name: confirmed.payload.appraiseeName } : null,
     },
     part2: {
-      interviewDate: snap?.interviewDate ?? null,
+      interviewDate: corrected("interviewDate", snap?.interviewDate ?? null),
       periodFrom: snap?.periodFrom ?? assessmentPeriodFrom(cycleId, cycle.period_start),
       periodTo: snap?.periodTo ?? null,
       rows,
       mean: snap?.result.mean ?? null,
       overallLevel: snap?.result.overallLevel ?? null,
       outcome: snap?.result.outcome ?? null,
-      justification: snap?.justification ?? null,
-      developmentConclusions: snap?.developmentConclusions ?? null,
+      justification: corrected("justification", snap?.justification ?? null),
+      developmentConclusions: corrected("developmentConclusions", snap?.developmentConclusions ?? null),
       previous,
       gradeRequest: appraisee.appointed !== 1 ? "not_applicable" : snap ? (snap.gradeRequest.attached ? "yes" : "no") : null,
       appraiserConfirmation: snap?.confirmation ?? null,
@@ -145,6 +151,7 @@ export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetDat
     deadlineLetters: ev
       .filter((e) => e.type === "deadline_changed")
       .map((e) => ({ id: e.id, date: e.date, oldDeadline: e.payload.oldDeadline, newDeadline: e.payload.newDeadline, case: e.payload.case })),
+    corrections,
     part3:
       appraisee.appointed === 1 && snap?.gradeRequest.attached
         ? {
