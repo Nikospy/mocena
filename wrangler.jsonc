@@ -1,0 +1,9 @@
+{
+  "name": "mocena",
+  "main": "src/worker.ts",
+  "compatibility_date": "2025-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "directory": "./public" },
+  "durable_objects": { "bindings": [{ "name": "DEMO_SESSION", "class_name": "DemoSession" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DemoSession"] }]
+}

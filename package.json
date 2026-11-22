@@ -1,15 +1,18 @@
 {
   "name": "mocena",
   "scripts": {
-    "dev": "bun run --hot src/index.tsx",
-    "seed": "bun run src/seed.ts",
+    "dev": "bun run --hot src/local.tsx",
+    "seed": "bun run src/seed-cli.ts",
+    "deploy": "wrangler deploy",
     "test": "bun test"
   },
   "dependencies": {
     "hono": "^4.13.16"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250901.0",
     "@types/bun": "latest",
-    "happy-dom": "^21.0.4"
+    "happy-dom": "^21.0.4",
+    "wrangler": "^4"
   }
 }

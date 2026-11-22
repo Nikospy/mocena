@@ -1,20 +1,21 @@
 import { Hono } from "hono";
-import { setCookie } from "hono/cookie";
-import { serveStatic } from "hono/bun";
+import { deleteCookie, setCookie } from "hono/cookie";
 import { getDb } from "./db";
+import { runSeed } from "./seed";
 import { homeTasks } from "./home-tasks";
 import { PERSON_COOKIE, currentPerson, personById } from "./people";
 import { today } from "./settings";
 import cycleStart from "./routes/cycle-start";
 import assessment from "./routes/assessment";
+import hr from "./routes/hr";
+import sheet from "./routes/sheet";
+import history from "./routes/history";
 import notes from "./routes/notes";
 import hrPartner from "./routes/hr-partner";
 import admin from "./routes/admin";
 import { Layout } from "./views/layout";
 
 const app = new Hono();
-
-app.use("/*", serveStatic({ root: "./public" }));
 
 function accounts() {
   return getDb().query("SELECT id, name, role, position_title FROM people WHERE has_account = 1 ORDER BY name").all() as {
@@ -42,6 +43,9 @@ function AccountScreen(props: { error?: string }) {
               </li>
             ))}
           </ul>
+        </form>
+        <form method="post" action="/demo/restart">
+          <button class="btn text" type="submit">Zacznij pokaz od nowa</button>
         </form>
       </section>
     </Layout>
@@ -84,6 +88,20 @@ app.post("/account", async (c) => {
   return c.redirect("/", 303);
 });
 
+app.post("/demo/restart", (c) => {
+  const db = getDb();
+  db.transaction(() => {
+    const tables = db
+      .query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '\\_cf\\_%' ESCAPE '\\'")
+      .all() as { name: string }[];
+    for (const t of tables) db.exec(`DELETE FROM "${t.name}"`);
+    db.exec("DELETE FROM sqlite_sequence");
+    runSeed(db, { liveStep2: true });
+  })();
+  deleteCookie(c, PERSON_COOKIE, { path: "/" });
+  return c.redirect("/account", 303);
+});
+
 app.post("/demo/date", async (c) => {
   const body = await c.req.parseBody();
   const date = typeof body.date === "string" ? body.date : "";
@@ -107,6 +125,9 @@ app.post("/demo/date", async (c) => {
 
 app.route("/", cycleStart);
 app.route("/", assessment);
+app.route("/", hr);
+app.route("/", sheet);
+app.route("/", history);
 app.route("/", notes);
 app.route("/", hrPartner);
 app.route("/", admin);

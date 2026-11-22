@@ -14,13 +14,16 @@ Prototyp asystenta ocen okresowych (HackNation 2026). Plany 7 plastrów gotowe w
 - Uruchamianie: sesja króla działa w aplikacji Herdr, a Caissa wymaga starego Herdra. Komendy Caissy idą z env `HERDR_ENV=1 HERDR_SOCKET_PATH=~/.config/herdr/herdr.sock HERDR_PANE_ID=w6J:p1 CAISSA_WAKE=0` (workspace „mOcena Caissa” w serwerze starego Herdra, bez fokusu). Koniec joba król łapie pętlą `caissa status` w tle.
 - Każdy job ma `tenX: partial` (bez archiwizacji): plan F-01 zawiera kontrakt czytany przez inne plastry; archiwizacja wszystkich zmian na końcu.
 
+- Wdrożenie: Cloudflare Workers, `bun run deploy` (lokalny wrangler; globalny `/usr/local/bin/wrangler` jest zepsuty, zła architektura). Każdy widz ma własny Durable Object z SQLite i świeżymi danymi. Test: `bun run scripts/smoke-worker.ts`. Prace poboczne (wdrożenie, narzędzia) król robi przez subagenta, nie przez slot Caissy (autor 22.11).
+- Po każdym scalonym plastrze: `bun run deploy`.
+
 ## Bieżący rezultat i zgoda
 
 Zgoda na start budowy: wiadomość autora 22.11 ok. 00:30 („Okej, będziemy ruszać, ale będziesz działał w caissie”).
 
 ## Aktywna praca
 
-F-01 `rules-engine-and-demo-data`.
+Na main: F-01, S-01, S-02, S-04, S-06, wdrożenie. W toku: S-05, S-03.
 
 ## Następny ruch
 

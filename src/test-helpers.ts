@@ -1,6 +1,6 @@
 import { Database } from "bun:sqlite";
 import { createSchema, setDb } from "./db";
-import app from "./index";
+import app from "./local";
 import { runSeed, type SeedOptions } from "./seed";
 
 export function createTestApp(opts: { today?: string; seedOptions?: SeedOptions } = {}) {

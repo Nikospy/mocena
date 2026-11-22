@@ -94,6 +94,11 @@ export function periodEndAfterNegative(acknowledgedOn: string): string {
   return addMonths(acknowledgedOn, D.reassessmentAfterNegativeMonths.value);
 }
 
+/** Art. 89 ust. 2 ustawy: stopień służbowy z mocy prawa w 30 dni od zapoznania się z drugą oceną. */
+export function mandatoryGradeDeadline(ackOn: string): string {
+  return toWorkingDay(addDays(ackOn, D.mandatoryGradeDays.value));
+}
+
 /** Art. 83 ust. 1 ustawy: sprzeciw do dyrektora generalnego w 7 dni od zapoznania się z oceną. */
 export function objectionDeadline(acknowledgedOn: string): string {
   return toWorkingDay(addDays(acknowledgedOn, D.objectionDays.value));
