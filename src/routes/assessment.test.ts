@@ -296,11 +296,11 @@ describe("fikcja zapoznania i wgląd kadr", () => {
     const post = (p: Record<string, string>) => call(app, "marek", `/cycles/${piotr}/assessment/fiction`, p);
     const r = await post({ ...good, reason: "" });
     expect(r.status).toBe(422);
-    expect(await r.text()).toContain("Wybierz, czy oceniany nie mógł, czy nie chciał potwierdzić");
+    expect(await r.text()).toContain("Wybierz, czy oceniany nie mógł, czy nie chciał potwierdzić zapoznania.");
     for (const bad of [{ deliveryMethod: "" }, { deliveredOn: "" }, { deliveredOn: "2026-11-23" }, { deliveredOn: "2026-11-20" }]) {
       const rr = await post({ ...good, ...bad });
       expect(rr.status).toBe(422);
-      expect(await rr.text()).toContain("Wpisz, jak i kiedy doręczono kopię arkusza");
+      expect(await rr.text()).toMatch(/Wybierz, jak doręczono kopię arkusza\.|Wybierz z kalendarza datę doręczenia kopii arkusza/);
     }
     expect(closing()).toHaveLength(0);
   });

@@ -1,6 +1,6 @@
 import { rules } from "../engine/rules";
 import type { Person } from "../people";
-import { LegalBasis, PageHeader } from "./components";
+import { ErrorSummary, FieldError, LegalBasis, PageHeader, invalid, type FormErrors } from "./components";
 import { Layout, formatDate } from "./layout";
 
 export type FictionViewProps = {
@@ -10,28 +10,27 @@ export type FictionViewProps = {
   today: string;
   approvedOn: string;
   deadline: string;
-  errors?: string[];
+  errors?: FormErrors;
   values?: { reason: string; deliveryMethod: string; deliveredOn: string };
 };
 
 export function FictionView(p: FictionViewProps) {
   const v = p.values ?? { reason: "", deliveryMethod: "in_person", deliveredOn: p.today };
+  const e = p.errors ?? {};
   return (
     <Layout title="Fikcja zapoznania" person={p.viewer} today={p.today}>
       <PageHeader context="Ocena okresowa · zapoznanie" title={<>Stwierdzenie fikcji zapoznania: {p.person.name}</>} />
       <div class="o-grid">
         <div class="o-main">
       <section class="card b-sec">
-        {p.errors?.length ? (
-          <div class="st bad" role="alert">
-            <ul>{p.errors.map((e) => <li>{e}</li>)}</ul>
-          </div>
-        ) : null}
         <form method="post" action={`/cycles/${p.cycleId}/assessment/fiction`} class="form-gap">
+          <ErrorSummary errors={{ reason: e.reason, deliveryMethod: e.deliveryMethod, deliveredOn: e.deliveredOn }} />
+          <div class="field" role="radiogroup" aria-labelledby="l-reason" {...invalid("reason", e)}>
           <p class="lbl" id="l-reason">Powód</p>
-          <div class="chips" role="radiogroup" aria-labelledby="l-reason">
+          <FieldError id="reason" errors={e} />
+          <div class="chips">
             <label class="chip">
-              <input type="radio" name="reason" value="could_not" checked={v.reason === "could_not"} />
+              <input type="radio" name="reason" id="reason" value="could_not" checked={v.reason === "could_not"} />
               <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Oceniany nie mógł potwierdzić zapoznania</span>
             </label>
             <label class="chip">
@@ -39,10 +38,13 @@ export function FictionView(p: FictionViewProps) {
               <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Oceniany nie chciał potwierdzić zapoznania</span>
             </label>
           </div>
+          </div>
+          <div class="field" role="radiogroup" aria-labelledby="l-delivery" {...invalid("deliveryMethod", e)}>
           <p class="lbl" id="l-delivery">Jak doręczono kopię arkusza <LegalBasis basis={rules.approval.acknowledgement.basis} /></p>
-          <div class="chips" role="radiogroup" aria-labelledby="l-delivery">
+          <FieldError id="deliveryMethod" errors={e} />
+          <div class="chips">
             <label class="chip">
-              <input type="radio" name="deliveryMethod" value="in_person" checked={v.deliveryMethod === "in_person"} />
+              <input type="radio" name="deliveryMethod" id="deliveryMethod" value="in_person" checked={v.deliveryMethod === "in_person"} />
               <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Osobiście</span>
             </label>
             <label class="chip">
@@ -54,8 +56,12 @@ export function FictionView(p: FictionViewProps) {
               <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Pocztą elektroniczną</span>
             </label>
           </div>
+          </div>
+          <div class="field">
           <label class="lbl" for="deliveredOn">Data doręczenia kopii arkusza</label>
-          <input class="area date-field" type="date" id="deliveredOn" name="deliveredOn" min={p.approvedOn} max={p.today} value={v.deliveredOn} />
+          <FieldError id="deliveredOn" errors={e} />
+          <input class="area date-field" type="date" id="deliveredOn" name="deliveredOn" min={p.approvedOn} max={p.today} value={v.deliveredOn} {...invalid("deliveredOn", e)} />
+          </div>
           <div class="btns">
             <button type="submit" class="btn primary">Zapisz fikcję zapoznania</button>
             <a class="btn" href={`/cycles/${p.cycleId}/assessment`}>Wróć bez zapisu</a>

@@ -17,6 +17,7 @@ import { currentPerson, personById, type Person } from "../people";
 import { setting, today } from "../settings";
 import { AssessmentMessage, AssessmentView, BlockerList, ResultPanel } from "../views/assessment";
 import { FictionView } from "../views/acknowledgement-fiction";
+import { formatDate } from "../views/layout";
 
 type Ctx = { cycle: Cycle; person: Person; appraisee: Person };
 
@@ -270,7 +271,7 @@ function fictionGuard(c: Context): Ctx | Response | Promise<Response> {
   return g;
 }
 
-function fictionScreen(c: Context, cx: Ctx, extra: { status?: 200 | 422; errors?: string[]; values?: Record<string, string> } = {}) {
+function fictionScreen(c: Context, cx: Ctx, extra: { status?: 200 | 422; errors?: Record<string, string>; values?: Record<string, string> } = {}) {
   const approvedOn = assessmentState(cx.cycle.id).approvedOn ?? today();
   return c.html(
     <FictionView
@@ -298,12 +299,13 @@ app.post("/cycles/:id/assessment/fiction", async (c) => {
   if (!isCtx(g)) return g;
   const body = await c.req.parseBody();
   const values = { reason: str(body.reason), deliveryMethod: str(body.deliveryMethod), deliveredOn: str(body.deliveredOn) };
-  const errors: string[] = [];
-  if (!REASONS.includes(values.reason)) errors.push("Wybierz, czy oceniany nie mógł, czy nie chciał potwierdzić");
+  const errors: Record<string, string> = {};
+  if (!REASONS.includes(values.reason)) errors.reason = "Wybierz, czy oceniany nie mógł, czy nie chciał potwierdzić zapoznania.";
   const approvedOn = assessmentState(g.cycle.id).approvedOn ?? today();
   const dateOk = isIsoDate(values.deliveredOn) && values.deliveredOn >= approvedOn && values.deliveredOn <= today();
-  if (!METHODS.includes(values.deliveryMethod) || !dateOk) errors.push("Wpisz, jak i kiedy doręczono kopię arkusza");
-  if (errors.length) return fictionScreen(c, g, { status: 422, errors, values });
+  if (!METHODS.includes(values.deliveryMethod)) errors.deliveryMethod = "Wybierz, jak doręczono kopię arkusza.";
+  if (!dateOk) errors.deliveredOn = `Wybierz z kalendarza datę doręczenia kopii arkusza: od ${formatDate(approvedOn)} do dziś.`;
+  if (Object.keys(errors).length) return fictionScreen(c, g, { status: 422, errors, values });
   const ok = getDb().transaction(() => {
     const state = assessmentState(g.cycle.id);
     if (state.stage !== "approved" || !state.approvedOn || !state.snapshot) return false;
