@@ -2,7 +2,7 @@
 
 Cel: ekrany pokazu mają wyglądać jak praca studia dla urzędu. Autor przejrzał 17 punktów przeglądu i przy każdym wybrał „Naprawić”. Decyzja autora: „wygląd A to tylko szkielet, można go zmieniać dowolnie, byle by to były zmiany na lepsze”. Zasady wspólne: `change.md` w tym katalogu.
 
-Wolno zmieniać: `public/style.css`, `public/rodzina.css` (tylko nowe tokeny ról), `public/tour.js`, `src/views/` (znaczniki i klasy), `scripts/design-audit.ts`, testy widoków. Tekstów interfejsu nie zmieniasz bez potrzeby (testy tras sprawdzają treść). Kolory, rozmiary i odstępy tylko z tokenów.
+Wolno zmieniać: `public/style.css`, `public/rodzina.css` (tylko nowe tokeny ról), `public/tour.js`, `src/views/` (znaczniki i klasy), testy widoków. Skrypt pomiaru należy do paczki „pomiar całości”: nie zmieniasz go, nowe możliwości (szerokości 320/768/1024, stany błędu, tryb pokazu) dostaniesz po `git merge main`. Tekstów interfejsu nie zmieniasz bez potrzeby (testy tras sprawdzają treść). Kolory, rozmiary i odstępy tylko z tokenów.
 
 ## Pomiar
 
@@ -43,7 +43,7 @@ Komponenty
 - **K6** Pasek pokazu: jedna dyskretna linia („Pokaz · dziś 21 listopada 2026 · Zmień datę”), pole daty rozwija się po kliknięciu (`details`), na telefonie zwinięty. Nie wygląda jak część usługi.
 
 Prawo i dostępność
-- **L2** Brak przewijania w poziomie przy 360 i 320 px (`overflowPx` = 0). Dodaj do skryptu szerokość 320.
+- **L2** Brak przewijania w poziomie przy 360 i 320 px (`overflowPx` = 0).
 - **L3** Żaden cel kliknięcia poniżej 24 px (`under24` = 0).
 - **L4** Każdy ekran ma jeden widoczny `h1` (`h1Count` = 1; dziś arkusz przy 1440 ma 0).
 - Bez zmian muszą zostać: kontrast (`contrastFails` = 0), etykiety pól (`unlabeled` = 0).
