@@ -144,3 +144,39 @@ describe("ocena sporządzona po raz drugi (art. 83 ust. 4 ustawy)", () => {
     expect(JSON.parse(last.payload).on_behalf_of).toBe("anna");
   });
 });
+
+test("kadry, CSV i statystyki pokazują drugą ocenę aż do zapoznania", async () => {
+  const { cycleById, startNextCycle } = await import("../cycles");
+  const { officeStats } = await import("../hr/stats");
+  for (const hasSuccessor of [true, false]) {
+    const app = await redone();
+    if (hasSuccessor) startNextCycle(cycleById("cycle-katarzyna")!, "katarzyna", "2026-11-16", "2026-11-17", "positive");
+    const exportRow = async () => {
+      const csv = await html(app, "joanna", "/hr/export.csv");
+      return csv.split("\r\n").find((line) => line.startsWith("Katarzyna Lewandowska;"))!.split(";");
+    };
+    setToday("2026-12-04");
+    const due = officeStats().overdueOpen;
+    setToday("2026-12-06");
+    const draft = await exportRow();
+    expect(draft[4]).toContain("ponowne sporządzenie oceny");
+    expect(draft.slice(5, 7)).toEqual(["04.12.2026", ""]);
+    expect(officeStats().byStep.objection_resolved).toBe(1);
+    expect(officeStats().overdueOpen).toBe(due + 1);
+    const overview = await html(app, "joanna", "/hr");
+    expect(overview.match(/>Katarzyna Lewandowska<\/a>/g)).toHaveLength(1);
+    expect(overview).toMatch(/Ponowna ocena do: <b[^>]*>04\.12\.2026<\/b>/);
+    const office = await html(app, "dyrektor-urzedu", "/office/statistics");
+    expect(office).toContain("Ponowne sporządzenie oceny lub zapoznanie z nią");
+    expect(office).not.toContain("Katarzyna Lewandowska");
+
+    expect((await call(app, "anna", `${CYCLE}/assessment/approve`, form([5, 5, 5, 5, 5]))).status).toBe(303);
+    const approved = await exportRow();
+    expect(approved[4]).toContain("po raz drugi");
+    expect(approved[5]).toBe("04.12.2026");
+    expect(officeStats().overdueOpen).toBe(due);
+    expect((await call(app, "katarzyna", `${CYCLE}/assessment/acknowledge`, {})).status).toBe(303);
+    expect((await exportRow())[5]).toBe("06.12.2028");
+    expect(await html(app, "dyrektor-urzedu", "/office/statistics")).not.toContain("Ponowne sporządzenie oceny lub zapoznanie z nią");
+  }
+});

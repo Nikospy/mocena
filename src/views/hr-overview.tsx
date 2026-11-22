@@ -113,6 +113,9 @@ export function StatsBlock(props: { stats: OfficeStats; title?: string }) {
         <div>
           <h3>Cykle według etapu</h3>
           <ul class="hr-stats plain-list">
+            {s.pendingReassessments > 0 ? (
+              <StatRow label="Ponowne sporządzenie oceny lub zapoznanie z nią" n={s.pendingReassessments} />
+            ) : null}
             {(Object.keys(STEP_LABEL) as CycleStep[]).map((k) => (
               <StatRow label={STEP_LABEL[k]} n={s.byStep[k] ?? 0} />
             ))}

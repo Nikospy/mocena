@@ -90,6 +90,10 @@ export function assessmentState(cycleId: string): AssessmentStateData {
   return stateFromEvents(visibleEvents(cycleId));
 }
 
+export function hasPendingReassessment(state: AssessmentStateData): boolean {
+  return state.redo !== null && (state.stage === "draft" || state.stage === "approved");
+}
+
 /** Ocena obowiązująca: póki druga ocena (art. 83 ust. 4 ustawy) nie jest zatwierdzona, obowiązuje pierwsza. */
 export function assessmentInForce(cycleId: string): AssessmentStateData {
   const s = assessmentState(cycleId);

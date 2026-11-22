@@ -108,7 +108,12 @@ export function cycleState(cycleId: string): CycleState {
     };
   }
   if (s.stage === "approved") {
-    return { step: "awaiting_acknowledgement", text: `Ocena zatwierdzona${second}, czeka na potwierdzenie zapoznania`, since: s.approvedOn ?? undefined };
+    return {
+      step: "awaiting_acknowledgement",
+      text: `Ocena zatwierdzona${second}, czeka na potwierdzenie zapoznania`,
+      since: s.approvedOn ?? undefined,
+      ...(s.redo ? { deadline: s.snapshot?.deadline, deadlineLabel: "Termin ponownej oceny" } : {}),
+    };
   }
 
   const dueChange = pendingRequest(cycleId);

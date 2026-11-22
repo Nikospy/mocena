@@ -1,4 +1,5 @@
-import type { Cycle } from "../cycles";
+import { assessmentState, hasPendingReassessment } from "../assessment/state";
+import { previousCycleOf, type Cycle } from "../cycles";
 import { getDb } from "../db";
 import { visibleEvents } from "../events";
 
@@ -14,4 +15,10 @@ export function latestCycles(): Cycle[] {
     out.push(c);
   }
   return out;
+}
+
+/** Cykle używane w zestawieniach stanu ocen. Druga ocena ma pierwszeństwo do zapoznania. */
+export function pendingReassessmentPredecessor(latest: Cycle): Cycle | null {
+  const previous = previousCycleOf(latest.id);
+  return previous && hasPendingReassessment(assessmentState(previous.id)) ? previous : null;
 }
