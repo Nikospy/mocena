@@ -8,5 +8,7 @@
   "Anna": { "gen": "Anny", "dat": "Annie", "ins": "Anną", "loc": "Annie" },
   "Joanna": { "gen": "Joanny", "dat": "Joannie", "ins": "Joanną", "loc": "Joannie" },
   "Jerzy": { "gen": "Jerzego", "dat": "Jerzemu", "ins": "Jerzym", "loc": "Jerzym" },
-  "Barbara": { "gen": "Barbary", "dat": "Barbarze", "ins": "Barbarą", "loc": "Barbarze" }
+  "Barbara": { "gen": "Barbary", "dat": "Barbarze", "ins": "Barbarą", "loc": "Barbarze" },
+  "Irena": { "gen": "Ireny", "dat": "Irenie", "ins": "Ireną", "loc": "Irenie" },
+  "Jan": { "gen": "Jana", "dat": "Janowi", "ins": "Janem", "loc": "Janie" }
 }
