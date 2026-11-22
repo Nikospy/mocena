@@ -1,5 +1,4 @@
 import rulesJson from "../../rules/regulation-2016-470.json";
-import { CODE_LICENSE } from "../content";
 import type { Person } from "../people";
 import { OFFICE_INIT_COMMAND } from "../settings";
 import { PageHeader } from "./components";
@@ -90,7 +89,8 @@ export function AboutPage(props: { person: Person | null; today: string }) {
           <h2 id="a-code">Kod</h2>
           <ul>
             <li>Repozytorium: <a href="https://github.com/Nikospy/mocena">github.com/Nikospy/mocena</a>.</li>
-            <li>Licencja kodu: {CODE_LICENSE}.</li>
+            <li>Prawa autorskie do kodu ma autor. Zgodnie z regulaminem zadania zwycięzca konkursu przenosi je na organizatora pisemną umową.</li>
+            <li>Biblioteka, z której korzysta działająca aplikacja: Hono, na licencji MIT.</li>
             <li>Font: Open Sans, licencja SIL Open Font License (plik OFL.txt w <code>public/fonts/</code>).</li>
           </ul>
         </section>
