@@ -31,6 +31,8 @@ export type AssessmentSnapshot = {
   confirmation: { place: string; date: string; name: string };
   /** Ocena sporządzona po raz drugi po uwzględnieniu sprzeciwu (art. 83 ust. 4 ustawy): data sprzeciwu i pierwszego zatwierdzenia. */
   redo?: { objectionFiledOn: string; firstApprovedOn: string };
+  /** Ocena zmieniona przez rozpatrującego sprzeciw (rozstrzygnięcie „zmiana oceny”, art. 83 ust. 3 ustawy): kto zapisał decyzję i kiedy. */
+  changedOnObjection?: { objectionFiledOn: string; changedOn: string; recordedBy: string; decidedBy: string };
 };
 
 /** Adresat sprzeciwu w dopełniaczu, do zdań „sprzeciw do …”: arkusz A z pola oceniającego, pozostałe z reguł. Jedyne źródło tej formy. */
@@ -149,7 +151,9 @@ function round(ev: Ev[], start: AssessmentStateData): AssessmentStateData {
   };
   if (!approved) return s;
   s.stage = "approved";
-  s.snapshot = approved.payload as AssessmentSnapshot;
+  // Rozstrzygnięcie „zmiana oceny”: obowiązuje migawka zmieniona przez rozpatrującego sprzeciw (zdarzenie `assessment_changed`).
+  const changed = ev.slice(approvedIdx + 1).findLast((e) => e.type === "assessment_changed");
+  s.snapshot = (changed ?? approved).payload as AssessmentSnapshot;
   s.approvedOn = approved.date;
   if (closing?.type === "assessment_acknowledged") {
     s.stage = "acknowledged";

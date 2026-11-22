@@ -151,7 +151,9 @@ export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetDat
           }
         : null,
       objectionTo: objectionRecipientFor(sheet, snap?.objectionRecipient),
-      redoNote: snap?.redo ? `Ocena sporządzona po raz drugi po uwzględnieniu sprzeciwu z dnia ${formatDate(snap.redo.objectionFiledOn)} (art. 83 ust. 4 ustawy).` : null,
+      redoNote: snap?.changedOnObjection
+        ? `Ocena zmieniona po uwzględnieniu sprzeciwu z dnia ${formatDate(snap.changedOnObjection.objectionFiledOn)} (art. 83 ust. 3 ustawy).`
+        : snap?.redo ? `Ocena sporządzona po raz drugi po uwzględnieniu sprzeciwu z dnia ${formatDate(snap.redo.objectionFiledOn)} (art. 83 ust. 4 ustawy).` : null,
     },
     deadlineLetters: ev
       .filter((e) => e.type === "deadline_changed")

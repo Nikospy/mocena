@@ -23,7 +23,7 @@ export type Slots = {
 export const REASON_LABEL = { could_not: "nie mógł potwierdzić", would_not: "nie chciał potwierdzić" } as const;
 export const METHOD_LABEL = { in_person: "osobiście", post: "pocztą", email: "pocztą elektroniczną" } as const;
 
-const LEVELS = new Map<number, string>(rules.partialScale.map((s) => [s.points, s.name]));
+export const LEVELS = new Map<number, string>(rules.partialScale.map((s) => [s.points, s.name]));
 
 export function PersonIco() {
   return (
@@ -494,6 +494,13 @@ export function AssessmentView(p: AssessmentViewProps) {
         </p>
       ) : null}
       {p.state.redo ? <RedoNote {...p} first={p.state.redo.first} /> : null}
+      {p.state.snapshot?.changedOnObjection ? (
+        <p class="st info" id="assessment-changed">
+          <span>
+            Ocena zmieniona po uwzględnieniu sprzeciwu z dnia {formatDate(p.state.snapshot.changedOnObjection.objectionFiledOn)}: decyzja {p.state.snapshot.changedOnObjection.decidedBy === rules.deadlines.objectionDays.to ? rules.deadlines.objectionDays.toGenitive : p.state.snapshot.changedOnObjection.decidedBy}, zapisana {formatDate(p.state.snapshot.changedOnObjection.changedOn)} przez kadry. <LegalBasis basis={[rules.deadlines.objectionReviewDays.basis]} />
+          </span>
+        </p>
+      ) : null}
       <ErrorSummary errors={p.errors} title={p.errorTitle} />
       {p.mode === "edit" || !snap ? <EditForm {...p} /> : <SnapshotView {...p} snapshot={snap} />}
     </Layout>

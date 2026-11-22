@@ -90,6 +90,10 @@ Identyfikator zrzutu daje plik `<identyfikator>-<szerokość>.jpg`. Eksporty CSV
 | `/cycles/:id/assessment` | `anna` | ocena sporządzona po raz drugi, zatwierdzona | `assessment-redo-approved-anna` | przechodzi przy 360 i 1440 (mierzone tylko te szerokości) |
 | `/cycles/:id/assessment` | `joanna` | ocena sporządzona po raz drugi, zatwierdzona | `assessment-redo-approved-joanna` | przechodzi przy 360 i 1440 (mierzone tylko te szerokości) |
 | `/cycles/:id/sheet` | `joanna` | arkusz z oceną sporządzoną po raz drugi | `sheet-redo` | przechodzi przy 360 i 1440 (mierzone tylko te szerokości) |
+| `/cycles/:id/objection-change` | `joanna` | zmiana oceny po sprzeciwie · formularz z pierwszą oceną | `objection-change-form` | przechodzi przy 360 i 1440 (mierzone tylko te szerokości) |
+| `/cycles/:id/objection-change` | `joanna` | 422 · zmieniona ocena niższa niż pierwsza | `objection-change-lowered` | przechodzi przy 360 i 1440 (mierzone tylko te szerokości) |
+| `/cycles/:id/assessment` | `anna` | ocena zmieniona po sprzeciwie | `assessment-changed-anna` | przechodzi przy 360 i 1440 (mierzone tylko te szerokości) |
+| `/cycles/:id/assessment` | `joanna` | ocena zmieniona po sprzeciwie | `assessment-changed-joanna` | przechodzi przy 360 i 1440 (mierzone tylko te szerokości) |
 | `/cycles/:id/assessment/export.json` | `marek` | 404 · ocena przed zatwierdzeniem | `assessment-export-not-approved` | nie przechodzi · 320 — T1, T2, H1, L4 / 360 — T1, T2, H1, H3, L4 / 768 — T1, T2, H1, L4 / 1024 — T1, T2, H1, L4 / 1440 — T1, T2, H1, L4 |
 | `/cycles/:id/assessment/export.json` | `marek` | zatwierdzona ocena · plik JSON | `assessment-export-approved-marek` | przechodzi przy wszystkich szerokościach |
 | `/cycles/:id/assessment/export.json` | `piotr` | zatwierdzona ocena · plik JSON | `assessment-export-approved-piotr` | przechodzi przy wszystkich szerokościach |

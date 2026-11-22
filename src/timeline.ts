@@ -151,6 +151,8 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
       if (x.objectionDeadline) {
         entries.push({ date: x.objectionDeadline, title: "Termin sprzeciwu", basis: [rules.deadlines.objectionDays.basis], kind: "deadline" });
       }
+    } else if (e.type === "assessment_changed") {
+      entries.push({ date: e.date, title: "Ocena zmieniona po uwzględnieniu sprzeciwu", detail: "Decyzję rozpatrującego sprzeciw zapisały kadry; pierwsza ocena zostaje w historii zdarzeń.", basis: [rules.deadlines.objectionReviewDays.basis], kind: "fact" });
     } else if (e.type === "objection_filed") {
       entries.push({ date: e.date, title: "Sprzeciw wniesiony", basis: [rules.deadlines.objectionDays.basis], kind: "fact" });
     } else if (e.type === "objection_resolved") {

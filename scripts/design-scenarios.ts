@@ -249,6 +249,19 @@ export async function auditScenarios(shot: Capture, post: Post) {
   } finally {
     redoDb.exec("ROLLBACK TO audit_redo; RELEASE audit_redo");
   }
+  // Rozstrzygnięcie „zmiana oceny” (art. 83 ust. 3 ustawy): kadry wpisują zmienione oceny cząstkowe; też cofane po zrzutach.
+  redoDb.exec("SAVEPOINT audit_change");
+  try {
+    redoDb.query("DELETE FROM events WHERE cycle_id = 'cycle-katarzyna' AND type = 'objection_resolved'").run();
+    const change = await post(H, objection, { outcome: "changed" });
+    await shot(H, change, "objection-change-form", { check: "Zapisujesz decyzję rozpatrującego sprzeciw" });
+    await invalid(H, change, "objection-change-lowered", change, { checks: { selector: 'input[name="score[rzetelnosc]"][value="3"]', count: 1 } });
+    const changed: Fields = {};
+    for (const id of regulation.sheets.C.mandatoryCriteria) changed[`score[${id}]`] = id === "rzetelnosc" ? "7" : "5";
+    await roles(await post(H, change, changed), "assessment-changed", [S, H]);
+  } finally {
+    redoDb.exec("ROLLBACK TO audit_change; RELEASE audit_change");
+  }
   await shot(D, "/office/statistics", "office-statistics-final");
   await keyboard(H, "/hr", "hr");
   await shot(H, "/hr", "hover-link", { hover: "a.brand" });

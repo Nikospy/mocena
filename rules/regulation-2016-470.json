@@ -345,7 +345,8 @@
     "notLower": {
       "kind": "wykładnia",
       "source": "poradnik dla urzędów o ocenach okresowych (wykładnia, nie brzmienie ustawy)",
-      "rule": "Ocena sporządzona po raz drugi nie może być niższa niż pierwsza: ani wynik, ani żadna ocena cząstkowa."
+      "rule": "Ocena sporządzona po raz drugi ani ocena zmieniona po uwzględnieniu sprzeciwu nie może być niższa niż pierwsza: ani wynik, ani żadna ocena cząstkowa.",
+      "appliesTo": ["ponowne sporządzenie oceny (art. 83 ust. 4 ustawy)", "zmiana oceny przez rozpatrującego sprzeciw (art. 83 ust. 3 ustawy)"]
     }
   },
   "approval": {

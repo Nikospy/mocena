@@ -3,13 +3,13 @@ import { rules } from "../engine/rules";
 import { computeAssessment, criterion } from "../engine/scoring";
 import type { AssessmentSnapshot } from "./state";
 
-const NOT_LOWER = "Ocena sporządzona po raz drugi nie może być niższa niż pierwsza";
 
 /**
  * Zakaz obniżenia drugiej oceny: wykładnia z poradnika dla urzędów (`rules.objectionRedo.notLower`), nie brzmienie ustawy.
  * Klucze błędów jak na ekranie oceny: `score-<kryterium>` przy ocenie cząstkowej, `h-crits` przy wyniku.
  */
-export function redoLoweringErrors(first: AssessmentSnapshot, scores: Record<string, number>): Record<string, string> {
+export function redoLoweringErrors(first: AssessmentSnapshot, scores: Record<string, number>, subject = "Ocena sporządzona po raz drugi"): Record<string, string> {
+  const NOT_LOWER = `${subject} nie może być niższa niż pierwsza`;
   const errors: Record<string, string> = {};
   for (const [id, before] of Object.entries(first.scores)) {
     const now = scores[id];
