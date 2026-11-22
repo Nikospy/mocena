@@ -36,8 +36,8 @@ export function ReminderCard(props: ReminderProps) {
           </p>
           <p>
             <b>Przyznać do {formatDate(g.dueOn)}</b>: 30 dni od zapoznania z oceną {formatDate(g.acknowledgedOn)}
-            {shifted ? `, koniec w ${rawDay} ${formatDate(raw)}, więc ${DOW[dow(g.dueOn)]}` : ""} (<LegalBasis basis={g.basis} />).
-            {g.overdue ? ` Termin minął ${formatDate(g.dueOn)}.` : ""}
+            {shifted ? `, koniec w ${rawDay} ${formatDate(raw)}, więc ${DOW[dow(g.dueOn)]}` : ""}.
+            {g.overdue ? ` Termin minął ${formatDate(g.dueOn)}.` : ""} <LegalBasis basis={g.basis} />
           </p>
           <p>
             <b>Stopień {romanGrade(g.fromGrade)} → {romanGrade(g.toGrade!)}</b>
@@ -115,6 +115,29 @@ export type StateRow = {
   links: CycleLink[];
 };
 
+const VISIBLE_LINKS = 3;
+
+function HrLinks(props: { links: CycleLink[]; printHref: string | null }) {
+  const all = [...props.links.map((l) => ({ href: l.href, label: l.label })), ...(props.printHref ? [{ href: props.printHref, label: "Drukuj / pobierz PDF" }] : [])];
+  const link = (l: { href: string; label: string }) => (
+    <a class="btn link-chip" href={l.href}>
+      {l.label}
+    </a>
+  );
+  const rest = all.slice(VISIBLE_LINKS);
+  return (
+    <span class="hr-links">
+      {all.slice(0, VISIBLE_LINKS).map(link)}
+      {rest.length ? (
+        <details class="disc hr-more">
+          <summary>Więcej <Chevron /></summary>
+          <span class="hr-links">{rest.map(link)}</span>
+        </details>
+      ) : null}
+    </span>
+  );
+}
+
 export function CycleStateTable(props: { rows: StateRow[] }) {
   return (
     <div class="hr-scroll">
@@ -131,11 +154,11 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
         </thead>
         <tbody>
           {props.rows.map((r) => (
-            <tr>
+            <tr class="hr-card">
               <th scope="row">{r.personName}</th>
-              <td>{r.appraiserName}</td>
-              <td>{r.sheet ?? "—"}</td>
-              <td>
+              <td data-label="Oceniający">{r.appraiserName}</td>
+              <td data-label="Arkusz">{r.sheet ?? "—"}</td>
+              <td data-label="Stan procesu" class="hr-state">
                 {r.state.text}
                 {r.state.more ? (
                   <details class="disc">
@@ -144,7 +167,7 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
                   </details>
                 ) : null}
               </td>
-              <td>
+              <td data-label="Termin" class="hr-due">
                 {r.state.deadline ? (
                   <>
                     {(r.state.step === "acknowledged" || r.state.step === "fiction") && r.state.deadline.date < r.today ? (
@@ -161,19 +184,8 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
                   "—"
                 )}
               </td>
-              <td>
-                <span class="hr-links">
-                  {r.links.map((l) => (
-                    <a class="btn link-chip" href={l.href}>
-                      {l.label}
-                    </a>
-                  ))}
-                  {r.sheet ? (
-                    <a class="btn link-chip" href={`/cycles/${r.cycleId}/sheet?print=1`}>
-                      Drukuj / pobierz PDF
-                    </a>
-                  ) : null}
-                </span>
+              <td data-label="Odnośniki">
+                <HrLinks links={r.links} printHref={r.sheet ? `/cycles/${r.cycleId}/sheet?print=1` : null} />
                 {r.state.step === "objection_filed" ? (
                   <form method="post" action={`/cycles/${r.cycleId}/objection-outcome`} class="hr-actions">
                     <span class="lbl">Rozstrzygnięcie sprzeciwu:</span>

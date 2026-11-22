@@ -15,7 +15,7 @@ export type FictionViewProps = {
 };
 
 export function FictionView(p: FictionViewProps) {
-  const v = p.values ?? { reason: "", deliveryMethod: "", deliveredOn: "" };
+  const v = p.values ?? { reason: "", deliveryMethod: "in_person", deliveredOn: p.today };
   return (
     <Layout title="Fikcja zapoznania" person={p.viewer} today={p.today}>
       <section class="card hdr">
@@ -40,34 +40,34 @@ export function FictionView(p: FictionViewProps) {
           </div>
         ) : null}
         <form method="post" action={`/cycles/${p.cycleId}/assessment/fiction`} class="form-gap">
-          <p class="lbl">Powód</p>
-          <div class="seg col">
-            <label>
+          <p class="lbl" id="l-reason">Powód</p>
+          <div class="chips" role="radiogroup" aria-labelledby="l-reason">
+            <label class="chip">
               <input type="radio" name="reason" value="could_not" checked={v.reason === "could_not"} />
-              <span>Oceniany nie mógł potwierdzić zapoznania</span>
+              <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Oceniany nie mógł potwierdzić zapoznania</span>
             </label>
-            <label>
+            <label class="chip">
               <input type="radio" name="reason" value="would_not" checked={v.reason === "would_not"} />
-              <span>Oceniany nie chciał potwierdzić zapoznania</span>
+              <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Oceniany nie chciał potwierdzić zapoznania</span>
             </label>
           </div>
-          <p class="lbl">Jak doręczono kopię arkusza <LegalBasis basis={rules.approval.acknowledgement.basis} /></p>
-          <div class="seg col">
-            <label>
+          <p class="lbl" id="l-delivery">Jak doręczono kopię arkusza <LegalBasis basis={rules.approval.acknowledgement.basis} /></p>
+          <div class="chips" role="radiogroup" aria-labelledby="l-delivery">
+            <label class="chip">
               <input type="radio" name="deliveryMethod" value="in_person" checked={v.deliveryMethod === "in_person"} />
-              <span>Osobiście</span>
+              <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Osobiście</span>
             </label>
-            <label>
+            <label class="chip">
               <input type="radio" name="deliveryMethod" value="post" checked={v.deliveryMethod === "post"} />
-              <span>Pocztą</span>
+              <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Pocztą</span>
             </label>
-            <label>
+            <label class="chip">
               <input type="radio" name="deliveryMethod" value="email" checked={v.deliveryMethod === "email"} />
-              <span>Pocztą elektroniczną</span>
+              <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Pocztą elektroniczną</span>
             </label>
           </div>
           <label class="lbl" for="deliveredOn">Kiedy</label>
-          <input class="area" type="date" id="deliveredOn" name="deliveredOn" min={p.approvedOn} max={p.today} value={v.deliveredOn} />
+          <input class="area date-field" type="date" id="deliveredOn" name="deliveredOn" min={p.approvedOn} max={p.today} value={v.deliveredOn} />
           <div class="btns">
             <button type="submit" class="btn primary">Zapisz wpis</button>
             <a class="btn" href={`/cycles/${p.cycleId}/assessment`}>Wróć bez zapisu</a>
