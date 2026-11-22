@@ -135,7 +135,8 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await shot(M, invitation, "invitation-expired");
   await shot(M, note + "/new", "note-form");
   await invalid(M, note + "/new", "note-error", note);
-  await roles("/notes", "notes-empty", [P, H, A]);
+  // Notatki widzi tylko autor: oceniany, kadry i administrator dostają stronę odmowy 403.
+  await roles("/notes", "notes-empty", [P, H, A], { status: 403 });
   await roles("/feedback", "feedback-empty", [M, P, H, A]);
   const noteFields = { criterion_id: "wspolpraca", text: "Po odejściu koleżanki 9 marca przejął jej kolejkę wniosków i spisał, co jest otwarte.", rating: "good", task_change: "1", date: "2026-03-11" };
   const question = await post(M, note, noteFields);

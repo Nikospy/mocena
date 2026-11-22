@@ -148,9 +148,9 @@ Identyfikator zrzutu daje plik `<identyfikator>-<szerokość>.jpg`. Eksporty CSV
 | `/notes` | `marek` | notatki | `notes-list` | nie przechodzi · 320 — H2 / 360 — H2 / 768 — T2, H2 / 1024 — H2 / 1440 — H2 |
 | `/notes` | `marek` | po zapisaniu notatki | `notes-saved` | nie przechodzi · 320 — H2 / 360 — H2 / 768 — T2, H2 / 1024 — H2 / 1440 — H2 |
 | `/notes` | `marek` | po wysłaniu informacji | `notes-feedback-sent` | nie przechodzi · 320 — H2 / 360 — H2 / 768 — T2, H2 / 1024 — H2 / 1440 — H2 |
-| `/notes` | `piotr` | brak notatek | `notes-empty-piotr` | nie przechodzi · 320 — T1 / 360 — T1 / 768 — T1, T2 / 1024 — T1 / 1440 — T1 |
-| `/notes` | `joanna` | brak notatek | `notes-empty-joanna` | nie przechodzi · 320 — T1 / 360 — T1 / 768 — T1, T2 / 1024 — T1 / 1440 — T1 |
-| `/notes` | `admin` | brak notatek | `notes-empty-admin` | nie przechodzi · 320 — T1 / 360 — T1 / 768 — T1, T2 / 1024 — T1 / 1440 — T1 |
+| `/notes` | `piotr` | 403 · odmowa: notatki widzi tylko autor | `notes-empty-piotr` | przechodzi · 320 — przechodzi / 360 — przechodzi / 768 — przechodzi / 1024 — przechodzi / 1440 — przechodzi |
+| `/notes` | `joanna` | 403 · odmowa: notatki widzi tylko autor | `notes-empty-joanna` | przechodzi · 320 — przechodzi / 360 — przechodzi / 768 — przechodzi / 1024 — przechodzi / 1440 — przechodzi |
+| `/notes` | `admin` | 403 · odmowa: notatki widzi tylko autor | `notes-empty-admin` | przechodzi · 320 — przechodzi / 360 — przechodzi / 768 — przechodzi / 1024 — przechodzi / 1440 — przechodzi |
 | `/notes/:id/feedback` | `marek` | treść z notatki | `feedback-form` | nie przechodzi · 320 — T1 / 360 — T1 / 768 — T1, T2 / 1024 — T1 / 1440 — T1 |
 | `/notes/:id/feedback` | `marek` | 422 · pusta treść | `feedback-error` | nie przechodzi · 320 — T1 / 360 — T1 / 768 — T1, T2 / 1024 — T1 / 1440 — T1 |
 | `/notes/:id/feedback` | `piotr` | 403 · odmowa | `feedback-form-403` | nie przechodzi · 320 — T1, T2, H1, L4 / 360 — T1, T2, H1, H3, L4 / 768 — T1, T2, H1, L4 / 1024 — T1, T2, H1, L4 / 1440 — T1, T2, H1, L4 |
