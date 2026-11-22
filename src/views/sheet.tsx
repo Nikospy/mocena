@@ -125,17 +125,13 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
         <PageHeader
           context={d.officeName}
           title={<>Arkusz oceny okresowej {d.sheet ? `(arkusz ${d.sheet})` : ""}</>}
-          extra={
-            <div class="no-print">
-              <PrintButton />
-            </div>
-          }
+          aside={<PrintButton />}
           links={
             <>
               <a class="no-print" href={only1 ? sheetHref : `${sheetHref}?part=1`}>
                 {only1 ? "Cały arkusz" : "Tylko część I"}
               </a>
-              {props.links.map((l) => (
+              {props.links.filter((l) => !/\/(sheet|part1)$/.test(l.href)).map((l) => (
                 <a class="no-print" href={l.href}>
                   {l.label}
                 </a>
@@ -144,6 +140,7 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
           }
         />
 
+        <div class="ct-paper">
         <section class="card sheet-part">
           <h2>Część I</h2>
           <SheetField label="Urząd">{d.officeName}</SheetField>
@@ -318,6 +315,7 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
           </section>
         )}
         <SheetFooter d={d} />
+        </div>
         {props.autoPrint ? <script src="/auto-print.js" defer></script> : null}
       </article>
     </Layout>

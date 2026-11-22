@@ -23,7 +23,7 @@ describe("historia ocen /people/:id/history", () => {
 
   test("pusta historia", async () => {
     const { app } = createTestApp({ today: "2024-12-09" });
-    expect(await html(app, "joanna", "/people/maria/history")).toContain("Brak ocen w systemie");
+    expect(await html(app, "joanna", "/people/maria/history")).toContain("Nie ma jeszcze zatwierdzonych ocen.");
   });
 
   test("odnośnik do arkusza według canViewSheet", async () => {

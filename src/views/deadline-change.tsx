@@ -56,28 +56,18 @@ export function ChangeFormView(props: {
   const off = props.blocked !== null;
   return (
     <Layout title={`Zmiana terminu oceny: ${props.personName}`} person={props.viewer} today={props.today}>
-      <PageHeader title={<>Zmień termin oceny: {props.personName}</>} />
-      <section class="card form-card">
-        <p>
-          Obecny termin: <b>{formatDateLong(props.currentDeadline)}</b>
+      <PageHeader
+        title={<>Zmień termin oceny: {props.personName}</>}
+        lead={<>Obecny termin: <b>{formatDateLong(props.currentDeadline)}</b></>}
+      />
+      {props.blocked ? (
+        <p class="st warn" role="status">
+          {props.blocked.message} <LegalBasis basis={DC.basis} />
         </p>
-        {props.blocked ? (
-          <p class="st warn" role="status">
-            {props.blocked.message} <LegalBasis basis={DC.basis} />
-          </p>
-        ) : null}
-        {props.request ? (
-          <div class="st info" role="status">
-            <div>
-              <b>Wniosek ocenianego z {formatDate(props.request.date)}</b>
-              <p>{props.request.reason}</p>
-              {props.request.requestedDate ? <small>Proponowany termin: {formatDate(props.request.requestedDate)}</small> : null}
-            </div>
-          </div>
-        ) : null}
-      </section>
-      {props.blocked ? null : <RuleCard id="h-dc-rule" cases={false} />}
-      <section class="card form-card">
+      ) : null}
+      <div class="o-grid">
+      <div class="o-main">
+      <section class="card form-card ct-form">
         <form method="post" action={`/cycles/${props.cycleId}/deadline-change`} class="abs-form">
           {props.request ? <input type="hidden" name="requestId" value={String(props.request.id)} /> : null}
           <fieldset class="dc-cases" disabled={off}>
@@ -98,7 +88,7 @@ export function ChangeFormView(props: {
             {e.case ? <p class="st bad" role="alert">{e.case}</p> : null}
           </fieldset>
           <div>
-            <label class="lbl" for="newDate">Nowy termin sporządzenia oceny</label>
+            <label class="lbl" for="newDate">Nowy termin oceny</label>
             <input class="area" type="date" id="newDate" name="newDate" value={v.newDate} disabled={off} aria-invalid={e.newDate ? "true" : undefined} aria-describedby="newDate-words" />
             <p class="date-words" id="newDate-words" data-date-words-for="newDate">{v.newDate ? formatDateLong(v.newDate) : ""}</p>
             {e.newDate ? <p class="st bad" role="alert">{e.newDate}</p> : null}
@@ -109,23 +99,41 @@ export function ChangeFormView(props: {
             <textarea class="area" id="reason" name="reason" rows={4} disabled={off} aria-invalid={e.reason ? "true" : undefined}>{v.reason}</textarea>
             {e.reason ? <p class="st bad" role="alert">{e.reason}</p> : null}
           </div>
-          <button class="btn primary full" type="submit" disabled={off}>
-            Zmień termin i przygotuj pismo
-          </button>
-          <p class="cap">{DC.notice.text} ({DC.notice.basis})</p>
+          <div class="ct-actions">
+            <button class="btn primary" type="submit" disabled={off}>
+              Zmień termin i przygotuj pismo
+            </button>
+            <p class="cap">{DC.notice.text} <LegalBasis basis={DC.notice.basis} /></p>
+          </div>
         </form>
       </section>
       {props.request ? (
-        <section class="card form-card">
-          <h2>Odrzuć wniosek</h2>
+        <section class="card form-card ct-form" aria-labelledby="h-reject">
+          <h2 id="h-reject">Odrzuć wniosek</h2>
           <form method="post" action={`/cycles/${props.cycleId}/deadline-change/reject`} class="abs-form">
             <input type="hidden" name="requestId" value={String(props.request.id)} />
-            <label class="lbl" for="reject-reason">Powód odrzucenia</label>
-            <textarea class="area" id="reject-reason" name="reason" rows={3}></textarea>
-            <button class="btn secondary full" type="submit">Odrzuć wniosek</button>
+            <div>
+              <label class="lbl" for="reject-reason">Powód odrzucenia</label>
+              <textarea class="area" id="reject-reason" name="reason" rows={3}></textarea>
+            </div>
+            <p class="ct-actions">
+              <button class="btn" type="submit">Odrzuć wniosek</button>
+            </p>
           </form>
         </section>
       ) : null}
+      </div>
+      <aside class="side">
+        {props.request ? (
+          <section class="card ct-request" aria-labelledby="h-request">
+            <h2 id="h-request">Wniosek ocenianego z {formatDate(props.request.date)}</h2>
+            <p>{props.request.reason}</p>
+            {props.request.requestedDate ? <p class="cap">Proponowany termin: <b>{formatDate(props.request.requestedDate)}</b></p> : null}
+          </section>
+        ) : null}
+        {props.blocked ? null : <RuleCard id="h-dc-rule" cases={false} />}
+      </aside>
+      </div>
       <script src="/date-words.js" defer></script>
     </Layout>
   );
@@ -148,11 +156,8 @@ export function RequestFormView(props: {
   const off = props.blocked !== null || pending !== null;
   return (
     <Layout title="Wniosek o zmianę terminu oceny" person={props.viewer} today={props.today}>
-      <PageHeader title="Wniosek o zmianę terminu oceny" />
-      <section class="card form-card">
-        <p>
-          Obecny termin: <b>{formatDateLong(props.currentDeadline)}</b>
-        </p>
+      <PageHeader title="Wniosek o zmianę terminu oceny" lead={<>Obecny termin: <b>{formatDateLong(props.currentDeadline)}</b></>} />
+      <div class="ct-states">
         {pending ? (
           <p class="st info" role="status">
             Wniosek z {formatDate(pending.date)} czeka na decyzję oceniającego.
@@ -180,10 +185,11 @@ export function RequestFormView(props: {
             {props.blocked.message} <LegalBasis basis={DC.basis} />
           </p>
         ) : null}
-      </section>
-      <RuleCard id="h-dc-rule" />
-      <section class="card form-card">
-        <p class="cap">Wniosek rozpatruje oceniający: może zmienić termin albo odrzucić wniosek z podaniem powodu.</p>
+      </div>
+      <div class="o-grid">
+      <section class="card form-card ct-form" aria-labelledby="h-req-form">
+        <h2 id="h-req-form">Złóż wniosek</h2>
+        <p>Wniosek rozpatruje oceniający: może zmienić termin albo odrzucić wniosek z podaniem powodu.</p>
         <form method="post" action={`/cycles/${props.cycleId}/deadline-change/request`} class="abs-form">
           <div>
             <label class="lbl" for="reason">Uzasadnienie wniosku</label>
@@ -196,11 +202,17 @@ export function RequestFormView(props: {
             <p class="date-words" id="requestedDate-words" data-date-words-for="requestedDate">{props.values.requestedDate ? formatDateLong(props.values.requestedDate) : ""}</p>
             {e.requestedDate ? <p class="st bad" role="alert">{e.requestedDate}</p> : null}
           </div>
-          <button class="btn primary full" type="submit" disabled={off}>
-            Złóż wniosek
-          </button>
+          <p class="ct-actions">
+            <button class="btn primary" type="submit" disabled={off}>
+              Złóż wniosek
+            </button>
+          </p>
         </form>
       </section>
+      <aside class="side">
+        <RuleCard id="h-dc-rule" />
+      </aside>
+      </div>
       <script src="/date-words.js" defer></script>
     </Layout>
   );
@@ -224,7 +236,7 @@ export function LetterView(props: {
         <div class="no-print">
           <PageHeader
             title="Pismo o zmianie terminu oceny"
-            extra={<PrintButton />}
+            aside={<PrintButton />}
             links={
               <>
                 <a href={`/cycles/${props.cycleId}/timeline`}>Oś czasu</a>
@@ -233,6 +245,7 @@ export function LetterView(props: {
             }
           />
         </div>
+        <div class="ct-paper">
         <section class="card sheet-part">
           <SheetField label="Urząd">{props.officeName}</SheetField>
           <p class="dc-place">
@@ -259,6 +272,7 @@ export function LetterView(props: {
           </div>
           <p class="cap">Kopię pisma dołącza się do arkusza oceny ({DC.notice.basis}).</p>
         </section>
+        </div>
       </article>
     </Layout>
   );

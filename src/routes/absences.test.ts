@@ -28,7 +28,7 @@ describe("ścieżka kadr: /hr → Wpisz nieobecność → oś → drugi wpis", (
     expect(r1.headers.get("location")).toStartWith(`/cycles/${PIOTR}/timeline`);
     const mid = await html(app, "joanna", `/cycles/${PIOTR}/timeline`);
     expect(mid).toContain("Nie dłużej niż miesiąc: termin bez zmian");
-    expect(mid).toContain("Wpisz kolejną nieobecność");
+    expect(mid).toContain("Wpisz nieobecność");
 
     expect((await call(app, "joanna", `/cycles/${PIOTR}/absences`, SECOND)).status).toBe(303);
     expect(rows(db)).toHaveLength(2);
@@ -56,10 +56,10 @@ describe("ścieżka kadr: /hr → Wpisz nieobecność → oś → drugi wpis", (
     expect(mine).toContain("art. 81 ust. 7");
     expect(mine).not.toContain("05.10.2026");
     expect(mine).not.toContain("33 dni");
-    expect(mine).not.toContain("Wpisz kolejną nieobecność");
+    expect(mine).not.toContain("Wpisz nieobecność");
     const boss = await html(app, "marek", `/cycles/${PIOTR}/timeline`);
     expect(boss).toContain("05.10.2026–06.11.2026");
-    expect(boss).not.toContain("Wpisz kolejną nieobecność");
+    expect(boss).not.toContain("Wpisz nieobecność");
   });
 
   test("żadne rozpatrywane żądanie nie wymaga /part1, a odnośniki zależą od roli", () => {

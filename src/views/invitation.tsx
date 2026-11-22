@@ -1,8 +1,18 @@
-import { INVITATION_KINDS, daysBetween, invitationHeadline, invitationStatus, type Invitation, type InvitationErrors, type InvitationInput, type InvitationKind } from "../invitations";
+import { INVITATION_KINDS, daysBetween, invitationStatus, type Invitation, type InvitationErrors, type InvitationInput, type InvitationKind } from "../invitations";
 import type { Cycle } from "../cycles";
 import type { Person } from "../people";
 import { LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate, formatDateLong } from "./layout";
+
+/** „Na rozmowę o kryteriach zostało 18 dni – do 27.12.2024.” z odmianą przez liczby. */
+function limitSentence(left: number, limit: string): string {
+  const d = formatDate(limit);
+  if (left < 0) return `Termin rozmowy o kryteriach minął ${d}.`;
+  if (left === 0) return `Termin rozmowy o kryteriach mija dziś, ${d}.`;
+  if (left === 1) return `Na rozmowę o kryteriach został 1 dzień – do ${d}.`;
+  const verb = new Intl.PluralRules("pl-PL").select(left) === "few" ? "zostały" : "zostało";
+  return `Na rozmowę o kryteriach ${verb} ${left} dni – do ${d}.`;
+}
 
 /** Blok na karcie rozmowy: stan zaproszenia i przycisk dla oceniającego. */
 export function InvitationBlock(props: { cycle: Cycle; kind: InvitationKind; active: Invitation | null }) {
@@ -21,7 +31,7 @@ export function InvitationBlock(props: { cycle: Cycle; kind: InvitationKind; act
         <p class="cap">Oceniany jeszcze nie dostał zaproszenia.</p>
       )}
       <div class="btns">
-        <a class="btn primary" href={`/cycles/${cycle.id}/invitations/new?kind=${kind}`}>{active ? "Zmień termin" : "Zaproś na rozmowę"}</a>
+        <a class="btn primary" href={`/cycles/${cycle.id}/invitations/new?kind=${kind}`}>{active ? "Zmień datę rozmowy" : "Zaproś na rozmowę"}</a>
       </div>
     </section>
   );
@@ -45,25 +55,16 @@ export function InvitationFormView(props: {
   return (
     <Layout title={`${k.invitationTitle}: ${props.personName}`} person={props.viewer} today={props.today}>
       <PageHeader context={k.title} title={<>Zaproś na rozmowę: {props.personName}</>} />
-      {props.limit ? (
-        <p class="st info" role="status">
-          <span>
-            <b>{left !== null && left < 0
-              ? `Termin rozmowy o kryteriach minął ${formatDate(props.limit)}.`
-              : `Do granicy z § 7: ${left} dni (do ${formatDate(props.limit)})`}</b>
-            <small>Rozmowa o kryteriach ma się odbyć w terminie z <LegalBasis basis={props.limitBasis} />.</small>
-          </span>
-        </p>
-      ) : null}
       {late ? (
         <p class="st warn" role="alert">
           <span>
-            <b>Ta data jest po granicy z § 7 ({formatDate(props.limit!)})</b>
-            <small>Zaproszenie zapisze się mimo to. Termin rozmowy wynika z przepisu, nie z zaproszenia.</small>
+            <b>Ta data jest po terminie rozmowy o kryteriach ({formatDate(props.limit!)})</b>
+            <small>Zaproszenie i tak zostanie wysłane. Termin rozmowy wynika z § 7 rozporządzenia, nie z zaproszenia.</small>
           </span>
         </p>
       ) : null}
-      <section class="card form-card">
+      <div class="o-grid">
+      <section class="card form-card ct-form">
         <form method="post" action={`/cycles/${props.cycleId}/invitations`} class="abs-form">
           <input type="hidden" name="kind" value={v.kind} />
           <div class="dates">
@@ -85,13 +86,24 @@ export function InvitationFormView(props: {
             {e.place ? <p class="st bad" role="alert">{e.place}</p> : null}
           </div>
           <div>
-            <label class="lbl" for="note">Notatka dla ocenianego (nieobowiązkowa)</label>
+            <label class="lbl" for="note">Wiadomość dla ocenianego (nieobowiązkowa)</label>
             <textarea class="area" id="note" name="note" rows={3} maxlength={500} aria-invalid={e.note ? "true" : undefined}>{v.note}</textarea>
             {e.note ? <p class="st bad" role="alert">{e.note}</p> : null}
           </div>
-          <button class="btn primary full" type="submit">Wyślij zaproszenie</button>
+          <p class="ct-actions">
+            <button class="btn primary" type="submit">Wyślij zaproszenie</button>
+          </p>
         </form>
       </section>
+      <aside class="side">
+      {props.limit ? (
+        <p class="st info" role="status">
+          <span>
+            <b>{limitSentence(left!, props.limit)}</b>
+            <small>Rozmowa o kryteriach ma się odbyć w terminie z <LegalBasis basis={props.limitBasis} /> rozporządzenia.</small>
+          </span>
+        </p>
+      ) : null}
       <section class="rule">
         <p class="voice rule-v"><span class="pg" aria-hidden="true">§</span><span><b>Tematy rozmowy</b> · z przepisu</span></p>
         <ol class="b-ol">{k.topics.map((t) => <li>{t}</li>)}</ol>
@@ -99,8 +111,10 @@ export function InvitationFormView(props: {
       </section>
       <section class="hint">
         <p class="voice hint-v">Podpowiedź</p>
-        <p>Zaproszenie nie jest wymogiem przepisu. To wygoda dla obu stron: termin, miejsce i tematy są w jednym miejscu.</p>
+        <p>Zaproszenie nie jest wymogiem przepisu. To wygoda dla obu stron: data, miejsce i tematy rozmowy są zebrane razem.</p>
       </section>
+      </aside>
+      </div>
     </Layout>
   );
 }
@@ -112,16 +126,18 @@ export function InvitationView(props: { viewer: Person; today: string; cycle: Cy
   const isEmployee = props.viewer.id === props.cycle.person_id;
   return (
     <Layout title={k.invitationTitle} person={props.viewer} today={props.today}>
-      <PageHeader context={props.personName} title={invitationHeadline(i)} lead={formatDateLong(i.date)} />
-      {i.note ? <p>{i.note}</p> : null}
+      <PageHeader context={props.personName} title={k.invitationTitle} lead={<>{formatDateLong(i.date)}, {i.time}, {i.place}</>} />
+      <div class="o-grid">
+      <div class="o-main ct-inv">
       <p class={`st ${i.confirmedOn ? "ok" : "info"}`} role="status">
         <b>{invitationStatus(i, props.cycle)}</b>
       </p>
-      <section class="rule">
-        <p class="voice rule-v"><span class="pg" aria-hidden="true">§</span><span><b>Tematy rozmowy</b> · z przepisu</span></p>
-        <ol class="b-ol">{k.topics.map((t) => <li>{t}</li>)}</ol>
-        <p><LegalBasis basis={k.basis} /></p>
-      </section>
+      {i.note ? (
+        <section aria-labelledby="h-inv-note">
+          <h2 id="h-inv-note" class="ct-side-h">Wiadomość od oceniającego</h2>
+          <p>{i.note}</p>
+        </section>
+      ) : null}
       <div class="btns">
         {isEmployee && !i.confirmedOn ? (
           <form method="post" action={`/cycles/${props.cycle.id}/invitations/${i.id}/confirm`}>
@@ -129,6 +145,15 @@ export function InvitationView(props: { viewer: Person; today: string; cycle: Cy
           </form>
         ) : null}
         <a class="btn" href={`/cycles/${props.cycle.id}/invitations/${i.id}.ics`}>Pobierz do kalendarza</a>
+      </div>
+      </div>
+      <aside class="side">
+      <section class="rule">
+        <p class="voice rule-v"><span class="pg" aria-hidden="true">§</span><span><b>Tematy rozmowy</b> · z przepisu</span></p>
+        <ol class="b-ol">{k.topics.map((t) => <li>{t}</li>)}</ol>
+        <p><LegalBasis basis={k.basis} /></p>
+      </section>
+      </aside>
       </div>
     </Layout>
   );

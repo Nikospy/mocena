@@ -11,7 +11,7 @@ describe("zaproszenia na rozmowy", () => {
   test("Marek zaprasza Piotra: zdarzenie, karta u Piotra z tematami z § 5, plik .ics", async () => {
     const { app, db } = createTestApp();
     const form = await html(app, "marek", `/cycles/${PIOTR}/invitations/new?kind=opening`);
-    expect(form).toContain("Do granicy z § 7: 18 dni (do 27.12.2024)");
+    expect(form).toContain("Na rozmowę o kryteriach zostało 18 dni – do 27.12.2024.");
     expect(form).toContain("Podpowiedź");
     expect(form).toContain("§ 5 ust. 1");
 
@@ -98,7 +98,7 @@ describe("zaproszenia na rozmowy", () => {
     expect(timeline).not.toContain("Zaproszenie na rozmowę oceniającą");
     const card = await html(app, "marek", "/cycles/cycle-ewa/cards/opening");
     expect(card).toContain("Potwierdzone przez Ewy 2.12");
-    expect(card).toContain("Zmień termin");
+    expect(card).toContain("Zmień datę rozmowy");
     expect(await html(app, "marek", `/cycles/${PIOTR}/cards/assessment-conversation`)).toContain("Zaproś na rozmowę");
     expect(await html(app, "marek", `/cycles/${PIOTR}/invitations/new?kind=assessment`)).toContain("§ 10");
   });
