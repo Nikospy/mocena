@@ -64,7 +64,7 @@ Lokalnie (Bun 1.4.4, linux x64):
 Notatka: zysk przy `applyTourStop` jest mały (około 6%), bo seedy już używały `prepare` i jednej transakcji. Migawki stanu bazowego nie dodano (zysk ~2 ms na krok nie uzasadnia ryzyka zmiany stanu). Główny koszt na żywej stronie leży prawdopodobnie w zimnym starcie Durable Object i sieci, a nie w odbudowie danych [INFERENCE: do potwierdzenia pomiarem na żywej stronie].
 Próg testu `src/live-speed.test.ts`: 19 ms (15,8 ms + 20%). To strażnik regresji, nie wymóg 20% zysku, który plan zapisywał jako cel.
 
-Pomiar na żywej stronie uzupełnia autor po wdrożeniu (`bun run scripts/measure-live.ts https://mocena.pietkiewicz-mikolaj.workers.dev`).
+Żywa strona po wdrożeniu (22.11, ok. 02:50, z Maca, 5 przebiegów, mediana/p90 ms): `GET /` w nowej sesji 368/535, `POST /tour/1` 193/278, `/tour/4` 174/369, `/tour/5b` 168/292, `style.css` 40/222, font 55/268 (`immutable`). Krok przewodnika trwa ok. 0,2 s; dalsza optymalizacja nie jest potrzebna.
 
 ## Progress
 
@@ -79,4 +79,4 @@ Pomiar na żywej stronie uzupełnia autor po wdrożeniu (`bun run scripts/measur
 
 #### Manual
 
-- [ ] 1.3 Pomiar na żywej stronie po wdrożeniu
+- [x] 1.3 Pomiar na żywej stronie po wdrożeniu — 9850183

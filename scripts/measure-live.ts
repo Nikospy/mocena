@@ -5,7 +5,7 @@ import { join } from "node:path";
 const args = process.argv.slice(2);
 const runsAt = args.indexOf("--runs");
 const runs = runsAt >= 0 ? Number(args[runsAt + 1]) : 5;
-const base = (args.find((a, i) => !a.startsWith("--") && i !== runsAt + 1) ?? "http://localhost:8787").replace(/\/$/, "");
+const base = (args.find((a, i) => !a.startsWith("--") && (runsAt < 0 || i !== runsAt + 1)) ?? "http://localhost:8787").replace(/\/$/, "");
 if (!Number.isInteger(runs) || runs < 1) throw new Error("--runs musi być liczbą całkowitą >= 1");
 
 const font = readdirSync(join(import.meta.dir, "..", "public", "fonts")).find((f) => f.endsWith(".woff2"));
