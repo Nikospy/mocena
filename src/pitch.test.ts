@@ -7,7 +7,7 @@ const files = { "README.md": readme, "docs/pitch/index.html": deck };
 
 describe("materiały dla jury", () => {
   test("README ma adres wdrożenia i przycisk pokazu", () => {
-    expect(readme).toContain("https://mocena.pietkiewicz-mikolaj.workers.dev");
+    expect(readme).toContain("https://mocena.mewitz.com");
     expect(readme).toContain("Rozpocznij pokaz");
   });
 

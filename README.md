@@ -4,7 +4,7 @@ mOcena is a prototype of a digital assistant for periodic assessments in the Pol
 
 Asystent ocen okresowych to nie AI, które pisze ocenę. Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie. mOcena prowadzi go przez cały cykl i pilnuje faktów, terminów i przepisów, a decyzję zawsze podejmuje człowiek.
 
-**Zobacz na żywo:** https://mocena.pietkiewicz-mikolaj.workers.dev
+**Zobacz na żywo:** https://mocena.mewitz.com
 
 Kliknij „Rozpocznij pokaz”: 5 kroków, ok. 3 minut. Każdy widz ma własne dane pokazowe.
 
