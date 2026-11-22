@@ -910,6 +910,7 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 .ct-form .abs-form > div, .ct-form fieldset { min-inline-size: 0; }
 .ct-form fieldset { border: 0; display: grid; gap: var(--sp-50); }
 .ct-form .area { max-inline-size: 40rem; }
+.ct-form .cap, .ct-form .cb small { font-size: var(--f-p); line-height: var(--lh-p); }
 @media (min-width: 521px) { .ct-form .dates { grid-template-columns: repeat(2, minmax(0, 20rem)); gap: var(--sp-200); } }
 @media (max-width: 520px) { .ct-actions, .ct-actions .btn { inline-size: 100%; justify-items: stretch; } }
 .o-grid > .side > * { margin: 0; }
@@ -935,7 +936,20 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 .ct-rows > li + li { border-block-start: 1px solid var(--line); }
 .ct-rows h2, .ct-rows h3 { font-size: var(--f-p); line-height: var(--lh-p); }
 .ct-rows p { margin: 0; }
+.ct-rows .cap { font-size: var(--f-p); line-height: var(--lh-p); }
+.ct-rows a { display: inline-flex; align-items: center; min-block-size: var(--hit); font-weight: var(--w-bold); }
 .ct-prev { margin-block-start: var(--sp-400); display: grid; gap: var(--sp-200); }
+
+/* Korekta arkusza: obecne wartości i historia w kolumnie bocznej. */
+.ct-lead-2 { max-inline-size: 66ch; margin-block-end: var(--sp-300); }
+.ct-rows > li > a { font-weight: var(--w-bold); }
+.ct-dl { display: grid; gap: var(--sp-150); }
+.ct-dl dt { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
+.ct-dl dd { font-weight: var(--w-bold); overflow-wrap: anywhere; }
+.ct-hist { list-style: none; display: grid; }
+.ct-hist > li { padding-block: var(--sp-150); border-block-start: 1px solid var(--line); }
+.ct-hist p { color: var(--text-2); }
+.ct-paper .sheet-part .plain-list .sheet-field p { font-weight: var(--w-regular); }
 
 /* Zaproszenie: stan, wiadomość, akcje. */
 .ct-inv { gap: var(--sp-300); }
@@ -959,7 +973,9 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
   .ct-paper .sign, .ct-paper .sheet-part > .cap { font-size: var(--f-p); line-height: var(--lh-p); }
   .ct-paper .sheet-notice { background: none; border: 0; border-radius: 0; border-inline-start: 4px solid var(--rule-line); padding: 0 0 0 var(--sp-200); }
   .ct-paper .print-footer { max-inline-size: 66ch; margin-block-start: var(--sp-400); padding-block-start: var(--sp-200); border-block-start: 1px solid var(--line); }
-  .ct-paper .sheet-part > p, .ct-paper .sheet-part > .cap { max-inline-size: 66ch; }
+  .ct-paper .sheet-part > p { max-inline-size: 66ch; }
+  .ct-paper .sheet-part > .cap { max-inline-size: 54ch; }
+  .ct-paper .lbl { font-size: var(--f-p); line-height: var(--lh-p); font-weight: var(--w-regular); color: var(--text-2); }
 }
 @media screen and (min-width: 768px) { .ct-paper { padding: var(--sp-500) var(--sp-600); } }
 
