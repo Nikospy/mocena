@@ -1,6 +1,6 @@
 # Pokrycie pomiaru całości
 
-Konta reprezentują role: `marek` to oceniający, `piotr` i `tomasz` to oceniani, `joanna` to kadry, `admin` to administrator, a `anna` to czynny zastępca w wierszach oznaczonych jako zastępstwo. Dla tras chronionych anonim otrzymuje przekierowanie do wyboru konta, mierzonego w wierszu `account`. Wiersze 403 pokazują odmowę dla przykładowego konta bez dostępu. Wiersze 404 pokazują odpowiedź dla brakującego zasobu.
+Konta reprezentują role: `marek` to oceniający, `piotr` i `maria` to oceniani, `joanna` to kadry, `admin` to administrator, a `anna` to czynny zastępca w wierszach oznaczonych jako zastępstwo. Dla tras chronionych anonim otrzymuje przekierowanie do wyboru konta, mierzonego w wierszu `account`. Wiersze 403 pokazują odmowę dla przykładowego konta bez dostępu. Wiersze 404 pokazują odpowiedź dla brakującego zasobu. Awarię 500 wywołuje chwilowa niedostępność tabeli w osobnej bazie pomiarowej. Przy wszystkich krokach przewodnika panel jest widoczny, a jego treść na telefonie rozwijana. Ekran końcowy w aplikacji ma własny układ bez panelu.
 
 Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`. Eksporty CSV i ICS otrzymują podgląd pobranej treści, a wydruk dodatkowo PDF i PNG każdej strony.
 
@@ -16,7 +16,7 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/` | `piotr` | oczekujące potwierdzenie | `home-piotr` |
 | `/` | `joanna` | sprawy kadr | `home-hr` |
 | `/` | `admin` | sprawy administratora | `home-admin` |
-| `/` | `tomasz` | brak spraw | `home-empty` |
+| `/` | `maria` | brak spraw | `home-empty` |
 | `/account` | `anonim` | wybór konta | `account` |
 | `/account` | `anonim` | 422 · nieznane konto | `account-error` |
 | `/account` | `marek` | wybór konta po zalogowaniu | `account-marek` |
@@ -27,8 +27,10 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/cycles/:id` | `piotr` | przekierowanie do części I | `cycle-piotr` |
 | `/cycles/:id` | `admin` | 403 · odmowa | `cycle-403` |
 | `/cycles/:id` | `marek` | 404 · brak zasobu | `cycle-404` |
+| `/cycles/:id` | `anna` | przekierowanie czynnego zastępcy | `cycle-anna` |
+| `/` | `anna` | sprawy czynnego zastępcy | `home-substitute` |
 | `/cycles/:id/part1` | `marek` | wybór kryteriów | `part1-edit` |
-| `/cycles/:id/part1` | `marek` | 422 · braki kryteriów | `part1-error` |
+| `/cycles/:id/part1` | `marek` | 422 · cztery kryteria dodatkowe | `part1-error` |
 | `/cycles/:id/part1` | `marek` | przekazana i zablokowana | `part1-submitted` |
 | `/cycles/:id/part1` | `marek` | po potwierdzeniu | `part1-done-marek` |
 | `/cycles/:id/part1` | `piotr` | przed przekazaniem | `part1-piotr-wait` |
@@ -39,13 +41,14 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/cycles/:id/part1` | `joanna` | podgląd po potwierdzeniu | `part1-hr-done` |
 | `/cycles/:id/part1` | `admin` | 403 · odmowa | `part1-403` |
 | `/cycles/:id/part1` | `marek` | 404 · brak zasobu | `part1-404` |
+| `/cycles/:id/part1` | `anna` | podgląd czynnego zastępcy | `part1-substitute` |
 | `/cycles/:id/cards/opening` | `marek` | karta bez zaproszenia | `card-opening` |
 | `/cycles/:id/cards/opening` | `marek` | karta z zaproszeniem | `card-opening-sent` |
 | `/cycles/:id/cards/opening` | `piotr` | podgląd ocenianego | `card-opening-piotr` |
 | `/cycles/:id/cards/opening` | `admin` | 403 · odmowa | `opening-403` |
 | `/cycles/:id/cards/opening` | `marek` | 404 · brak zasobu | `opening-404` |
+| `/cycles/:id/cards/opening` | `anna` | karta czynnego zastępcy | `opening-substitute` |
 | `/cycles/:id/assessment` | `marek` | blokada · brak potwierdzenia części I | `assessment-no-part1` |
-| `/cycles/:id/assessment` | `marek` | blokada · przed oknem oceny | `assessment-early` |
 | `/cycles/:id/assessment` | `marek` | pusty formularz | `assessment-empty` |
 | `/cycles/:id/assessment` | `marek` | 422 · niekompletna ocena | `assessment-error` |
 | `/cycles/:id/assessment` | `marek` | zapisany szkic | `assessment-draft` |
@@ -69,6 +72,8 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/cycles/:id/assessment/fiction` | `marek` | 409 · już zapoznano | `fiction-blocked` |
 | `/cycles/:id/assessment/fiction` | `piotr` | 403 · odmowa | `fiction-403` |
 | `/cycles/:id/assessment/fiction` | `marek` | 404 · brak zasobu | `fiction-404` |
+| `/cycles/:id/assessment/fiction` | `anna` | formularz czynnego zastępcy | `fiction-substitute` |
+| `/cycles/:id/assessment/fiction` | `anna` | 422 · brak danych doręczenia | `fiction-substitute-error` |
 | `/hr` | `joanna` | stan cykli i obowiązek nadania stopnia | `hr` |
 | `/hr` | `joanna` | po przyznaniu stopnia | `hr-awarded` |
 | `/hr` | `joanna` | fokus · Tab × 1 | `hr-tab-1` |
@@ -76,6 +81,7 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/hr` | `joanna` | fokus · Tab × 6 | `hr-tab-6` |
 | `/hr` | `joanna` | najechanie · odnośnik | `hover-link` |
 | `/hr` | `piotr` | 403 · odmowa | `hr-403` |
+| `/hr` | `anonim` | 302 · wybór konta | `hr-anonymous` |
 | `/cycles/:id/sheet` | `marek` | pełny arkusz | `sheet` |
 | `/cycles/:id/sheet` | `marek` | wyciąg części I | `sheet-part1-marek` |
 | `/cycles/:id/sheet` | `piotr` | pełny arkusz | `sheet-piotr` |
@@ -195,11 +201,10 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/admin/suggestion-sources` | `piotr` | 403 · odmowa | `sources-403` |
 | `/tour` | `anonim` | wejście do przewodnika | `tour-entry` |
 | `/tour` | `marek` | wejście po zalogowaniu | `tour` |
-| `/tour` | `marek` | najechanie · przycisk drugorzędny | `hover-secondary` |
 | `/tour` | `piotr` | wejście po zalogowaniu | `tour-entry-piotr` |
 | `/tour` | `joanna` | wejście po zalogowaniu | `tour-entry-joanna` |
 | `/tour` | `admin` | wejście po zalogowaniu | `tour-entry-admin` |
-| `/tour/done` | `joanna` | ekran końcowy z przewodnikiem | `tour-done` |
+| `/tour/done` | `joanna` | ekran końcowy po przejściu przewodnika | `tour-done` |
 | `/tour/done` | `anonim` | ekran końcowy bez aktywnego przewodnika | `tour-done-direct-anonim` |
 | `/tour/done` | `marek` | ekran końcowy bez aktywnego przewodnika | `tour-done-direct-marek` |
 | `/tour/done` | `piotr` | ekran końcowy bez aktywnego przewodnika | `tour-done-direct-piotr` |
@@ -243,6 +248,7 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `marek` | potwierdzone | `invitation-confirmed-marek` |
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `piotr` | potwierdzone | `invitation-confirmed-piotr` |
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `marek` | termin minął | `invitation-expired` |
+| `/cycles/:id/invitations/:eventId{[0-9]+}` | `marek` | najechanie · przycisk drugorzędny | `hover-secondary` |
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `joanna` | 403 · odmowa | `invitation-403` |
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `marek` | 404 · brak zasobu | `invitation-404` |
 | `/cycles/:id/invitations/:eventId{[0-9]+\.ics}` | `marek` | pobranie ICS · podgląd treści | `calendar-marek` |
@@ -250,3 +256,4 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/cycles/:id/invitations/:eventId{[0-9]+\.ics}` | `joanna` | 403 · odmowa | `calendar-403` |
 | `/cycles/:id/invitations/:eventId{[0-9]+\.ics}` | `marek` | 404 · brak zasobu | `calendar-404` |
 | `(brak trasy)` | `marek` | 404 · strona aplikacji | `error-404` |
+| `/` | `marek` | 500 · awaria dostępu do danych w bazie pomiarowej | `error-500` |
