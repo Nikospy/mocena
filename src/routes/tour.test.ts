@@ -102,6 +102,9 @@ describe("przewodnik pokazu", () => {
     const hr = await html(app, "/hr", cookies(stop));
     expect(hr.text).toMatch(/Rozmowa o kryteriach do:\s*(<[^>]+>)*30\.11\.2026/);
     expect(hr.text).toContain("§ 7 pkt 2");
+    // Krok 5b panelu: data ponownej oceny także na ekranie kadr, z przepisem.
+    expect(hr.text).toMatch(/Ponowna ocena:\s*(<[^>]+>)*23\.05\.2027/);
+    expect(hr.text).toContain("art. 81 ust. 9 ustawy");
     const home = await html(app, "/", "person_id=marek");
     expect(home.text).toContain("Wyznacz kryteria");
     expect(home.text).toContain(`href="/cycles/${cycle.id}/part1"`);

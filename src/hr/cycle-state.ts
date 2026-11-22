@@ -29,6 +29,8 @@ export type CycleState = {
   /** Termin sporządzenia oceny minął (tylko kroki przed zatwierdzeniem oceny). */
   overdue?: boolean;
   since?: string;
+  /** Drugi termin w wierszu, np. ponowna ocena po ocenie negatywnej (art. 81 ust. 9 ustawy). */
+  second?: { label: string; date: string; basis: string[] };
   /** Dalszy ciąg opisu stanu: w tabeli zwinięty pod „Szczegóły”. */
   more?: string;
 };
@@ -149,5 +151,7 @@ export function cycleState(cycleId: string): CycleState {
     deadlineLabel: "Rozmowa o kryteriach do",
     overdue: date < now,
     since: started?.date,
+    // Ta sama funkcja silnika co na stronie głównej oceniającego.
+    ...(negative ? { second: { label: "Ponowna ocena", ...effectiveDeadline(cycleId) } } : {}),
   };
 }
