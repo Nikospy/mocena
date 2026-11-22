@@ -3,7 +3,7 @@ import { Hono, type Context } from "hono";
 import { card } from "../content";
 import { visibleCycleById, effectiveDeadline, openCycle, type Cycle } from "../cycles";
 import { cycleLinks, registerCycleLinks } from "../cycle-links";
-import { confirmPart1, cycleCriteria, isPart1Locked, part1Status, saveCriteria, submitPart1, type Part1Input } from "../cycles/part1";
+import { confirmPart1, cycleCriteria, isPart1Locked, part1DeadlinesAfterObjection, part1Status, saveCriteria, submitPart1, type Part1Input } from "../cycles/part1";
 import { sheetForPosition } from "../engine/criteria";
 import { criteriaTalkDeadline } from "../engine/deadlines";
 import { rules } from "../engine/rules";
@@ -71,6 +71,23 @@ registerHomeTasks((person) => {
     tasks.push({ title: "Potwierdź część I oceny", href: `/cycles/${own.id}/part1`, action: "Przejdź do potwierdzenia" });
   }
   return tasks;
+});
+
+registerHomeTasks((person) => {
+  const ids = new Set([person.id, ...personsAppraisedBy(person.id)]);
+  return [...ids].flatMap((personId): HomeTask[] => {
+    const cycle = openCycle(personId);
+    if (!cycle || !isParty(cycle, person)) return [];
+    const dates = part1DeadlinesAfterObjection(cycle.id);
+    if (!dates) return [];
+    const name = personId === person.id ? null : personById(personId)?.name;
+    return [{
+      title: name ? `Terminy oceny: ${name}` : "Terminy oceny",
+      detail: `Termin bieżący: ${formatDate(dates.current)}. Termin przekazany w części I: ${formatDate(dates.previous.date)}.`,
+      href: `/cycles/${cycle.id}/part1`,
+      standing: true,
+    }];
+  });
 });
 
 const app = new Hono();
