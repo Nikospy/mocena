@@ -1,3 +1,4 @@
+import { errorPage } from "../views/error-page";
 import { Hono, type Context } from "hono";
 import { visibleCycleById, openCycle, type Cycle } from "../cycles";
 import { registerCycleLinks } from "../cycle-links";
@@ -82,10 +83,10 @@ function guard(c: Context, access: "send" | "party"): Response | Ctx {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
   const cycle = visibleCycleById(c.req.param("id") ?? "");
-  if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
+  if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
   if (access === "send") {
-    if (!canInvite(viewer, cycle)) return c.text("Zaproszenie wysyła oceniający otwartego cyklu.", 403);
-  } else if (!isParty(cycle, viewer)) return c.text("Brak uprawnień do tego cyklu.", 403);
+    if (!canInvite(viewer, cycle)) return errorPage(c, "Zaproszenie wysyła oceniający otwartego cyklu.", 403);
+  } else if (!isParty(cycle, viewer)) return errorPage(c, "Ten cykl oceny widzą oceniany, jego oceniający i kadry.", 403);
   return { viewer, cycle };
 }
 
@@ -114,7 +115,7 @@ app.get("/cycles/:id/invitations/new", (c) => {
   const g = guard(c, "send");
   if (g instanceof Response) return g;
   const kind = parseKind(c.req.query("kind"));
-  if (!kind) return c.text("Nieznany rodzaj rozmowy.", 404);
+  if (!kind) return errorPage(c, "Nie ma takiej rozmowy. Wybierz rozmowę o kryteriach albo rozmowę oceniającą.", 404);
   const prev = activeInvitations(g.cycle.id).find((i) => i.kind === kind);
   return renderForm(c, g, { kind, date: prev?.date ?? "", time: prev?.time ?? "", place: prev?.place ?? "", note: prev?.note ?? "" });
 });
@@ -125,7 +126,7 @@ app.post("/cycles/:id/invitations", async (c) => {
   const body = await c.req.parseBody();
   const str = (k: string) => (typeof body[k] === "string" ? (body[k] as string).trim() : "");
   const kind = parseKind(str("kind"));
-  if (!kind) return c.text("Nieznany rodzaj rozmowy.", 422);
+  if (!kind) return errorPage(c, "Nie ma takiej rozmowy. Wybierz rozmowę o kryteriach albo rozmowę oceniającą.", 422);
   const values: InvitationInput = { kind, date: str("date"), time: str("time"), place: str("place"), note: str("note") };
   const errors = validateInvitation(values);
   if (Object.keys(errors).length) return renderForm(c, g, values, errors, 422);
@@ -137,7 +138,7 @@ app.get("/cycles/:id/invitations/:eventId{[0-9]+}", (c) => {
   const g = guard(c, "party");
   if (g instanceof Response) return g;
   const found = invitationById(g.cycle.id, Number(c.req.param("eventId")));
-  if (!found?.active) return c.text("Nie ma takiego zaproszenia albo zostało zastąpione nowszym.", 404);
+  if (!found?.active) return errorPage(c, "Nie ma takiego zaproszenia albo zostało zastąpione nowszym.", 404);
   const invitation = found.invitation;
   return c.html(<InvitationView viewer={g.viewer} today={today()} cycle={g.cycle} invitation={invitation} personName={personById(g.cycle.person_id)?.name ?? ""} />);
 });
@@ -145,10 +146,10 @@ app.get("/cycles/:id/invitations/:eventId{[0-9]+}", (c) => {
 app.post("/cycles/:id/invitations/:eventId{[0-9]+}/confirm", (c) => {
   const g = guard(c, "party");
   if (g instanceof Response) return g;
-  if (g.viewer.id !== g.cycle.person_id) return c.text("Termin potwierdza oceniany.", 403);
+  if (g.viewer.id !== g.cycle.person_id) return errorPage(c, "Termin potwierdza oceniany.", 403);
   const id = Number(c.req.param("eventId"));
   const found = invitationById(g.cycle.id, id);
-  if (!found?.active) return c.text("Nie ma takiego zaproszenia albo zostało zastąpione nowszym.", 404);
+  if (!found?.active) return errorPage(c, "Nie ma takiego zaproszenia albo zostało zastąpione nowszym.", 404);
   const invitation = found.invitation;
   if (!invitation.confirmedOn) recordEvent("invitation_confirmed", g.cycle.id, g.viewer.id, { invitation_id: id, kind: invitation.kind });
   return c.redirect(`/cycles/${g.cycle.id}/invitations/${id}`, 303);

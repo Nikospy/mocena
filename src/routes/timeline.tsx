@@ -5,6 +5,7 @@ import { currentPerson, personById } from "../people";
 import { today } from "../settings";
 import { buildTimeline, canRecordAbsence, canViewTimeline, timelineRulesVersion } from "../timeline";
 import { TimelineView } from "../views/timeline";
+import { errorPage } from "../views/error-page";
 
 const app = new Hono();
 
@@ -16,8 +17,8 @@ app.get("/cycles/:id/timeline", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
   const cycle = visibleCycleById(c.req.param("id"));
-  if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
-  if (!canViewTimeline(viewer, cycle)) return c.text("Oś czasu widzi oceniany, jego oceniający i kadry.", 403);
+  if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
+  if (!canViewTimeline(viewer, cycle)) return errorPage(c, "Oś czasu widzą oceniany, jego oceniający i kadry.", 403);
   const person = personById(cycle.person_id);
   const saved = c.req.query("saved");
   const notices: Record<string, string> = {

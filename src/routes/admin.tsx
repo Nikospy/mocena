@@ -12,6 +12,7 @@ import { CorrectionFormView, CorrectionListView } from "../views/sheet-correctio
 import { SuggestionSourcesView } from "../views/suggestion-sources";
 import { RulesVersionView } from "../views/rules-version";
 import { rules } from "../engine/rules";
+import { errorPage } from "../views/error-page";
 
 registerHomeTasks((person) =>
   person.role === "admin"
@@ -38,14 +39,14 @@ const app = new Hono();
 app.get("/admin/suggestion-sources", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  if (viewer.role !== "admin") return c.text("Brak uprawnień.", 403);
+  if (viewer.role !== "admin") return errorPage(c, "Ten ekran widzi administrator. Zmień konto, żeby go otworzyć.", 403);
   return c.html(<SuggestionSourcesView viewer={viewer} today={today()} data={data} modeLabel={data.modes[suggestionMode()]} />);
 });
 
 app.get("/admin/rules", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  if (viewer.role !== "admin") return c.text("Brak uprawnień.", 403);
+  if (viewer.role !== "admin") return errorPage(c, "Ten ekran widzi administrator. Zmień konto, żeby go otworzyć.", 403);
   const info = {
     version: rules.version,
     effectiveFrom: rules.effectiveFrom,
@@ -61,7 +62,7 @@ app.get("/admin/rules", (c) => {
 app.get("/admin/corrections", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  if (viewer.role !== "admin") return c.text("Brak uprawnień.", 403);
+  if (viewer.role !== "admin") return errorPage(c, "Ten ekran widzi administrator. Zmień konto, żeby go otworzyć.", 403);
   return c.html(<CorrectionListView viewer={viewer} today={today()} cycles={approvedCycles()} />);
 });
 
@@ -80,7 +81,7 @@ app.get("/cycles/:id/sheet/correction", (c) => {
   const cx = correctionContext(viewer, c.req.param("id"));
   if ("error" in cx) {
     if (cx.error === "account") return c.redirect("/account");
-    return cx.error === "forbidden" ? c.text("Korektę zatwierdzonego arkusza wprowadza tylko administrator.", 403) : c.text("Nie ma zatwierdzonej oceny w tym cyklu.", 404);
+    return cx.error === "forbidden" ? errorPage(c, "Korektę zatwierdzonego arkusza wprowadza tylko administrator.", 403) : errorPage(c, "Nie ma zatwierdzonej oceny w tym cyklu.", 404);
   }
   return c.html(
     <CorrectionFormView
@@ -101,7 +102,7 @@ app.post("/cycles/:id/sheet/correction", async (c) => {
   const cx = correctionContext(viewer, c.req.param("id"));
   if ("error" in cx) {
     if (cx.error === "account") return c.redirect("/account");
-    return cx.error === "forbidden" ? c.text("Korektę zatwierdzonego arkusza wprowadza tylko administrator.", 403) : c.text("Nie ma zatwierdzonej oceny w tym cyklu.", 404);
+    return cx.error === "forbidden" ? errorPage(c, "Korektę zatwierdzonego arkusza wprowadza tylko administrator.", 403) : errorPage(c, "Nie ma zatwierdzonej oceny w tym cyklu.", 404);
   }
   const body = await c.req.parseBody();
   const values = { field: String(body.field ?? ""), value: String(body.value ?? ""), reason: String(body.reason ?? "") };

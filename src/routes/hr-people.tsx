@@ -10,6 +10,7 @@ import { isDemoMode, today } from "../settings";
 import { Layout } from "../views/layout";
 import { PageHeader } from "../views/components";
 import { PeopleListView, PersonFormView } from "../views/hr-people";
+import { errorPage } from "../views/error-page";
 
 const app = new Hono();
 
@@ -17,7 +18,7 @@ const app = new Hono();
 export function hrGuard(c: Context): Person | Response {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  if (viewer.role !== "hr" && viewer.role !== "admin") return c.text("Ten ekran widzą kadry.", 403);
+  if (viewer.role !== "hr" && viewer.role !== "admin") return errorPage(c, "Ten ekran widzą kadry.", 403);
   return viewer;
 }
 
@@ -99,7 +100,7 @@ function editGuard(c: Context): { viewer: Person; person: Person } | Response {
   const viewer = hrGuard(c);
   if (viewer instanceof Response) return viewer;
   const person = personById(c.req.param("id") ?? "");
-  if (!person) return c.text("Nie ma takiej osoby.", 404);
+  if (!person) return errorPage(c, "Nie ma takiej osoby w danych urzędu.", 404);
   return { viewer, person };
 }
 
@@ -133,7 +134,7 @@ app.post("/hr/people/:id/edit", async (c) => {
 function deletionGuard(c: Context) {
   const g = editGuard(c);
   if (g instanceof Response) return g;
-  if (g.viewer.role !== "hr") return c.text("Dane pracownika usuwają kadry.", 403);
+  if (g.viewer.role !== "hr") return errorPage(c, "Dane pracownika usuwają kadry.", 403);
   return g;
 }
 
@@ -170,9 +171,9 @@ app.get("/hr/people/:id/delete", (c) => {
 app.post("/hr/people/:id/delete", async (c) => {
   const g = deletionGuard(c);
   if (g instanceof Response) return g;
-  if ((await c.req.parseBody()).confirmed !== "1") return c.text("Potwierdź usunięcie danych pracownika.", 422);
+  if ((await c.req.parseBody()).confirmed !== "1") return errorPage(c, "Potwierdź usunięcie danych pracownika.", 422);
   const result = deleteEmployee(g.person.id);
-  if (result) return c.text(result.reason, result.status);
+  if (result) return errorPage(c, result.reason, result.status);
   return c.redirect("/hr/people?deleted=1", 303);
 });
 

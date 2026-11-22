@@ -29,6 +29,7 @@ import { Layout, formatDate } from "./views/layout";
 import { NotFoundPage, ServerErrorPage } from "./views/error-page";
 import { AboutPage } from "./views/about";
 import { LegalBasis, PageHeader } from "./views/components";
+import { errorPage } from "./views/error-page";
 
 const app = new Hono();
 
@@ -240,7 +241,7 @@ app.post("/account", async (c) => {
 });
 
 app.post("/demo/restart", (c) => {
-  if (!isDemoMode()) return c.text("Ta funkcja jest dostępna w pokazie.", 403);
+  if (!isDemoMode()) return errorPage(c, "Ta funkcja działa tylko w trybie pokazu.", 403);
   const db = getDb();
   db.transaction(() => {
     const tables = db
@@ -255,7 +256,7 @@ app.post("/demo/restart", (c) => {
 });
 
 app.post("/demo/date", async (c) => {
-  if (!isDemoMode()) return c.text("Ta funkcja jest dostępna w pokazie.", 403);
+  if (!isDemoMode()) return errorPage(c, "Ta funkcja działa tylko w trybie pokazu.", 403);
   const body = await c.req.parseBody();
   const date = typeof body.date === "string" ? body.date : "";
   const valid = /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(Date.parse(date)) && new Date(date).toISOString().slice(0, 10) === date;

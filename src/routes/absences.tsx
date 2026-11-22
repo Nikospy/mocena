@@ -6,6 +6,7 @@ import { recordEvent, visibleEvents } from "../events";
 import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
 import { AbsenceFormView, type AbsenceFormValues } from "../views/absence-form";
+import { errorPage } from "../views/error-page";
 
 const app = new Hono();
 
@@ -15,8 +16,8 @@ function guard(c: Context): Response | Ctx {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
   const cycle = visibleCycleById(c.req.param("id") ?? "");
-  if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
-  if (viewer.role !== "hr") return c.text("Nieobecności wpisują kadry.", 403);
+  if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
+  if (viewer.role !== "hr") return errorPage(c, "Nieobecności wpisują kadry.", 403);
   return { viewer, cycle };
 }
 
@@ -44,7 +45,7 @@ function render(c: Context, cx: Ctx, values: AbsenceFormValues, errors: Partial<
   );
 }
 
-const closed = (c: Context) => c.text("Cykl jest zamknięty, nieobecności nie wpisuje się.", 409);
+const closed = (c: Context) => errorPage(c, "Cykl jest zamknięty. Nieobecność wpisuje się tylko w otwartym cyklu.", 409);
 const isOpen = (cycle: Cycle) => openCycle(cycle.person_id)?.id === cycle.id;
 
 app.get("/cycles/:id/absences", (c) => {

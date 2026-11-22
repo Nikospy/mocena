@@ -18,6 +18,7 @@ import { setting, today } from "../settings";
 import { AssessmentMessage, AssessmentView, BlockerList, ResultPanel } from "../views/assessment";
 import { FictionView } from "../views/acknowledgement-fiction";
 import { formatDate } from "../views/layout";
+import { errorPage } from "../views/error-page";
 
 type Ctx = { cycle: Cycle; person: Person; appraisee: Person };
 
@@ -25,9 +26,9 @@ function guard(c: Context): Response | Ctx {
   const person = currentPerson(c);
   if (!person) return c.redirect("/account");
   const cycle = visibleCycleById(c.req.param("id") ?? "");
-  if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
+  if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
   const appraisee = personById(cycle.person_id);
-  if (!appraisee) return c.text("Nie ma takiego cyklu.", 404);
+  if (!appraisee) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
   return { cycle, person, appraisee };
 }
 
@@ -169,16 +170,16 @@ const app = new Hono();
 app.get("/cycles/:id/assessment", (c) => {
   const g = guard(c);
   if (!isCtx(g)) return g;
-  if (!isAppraiser(g) && !isAppraisee(g) && g.person.role !== "hr") return c.text("Brak uprawnień do tej oceny.", 403);
+  if (!isAppraiser(g) && !isAppraisee(g) && g.person.role !== "hr") return errorPage(c, "Tę ocenę widzą oceniany, jego oceniający i kadry.", 403);
   return render(c, g);
 });
 
 app.get("/cycles/:id/assessment/export.json", (c) => {
   const g = guard(c);
   if (!isCtx(g)) return g;
-  if (!isAppraiser(g) && !isAppraisee(g) && g.person.role !== "hr") return c.text("Brak uprawnień do tej oceny.", 403);
+  if (!isAppraiser(g) && !isAppraisee(g) && g.person.role !== "hr") return errorPage(c, "Tę ocenę widzą oceniany, jego oceniający i kadry.", 403);
   const { snapshot, acknowledgement, fiction, approvedOn } = assessmentState(g.cycle.id);
-  if (!snapshot) return c.text("Ocena nie jest jeszcze zatwierdzona.", 404);
+  if (!snapshot) return errorPage(c, "Ocena nie jest jeszcze zatwierdzona. Wróć tu po zatwierdzeniu przez oceniającego.", 404);
   return c.json(
     { employee: g.appraisee.name, assessment: snapshot, approvedOn, acknowledgement, fiction },
     200,
@@ -192,7 +193,7 @@ const CLOSED = "Ocena nie przyjmuje już zmian: została zatwierdzona albo cykl 
 function writeGuard(c: Context): Ctx | Response | Promise<Response> {
   const g = guard(c);
   if (!isCtx(g)) return g;
-  if (!isAppraiser(g)) return c.text("Tylko oceniający może zapisać ocenę.", 403);
+  if (!isAppraiser(g)) return errorPage(c, "Ocenę zapisuje oceniający.", 403);
   const stage = assessmentState(g.cycle.id).stage;
   if (stage === "no_part1") return render(c, g, { status: 409 });
   if (stage !== "draft") return render(c, g, { status: 409, errors: { _: CLOSED } });
@@ -236,7 +237,7 @@ app.post("/cycles/:id/assessment/approve", async (c) => {
 app.post("/cycles/:id/assessment/acknowledge", (c) => {
   const g = guard(c);
   if (!isCtx(g)) return g;
-  if (!isAppraisee(g)) return c.text("Tylko oceniany może potwierdzić zapoznanie z oceną.", 403);
+  if (!isAppraisee(g)) return errorPage(c, "Zapoznanie z oceną potwierdza oceniany.", 403);
   const ok = getDb().transaction(() => {
     const state = assessmentState(g.cycle.id);
     if (state.stage !== "approved" || !state.approvedOn || !state.snapshot) return false;
@@ -277,7 +278,7 @@ const METHODS = ["in_person", "post", "email"];
 function fictionGuard(c: Context): Ctx | Response | Promise<Response> {
   const g = guard(c);
   if (!isCtx(g)) return g;
-  if (!isAppraiser(g)) return c.text("Tylko oceniający może stwierdzić fikcję zapoznania.", 403);
+  if (!isAppraiser(g)) return errorPage(c, "Fikcję zapoznania wpisuje oceniający.", 403);
   const stage = assessmentState(g.cycle.id).stage;
   if (stage !== "approved") {
     return render(c, g, { status: 409, errors: { _: "Fikcję zapoznania można stwierdzić tylko po zatwierdzeniu oceny, dopóki oceniany jej nie potwierdził." } });

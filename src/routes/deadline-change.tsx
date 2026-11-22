@@ -7,6 +7,7 @@ import { currentPerson, personById, type Person } from "../people";
 import { setting, today } from "../settings";
 import { ChangeFormView, LetterView, RequestFormView, type ChangeFormErrors } from "../views/deadline-change";
 import "../deadline-change-links";
+import { errorPage } from "../views/error-page";
 
 const app = new Hono();
 
@@ -17,9 +18,9 @@ function guard(c: Context, who: "appraiser" | "appraisee"): Response | Ctx {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
   const cycle = visibleCycleById(c.req.param("id") ?? "");
-  if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
-  if (who === "appraiser" && viewer.id !== cycle.appraiser_id) return c.text("Termin zmienia oceniający tego cyklu.", 403);
-  if (who === "appraisee" && viewer.id !== cycle.person_id) return c.text("Wniosek o zmianę terminu składa oceniany.", 403);
+  if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
+  if (who === "appraiser" && viewer.id !== cycle.appraiser_id) return errorPage(c, "Termin zmienia oceniający tego cyklu.", 403);
+  if (who === "appraisee" && viewer.id !== cycle.person_id) return errorPage(c, "Wniosek o zmianę terminu składa oceniany.", 403);
   return { viewer, cycle };
 }
 
@@ -58,7 +59,7 @@ app.post("/cycles/:id/deadline-change", async (c) => {
   const blocked = deadlineChangeBlocked(cycle);
   const body = await c.req.parseBody();
   const values = { case: str(body.case), newDate: str(body.newDate), reason: str(body.reason) };
-  if (blocked) return blocked.code === "six_months" ? renderChange(c, g, values, { case: blocked.message }, 422) : c.text(blocked.message, 409);
+  if (blocked) return blocked.code === "six_months" ? renderChange(c, g, values, { case: blocked.message }, 422) : errorPage(c, blocked.message, 409);
   const pending = pendingRequest(cycle.id);
   const errors: ChangeFormErrors = {};
   const kase = deadlineCase(Number(values.case));
@@ -84,7 +85,7 @@ app.post("/cycles/:id/deadline-change/reject", async (c) => {
   if (g instanceof Response) return g;
   const { viewer, cycle } = g;
   const pending = pendingRequest(cycle.id);
-  if (!pending) return c.text("Nie ma wniosku do rozpatrzenia.", 409);
+  if (!pending) return errorPage(c, "Nie ma wniosku do rozpatrzenia.", 409);
   const reason = str((await c.req.parseBody()).reason);
   if (!reason) return renderChange(c, g, { case: "4", newDate: "", reason: "" }, { "reject-reason": "Podaj powód odrzucenia wniosku." }, 422);
   recordEvent("deadline_change_rejected", cycle.id, viewer.id, { requestId: pending.id, reason });
@@ -118,8 +119,8 @@ app.post("/cycles/:id/deadline-change/request", async (c) => {
   if (g instanceof Response) return g;
   const { viewer, cycle } = g;
   const blocked = deadlineChangeBlocked(cycle);
-  if (blocked) return c.text(blocked.message, blocked.code === "six_months" ? 422 : 409);
-  if (pendingRequest(cycle.id)) return c.text("Wniosek czeka już na decyzję oceniającego.", 409);
+  if (blocked) return errorPage(c, blocked.message, blocked.code === "six_months" ? 422 : 409);
+  if (pendingRequest(cycle.id)) return errorPage(c, "Wniosek czeka już na decyzję oceniającego.", 409);
   const body = await c.req.parseBody();
   const values = { reason: str(body.reason), requestedDate: str(body.requestedDate) };
   const errors: { reason?: string; requestedDate?: string } = {};
@@ -137,10 +138,10 @@ app.get("/cycles/:id/deadline-change/:eventId/letter", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
   const cycle = visibleCycleById(c.req.param("id"));
-  if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
+  if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
   const event = visibleEvents(cycle.id).find((e) => e.type === "deadline_changed" && String(e.id) === c.req.param("eventId"));
-  if (!event) return c.text("Nie ma takiego pisma.", 404);
-  if (viewer.id !== cycle.person_id && viewer.id !== cycle.appraiser_id && viewer.role !== "hr") return c.text("Pismo widzi oceniany, oceniający i kadry.", 403);
+  if (!event) return errorPage(c, "Nie ma takiego pisma.", 404);
+  if (viewer.id !== cycle.person_id && viewer.id !== cycle.appraiser_id && viewer.role !== "hr") return errorPage(c, "Pismo widzą oceniany, jego oceniający i kadry.", 403);
   const appraiser = personById(cycle.appraiser_id);
   return c.html(
     <LetterView

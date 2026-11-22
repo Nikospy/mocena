@@ -1,3 +1,4 @@
+import { errorPage } from "../views/error-page";
 import { Hono, type Context } from "hono";
 import { card } from "../content";
 import { assessmentWindowReached } from "../assessment/phase";
@@ -67,9 +68,9 @@ function noteGuard(c: Context): { viewer: Person; note: Note } | Response {
   if (!viewer) return c.redirect("/account");
   const id = Number(c.req.param("noteId"));
   const note = Number.isInteger(id) ? noteById(id) : null;
-  if (!note) return c.text("Nie ma takiej notatki.", 404);
-  if (note.author_id !== viewer.id) return c.text("Brak uprawnień do tej notatki.", 403);
-  if (note.task_change !== 1) return c.text("Ta notatka nie ma zaznaczonej zmiany zadań.", 404);
+  if (!note) return errorPage(c, "Nie ma takiej notatki. Mogła zostać usunięta.", 404);
+  if (note.author_id !== viewer.id) return errorPage(c, "Notatkę widzi tylko jej autor.", 403);
+  if (note.task_change !== 1) return errorPage(c, "Ta notatka nie ma zaznaczonej zmiany zadań.", 404);
   return { viewer, note };
 }
 
@@ -94,7 +95,7 @@ app.get("/notes/:noteId/task-change", (c) => {
 app.post("/notes/:noteId/task-change", async (c) => {
   const g = noteGuard(c);
   if (g instanceof Response) return g;
-  if (lastAnswer(g.note.id, answersFor(g.note)) !== null) return c.text("Na to pytanie już odpowiedziano.", 409);
+  if (lastAnswer(g.note.id, answersFor(g.note)) !== null) return errorPage(c, "Na to pytanie już odpowiedziano.", 409);
   const raw = (await c.req.parseBody()).answer;
   const answer = raw === "yes" || raw === "no" ? raw : null;
   if (!answer) {
@@ -114,8 +115,8 @@ function cycleGuard(c: Context): { viewer: Person; cycle: Cycle; subject: Person
   if (!viewer) return c.redirect("/account");
   const cycle = visibleCycleById(c.req.param("id") ?? "");
   const subject = cycle ? personById(cycle.person_id) : null;
-  if (!cycle || !subject) return c.text("Nie ma takiego cyklu.", 404);
-  if (cycle.appraiser_id !== viewer.id) return c.text("Brak uprawnień do tego cyklu.", 403);
+  if (!cycle || !subject) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
+  if (cycle.appraiser_id !== viewer.id) return errorPage(c, "Ten ekran widzi oceniający tego cyklu.", 403);
   return { viewer, cycle, subject };
 }
 
