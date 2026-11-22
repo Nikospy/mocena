@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { openCycle } from "../cycles";
+import { visibleEvents } from "../events";
 import { Window } from "happy-dom";
 import { createTestApp } from "../test-helpers";
 import { stopById } from "../tour/stops";
@@ -89,6 +91,23 @@ describe("przewodnik pokazu", () => {
     expect((await post(app, "/tour/5b")).headers.get("location")).toBe("/hr");
     expect((await post(app, "/tour/1")).status).toBe(303);
     expect((db.query("SELECT value FROM settings WHERE key = 'demo_date'").get() as any).value).toBe("2024-12-09");
+  });
+
+  test("krok 5b otwiera nowy cykl Piotra i restart usuwa go z danych pokazu", async () => {
+    const { app } = createTestApp();
+    const stop = await post(app, "/tour/5b");
+    const cycle = openCycle("piotr")!;
+    expect(cycle.id).not.toBe("cycle-piotr");
+    expect(visibleEvents(cycle.id).find((e) => e.type === "cycle_started")?.date).toBe("2026-11-22");
+    const hr = await html(app, "/hr", cookies(stop));
+    expect(hr.text).toMatch(/Rozmowa o kryteriach do:\s*30\.11\.2026/);
+    expect(hr.text).toContain("§ 7 pkt 2");
+    const home = await html(app, "/", "person_id=marek");
+    expect(home.text).toContain("Wyznacz kryteria");
+    expect(home.text).toContain(`href="/cycles/${cycle.id}/part1"`);
+    expect((await post(app, "/demo/restart", cookies(stop))).status).toBe(303);
+    expect(openCycle("piotr")?.id).toBe("cycle-piotr");
+    expect(visibleEvents(cycle.id)).toEqual([]);
   });
 
   test("POST /tour/end zdejmuje ciasteczko przewodnika", async () => {

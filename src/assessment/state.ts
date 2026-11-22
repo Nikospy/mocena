@@ -1,3 +1,4 @@
+import { rules } from "../engine/rules";
 import type { AssessmentResult } from "../engine/scoring";
 import { visibleEvents } from "../events";
 import { currentGrade } from "../people";
@@ -6,6 +7,7 @@ export type AssessmentDraft = {
   scores: Record<string, number>;
   justification: string;
   developmentConclusions: string;
+  objectionRecipient?: string;
   interviewDate: string | null;
   gradeRequest: { attached: boolean; motivation: string };
 };
@@ -14,6 +16,7 @@ export type AssessmentSnapshot = {
   scores: Record<string, number>;
   justification: string;
   developmentConclusions: string;
+  objectionRecipient?: string;
   interviewDate: string;
   gradeRequest: { attached: boolean; motivation: string; targetGrade: number | null };
   sheet: string;
@@ -27,6 +30,10 @@ export type AssessmentSnapshot = {
   rulesVersion: { version: string; effectiveFrom: string; act: string };
   confirmation: { place: string; date: string; name: string };
 };
+
+export function objectionRecipientFor(sheet: string | null, recipient?: string): string | null {
+  return sheet === "A" ? recipient?.trim() || null : rules.deadlines.objectionDays.to;
+}
 
 export type Acknowledgement = { place: string; date: string; name: string; objectionDeadline: string };
 export type Fiction = { reason: "could_not" | "would_not"; deliveryMethod: "in_person" | "post" | "email"; deliveredOn: string; objectionDeadline: string };

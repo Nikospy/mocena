@@ -66,14 +66,14 @@ describe("część I", () => {
     expect(visibleEvents(piotr).find((e) => e.type === "part1_submitted")!.actorId).toBe("poprzedni-naczelnik");
   });
 
-  test("po ocenie negatywnej migawka terminu to 6 miesięcy od zapoznania", () => {
+  test("po ocenie negatywnej migawka terminu wskazuje dzień po upływie 6 miesięcy", () => {
     const { db } = createTestApp({ today: "2024-12-09" });
     db.query("INSERT INTO events (type, cycle_id, actor_id, date, payload) VALUES ('cycle_started','cycle-piotr','marek','2024-12-09', ?)").run(
       JSON.stringify({ reason: "previous_assessment", periodStart: "2024-11-27", previousAssessmentOn: "2024-11-27", previousAcknowledgedOn: "2024-12-01", previousOutcome: "negative" }),
     );
     savePart1(piotr, "marek", { additional: [], expectations: {} }, "2024-12-09");
     const p = visibleEvents(piotr).find((e) => e.type === "part1_submitted")!.payload;
-    expect(p.dueDate).toBe("2025-06-01");
+    expect(p.dueDate).toBe("2025-06-02");
   });
 });
 

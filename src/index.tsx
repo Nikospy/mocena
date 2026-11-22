@@ -4,7 +4,7 @@ import { getDb } from "./db";
 import { runSeed } from "./seed";
 import { homeOptions, homeTasks } from "./home-tasks";
 import { PERSON_COOKIE, currentPerson, personById, roleLabel, type Person } from "./people";
-import { today } from "./settings";
+import { isDemoMode, OFFICE_INIT_COMMAND, today } from "./settings";
 import cycleStart from "./routes/cycle-start";
 import assessment from "./routes/assessment";
 import hr from "./routes/hr";
@@ -38,14 +38,28 @@ function accounts() {
 }
 
 function AccountScreen(props: { error?: string }) {
+  const demo = isDemoMode();
+  const people = accounts();
+  if (!demo && people.length === 0) {
+    return (
+      <Layout title="Pierwsze uruchomienie" person={null} today={today()}>
+        <PageHeader title="Pierwsze uruchomienie" />
+        <section class="card">
+          <p>Załóż pierwsze konto kadr w terminalu na komputerze, na którym działa mOcena.</p>
+          <p><code>{OFFICE_INIT_COMMAND}</code></p>
+          <p>Po wykonaniu polecenia odśwież stronę i wybierz konto.</p>
+        </section>
+      </Layout>
+    );
+  }
   return (
     <Layout title="Wybór konta" person={null} today={today()}>
       <section class="account-list">
-        <PageHeader title="Wybierz konto pokazowe" lead="Każde konto pokazuje ekrany jednej osoby w cyklu oceny." />
+        <PageHeader title={demo ? "Wybierz konto pokazowe" : "Wybierz konto"} lead={demo ? "Każde konto pokazuje ekrany jednej osoby w cyklu oceny." : undefined} />
         {props.error ? <p class="st bad" role="alert">{props.error}</p> : null}
         <form method="post" action="/account">
           <ul class="acc-grid">
-            {accounts().map((a) => (
+            {people.map((a) => (
               <li>
                 <button class="card acc" type="submit" name="person_id" value={a.id}>
                   <b>{a.name}</b>
@@ -56,9 +70,11 @@ function AccountScreen(props: { error?: string }) {
             ))}
           </ul>
         </form>
-        <form method="post" action="/demo/restart" class="again">
-          <button class="btn text" type="submit">Zacznij pokaz od nowa</button>
-        </form>
+        {demo ? (
+          <form method="post" action="/demo/restart" class="again">
+            <button class="btn text" type="submit">Zacznij pokaz od nowa</button>
+          </form>
+        ) : null}
       </section>
     </Layout>
   );
@@ -86,7 +102,7 @@ app.use("*", tourContext);
 
 app.get("/", (c) => {
   const person = currentPerson(c);
-  if (!person) return c.html(<TourEntry />);
+  if (!person) return isDemoMode() ? c.html(<TourEntry />) : c.redirect("/account");
   const tasks = homeTasks(person);
   const options = homeOptions(person);
   const now = today();
@@ -184,6 +200,7 @@ app.post("/account", async (c) => {
 });
 
 app.post("/demo/restart", (c) => {
+  if (!isDemoMode()) return c.text("Ta funkcja jest dostępna w pokazie.", 403);
   const db = getDb();
   db.transaction(() => {
     const tables = db
@@ -198,6 +215,7 @@ app.post("/demo/restart", (c) => {
 });
 
 app.post("/demo/date", async (c) => {
+  if (!isDemoMode()) return c.text("Ta funkcja jest dostępna w pokazie.", 403);
   const body = await c.req.parseBody();
   const date = typeof body.date === "string" ? body.date : "";
   const valid = /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(Date.parse(date)) && new Date(date).toISOString().slice(0, 10) === date;

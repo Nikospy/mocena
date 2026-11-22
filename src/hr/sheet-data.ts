@@ -1,5 +1,5 @@
 import { actsAsAppraiser } from "../substitutions";
-import { assessmentState, type AssessmentSnapshot } from "../assessment/state";
+import { assessmentState, objectionRecipientFor, type AssessmentSnapshot } from "../assessment/state";
 import { cycleById, effectiveDeadline, type Cycle } from "../cycles";
 import { rulesVersion } from "../engine/rules";
 import { visibleEvents } from "../events";
@@ -45,7 +45,7 @@ export type SheetData = {
     appraiserConfirmation: Confirmation | null;
     appraiseeConfirmation: (Confirmation & { objectionDeadline: string }) | null;
     fiction: { reason: "could_not" | "would_not"; deliveryMethod: "in_person" | "post" | "email"; deliveredOn: string; date: string; appraiserName: string } | null;
-    objectionTo: string;
+    objectionTo: string | null;
   };
   /** Tylko urzędnik mianowany z dołączonym wnioskiem o kolejny stopień. */
   /** Pisma o zmianie terminu (§ 8 rozporządzenia): kopie dołączane do arkusza. */
@@ -146,7 +146,7 @@ export function sheetData(cycleId: string, options: { part?: 1 } = {}): SheetDat
             appraiserName: appraiser.name,
           }
         : null,
-      objectionTo: sheet === "A" ? "kierownika urzędu" : "dyrektora generalnego urzędu",
+      objectionTo: objectionRecipientFor(sheet, snap?.objectionRecipient),
     },
     deadlineLetters: ev
       .filter((e) => e.type === "deadline_changed")

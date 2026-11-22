@@ -2,6 +2,7 @@
   "name": "mocena",
   "scripts": {
     "dev": "bun run --hot src/local.tsx",
+    "init": "bun run src/init-cli.ts",
     "seed": "bun run src/seed-cli.ts",
     "demo-check": "bun run scripts/demo-check.ts",
     "record": "bun run scripts/record-demo.ts",

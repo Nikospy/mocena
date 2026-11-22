@@ -4,6 +4,8 @@ import { cycleLinks } from "../cycle-links";
 import { cycleById, effectiveDeadline, openCycle } from "../cycles";
 import { currentGrade, personById } from "../people";
 import { getDb } from "../db";
+import { mandatoryCriteria } from "../engine/scoring";
+import { officeSettings } from "../office-settings";
 import { rulesVersion } from "../engine/rules";
 import { seedEvent, visibleEvents } from "../events";
 import { homeTasks } from "../home-tasks";
@@ -238,7 +240,7 @@ describe("krok 5 pokazu: potwierdzenie i zegar", () => {
     expect(events("assessment_acknowledged")).toHaveLength(1);
     const successor = openCycle("piotr")!;
     expect(successor.id).not.toBe(piotr);
-    expect(effectiveDeadline(successor.id).date).toBe("2027-05-21");
+    expect(effectiveDeadline(successor.id).date).toBe("2027-05-22");
   });
 });
 
@@ -321,7 +323,7 @@ describe("fikcja zapoznania i wgląd kadr", () => {
     expect(closing()).toHaveLength(1);
     const successor = openCycle("piotr")!;
     expect(successor.id).not.toBe(piotr);
-    expect(effectiveDeadline(successor.id).date).toBe("2027-05-22");
+    expect(effectiveDeadline(successor.id).date).toBe("2027-05-23");
   });
 
   test("potwierdzenie, potem fikcja: 409; równoczesne żądania zostawiają jedno zdarzenie końcowe", async () => {
@@ -422,4 +424,38 @@ describe("S-04: notatki w formularzu oceny", () => {
     expect(part1).toContain(`/cycles/${piotr}/cards/assessment-conversation`);
     expect(await (await call(app, "piotr", `/cycles/${piotr}/part1`)).text()).not.toContain("assessment-conversation");
   });
+});
+
+test("arkusz A wymaga adresata sprzeciwu i zachowuje adresata w zatwierdzonej ocenie", async () => {
+  const { app, db } = createTestApp({ today: "2026-11-22" });
+  db.query("UPDATE people SET has_account = 1 WHERE id IN ('office-head', 'office-head-supervisor')").run();
+  const id = "cycle-office-head";
+  const path = `/cycles/${id}/assessment`;
+  const actor = "office-head-supervisor";
+  const print = () => call(app, "joanna", `/cycles/${id}/sheet?print=1`).then((r) => r.text());
+  const emptySheet = await print();
+  expect(emptySheet).toContain("Sprzeciw przysługuje do:");
+  expect(emptySheet).not.toContain("sprzeciw do kierownika urzędu");
+  const draft = form(mandatoryCriteria("A"), { developmentConclusions: "Kurs." });
+  const denied = await call(app, actor, `${path}/approve`, { ...draft, objectionRecipient: "  " });
+  expect(denied.status).toBe(422);
+  expect(await denied.text()).toContain("Wpisz, do kogo przysługuje sprzeciw.");
+  expect(assessmentState(id).snapshot).toBeNull();
+
+  const config = officeSettings().sheetAObjectionRecipient;
+  const original = config.value;
+  try {
+    db.query("DELETE FROM events WHERE cycle_id = ? AND type = 'assessment_draft_saved'").run(id);
+    config.value = "Organu wskazanego przez urząd";
+    expect(await (await call(app, actor, path)).text()).toContain('value="Organu wskazanego przez urząd"');
+    const entered = "Właściwego organu nadzorującego";
+    expect((await call(app, actor, `${path}/approve`, { ...draft, objectionRecipient: entered })).status).toBe(303);
+    config.value = "";
+    expect(assessmentState(id).snapshot?.objectionRecipient).toBe(entered);
+    expect(await print()).toContain(entered);
+    expect((await call(app, "office-head", `${path}/acknowledge`, {})).status).toBe(303);
+    expect(await (await call(app, "office-head", path)).text()).toContain(`Sprzeciw do ${entered}`);
+  } finally {
+    config.value = original;
+  }
 });

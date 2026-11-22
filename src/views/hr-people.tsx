@@ -122,6 +122,7 @@ export function PersonFormView(props: {
   values: PersonForm;
   errors: FormErrors;
   supervisors: Person[];
+  canSkipCycle?: boolean;
   /** Osoba ma już cykl: data zatrudnienia nie otwiera nowego. */
   hasCycle: boolean;
   hasOpenCycle: boolean;
@@ -180,6 +181,9 @@ export function PersonFormView(props: {
             <FieldError text={e.supervisor_id} />
           </div>
           <Check name="is_appraiser" checked={v.is_appraiser} label="Kieruje pracownikami i może być przełożonym" />
+          {props.canSkipCycle ? (
+            <p class="cap">Aby dodać osobę kierującą zespołem bez otwierania jej oceny, zaznacz pole powyżej. Zostaw puste pola przełożonego, daty zatrudnienia i ostatniej oceny.</p>
+          ) : null}
           <Check name="appointed" checked={v.appointed} label="Urzędnik służby cywilnej (mianowany)" />
           <div class="dates">
             <div>

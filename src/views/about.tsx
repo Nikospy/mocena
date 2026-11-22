@@ -1,6 +1,7 @@
 import rulesJson from "../../rules/regulation-2016-470.json";
 import { CODE_LICENSE } from "../content";
 import type { Person } from "../people";
+import { OFFICE_INIT_COMMAND } from "../settings";
 import { PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
@@ -13,13 +14,16 @@ export function AboutPage(props: { person: Person | null; today: string }) {
 
         <section class="card">
           <h2>Uruchomienie u siebie</h2>
-          <p>
-            <code>bun install &amp;&amp; bun run seed &amp;&amp; bun run dev</code>
-          </p>
+          <ol class="points">
+            <li><code>bun install</code></li>
+            <li><code>{OFFICE_INIT_COMMAND}</code></li>
+            <li><code>bun run dev</code></li>
+          </ol>
+          <p>Wybierz konto kadr na <a href="/account">ekranie kont</a>. W zakładce „Pracownicy” użyj przycisku „Dodaj pracownika”.</p>
           <ul class="points">
             <li><span>Wystarczy darmowe środowisko Bun: bez serwera bazy, bez dodatkowego sprzętu, bez płatnych licencji i usług.</span></li>
             <li><span>Dane trzyma jeden plik bazy SQLite na komputerze. Aplikacja uruchomiona lokalnie nie wysyła danych do żadnej usługi zewnętrznej.</span></li>
-            <li><span><code>bun run seed</code> wgrywa dane pokazowe; bez niego baza jest pusta.</span></li>
+            <li><span><code>bun run seed</code> służy wyłącznie do pokazu w osobnej bazie.</span></li>
             <li><span>Wersja na workers.dev to wdrożenie pokazowe na zawody. Wdrożenie w urzędzie działa lokalnie, bez chmury.</span></li>
           </ul>
         </section>
@@ -38,9 +42,9 @@ export function AboutPage(props: { person: Person | null; today: string }) {
 
         <section class="card">
           <h2>Dane kadrowe</h2>
-          <p><span class="lbl">Jest w prototypie:</span> lista pracowników z arkuszami, podległością i wyszukiwaniem (wgrana skryptem danych pokazowych) oraz eksport zestawienia do pliku CSV.</p>
+          <p><span class="lbl">Jest w prototypie:</span> lista pracowników z arkuszami, podległością, wyszukiwaniem i dodawaniem osób oraz eksport zestawienia do pliku CSV.</p>
           <p>
-            <span class="lbl">Nie ma w prototypie:</span> integracji z systemem kadrowym (dziś dane pracowników wstawia skrypt), z EZD (obieg pism i kopii arkusza) ani z pocztą
+            <span class="lbl">Nie ma w prototypie:</span> integracji z systemem kadrowym, z EZD (obieg pism i kopii arkusza) ani z pocztą
             (zaproszenia na rozmowy to karta z datą, bez e-maila). Przy wdrożeniu te trzy miejsca urząd podłącza u siebie.
           </p>
         </section>

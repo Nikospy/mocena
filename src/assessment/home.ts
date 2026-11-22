@@ -8,7 +8,7 @@ import { personById } from "../people";
 import { formatDate } from "../views/layout";
 import { today } from "../settings";
 import { assessmentPhaseOpen } from "./phase";
-import { assessmentState } from "./state";
+import { assessmentState, objectionRecipientFor } from "./state";
 import { verdictText } from "./verdict";
 
 registerHomeTasks((person) => {
@@ -57,12 +57,13 @@ registerHomeTasks((person) => {
     const href = `/cycles/${previous?.id ?? mine.id}/assessment`;
     if ((st.stage === "acknowledged" || st.stage === "fiction") && st.snapshot && st.objectionDeadline) {
       const { verdict, level } = verdictText(st.snapshot.result);
-      const to = st.snapshot.sheet === "A" ? "kierownika urzędu" : "dyrektora generalnego urzędu";
+      const recipient = objectionRecipientFor(st.snapshot.sheet, st.snapshot.objectionRecipient);
+      const addressee = recipient ? ` do ${recipient}` : "";
       const open = st.objectionDeadline >= today();
       tasks.push({
         title: "Twoja ocena",
         person: level ? `${verdict}, ${level}` : verdict,
-        detail: open ? `Sprzeciw do ${to} możesz złożyć w ustawowym terminie.` : `Termin sprzeciwu minął ${formatDate(st.objectionDeadline)}.`,
+        detail: open ? `Sprzeciw${addressee} możesz złożyć w ustawowym terminie.` : `Termin sprzeciwu minął ${formatDate(st.objectionDeadline)}.`,
         due: open ? st.objectionDeadline : undefined,
         basis: open ? rules.deadlines.objectionDays.basis : undefined,
         action: "Zobacz ocenę",
