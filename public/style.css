@@ -1009,7 +1009,10 @@ details.crit-notes-d > .note-list { padding-inline-start: 0; max-inline-size: no
 /* przed rozmową: pytania do zadania są treścią (16 px), nie metadanymi */
 .bm-ask .cap { font-size: var(--f-p); line-height: var(--lh-p); }
 /* 320 px: pięć kółek ocen mieści się bez przewijania w poziomie */
-@media (max-width: 359px) { #assessment-form .score { gap: var(--sp-50); } }
+@media (max-width: 359px) {
+  #assessment-form .score, .objection-change-form .score { gap: var(--sp-50); }
+  .objection-change-form .card.sheet { padding-inline: var(--sp-150); }
+}
 @media (max-width: 639px) {
   #assessment-form .crit { padding-block: var(--sp-150); }
   #assessment-form .tx-card .area:not(.date-field) { min-block-size: calc(var(--sp-800) + var(--sp-400)); }
