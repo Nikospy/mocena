@@ -37,7 +37,7 @@ const BODY: Record<TourStopId, Body> = {
     look: [
       { text: "Termin oceny z przepisem.", selector: ".rule" },
       { text: "Podpowiedzi kryteriów: przerywana ramka i powód. Nic nie jest zaznaczone z góry.", selector: ".hint" },
-      { text: "„Karta rozmowy o kryteriach” z tematami z przepisu.", selector: 'a[href$="/cards/opening"]' },
+      { text: "„Karta rozmowy o kryteriach” z tematami z przepisu.", selector: '[data-tour="opening-card"]' },
     ],
     tryIt: "Zaznacz „Orientacja na klienta/interesanta” i „Myślenie analityczne”, potem kliknij „Potwierdzam rozmowę i przekazuję część I”.",
     basis: basis(d.criteriaTalkDays.basis),
@@ -83,7 +83,7 @@ const BODY: Record<TourStopId, Body> = {
     short: "zapoznanie",
     lead: "Ocenę wystawia się w ostatnim tygodniu, ale notatki są z 24 miesięcy. Oceny cząstkowe stawia Marek. System liczy wynik według przepisu i pilnuje braków.",
     look: [
-      { text: "Notatki i pola wyboru przy kryteriach.", selector: ".crit-notes .note-list" },
+      { text: "Rozwiń notatki przy kryterium, aby zobaczyć pola wyboru.", selector: ".crit-notes-d > summary" },
       { text: "Ostrzeżenie, gdy fakty do kryterium są tylko z ostatniego miesiąca.", selector: ".st.warn" },
       { text: "Po „1” przy Rzetelności wynik jest negatywny mimo średniej powyżej 4, a zatwierdzenie czeka na uzasadnienie i wnioski do indywidualnego programu rozwoju zawodowego.", selector: "#assessment-result" },
     ],
@@ -98,7 +98,7 @@ const BODY: Record<TourStopId, Body> = {
     lead: "Piotr czyta ocenę. Uzasadnienie napisał Marek i wstawił do niego fakty z notatek. Piotr potwierdza zapoznanie. Od tej chwili system liczy 7 dni na sprzeciw.",
     look: [
       { text: "Przycisk „Potwierdzam zapoznanie z oceną”.", selector: 'form[action$="/assessment/acknowledge"] button' },
-      { text: "Termin sprzeciwu z przepisem; gdy wypada w dzień wolny, przechodzi na następny dzień roboczy.", selector: ".rule" },
+      { text: "Termin sprzeciwu z przepisem; gdy wypada w dzień wolny, przechodzi na następny dzień roboczy.", selector: "#objection-clock" },
     ],
     tryIt: "Kliknij „Potwierdzam zapoznanie z oceną”.",
     basis: basis(d.objectionDays.basis),
