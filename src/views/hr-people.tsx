@@ -13,43 +13,57 @@ const SHEET_LABEL: Record<string, string> = { A: "A: kierownik urzędu", B: "B: 
 export function PeopleListView(props: { viewer: Person; today: string; rows: PersonRow[]; q: string; sort: Sort; saved?: string; deleted?: boolean }) {
   return (
     <Layout title="Pracownicy" person={props.viewer} today={props.today}>
-      <PageHeader title="Pracownicy" lead="Dane, z których system liczy arkusz i termin oceny. Termin pochodzi z przepisów, nie z oceny osoby." />
-      {props.deleted ? <p class="st ok" role="status">Usunięto dane pracownika.</p> : null}
+      <PageHeader
+        title="Pracownicy"
+        lead="Dane, z których system liczy arkusz i termin oceny. Termin pochodzi z przepisów, nie z oceny osoby."
+        extra={
+          <p class="btns people-add">
+            <a class="btn primary" href="/hr/people/new">Dodaj pracownika</a>
+            <a class="btn" href="/hr/people/import">Importuj z CSV</a>
+          </p>
+        }
+      />
+      {props.deleted ? (
+        <div class="st ok" role="status">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+          <div><b>Usunięto dane pracownika.</b></div>
+        </div>
+      ) : null}
       {props.saved ? (
         <div class="st ok" role="status">
           <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
-          <div><b>Zapisano dane: {props.saved}.</b></div>
+          <div><b>Zapisano dane pracownika: {props.saved}.</b></div>
         </div>
       ) : null}
-      <section class="card people-tools">
-        <form method="get" action="/hr/people" role="search" class="abs-form">
-          <div>
+      <section class="card people-list" aria-labelledby="h-people">
+        <h2 id="h-people">Pracownicy ({props.rows.length})</h2>
+        <form method="get" action="/hr/people" role="search" class="people-find">
+          <div class="people-q">
             <label class="lbl" for="q">Szukaj po imieniu, nazwisku albo stanowisku</label>
             <input class="area" type="search" id="q" name="q" value={props.q} />
           </div>
-          <input type="hidden" name="sort" value={props.sort} />
-          <div class="hr-actions">
-            <button class="btn primary" type="submit">Szukaj</button>
-            {props.q ? <a class="btn" href={`/hr/people?sort=${props.sort}`}>Pokaż wszystkich</a> : null}
-            <a class="btn" href="/hr/people/new">Dodaj pracownika</a>
+          <div class="people-sort">
+            <label class="lbl" for="sort">Kolejność</label>
+            <select class="area" id="sort" name="sort">
+              {SORTS.map((s) => (
+                <option value={s.id} selected={props.sort === s.id}>{s.label}</option>
+              ))}
+            </select>
+          </div>
+          <div class="people-go">
+            <button class="btn" type="submit">Pokaż</button>
+            {props.q ? <a class="btn text" href={`/hr/people?sort=${props.sort}`}>Pokaż wszystkich</a> : null}
           </div>
         </form>
-        <nav class="hr-links" aria-label="Sortowanie">
-          <span class="cap">Sortuj:</span>
-          {SORTS.map((s) => (
-            <a href={`/hr/people?sort=${s.id}${props.q ? `&q=${encodeURIComponent(props.q)}` : ""}`} aria-current={props.sort === s.id ? "true" : undefined}>
-              {s.label}
-            </a>
-          ))}
-        </nav>
-      </section>
-      <section class="card">
-        <h2>Lista ({props.rows.length})</h2>
         {props.rows.length === 0 ? (
-          <p class="cap">Nikt nie pasuje do wyszukiwania.</p>
+          <div class="people-none">
+            <p>Nikt nie pasuje do „{props.q}”. Sprawdź pisownię albo pokaż wszystkich pracowników.</p>
+            <p><a href={`/hr/people?sort=${props.sort}`}>Pokaż wszystkich</a></p>
+          </div>
         ) : (
           <div class="hr-scroll">
             <table class="hr-table people-table">
+              <caption class="vh">Pracownicy: stanowisko, komórka, przełożony, arkusz i termin oceny. Nazwisko otwiera dane pracownika.</caption>
               <thead>
                 <tr>
                   <th scope="col">Imię i nazwisko</th>
@@ -57,32 +71,27 @@ export function PeopleListView(props: { viewer: Person; today: string; rows: Per
                   <th scope="col">Komórka</th>
                   <th scope="col">Przełożony</th>
                   <th scope="col">Arkusz</th>
-                  <th scope="col">Termin najbliższej oceny</th>
-                  <th scope="col">Działania</th>
+                  <th scope="col">Termin oceny</th>
                 </tr>
               </thead>
               <tbody>
                 {props.rows.map((r) => (
                   <tr class="hr-card">
-                    <th scope="row">{r.name}</th>
-                    <td data-label="Stanowisko">{r.position || "—"}</td>
-                    <td data-label="Komórka">{r.unit || "—"}</td>
-                    <td data-label="Przełożony">{r.supervisor || "—"}</td>
-                    <td data-label="Arkusz">{r.sheet ?? "—"}</td>
-                    <td data-label="Termin najbliższej oceny">
+                    <th scope="row"><a href={`/hr/people/${r.id}/edit`}>{r.name}</a></th>
+                    <td data-label="Stanowisko">{r.position || <span class="hr-none">brak</span>}</td>
+                    <td data-label="Komórka">{r.unit || <span class="hr-none">brak</span>}</td>
+                    <td data-label="Przełożony">{r.supervisor || <span class="hr-none">brak</span>}</td>
+                    <td data-label="Arkusz">{r.sheet ?? <span class="hr-none">brak</span>}</td>
+                    <td data-label="Termin oceny">
                       {r.deadline ? (
                         <>
-                          <span class={`due-pill${r.deadline.date < props.today ? " late" : ""}`}>{formatDate(r.deadline.date)}</span> <LegalBasis basis={r.deadline.basis} />
+                          <b class="tnum">{formatDate(r.deadline.date)}</b>
+                          {r.deadline.date < props.today ? <span class="hr-late"> po terminie</span> : null}
+                          <LegalBasis basis={r.deadline.basis} />
                         </>
                       ) : (
-                        "—"
+                        <span class="hr-none">brak cyklu</span>
                       )}
-                    </td>
-                    <td data-label="Działania">
-                      <div class="hr-links">
-                        <a href={`/hr/people/${r.id}/edit`}>Edytuj</a>
-                        <a href={`/people/${r.id}/history`}>Historia ocen</a>
-                      </div>
                     </td>
                   </tr>
                 ))}
