@@ -35,7 +35,7 @@ export function PrintButton() {
 
 export function ScoreMatrix(props: { rows: { id: string; kind: string; score: number | null }[] }) {
   return (
-    <table class="sheet-matrix">
+    <table class="sheet-matrix" tabindex={0} aria-label="Oceny cząstkowe">
       <thead>
         <tr>
           <th scope="col">Kryterium</th>
@@ -93,7 +93,15 @@ function PartyFields(props: { p: { name: string; positionTitle: string | null; u
 }
 
 function Confirm(props: { c: { place: string; date: string; name: string } | null }) {
-  return props.c ? <ConfirmationBlock kind="confirmation" name={props.c.name} place={props.c.place} date={props.c.date} /> : <p class="sign">{DASH}</p>;
+  if (props.c) {
+    return <ConfirmationBlock kind="confirmation" name={props.c.name} place={props.c.place} date={props.c.date} />;
+  }
+  return (
+    <div class="sheet-confirm-slot">
+      <p class="sign">{DASH}</p>
+      <p class="cap sheet-confirm-line">Miejscowość, data i potwierdzenie</p>
+    </div>
+  );
 }
 
 export function SheetFooter(props: { d: SheetData }) {
@@ -114,9 +122,11 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
   return (
     <Layout title="Arkusz oceny" person={props.viewer} today={props.today}>
       <article class="sheet-doc">
-        <header class="card hdr slim">
-          <h1>Arkusz oceny okresowej {d.sheet ? `(arkusz ${d.sheet})` : ""}</h1>
-          <p class="cap">{d.officeName}</p>
+        <header class="card hdr">
+          <div class="hdr-id">
+            <h1>Arkusz oceny okresowej {d.sheet ? `(arkusz ${d.sheet})` : ""}</h1>
+            <p class="cap">{d.officeName}</p>
+          </div>
           <div class="no-print">
             <PrintButton />
             <a class="btn link-chip" href={only1 ? sheetHref : `${sheetHref}?part=1`}>
@@ -137,10 +147,16 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
         <section class="card sheet-part">
           <h2>Część I</h2>
           <SheetField label="Urząd">{d.officeName}</SheetField>
-          <h3>Oceniany</h3>
-          <PartyFields p={p1.appraisee} sheet={d.sheet} />
-          <h3>Oceniający</h3>
-          <PartyFields p={p1.appraiser} sheet={d.sheet} />
+          <div class="sheet-confirms sheet-parties">
+            <div class="b-facts">
+              <h3>Oceniany</h3>
+              <PartyFields p={p1.appraisee} sheet={d.sheet} />
+            </div>
+            <div class="b-facts">
+              <h3>Oceniający</h3>
+              <PartyFields p={p1.appraiser} sheet={d.sheet} />
+            </div>
+          </div>
           <h3>Kryteria obowiązkowe</h3>
           {p1.mandatory.length ? (
             <ul>{p1.mandatory.map((c) => <li>{criterion(c.id).name}</li>)}</ul>
@@ -195,39 +211,46 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
           <>
             <section class="card sheet-part">
               <h2>Część II</h2>
-              <SheetField label="Data rozmowy oceniającej">{p2.interviewDate ? formatDate(p2.interviewDate) : null}</SheetField>
-              <SheetField label="Okres podlegania ocenie">
-                od {formatDate(p2.periodFrom)} do {p2.periodTo ? formatDate(p2.periodTo) : DASH}
-              </SheetField>
+              <div class="sheet-confirms sheet-meta">
+                <SheetField label="Data rozmowy oceniającej">{p2.interviewDate ? formatDate(p2.interviewDate) : null}</SheetField>
+                <SheetField label="Okres podlegania ocenie">
+                  od {formatDate(p2.periodFrom)} do {p2.periodTo ? formatDate(p2.periodTo) : DASH}
+                </SheetField>
+              </div>
               <h3>Oceny cząstkowe</h3>
               <ScoreMatrix rows={p2.rows} />
               <SheetField label="Średnia ocen cząstkowych">{p2.mean === null ? null : mean2(p2.mean)}</SheetField>
               <h3>Ogólny poziom spełniania kryteriów</h3>
-              <table class="sheet-matrix">
+              <table class="sheet-matrix" tabindex={0} aria-label="Ogólny poziom spełniania kryteriów">
                 <tbody>
                   <tr>
                     {rules.overallLevels.map((l) => (
                       <td>
                         {l.name}
-                        <b>{p2.overallLevel === l.name ? " X" : ""}</b>
+                        <small>{l.fromInclusive ? `od ${l.from} do ${l.to}` : `powyżej ${l.from} do ${l.to}`}</small>
+                        {p2.overallLevel === l.name ? <b class="sheet-x">X</b> : null}
                       </td>
                     ))}
                   </tr>
                 </tbody>
               </table>
               <h3>Ocena okresowa</h3>
-              <table class="sheet-matrix">
+              <table class="sheet-matrix" tabindex={0} aria-label="Ocena okresowa">
                 <tbody>
                   <tr>
-                    <td>POZYTYWNA {p2.outcome === "positive" ? "X" : ""}</td>
-                    <td>NEGATYWNA {p2.outcome === "negative" ? "X" : ""}</td>
+                    <td>
+                      POZYTYWNA{p2.outcome === "positive" ? <b> X</b> : ""}
+                    </td>
+                    <td>
+                      NEGATYWNA{p2.outcome === "negative" ? <b> X</b> : ""}
+                    </td>
                   </tr>
                 </tbody>
               </table>
             </section>
 
             <section class="card sheet-part">
-              <h2>Dalsza część</h2>
+              <h2>Część II (ciąg dalszy)</h2>
               <SheetField label="Uzasadnienie przyznanej oceny">{p2.justification}</SheetField>
               <SheetField label="Wnioski do indywidualnego programu rozwoju zawodowego">{p2.developmentConclusions}</SheetField>
               {p2.previous === null ? null : (
@@ -240,7 +263,9 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
               <SheetField label="Czy dołączono wniosek o kolejny stopień służbowy">
                 {p2.gradeRequest === "yes" ? "TAK" : p2.gradeRequest === "no" ? "NIE" : p2.gradeRequest === "not_applicable" ? "NIE DOTYCZY" : null}
               </SheetField>
-              <SheetField label="Dane oceniającego">{p1.appraiser.name}</SheetField>
+              <SheetField label="Dane oceniającego">
+                {[p1.appraiser.name, p1.appraiser.positionTitle, d.sheet === "A" ? null : p1.appraiser.unit].filter(Boolean).join(", ")}
+              </SheetField>
               <div class="sheet-confirms">
                 <div>
                   <span class="lbl">Potwierdzenie oceniającego</span>
@@ -276,15 +301,19 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
             <h2>Część III</h2>
             <h3>Wniosek o przyznanie kolejnego stopnia służbowego</h3>
             <SheetField label="Imię i nazwisko">{d.part3.name}</SheetField>
-            <SheetField label="Rok mianowania">{d.part3.appointedYear}</SheetField>
-            <SheetField label="Posiadany stopień służbowy">
-              {d.part3.grade === null ? null : `${romanGrade(d.part3.grade)}${d.part3.gradeAwardedOn ? `, przyznany ${formatDate(d.part3.gradeAwardedOn)}` : ""}`}
-            </SheetField>
+            <div class="sheet-confirms sheet-meta">
+              <SheetField label="Rok mianowania">{d.part3.appointedYear}</SheetField>
+              <SheetField label="Posiadany stopień służbowy">
+                {d.part3.grade === null ? null : `${romanGrade(d.part3.grade)}${d.part3.gradeAwardedOn ? `, przyznany ${formatDate(d.part3.gradeAwardedOn)}` : ""}`}
+              </SheetField>
+            </div>
             <p>Wnoszę o przyznanie kolejnego stopnia służbowego (art. 89 ust. 1 ustawy).</p>
             <SheetField label="Umotywowanie wniosku">{d.part3.motivation}</SheetField>
-            <div>
-              <span class="lbl">Potwierdzenie oceniającego</span>
-              <Confirm c={d.part3.appraiserConfirmation} />
+            <div class="sheet-confirms">
+              <div>
+                <span class="lbl">Potwierdzenie oceniającego</span>
+                <Confirm c={d.part3.appraiserConfirmation} />
+              </div>
             </div>
           </section>
         )}
