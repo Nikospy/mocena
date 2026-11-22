@@ -31,6 +31,16 @@ body { background: var(--grey-30); font-family: var(--font); padding: 24px; disp
 #b h1 em { font-style: normal; color: var(--cobalt-30); }
 #b .shot { margin-inline: 48px; border-radius: 16px 16px 0 0; overflow: hidden; background: var(--white); box-shadow: 0 -8px 40px rgb(0 0 0 / 0.25); }
 #b .shot img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; object-position: 100% 90%; }
+
+/* C: znak zamiast slajdu. Oś okresu oceny z faktami rozsianymi przez cały okres; czytelna jako miniatura. */
+#c { padding: 56px 64px 60px; display: grid; grid-template-rows: auto 1fr auto; }
+#c .brand { font-size: 88px; line-height: 96px; font-weight: var(--w-bold); letter-spacing: -2px; }
+#c .axis { position: relative; align-self: center; block-size: 40px; }
+#c .axis::before { content: ""; position: absolute; inset-inline: 0; inset-block-start: 18px; block-size: 4px; border-radius: 2px; background: var(--cobalt-100); }
+#c .axis i { position: absolute; inset-block-start: 8px; inline-size: 24px; block-size: 24px; border-radius: 50%; background: var(--cobalt-30); translate: -50% 0; }
+#c .axis i.end { inline-size: 40px; block-size: 40px; inset-block-start: 0; background: var(--white); translate: -100% 0; }
+#c .line { font-size: 48px; line-height: 58px; font-weight: var(--w-bold); letter-spacing: -1px; text-wrap: balance; }
+#c .line em { font-style: normal; color: var(--cobalt-30); }
 </style>
 </head>
 <body>
@@ -42,6 +52,16 @@ body { background: var(--grey-30); font-family: var(--font); padding: 24px; disp
     <span class="end l">09.12.2024</span><span class="end r">dzień oceny</span>
   </div>
   <p class="foot">Asystent ocen okresowych w służbie cywilnej · fakty zbierane przez cały okres, terminy liczone z przepisu</p>
+</section>
+
+<section class="cover" id="c">
+  <div class="brand">mOcena</div>
+  <div class="axis" aria-hidden="true">
+    <i style="left:4%"></i><i style="left:13%"></i><i style="left:19%"></i><i style="left:31%"></i><i style="left:40%"></i>
+    <i style="left:47%"></i><i style="left:58%"></i><i style="left:66%"></i><i style="left:74%"></i><i style="left:85%"></i>
+    <i class="end" style="left:100%"></i>
+  </div>
+  <p class="line">Dwa lata pracy,<br><em>nie dwa ostatnie tygodnie.</em></p>
 </section>
 
 <section class="cover" id="b">
