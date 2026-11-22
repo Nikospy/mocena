@@ -930,6 +930,29 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 /* === screens: forms-states === */
 /* Notatka, lista notatek, docenienie, informacja zwrotna oraz wspólne stany błędów formularzy. */
 /* Reguły tej grupy dopisuj bezpośrednio pod tą linią. */
+/* Błędy formularza (ErrorSummary, FieldError, invalid() z components.tsx; wzór GOV.UK).
+   Podsumowanie: biała powierzchnia z czerwoną obwódką nad formularzem, odnośniki do pól.
+   Pole z błędem: czerwony obrys, komunikat między etykietą a polem, grupa pola z czerwoną kreską po lewej. */
+.err-sum { display: flex; align-items: flex-start; gap: var(--sp-150); background: var(--white); border: 2px solid var(--red-100); border-radius: var(--card-r);
+  padding: calc(var(--sp-300) - 2px); color: var(--text); }
+.err-sum:focus, .err-sum:focus-visible { outline: 2px solid transparent; box-shadow: none; }
+.err-sum > .ico { color: var(--red-100); }
+.err-sum h2 { font-size: var(--f-h5); line-height: var(--lh-h5); font-weight: var(--w-bold); }
+.err-sum h2 + * { margin-block-start: var(--sp-100); }
+.err-sum p { max-inline-size: 66ch; }
+.err-sum ul { list-style: none; padding: 0; display: grid; gap: var(--sp-100); margin-block-start: var(--sp-150); }
+.err-sum a { color: var(--red-200); font-weight: var(--w-bold); text-decoration-thickness: 1px; }
+.err-sum + * { margin-block-start: var(--sp-300); }
+.field-err { display: block; color: var(--red-200); font-weight: var(--w-bold); font-size: var(--f-p); line-height: var(--lh-p); max-inline-size: 66ch; }
+.field { display: grid; gap: var(--sp-100); }
+.field > .lbl { margin-block-end: 0; }
+:is(.field, fieldset, [role="radiogroup"]):has(> .field-err) { border-inline-start: var(--sp-50) solid var(--red-100); padding-inline-start: var(--sp-200); }
+.area[aria-invalid="true"], select[aria-invalid="true"], input[aria-invalid="true"]:not([type="radio"], [type="checkbox"]) { border-color: var(--red-100); }
+.area[aria-invalid="true"]:focus-visible { border-color: var(--red-100); }
+.tok:has([aria-invalid="true"]) { border-color: var(--red-100); box-shadow: inset 0 0 0 1px var(--red-100); }
+.hero-field:has(textarea[aria-invalid="true"]) { border: 2px solid var(--red-100); padding: calc(var(--sp-300) - 1px); }
+.hero-field .field-err { margin-block-start: var(--sp-100); }
+
 
 /* --- koniec sekcji forms-states (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
 /* . */
