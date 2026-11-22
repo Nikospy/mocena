@@ -1,8 +1,8 @@
 # Pokrycie pomiaru całości
 
-Konta reprezentują role: `marek` to oceniający, `piotr` i `maria` to oceniani, `joanna` to kadry, `admin` to administrator, a `anna` to czynny zastępca w wierszach oznaczonych jako zastępstwo. Dla tras chronionych anonim otrzymuje przekierowanie do wyboru konta, mierzonego w wierszu `account`. Wiersze 403 pokazują odmowę dla przykładowego konta bez dostępu. Wiersze 404 pokazują odpowiedź dla brakującego zasobu. Awarię 500 wywołuje chwilowa niedostępność tabeli w osobnej bazie pomiarowej. Przy wszystkich krokach przewodnika panel jest widoczny, a jego treść na telefonie rozwijana. Ekran końcowy w aplikacji ma własny układ bez panelu.
+Konta reprezentują role. `marek` to oceniający, `piotr` i `maria` to oceniani, `joanna` to kadry, `admin` to administrator, `anna` to czynny zastępca w wierszach oznaczonych jako zastępstwo, a `dyrektor-urzedu` to dyrektor generalny. Dla tras chronionych anonim otrzymuje przekierowanie do wyboru konta, mierzonego w wierszu `account`. Wiersze 403 pokazują odmowę dla przykładowego konta bez dostępu. Wiersze 404 pokazują odpowiedź dla brakującego zasobu. Awarię 500 wywołuje chwilowa niedostępność tabeli w osobnej bazie pomiarowej. Przy wszystkich krokach przewodnika panel jest widoczny, a jego treść na telefonie rozwijana. Ekran końcowy w aplikacji ma własny układ bez panelu.
 
-Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`. Eksporty CSV i ICS otrzymują podgląd pobranej treści, a wydruk dodatkowo PDF i PNG każdej strony.
+Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`. Eksporty CSV, ICS i JSON otrzymują podgląd pobranej treści, a wydruk dodatkowo PDF i PNG każdej strony.
 
 | Trasa GET | Konto | Stan | Identyfikator zrzutu |
 | --- | --- | --- | --- |
@@ -16,6 +16,7 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/` | `piotr` | oczekujące potwierdzenie | `home-piotr` |
 | `/` | `joanna` | sprawy kadr | `home-hr` |
 | `/` | `admin` | sprawy administratora | `home-admin` |
+| `/` | `dyrektor-urzedu` | sprawy dyrektora generalnego | `home-director` |
 | `/` | `maria` | brak spraw | `home-empty` |
 | `/account` | `anonim` | wybór konta | `account` |
 | `/account` | `anonim` | 422 · nieznane konto | `account-error` |
@@ -23,6 +24,7 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/account` | `piotr` | wybór konta po zalogowaniu | `account-piotr` |
 | `/account` | `joanna` | wybór konta po zalogowaniu | `account-joanna` |
 | `/account` | `admin` | wybór konta po zalogowaniu | `account-admin` |
+| `/account` | `dyrektor-urzedu` | wybór konta po zalogowaniu | `account-dyrektor-urzedu` |
 | `/cycles/:id` | `marek` | przekierowanie do części I | `cycle-marek` |
 | `/cycles/:id` | `piotr` | przekierowanie do części I | `cycle-piotr` |
 | `/cycles/:id` | `admin` | 403 · odmowa | `cycle-403` |
@@ -67,6 +69,20 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/cycles/:id/assessment` | `anna` | formularz czynnego zastępcy | `assessment-substitute` |
 | `/cycles/:id/assessment` | `admin` | 403 · odmowa | `assessment-403` |
 | `/cycles/:id/assessment` | `marek` | 404 · brak zasobu | `assessment-404` |
+| `/cycles/:id/assessment/export.json` | `marek` | 404 · ocena przed zatwierdzeniem | `assessment-export-not-approved` |
+| `/cycles/:id/assessment/export.json` | `marek` | zatwierdzona ocena · plik JSON | `assessment-export-approved-marek` |
+| `/cycles/:id/assessment/export.json` | `piotr` | zatwierdzona ocena · plik JSON | `assessment-export-approved-piotr` |
+| `/cycles/:id/assessment/export.json` | `joanna` | zatwierdzona ocena · plik JSON | `assessment-export-approved-joanna` |
+| `/cycles/:id/assessment/export.json` | `marek` | ocena po zapoznaniu · plik JSON | `assessment-export-acknowledged-marek` |
+| `/cycles/:id/assessment/export.json` | `piotr` | ocena po zapoznaniu · plik JSON | `assessment-export-acknowledged-piotr` |
+| `/cycles/:id/assessment/export.json` | `joanna` | ocena po zapoznaniu · plik JSON | `assessment-export-acknowledged-joanna` |
+| `/cycles/:id/assessment/export.json` | `anna` | plik JSON dla zastępcy | `assessment-export-substitute` |
+| `/cycles/:id/assessment/export.json` | `admin` | 403 · odmowa | `assessment-export-403` |
+| `/cycles/:id/assessment/export.json` | `marek` | 404 · brak zasobu | `assessment-export-404` |
+| `/cycles/:id/part1` | `marek` | nowy cykl po negatywnej ocenie | `part1-after-negative` |
+| `/cycles/:id/invitations/new` | `marek` | zaproszenie na rozmowę po negatywnej ocenie | `invitation-after-negative` |
+| `/cycles/:id/deadline-change/request` | `piotr` | zmiana terminu zablokowana po negatywnej ocenie | `deadline-request-after-negative` |
+| `/cycles/:id/deadline-change` | `marek` | zmiana terminu zablokowana po negatywnej ocenie | `deadline-decision-after-negative` |
 | `/cycles/:id/assessment/fiction` | `marek` | pusty formularz | `fiction-form` |
 | `/cycles/:id/assessment/fiction` | `marek` | 422 · brak danych doręczenia | `fiction-error` |
 | `/cycles/:id/assessment/fiction` | `marek` | 409 · już zapoznano | `fiction-blocked` |
@@ -81,6 +97,9 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/hr` | `joanna` | fokus · Tab × 6 | `hr-tab-6` |
 | `/hr` | `joanna` | najechanie · odnośnik | `hover-link` |
 | `/hr` | `piotr` | 403 · odmowa | `hr-403` |
+| `/office/statistics` | `dyrektor-urzedu` | statystyki na początku pokazu | `office-statistics-initial` |
+| `/office/statistics` | `dyrektor-urzedu` | statystyki po zapoznaniu z oceną | `office-statistics-final` |
+| `/office/statistics` | `joanna` | 403 · odmowa | `office-statistics-403` |
 | `/hr` | `anonim` | 302 · wybór konta | `hr-anonymous` |
 | `/cycles/:id/sheet` | `marek` | pełny arkusz | `sheet` |
 | `/cycles/:id/sheet` | `marek` | wyciąg części I | `sheet-part1-marek` |
@@ -90,7 +109,9 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/cycles/:id/sheet` | `joanna` | wyciąg części I | `sheet-part1-joanna` |
 | `/cycles/:id/sheet` | `anna` | pełny arkusz | `sheet-anna` |
 | `/cycles/:id/sheet` | `anna` | wyciąg części I | `sheet-part1-anna` |
-| `/cycles/:id/sheet` | `marek` | wydruk · PDF i obrazy stron | `sheet-print` |
+| `/cycles/:id/sheet` | `marek` | wydruk arkusza C · PDF i obrazy stron | `sheet-print` |
+| `/cycles/:id/sheet` | `joanna` | arkusz A · kierownik urzędu | `sheet-a` |
+| `/cycles/:id/sheet` | `joanna` | arkusz B · stanowisko kierownicze | `sheet-b` |
 | `/cycles/:id/sheet` | `admin` | 403 · odmowa | `sheet-403` |
 | `/cycles/:id/sheet` | `marek` | 404 · brak zasobu | `sheet-404` |
 | `/people/:id/history` | `marek` | wypełniona historia | `history-marek` |
@@ -160,6 +181,12 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/hr/people` | `admin` | po utworzeniu | `people-saved-admin` |
 | `/hr/people` | `admin` | po edycji | `people-updated-admin` |
 | `/hr/people` | `piotr` | 403 · odmowa | `people-403` |
+| `/hr/people` | `joanna` | po usunięciu fikcyjnego pracownika | `people-deleted` |
+| `/hr/people/:id/delete` | `joanna` | potwierdzenie usunięcia | `person-delete-confirm` |
+| `/hr/people/:id/delete` | `joanna` | 422 · brak potwierdzenia | `person-delete-error` |
+| `/hr/people/:id/delete` | `joanna` | 409 · pracownik powiązany z innymi cyklami | `person-delete-blocked` |
+| `/hr/people/:id/delete` | `joanna` | 404 · brak pracownika | `person-delete-404` |
+| `/hr/people/:id/delete` | `admin` | 403 · odmowa administratorowi | `person-delete-403` |
 | `/hr/people/new` | `joanna` | pusty formularz | `person-new-joanna` |
 | `/hr/people/new` | `joanna` | 422 · brak danych | `person-new-error-joanna` |
 | `/hr/people/:id/edit` | `joanna` | wypełniony formularz z cyklem | `person-edit-joanna` |
@@ -204,12 +231,14 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/tour` | `piotr` | wejście po zalogowaniu | `tour-entry-piotr` |
 | `/tour` | `joanna` | wejście po zalogowaniu | `tour-entry-joanna` |
 | `/tour` | `admin` | wejście po zalogowaniu | `tour-entry-admin` |
+| `/tour` | `dyrektor-urzedu` | wejście po zalogowaniu | `tour-entry-dyrektor-urzedu` |
 | `/tour/done` | `joanna` | ekran końcowy po przejściu przewodnika | `tour-done` |
 | `/tour/done` | `anonim` | ekran końcowy bez aktywnego przewodnika | `tour-done-direct-anonim` |
 | `/tour/done` | `marek` | ekran końcowy bez aktywnego przewodnika | `tour-done-direct-marek` |
 | `/tour/done` | `piotr` | ekran końcowy bez aktywnego przewodnika | `tour-done-direct-piotr` |
 | `/tour/done` | `joanna` | ekran końcowy bez aktywnego przewodnika | `tour-done-direct-joanna` |
 | `/tour/done` | `admin` | ekran końcowy bez aktywnego przewodnika | `tour-done-direct-admin` |
+| `/tour/done` | `dyrektor-urzedu` | ekran końcowy bez aktywnego przewodnika | `tour-done-direct-dyrektor-urzedu` |
 | `/cycles/:id/part1` | `marek` | przewodnik · krok 1 | `tour-1` |
 | `/cycles/:id/part1` | `piotr` | przewodnik · krok 1b | `tour-1b` |
 | `/people/:personId/notes/new` | `marek` | przewodnik · krok 2 | `tour-2` |
@@ -217,6 +246,12 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/cycles/:id/assessment` | `marek` | przewodnik · krok 4 | `tour-4` |
 | `/cycles/:id/assessment` | `piotr` | przewodnik · krok 5 | `tour-5` |
 | `/hr` | `joanna` | przewodnik · krok 5b | `tour-5b` |
+| `/cycles/:id/timeline` | `joanna` | dodatek pokazu · oś Ewy | `tour-extra-ewa-timeline` |
+| `/cycles/:id/assessment/fiction` | `marek` | dodatek pokazu · fikcja zapoznania | `tour-extra-fiction` |
+| `/admin/suggestion-sources` | `admin` | dodatek pokazu · źródła podpowiedzi | `tour-extra-sources` |
+| `/cycles/:id/deadline-change` | `dyrektor-urzedu` | dyrektor rozpatruje wniosek Anny | `deadline-director-pending` |
+| `/cycles/:id/deadline-change/:eventId/letter` | `dyrektor-urzedu` | pismo dyrektora generalnego | `deadline-letter-director` |
+| `/cycles/:id/deadline-change/:eventId/letter` | `anna` | pismo dla ocenianej Anny | `deadline-letter-appraiser-as-employee` |
 | `/cycles/:id/deadline-change` | `marek` | formularz bez wniosku | `deadline-decision` |
 | `/cycles/:id/deadline-change` | `marek` | 422 · brak danych | `deadline-decision-error` |
 | `/cycles/:id/deadline-change` | `marek` | decyzja na wniosek ocenianego | `deadline-pending` |
@@ -247,7 +282,7 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `piotr` | wysłane | `invitation-sent-piotr` |
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `marek` | potwierdzone | `invitation-confirmed-marek` |
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `piotr` | potwierdzone | `invitation-confirmed-piotr` |
-| `/cycles/:id/invitations/:eventId{[0-9]+}` | `marek` | termin minął | `invitation-expired` |
+| `/cycles/:id/invitations/:eventId{[0-9]+}` | `marek` | potwierdzone po dacie rozmowy | `invitation-expired` |
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `marek` | najechanie · przycisk drugorzędny | `hover-secondary` |
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `joanna` | 403 · odmowa | `invitation-403` |
 | `/cycles/:id/invitations/:eventId{[0-9]+}` | `marek` | 404 · brak zasobu | `invitation-404` |

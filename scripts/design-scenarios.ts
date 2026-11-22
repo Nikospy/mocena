@@ -1,5 +1,6 @@
 // Dane i działania potrzebne do odtworzenia stanów z coverage.md.
 import regulation from "../rules/regulation-2016-470.json";
+import { openCycle } from "../src/cycles";
 import { getDb } from "../src/db";
 import { STOPS } from "../src/tour/stops";
 
@@ -13,14 +14,14 @@ export type CaptureOptions = {
   tabs?: number;
   hover?: string;
   print?: boolean;
-  download?: "csv" | "ics";
+  download?: "csv" | "ics" | "json";
   form?: { action: string; button?: string; fields?: Record<string, string>; omitSubmitter?: boolean; checks?: { selector: string; count: number } };
 };
 
 type Capture = (who: string | null, path: string, name: string, options?: CaptureOptions) => Promise<void>;
 type Post = (who: string | null, path: string, fields?: Fields) => Promise<string>;
 
-const M = "marek", P = "piotr", H = "joanna", A = "admin", S = "anna";
+const M = "marek", P = "piotr", H = "joanna", A = "admin", S = "anna", D = "dyrektor-urzedu";
 const cycle = "/cycles/cycle-piotr";
 const missing = "/cycles/audit-missing";
 const closed = "/cycles/cycle-piotr-2022";
@@ -46,6 +47,7 @@ const sources = "/admin/suggestion-sources";
 const before = cycle + "/before-meeting";
 const appreciation = cycle + "/appreciation";
 const exportCsv = "/hr/export.csv";
+const exportAssessment = assessment + "/export.json";
 
 export async function auditScenarios(shot: Capture, post: Post) {
   const date = (value: string) => post(A, "/demo/date", { date: value });
@@ -64,13 +66,16 @@ export async function auditScenarios(shot: Capture, post: Post) {
 
   await shot(null, "/", "home-guest");
   await shot(null, "/account", "account");
-  await roles("/account", "account", [M, P, H, A]);
+  await roles("/account", "account", [M, P, H, A, D]);
   await invalid(null, "/account", "account-error", "/account", { omitSubmitter: true });
   await shot(M, "/", "home-marek");
   await keyboard(M, "/", "home");
   await shot(M, "/", "hover-primary", { hover: "main .btn.primary" });
   await shot(H, "/", "home-hr");
   await shot(A, "/", "home-admin");
+  await shot(D, "/", "home-director", { check: "Terminowość w urzędzie" });
+  await shot(D, "/office/statistics", "office-statistics-initial");
+  await denied("/office/statistics", "office-statistics", H);
   // Maria nie ma cyklu ani konta w danych pokazu. Konto włączamy tylko do pomiaru pustej listy.
   const mariaAccount = getDb().query("UPDATE people SET has_account = ? WHERE id = 'maria'");
   mariaAccount.run(1);
@@ -164,6 +169,7 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await post(M, invitations, { kind: "assessment", date: "2026-11-23", time: "09:00", place: "Pokój 214" });
   await shot(M, cardAssessment, "card-assessment-sent");
   await shot(M, assessment, "assessment-empty", { selector: "#assessment-form" });
+  await shot(M, exportAssessment, "assessment-export-not-approved", { status: 404, check: "nie jest jeszcze zatwierdzona" });
   await keyboard(M, assessment, "assessment");
   await invalid(M, assessment, "assessment-error", assessment + "/approve", { button: 'button[formaction$="/assessment/approve"]' });
   const draft: Fields = { justification: "Trzy odpowiedzi wyszły po terminie (notatki z 11.02.2025 i 26.08.2026).", developmentConclusions: "Rozmowa o priorytetach i podziale kolejki wniosków.", interviewDate: "2026-11-21" };
@@ -173,6 +179,8 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await post(M, assessment + "/approve", draft);
   await shot(M, assessment, "assessment-approved");
   await shot(H, assessment, "assessment-hr-approved");
+  await roles(exportAssessment, "assessment-export-approved", [M, P, H], { download: "json" });
+  await denied(exportAssessment, "assessment-export", A, missing + "/assessment/export.json");
   await shot(M, deadline, "deadline-decision-blocked");
   await shot(P, request, "deadline-request-blocked");
   await shot(M, fiction, "fiction-form");
@@ -186,14 +194,25 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await shot(P, assessment, "assessment-acknowledged");
   await shot(M, assessment, "assessment-done-marek");
   await shot(H, assessment, "assessment-hr-done");
+  await roles(exportAssessment, "assessment-export-acknowledged", [M, P, H], { download: "json" });
+  const nextCycle = openCycle(P);
+  if (!nextCycle || nextCycle.id === "cycle-piotr") throw new Error("Brak kolejnego cyklu Piotra po zapoznaniu");
+  const next = `/cycles/${nextCycle.id}`;
+  await shot(M, next + "/part1", "part1-after-negative");
+  await shot(M, next + "/invitations/new?kind=opening", "invitation-after-negative");
+  await shot(P, next + "/deadline-change/request", "deadline-request-after-negative");
+  await shot(M, next + "/deadline-change", "deadline-decision-after-negative");
   await shot(M, fiction, "fiction-blocked", { status: 409 });
   await shot(M, cycle + "/sheet", "sheet");
+  await shot(H, "/cycles/cycle-office-head/sheet", "sheet-a", { check: "arkusz A" });
+  await shot(H, "/cycles/cycle-tomasz/sheet", "sheet-b", { check: "arkusz B" });
   await roles(cycle + "/sheet", "sheet", [P, H]);
   await roles(cycle + "/sheet?part=1", "sheet-part1", [M, P, H]);
   await shot(M, cycle + "/sheet", "sheet-print", { print: true });
   await roles(history, "history", [M, P, H]);
 
   await shot(H, "/hr", "hr");
+  await shot(D, "/office/statistics", "office-statistics-final");
   await keyboard(H, "/hr", "hr");
   await shot(H, "/hr", "hover-link", { hover: "a.brand" });
   await shot(H, await post(H, "/hr/grades/tomasz"), "hr-awarded");
@@ -226,6 +245,7 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await shot(S, history, "history-anna");
   await shot(S, cycle + "/sheet", "sheet-anna");
   await shot(S, cycle + "/sheet?part=1", "sheet-part1-anna");
+  await shot(S, exportAssessment, "assessment-export-substitute", { download: "json" });
   await shot(S, note + "/new", "note-substitute");
 
   const newAppraiser = "/cycles/cycle-jan-testowy/appraiser";
@@ -267,6 +287,19 @@ export async function auditScenarios(shot: Capture, post: Post) {
     db.exec("ROLLBACK TO audit_server_error; RELEASE audit_server_error");
   }
   await shot(H, await post(H, newAppraiser, { appraiser_id: S }), "timeline-appraiser-changed");
+  const deletion = people + "/jan-testowy/delete";
+  await shot(H, deletion, "person-delete-confirm");
+  await invalid(H, deletion, "person-delete-error", deletion, { omitSubmitter: true });
+  await shot(H, people + "/marek/delete", "person-delete-blocked", { status: 409 });
+  await shot(A, deletion, "person-delete-403", { status: 403 });
+  await shot(H, people + "/audit-missing/delete", "person-delete-404", { status: 404 });
+  await shot(H, await post(H, deletion, { confirmed: "1" }), "people-deleted", { check: "Usunięto dane pracownika." });
+
+  const directorDecision = "/cycles/cycle-anna/deadline-change";
+  await shot(D, directorDecision, "deadline-director-pending", { check: "zmiana stanowiska pracy" });
+  const directorLetter = await post(D, directorDecision, { case: "4", newDate: "2027-03-15", reason: "Uwzględniono zmianę stanowiska." });
+  await shot(D, directorLetter, "deadline-letter-director");
+  await shot(S, directorLetter, "deadline-letter-appraiser-as-employee");
 
   // Oddzielne dane do wariantów, które zmieniłyby termin lub zamknęły ten sam cykl.
   await post(null, "/tour/4");
@@ -301,11 +334,14 @@ export async function auditScenarios(shot: Capture, post: Post) {
 
   await shot(null, "/tour", "tour-entry");
   await shot(M, "/tour", "tour");
-  await roles("/tour", "tour-entry", [P, H, A]);
+  await roles("/tour", "tour-entry", [P, H, A, D]);
   for (const stop of STOPS) {
     const path = await post(null, `/tour/${stop.id}`);
     await shot(stop.personId, path, `tour-${stop.id}`, { tour: stop.id, selector: "#tour-guide" });
   }
   await shot(H, "/tour/done", "tour-done", { tour: STOPS.at(-1)?.id, check: "Koniec pokazu" });
-  await roles("/tour/done", "tour-done-direct", [null, M, P, H, A]);
+  await roles("/tour/done", "tour-done-direct", [null, M, P, H, A, D]);
+  await shot(H, await post(null, "/tour/extra/ewa-timeline"), "tour-extra-ewa-timeline");
+  await shot(M, await post(null, "/tour/extra/fiction"), "tour-extra-fiction");
+  await shot(A, await post(null, "/tour/extra/sources"), "tour-extra-sources");
 }

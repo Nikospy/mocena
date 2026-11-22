@@ -319,8 +319,14 @@ async function capture(who: string | null, path: string, name: string, width: nu
     const evidence: Record<string, string | string[]> = {};
     if (options.download) {
       const download = await local.request(base + path, { headers: who ? { cookie: `person_id=${who}` } : {} });
+      const formats = {
+        csv: { type: "text/csv", title: "Eksport CSV" },
+        ics: { type: "text/calendar", title: "Zaproszenie ICS" },
+        json: { type: "application/json", title: "Eksport oceny JSON" },
+      };
+      const format = formats[options.download];
       const contentType = download.headers.get("content-type");
-      if (!contentType?.startsWith(options.download === "csv" ? "text/csv" : "text/calendar")) {
+      if (!contentType?.startsWith(format.type)) {
         throw new Error(`Oczekiwano pliku ${options.download}, otrzymano ${contentType}`);
       }
       const content = await download.text();
@@ -333,7 +339,7 @@ async function capture(who: string | null, path: string, name: string, width: nu
         document.title = name;
         document.querySelector("h1")!.textContent = name;
         document.querySelector("pre")!.textContent = content;
-      }, { name: options.download === "csv" ? "Eksport CSV" : "Zaproszenie ICS", content });
+      }, { name: format.title, content: options.download === "json" ? JSON.stringify(JSON.parse(content), null, 2) : content });
       status = download.status;
       responsePath = path;
     } else {
