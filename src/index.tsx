@@ -19,6 +19,7 @@ import hrPartner from "./routes/hr-partner";
 import admin from "./routes/admin";
 import tour from "./routes/tour";
 import deadlineChange from "./routes/deadline-change";
+import invitations from "./routes/invitations";
 import { tourContext } from "./tour/context";
 import { TourEntry } from "./views/tour-entry";
 import { Layout, formatDate } from "./views/layout";
@@ -96,7 +97,19 @@ app.get("/", (c) => {
                     </p>
                   ) : null}
                 </div>
-                <a class="btn primary" href={t.href}>{t.action ?? "Otwórz"}</a>
+                {t.post || t.secondary ? (
+                  <div class="btns">
+                    <a class="btn primary" href={t.href}>{t.action ?? "Otwórz"}</a>
+                    {t.post ? (
+                      <form method="post" action={t.post.action}>
+                        <button class="btn" type="submit">{t.post.label}</button>
+                      </form>
+                    ) : null}
+                    {t.secondary ? <a class="btn" href={t.secondary.href}>{t.secondary.label}</a> : null}
+                  </div>
+                ) : (
+                  <a class="btn primary" href={t.href}>{t.action ?? "Otwórz"}</a>
+                )}
               </li>
             ))}
           </ul>
@@ -165,6 +178,7 @@ app.route("/", hrPartner);
 app.route("/", admin);
 app.route("/", tour);
 app.route("/", deadlineChange);
+app.route("/", invitations);
 
 export const notFoundHandler: NotFoundHandler = (c) => c.html(<NotFoundPage />, 404);
 app.notFound(notFoundHandler);

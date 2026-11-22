@@ -1,0 +1,175 @@
+import { Hono, type Context } from "hono";
+import { cycleById, openCycle, type Cycle } from "../cycles";
+import { registerCycleLinks } from "../cycle-links";
+import { getDb } from "../db";
+import { recordEvent } from "../events";
+import { registerHomeTasks, type HomeTask } from "../home-tasks";
+import { buildIcs } from "../ics";
+import {
+  INVITATION_KINDS,
+  activeInvitations,
+  canInvite,
+  criteriaTalkLimit,
+  invitationById,
+  invitationHeadline,
+  invitationStatus,
+  isParty,
+  parseKind,
+  validateInvitation,
+  type InvitationErrors,
+  type InvitationInput,
+} from "../invitations";
+import { rules } from "../engine/rules";
+import { currentPerson, personById, type Person } from "../people";
+import { today } from "../settings";
+import { InvitationFormView, InvitationView } from "../views/invitation";
+
+
+registerHomeTasks((person) => {
+  const tasks: HomeTask[] = [];
+  const now = today();
+  // Oceniany: aktywne, niepotwierdzone zaproszenia do własnego otwartego cyklu.
+  const mine = openCycle(person.id);
+  if (mine) {
+    for (const i of activeInvitations(mine.id)) {
+      if (i.confirmedOn || i.date < now) continue;
+      tasks.push({
+        title: invitationHeadline(i),
+        href: `/cycles/${mine.id}/invitations/${i.id}`,
+        detail: `Tematy: ${INVITATION_KINDS[i.kind].topics.join("; ")}`,
+        action: "Zobacz zaproszenie",
+        post: { label: "Potwierdzam termin", action: `/cycles/${mine.id}/invitations/${i.id}/confirm` },
+        secondary: { label: "Pobierz do kalendarza", href: `/cycles/${mine.id}/invitations/${i.id}.ics` },
+      });
+    }
+  }
+  // Oceniający: stan zaproszeń, które jeszcze nic nie zamknęło.
+  if (person.role === "appraiser") {
+    const ids = getDb().query("SELECT DISTINCT person_id FROM cycles WHERE appraiser_id = ?").all(person.id) as { person_id: string }[];
+    for (const { person_id } of ids) {
+      const cycle = openCycle(person_id);
+      if (!cycle || !canInvite(person, cycle)) continue;
+      for (const i of activeInvitations(cycle.id)) {
+        if (i.date < now) continue;
+        tasks.push({
+          title: `${INVITATION_KINDS[i.kind].invitationTitle}: ${personById(person_id)?.name}`,
+          person: personById(person_id)?.name,
+          detail: invitationStatus(i, cycle),
+          href: `/cycles/${cycle.id}/invitations/${i.id}`,
+          action: "Zobacz zaproszenie",
+          quiet: !!i.confirmedOn,
+        });
+      }
+    }
+  }
+  return tasks;
+});
+
+registerCycleLinks((cycle, person) =>
+  canInvite(person, cycle)
+    ? [
+        { label: "Zaproś na rozmowę o kryteriach", href: `/cycles/${cycle.id}/invitations/new?kind=opening` },
+        { label: "Zaproś na rozmowę oceniającą", href: `/cycles/${cycle.id}/invitations/new?kind=assessment` },
+      ]
+    : [],
+);
+
+const app = new Hono();
+
+type Ctx = { viewer: Person; cycle: Cycle };
+
+function guard(c: Context, access: "send" | "party"): Response | Ctx {
+  const viewer = currentPerson(c);
+  if (!viewer) return c.redirect("/account");
+  const cycle = cycleById(c.req.param("id") ?? "");
+  if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
+  if (access === "send") {
+    if (!canInvite(viewer, cycle)) return c.text("Zaproszenie wysyła oceniający otwartego cyklu.", 403);
+  } else if (!isParty(cycle, viewer)) return c.text("Brak uprawnień do tego cyklu.", 403);
+  return { viewer, cycle };
+}
+
+function renderForm(c: Context, cx: Ctx, values: InvitationInput, errors: InvitationErrors = {}, status: 200 | 422 = 200) {
+  const limit = values.kind === "opening" ? criteriaTalkLimit(cx.cycle) : null;
+  return c.html(
+    <InvitationFormView
+      viewer={cx.viewer}
+      today={today()}
+      cycleId={cx.cycle.id}
+      personName={personById(cx.cycle.person_id)?.name ?? cx.cycle.person_id}
+      values={values}
+      errors={errors}
+      limit={limit}
+      limitBasis={rules.deadlines.criteriaTalkDays.basis}
+    />,
+    status,
+  );
+}
+
+app.get("/cycles/:id/invitations/new", (c) => {
+  const g = guard(c, "send");
+  if (g instanceof Response) return g;
+  const kind = parseKind(c.req.query("kind"));
+  if (!kind) return c.text("Nieznany rodzaj rozmowy.", 404);
+  const prev = activeInvitations(g.cycle.id).find((i) => i.kind === kind);
+  return renderForm(c, g, { kind, date: prev?.date ?? "", time: prev?.time ?? "", place: prev?.place ?? "", note: prev?.note ?? "" });
+});
+
+app.post("/cycles/:id/invitations", async (c) => {
+  const g = guard(c, "send");
+  if (g instanceof Response) return g;
+  const body = await c.req.parseBody();
+  const str = (k: string) => (typeof body[k] === "string" ? (body[k] as string).trim() : "");
+  const kind = parseKind(str("kind"));
+  if (!kind) return c.text("Nieznany rodzaj rozmowy.", 422);
+  const values: InvitationInput = { kind, date: str("date"), time: str("time"), place: str("place"), note: str("note") };
+  const errors = validateInvitation(values);
+  if (Object.keys(errors).length) return renderForm(c, g, values, errors, 422);
+  const id = recordEvent("invitation_sent", g.cycle.id, g.viewer.id, values);
+  return c.redirect(`/cycles/${g.cycle.id}/invitations/${id}`, 303);
+});
+
+app.get("/cycles/:id/invitations/:eventId{[0-9]+}", (c) => {
+  const g = guard(c, "party");
+  if (g instanceof Response) return g;
+  const found = invitationById(g.cycle.id, Number(c.req.param("eventId")));
+  if (!found?.active) return c.text("Nie ma takiego zaproszenia albo zostało zastąpione nowszym.", 404);
+  const invitation = found.invitation;
+  return c.html(<InvitationView viewer={g.viewer} today={today()} cycle={g.cycle} invitation={invitation} personName={personById(g.cycle.person_id)?.name ?? ""} />);
+});
+
+app.post("/cycles/:id/invitations/:eventId{[0-9]+}/confirm", (c) => {
+  const g = guard(c, "party");
+  if (g instanceof Response) return g;
+  if (g.viewer.id !== g.cycle.person_id) return c.text("Termin potwierdza oceniany.", 403);
+  const id = Number(c.req.param("eventId"));
+  const found = invitationById(g.cycle.id, id);
+  if (!found?.active) return c.text("Nie ma takiego zaproszenia albo zostało zastąpione nowszym.", 404);
+  const invitation = found.invitation;
+  if (!invitation.confirmedOn) recordEvent("invitation_confirmed", g.cycle.id, g.viewer.id, { invitation_id: id, kind: invitation.kind });
+  return c.redirect(`/cycles/${g.cycle.id}/invitations/${id}`, 303);
+});
+
+app.get("/cycles/:id/invitations/:eventId{[0-9]+\\.ics}", (c) => {
+  const g = guard(c, "party");
+  if (g instanceof Response) return g;
+  const id = Number(c.req.param("eventId").replace(/\.ics$/, ""));
+  const found = invitationById(g.cycle.id, id);
+  if (!found) return c.text("Nie ma takiego zaproszenia.", 404);
+  // Zastąpione zaproszenie też da się pobrać: dane są w zdarzeniu.
+  const sent = found.invitation;
+  const k = INVITATION_KINDS[sent.kind];
+  const name = personById(g.cycle.person_id)?.name ?? "";
+  const ics = buildIcs({
+    uid: `invitation-${id}@mocena.local`,
+    summary: `${k.title}: ${name}`,
+    description: `Tematy rozmowy (${k.basis}): ${k.topics.join("; ")}${sent.note ? `\n${sent.note}` : ""}`,
+    location: sent.place,
+    date: sent.date,
+    time: sent.time,
+    stampDate: sent.sentOn,
+  });
+  return c.body(ics, 200, { "Content-Type": "text/calendar; charset=utf-8", "Content-Disposition": `attachment; filename="rozmowa-${id}.ics"` });
+});
+
+export default app;

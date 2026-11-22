@@ -4,6 +4,7 @@ import { seedPart1 } from "./seed/part1";
 import { seedNotes } from "./seed/notes";
 import { seedAssessments } from "./seed/assessments";
 import { seedAbsences } from "./seed/absences";
+import { seedInvitations } from "./seed/invitations";
 
 export type SeedOptions = { liveStep2?: boolean; afterStep1?: boolean };
 
@@ -16,4 +17,5 @@ export function runSeed(db: Db, options: SeedOptions = {}): void {
   seedNotes(opts);
   seedAssessments();
   seedAbsences();
+  seedInvitations();
 }

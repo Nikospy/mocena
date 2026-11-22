@@ -1,3 +1,4 @@
+import type { Child } from "hono/jsx";
 import type { Card } from "../content";
 import type { Person } from "../people";
 import { LegalBasis } from "./components";
@@ -11,6 +12,7 @@ export function AssessmentCardView(props: {
   card: Card;
   basis: string;
   topics: string[];
+  invitation?: Child;
 }) {
   const { questions, hardSituations } = props.card;
   return (
@@ -40,6 +42,7 @@ export function AssessmentCardView(props: {
         ) : null}
         <div class="btns"><a class="btn primary" href={`/cycles/${props.cycleId}/assessment`}>Notatki przy kryteriach</a></div>
       </section>
+      {props.invitation}
     </Layout>
   );
 }
