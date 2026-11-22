@@ -108,6 +108,9 @@ export type BeforeMeetingInput = {
   silenceMonths: number;
 };
 
+/** Pytanie o pracę po godzinach: notatki po zmianie zadań, w których wracają słowa z listy urzędu, i karta rozmowy po „tak”. */
+export type AfterHours = { notes: Note[]; cardHref: string | null };
+
 export type BeforeMeetingSummary = {
   boundary: string | null;
   boundarySentence: string | null;
@@ -115,6 +118,7 @@ export type BeforeMeetingSummary = {
   after: Note[];
   bothSides: Item[];
   pendingQuestion: { note: Note; prompt: string } | null;
+  afterHours: AfterHours | null;
   criteriaWithoutNotes: Item[];
   feedback: Item;
   team: Item[];
@@ -140,6 +144,17 @@ export function beforeMeetingSummary(i: BeforeMeetingInput): BeforeMeetingSummar
   }
 
   const pending = notes.find((n) => n.task_change === 1 && lastAnswer(n.id, i.events) === null);
+
+  /** Lista słów pracy po godzinach to ustawienie urzędu, jak lista słów zmiany zadań. */
+  const words = officeSettings().afterHoursWords;
+  const overload = after.filter((n) => {
+    const lower = n.text.toLowerCase();
+    return words.some((w) => lower.includes(w.toLowerCase()));
+  });
+  const cardNote = notes.find((n) => n.task_change === 1 && lastAnswer(n.id, i.events) === "yes");
+  const afterHours: AfterHours | null = overload.length
+    ? { notes: overload, cardHref: cardNote ? `/notes/${cardNote.id}/task-change` : null }
+    : null;
 
   const criteriaWithoutNotes: Item[] = i.criteriaIds
     .filter((id) => !notes.some((n) => n.criterion_id === id))
@@ -167,6 +182,7 @@ export function beforeMeetingSummary(i: BeforeMeetingInput): BeforeMeetingSummar
     after,
     bothSides,
     pendingQuestion: pending ? { note: pending, prompt: text("beforeMeeting", "pending") } : null,
+    afterHours,
     criteriaWithoutNotes,
     feedback,
     team: teamWithoutNotes(i.team.filter((m) => m.id !== i.subject.id), i.today, i.silenceMonths),

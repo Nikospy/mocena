@@ -97,6 +97,8 @@ describe("ekran „Przed rozmową”", () => {
     expect(html).toContain("Zaznaczono zmianę zadań w notatce z 11.03.2026.");
     expect(html).toContain("To stała zmiana zadań?");
     expect(html).toContain('action="/notes/10/task-change"');
+    expect(html).toContain("wraca praca po godzinach");
+    expect(html).toMatch(/href="#note-\d+"/);
     expect(html).toContain("O Marii nie masz jeszcze żadnej notatki.");
     expect(html).toContain('href="/people/maria/notes/new"');
     for (const w of FORBIDDEN) expect(html.toLowerCase()).not.toContain(w);

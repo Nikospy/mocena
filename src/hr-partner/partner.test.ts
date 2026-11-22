@@ -28,6 +28,21 @@ function piotrSummary(today: string, opts: { answer?: "yes" | "no" } = {}) {
   return { db, notes, summary: beforeMeetingSummary(input) };
 }
 
+describe("pytanie o pracę po godzinach", () => {
+  test("wyzwala je notatka po zmianie zadań z „po 18:00”; karta rozmowy tylko po odpowiedzi „tak”", () => {
+    const { summary } = piotrSummary("2026-11-21");
+    expect(summary.afterHours?.notes.map((n) => n.date)).toContain("2026-04-21");
+    // Bez odpowiedzi „tak” na notatce ze zmianą zadań nie ma karty rozmowy.
+    expect(summary.afterHours?.cardHref).toBeNull();
+    const yes = piotrSummary("2026-11-21", { answer: "yes" }).summary;
+    expect(yes.afterHours?.cardHref).toMatch(/^\/notes\/\d+\/task-change$/);
+  });
+
+  test("odpowiedź „nie” znosi granicę zmiany zadań razem z pytaniem", () => {
+    expect(piotrSummary("2026-11-21", { answer: "no" }).summary.afterHours).toBeNull();
+  });
+});
+
 describe("granica zmiany zadań i zestawienie", () => {
   test("granica 11.03.2026, kryteria po obu stronach i bez notatek, zdanie o Marii bez Ewy", () => {
     const { summary } = piotrSummary("2026-11-21");
