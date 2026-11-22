@@ -58,9 +58,15 @@
     "zastępuje",
     "zastępstw"
   ],
+  "afterHoursWords": [
+    "po 18",
+    "wieczorami",
+    "nadgodziny",
+    "weekend"
+  ],
   "recentFactsWindowMonths": 1,
   "assessmentReminderDays": { "value": 30, "label": "ustawienie urzędu" },
-  "noteSettingsNote": "taskChangeWords i recentFactsWindowMonths: ustawienie urzędu, nie pochodzi z przepisów. Słowa to rdzenie szukane jako podciąg tekstu notatki (małe litery).",
+  "noteSettingsNote": "taskChangeWords, afterHoursWords i recentFactsWindowMonths: ustawienie urzędu, nie pochodzi z przepisów. Słowa to rdzenie szukane jako podciąg tekstu notatki (małe litery). afterHoursWords wybiera notatki po zmianie zadań do pytania partnera o pracę po godzinach.",
   "hrPartnerLabel": "ustawienie urzędu",
   "hrPartnerNote": "developmentForms, appreciationReminderDays i teamSilenceMonths: ustawienie urzędu, nie pochodzi z przepisów. Urząd może zmienić katalog i progi u siebie.",
   "appreciationReminderDays": 90,

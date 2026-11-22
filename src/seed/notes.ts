@@ -32,7 +32,7 @@ export const DEMO_NOTES: Row[] = [
   ["2026-04-21", "piotr", "Organizacja pracy i orientacja na osiąganie celów", N, 0, "Od przejęcia kolejki zostaje po 18:00. W tym tygodniu trzy sprawy z wtorku, które sam oznaczył jako pilne, przeszły na czwartek."],
   ["2026-05-19", "tomasz", "Współpraca", G, 0, "Oddał naczelnikowi z drugiego wydziału swój wzór pisma do uzgodnień. Tamten wysłał pismo na tym wzorze, bez poprawek, i napisał o tym do mnie."],
   ["2026-06-18", "piotr", "Komunikacja", G, 0, "Przepisał pismo do gminy: jedno zdanie, czego brakuje, i termin. Gmina odpowiedziała raz, bez dopytywania. Warto mu to powiedzieć, nie tylko odhaczyć."],
-  ["2026-08-26", "piotr", "Rzetelność", N, 0, "Trzy odpowiedzi wyszły po terminie, który sam wpisał w marcu. Powiedział, że domyka kolejkę wieczorami i nie widzi, jak zdążyć bez odpuszczenia części spraw."],
+  ["2026-08-26", "piotr", "Rzetelność", N, 0, "Trzy odpowiedzi wyszły po terminie, który sam wpisał w marcu: 12, 19 i 25 sierpnia. Żadnej nie zgłosił wcześniej; wyszło to przy przeglądzie rejestru odpowiedzi 26 sierpnia."],
   ["2026-09-03", "ewa", "Współpraca", G, 0, "Po powrocie 31 sierpnia poprosiła Marię o pół godziny, żeby odtworzyć kolejkę. Nie udawała, że pamięta sprawy sprzed lutego; spisała, co ma przejąć."],
   ["2026-11-12", "piotr", "Wykorzystywanie wiedzy i doskonalenie zawodowe", G, 0, "Po powrocie 9 listopada przeszedł zaległe szkolenie z nowego rejestru wniosków i tego samego dnia wprowadził do niego swoje otwarte sprawy. Nie czekał na przypomnienie."],
 ];

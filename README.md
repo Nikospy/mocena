@@ -58,11 +58,15 @@ bun test
 
 ## Wdrożenie
 
+**W urzędzie (lokalnie, bez chmury).** Aplikacja działa na jednym komputerze urzędu: `bun install` i `bun run dev`, dane w jednym pliku bazy SQLite (`mocena.sqlite`, ścieżkę można zmienić zmienną `MOCENA_DB`). Bez serwera bazy, bez chmury i bez płatnych usług. `bun run seed` służy tylko do danych pokazowych. Co urząd dodaje przy wdrożeniu (logowanie i konta, retencja, administrator danych) oraz jak chronione są dane — opisuje strona `/about` w aplikacji.
+
+**Wdrożenie pokazowe (chmura, tylko na czas zawodów).**
+
 ```sh
 bun run deploy
 ```
 
-Skrypt wywołuje `wrangler deploy` na podstawie `wrangler.jsonc`.
+Skrypt wywołuje `wrangler deploy` na podstawie `wrangler.jsonc`. Każdy widz dostaje osobną sesję z własnymi danymi pokazowymi.
 
 ## Podstawa prawna
 

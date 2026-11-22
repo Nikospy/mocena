@@ -14,7 +14,6 @@ import {
   notesAbout,
   openCyclesOfAppraiser,
   talkDate,
-  teamOf,
 } from "../hr-partner/data";
 import { appreciationReminder, beforeMeetingSummary, lastAnswer, nameForm } from "../hr-partner/partner";
 import { officeSettings } from "../office-settings";
@@ -133,8 +132,6 @@ app.get("/cycles/:id/before-meeting", (c) => {
     events: answersForNotes(notes),
     criteriaIds: cycleCriteria(g.cycle.id).map((k) => k.id),
     lastFeedback: lastFeedbackDate(g.viewer.id, g.subject.id),
-    team: teamOf(g.viewer.id),
-    silenceMonths: officeSettings().teamSilenceMonths,
   });
   return c.html(
     <BeforeMeetingView

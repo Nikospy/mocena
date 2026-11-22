@@ -1,0 +1,38 @@
+import { describe, expect, test } from "bun:test";
+import { CODE_LICENSE } from "./content";
+import { createTestApp } from "./test-helpers";
+
+describe("strona /about „Wdrożenie i dane”", () => {
+  test("wersja reguł i data obowiązywania, ciasteczka, braki integracji, repo i licencja ze stałej", async () => {
+    const { app } = createTestApp({ today: "2026-11-21" });
+    const res = await app.request("/about");
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    for (const t of [
+      "Wdrożenie i dane",
+      "bun install",
+      "2016-470/1",
+      "23.04.2016",
+      "Nie ma w prototypie",
+      "person_id",
+      "mocena_demo",
+      "mocena_tour",
+      "github.com/Nikospy/mocena",
+      "Open Sans",
+      CODE_LICENSE,
+    ]) {
+      expect(html).toContain(t);
+    }
+    // Repo jest publiczne: bez prywatnych ścieżek i adresów e-mail.
+    expect(html).not.toMatch(/\/Users\//);
+    expect(html).not.toMatch(/[\w.]+@[\w.]+/);
+  });
+
+  test("działa niezależnie od konta i bez konta", async () => {
+    const { app } = createTestApp({ today: "2026-11-21" });
+    for (const cookie of ["", "person_id=joanna", "person_id=piotr"]) {
+      const res = await app.request("/about", { headers: cookie ? { cookie } : {} });
+      expect(res.status).toBe(200);
+    }
+  });
+});

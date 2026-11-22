@@ -35,10 +35,10 @@ export function TourEntry() {
   return (
     <TourShell title="Pokaz">
       <div class="e-head">
-        <h1 class="e-h1">Ten asystent nie pisze oceny.</h1>
+        <h1 class="e-h1">Ten asystent prowadzi ocenę od pierwszej notatki do arkusza.</h1>
         <div class="e-side">
           <p class="e-lead">
-            Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie. mOcena prowadzi go przez cały cykl: zbiera fakty, kiedy się dzieją, i pilnuje każdego terminu z przepisu. Punkty stawia człowiek.
+            Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie. Asystent zbiera fakty, kiedy się dzieją, i pilnuje każdego terminu z przepisu. Punkty stawia człowiek — samej oceny nie pisze.
           </p>
           <div class="e-cta">
             <form method="post" action="/tour/1">

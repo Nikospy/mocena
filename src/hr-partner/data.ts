@@ -3,10 +3,9 @@ import { openCycle } from "../cycles";
 import { cycleCriteria } from "../cycles/part1";
 import { getDb } from "../db";
 import { visibleEvents, type AppEvent } from "../events";
-import { canWriteNoteAbout, lastFeedbackDate, noteById, notesAbout, type Note } from "../notes/repo";
+import { lastFeedbackDate, noteById, notesAbout, type Note } from "../notes/repo";
 import { today } from "../settings";
 import type { Cycle } from "../cycles";
-import type { TeamMember } from "./partner";
 
 export { noteById, lastFeedbackDate, notesAbout, openCycle, cycleCriteria };
 
@@ -31,15 +30,6 @@ export function answersForNotes(notes: Note[]): AppEvent[] {
 export function talkDate(cycle: Cycle): string {
   const ev = visibleEvents(cycle.id).find((e) => e.type === "part1_submitted");
   return ev?.date ?? cycle.period_start;
-}
-
-/** Podwładni przełożonego z datą najnowszej jego notatki o nich. */
-export function teamOf(supervisorId: string): TeamMember[] {
-  const rows = getDb().query("SELECT id, name FROM people WHERE supervisor_id = ? ORDER BY name").all(supervisorId) as { id: string; name: string }[];
-  return rows.map((r) => {
-    const notes = notesAbout(r.id, { authorId: supervisorId });
-    return { id: r.id, name: r.name, latestNoteDate: notes[notes.length - 1]?.date ?? null, canWrite: canWriteNoteAbout(supervisorId, r.id) };
-  });
 }
 
 /** Otwarte cykle, w których osoba jest oceniającym. */
