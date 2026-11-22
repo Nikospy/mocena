@@ -3,6 +3,7 @@ import { assessmentState } from "../assessment/state";
 import { effectiveDeadline, previousCycleOf } from "../cycles";
 import { cycleState } from "../hr/cycle-state";
 import { latestCycles } from "../hr/latest-cycles";
+import { EXPORT_HEADER } from "../hr/csv-import";
 import { lastAssessmentOf, OUTCOME_LABEL } from "../hr/people";
 import { personById } from "../people";
 import { formatDate } from "../views/layout";
@@ -10,7 +11,7 @@ import { hrGuard } from "./hr-people";
 
 const app = new Hono();
 
-const HEADER = ["Osoba", "Stanowisko", "Komórka", "Oceniający", "Stan procesu", "Termin oceny", "Termin sprzeciwu", "Data ostatniej oceny", "Wynik ostatniej oceny"];
+const HEADER = EXPORT_HEADER;
 
 /** Pole CSV z separatorem `;`: cudzysłów przy `;`, `"` i końcach linii, a komórka zaczynająca się od `=`, `+`, `-`, `@` nie jest formułą w arkuszu. */
 function field(v: string): string {

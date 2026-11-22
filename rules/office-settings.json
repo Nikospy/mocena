@@ -69,6 +69,7 @@
   "noteSettingsNote": "taskChangeWords, afterHoursWords i recentFactsWindowMonths: ustawienie urzędu, nie pochodzi z przepisów. Słowa to rdzenie szukane jako podciąg tekstu notatki (małe litery). afterHoursWords wybiera notatki po zmianie zadań do pytania partnera o pracę po godzinach.",
   "hrPartnerLabel": "ustawienie urzędu",
   "hrPartnerNote": "developmentForms, appreciationReminderDays i teamSilenceMonths: ustawienie urzędu, nie pochodzi z przepisów. Urząd może zmienić katalog i progi u siebie.",
+  "organizationalUnits": ["Biuro Dyrektora Generalnego", "Wydział Finansów i Budżetu", "Wydział Kadr i Szkoleń", "Wydział Organizacyjny", "Wydział Spraw Obywatelskich"],
   "appreciationReminderDays": 90,
   "teamSilenceMonths": 6,
   "developmentForms": [

@@ -1,53 +1,68 @@
-// Pomiar wyglądu na żywej stronie: przechodzi pokaz z demo.md, robi zrzuty każdego ekranu
-// w 360 px i 1440 px i liczy to, co da się policzyć (pismo, kontrast, cele kliknięcia, długość wiersza,
-// przepełnienie, liczba ramek, pigułek i cieni). Wynik: <outDir>/metrics.json i zrzuty z zaznaczonymi miejscami.
-// To skrypt, nie trasa: nie importuj go z src/.
-//   bun run scripts/design-audit.ts <outDir> [--only ekran,ekran] [--css plik.css]
-// --css dokłada arkusz przed pomiarem: tak sprawdzasz poprawkę, zanim trafi do public/style.css.
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import regulation from "../rules/regulation-2016-470.json";
+import type { Page, Response as BrowserResponse } from "playwright";
+import { auditScenarios, type CaptureOptions, type Fields } from "./design-scenarios";
 
+// bun run scripts/design-audit.ts <outDir> [--widths 320,360,768,1024,1440] [--only ekran,ekran] [--css plik.css]
 const argv = process.argv.slice(2);
-const flag = (name: string) => (argv.includes(name) ? argv[argv.indexOf(name) + 1] : undefined);
-const only = flag("--only")?.split(",");
-const cssFile = flag("--css");
+const flags = new Map<string, string>();
+let output: string | undefined;
+for (let i = 0; i < argv.length; i++) {
+  const arg = argv[i];
+  if (["--widths", "--only", "--css"].includes(arg)) {
+    const value = argv[++i];
+    if (!value || value.startsWith("--")) throw new Error(`Brak wartości dla ${arg}`);
+    flags.set(arg, value);
+  } else if (!arg.startsWith("--") && output === undefined) {
+    output = arg;
+  } else {
+    throw new Error(`Nieznany argument: ${arg}`);
+  }
+}
+const only = flags.get("--only")?.split(",");
+const widths = [...new Set((flags.get("--widths") ?? "360,1440").split(",").map(Number))];
+if (widths.some((width) => ![320, 360, 768, 1024, 1440].includes(width))) {
+  throw new Error("Dozwolone szerokości: 320,360,768,1024,1440.");
+}
+const cssFile = flags.get("--css");
 const extraCss = cssFile ? await Bun.file(resolve(cssFile)).text() : null;
-const outDir = resolve(argv.find((a, i) => !a.startsWith("--") && !["--only", "--css"].includes(argv[i - 1] ?? "")) ?? "design-audit-out");
+const outDir = resolve(output ?? "design-audit-out");
 mkdirSync(outDir, { recursive: true });
 
 type Rect = { x: number; y: number; w: number; h: number; label: string };
 type Measured = { metrics: Record<string, unknown>; off: Record<string, Rect[]>; pageHeight: number };
-type Page = {
-  goto(u: string): Promise<unknown>;
-  screenshot(o: unknown): Promise<unknown>;
-  evaluate<T>(fn: string | ((arg: never) => T), arg?: unknown): Promise<T>;
-  addStyleTag(o: { content: string }): Promise<{ evaluate(fn: string): Promise<unknown> }>;
-};
-type Context = { addCookies(c: unknown[]): Promise<void>; newPage(): Promise<Page>; close(): Promise<void> };
-type Browser = { newContext(o: unknown): Promise<Context>; close(): Promise<void> };
 
-const pw = (await import("playwright")) as { chromium: { launch(): Promise<Browser> } };
-const browser = await pw.chromium.launch();
-
+const { chromium } = await import("playwright");
+const singleProcess = process.platform === "darwin" && process.env.MOCENA_AUDIT_SINGLE_PROCESS === "1";
+const browser = await chromium.launch({
+  headless: true,
+  // Na macOS pojedynczy proces działa także bez usług Mach wymaganych przez renderery potomne.
+  args: singleProcess ? ["--single-process", "--disable-gpu"] : [],
+});
 const dir = mkdtempSync(join(tmpdir(), "mocena-audit-"));
 process.env.MOCENA_DB = join(dir, "audit.sqlite");
 process.argv = [process.argv[0], process.argv[1], "--live-step-2"];
 await import("../src/seed-cli");
 const { default: local } = await import("../src/local");
-const server = Bun.serve({ port: 0, hostname: "127.0.0.1", fetch: local.fetch });
-const base = `http://127.0.0.1:${server.port}`;
-const CYCLE = "cycle-piotr";
-
-async function post(who: string, path: string, fields: Record<string, string | string[]>): Promise<Response> {
+const { default: app } = await import("../src/index");
+// Playwright przechwytuje żądania HTTP i przekazuje je rzeczywistej aplikacji Hono
+// razem z plikami public/. Pomiar nie potrzebuje portu ani dostępu do sieci.
+const base = "http://mocena.test";
+async function post(who: string | null, path: string, fields: Fields = {}) {
   const body = new URLSearchParams();
-  for (const [k, v] of Object.entries(fields)) for (const x of Array.isArray(v) ? v : [v]) body.append(k, x);
-  const res = await fetch(base + path, { method: "POST", body, redirect: "manual", headers: { cookie: `person_id=${who}` } });
-  if (res.status >= 400) console.log(`POST ${path} jako ${who}: HTTP ${res.status}`);
-  return res;
+  for (const [key, value] of Object.entries(fields)) {
+    for (const item of Array.isArray(value) ? value : [value]) body.append(key, item);
+  }
+  const res = await local.request(base + path, {
+    method: "POST", body,
+    headers: who ? { cookie: `person_id=${who}` } : {},
+  });
+  if (res.status !== 303) throw new Error(`POST ${path} (${who}): HTTP ${res.status} ${(await res.text()).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").slice(-300)}`);
+  const location = res.headers.get("location");
+  if (!location?.startsWith("/")) throw new Error(`POST ${path}: brak przekierowania`);
+  return location;
 }
-const setDate = (date: string) => post("admin", "/demo/date", { date });
 
 // Pomiar w przeglądarce. Zwraca liczby i listy miejsc (współrzędne strony) do zaznaczenia na zrzucie.
 const MEASURE = String.raw`(() => {
@@ -64,6 +79,7 @@ const MEASURE = String.raw`(() => {
   const push = (k, r) => { (off[k] = off[k] || []).push(r); };
 
   // Tekst: węzły tekstowe z widocznym prostokątem.
+  const mainContent = document.querySelector("main");
   const texts = [];
   const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   while (tw.nextNode()) {
@@ -75,10 +91,15 @@ const MEASURE = String.raw`(() => {
     texts.push({ el, t, rects, cs });
   }
   const sizes = {}, weights = {}, colors = {}, lefts = {}; let chars = 0, bold = 0, small = 0, tiny = 0, upper = 0;
+  let mainChars = 0, mainSmall = 0;
   const lowContrast = []; let unknownBg = 0;
   for (const x of texts) {
     const n = x.t.length, fs = parseFloat(x.cs.fontSize), fw = +x.cs.fontWeight;
     chars += n; inc(sizes, fs, n); inc(weights, fw, n); if (fw >= 600) bold += n; if (fs < 16) small += n; if (fs <= 12) tiny += n;
+    if (mainContent?.contains(x.el)) {
+      mainChars += n;
+      if (fs < 16) mainSmall += n;
+    }
     if (x.cs.textTransform === "uppercase") upper += n;
     if (fs <= 12) push("tiny", box(x.rects[0], fs + "px"));
     inc(lefts, Math.round(x.rects[0].left), 1);
@@ -150,7 +171,7 @@ const MEASURE = String.raw`(() => {
   }
 
   // Odstępy pionowe między sąsiadami w treści.
-  const gaps = {}; const main = document.querySelector("main") || document.body;
+  const gaps = {}; const main = mainContent || document.body;
   for (const p of [main, ...main.querySelectorAll("*")]) {
     const kids = [...p.children].filter((c) => shown(c) && !getComputedStyle(c).display.startsWith("inline") && getComputedStyle(c).position !== "absolute" && getComputedStyle(c).position !== "fixed");
     for (let i = 1; i < kids.length; i++) { const a = kids[i - 1].getBoundingClientRect(), b = kids[i].getBoundingClientRect(); const g = Math.round(b.top - a.bottom); if (g >= 0 && g < 200 && Math.abs(a.left - b.left) < 4) inc(gaps, g, 1); }
@@ -161,7 +182,12 @@ const MEASURE = String.raw`(() => {
   let skipped = 0; for (let i = 1; i < heads.length; i++) if (heads[i] - heads[i - 1] > 1) skipped++;
   const h1 = [...document.querySelectorAll("h1")].filter(shown)[0];
   const maxSize = Math.max(...Object.keys(sizes).map(Number));
-  const biggest = new Set(texts.filter((x) => parseFloat(x.cs.fontSize) === maxSize).map((x) => x.el)).size;
+  const biggest = new Set(texts.filter((x) => parseFloat(x.cs.fontSize) === maxSize).map((x) => x.el.closest("h1") || x.el));
+  const mobileNavUnder48 = vw <= 360
+    ? [...document.querySelectorAll("nav.nav a")].filter((el) => shown(el) && el.getBoundingClientRect().height < 48).length
+    : 0;
+  const controlHeights = [...document.querySelectorAll("main input:not([type=hidden],[type=radio],[type=checkbox]),main select,main button.btn:not(.text),main a.btn:not(.text)")]
+    .filter(shown).map((el) => Math.round(el.getBoundingClientRect().height));
 
   // Przepełnienie w poziomie.
   const overflow = document.documentElement.scrollWidth - document.documentElement.clientWidth;
@@ -183,6 +209,7 @@ const MEASURE = String.raw`(() => {
       sizeCount: Object.keys(sizes).length,
       weights: sorted(weights).map(([k, v]) => [Number(k), pct(v)]),
       boldPct: pct(bold), under16Pct: pct(small), tinyPct: pct(tiny), upperPct: pct(upper),
+      under16PctMain: mainChars ? Math.round(mainSmall * 100 / mainChars) : null,
       textColors: sorted(colors).map(([k, v]) => [k, pct(v)]), textColorCount: Object.keys(colors).length,
       contrastFails: lowContrast.length, worstContrast: lowContrast[0] ? +lowContrast[0].cr.toFixed(2) : null, unknownBg,
       maxCpl, longLineBlocks: longLines.length,
@@ -191,10 +218,10 @@ const MEASURE = String.raw`(() => {
       boxes, maxBoxDepth: maxDepth, boxBgCount: Object.keys(boxBgs).length, boxBgs: sorted(boxBgs), shadows, pills, pillLinks,
       gaps: sorted(gaps).map(([k, v]) => [Number(k), v]), gapCount: Object.keys(gaps).length,
       leftEdges: sorted(lefts).filter(([, v]) => v >= 2).map(([k, v]) => [Number(k), v]),
-      h1Count: heads.filter((h) => h === 1).length, headings: heads.join(""), skippedLevels: skipped, biggestSize: maxSize, biggestCount: biggest,
+      h1Count: heads.filter((h) => h === 1).length, headings: heads.join(""), skippedLevels: skipped, biggestSize: maxSize, biggestCount: biggest.size, largestIsH1: biggest.has(h1),
       h1Top: h1 ? Math.round(h1.getBoundingClientRect().top + scrollY) : null, mainTop: Math.round(main.getBoundingClientRect().top + scrollY),
       screens: +(document.documentElement.scrollHeight / vh).toFixed(1),
-      overflowPx: Math.max(0, overflow), unlabeled,
+      mobileNavUnder48, assessmentForm: !!document.querySelector("#assessment-form"), overflowPx: Math.max(0, overflow), unlabeled, controlsUnder48: controlHeights.filter((h) => h < 48).length,
       straightQuotes: (body.match(/"/g) || []).length, hyphenDashes: (body.match(/ - /g) || []).length,
     },
   };
@@ -210,109 +237,260 @@ const DRAW = String.raw`((list) => {
   document.body.append(c);
 })`;
 
-const results: unknown[] = [];
-const VIEWS = [
-  { width: 360, height: 800, scale: 2 },
-  { width: 1440, height: 900, scale: 1 },
-];
-// Które listy miejsc trafiają na zrzut z zaznaczeniem i ile ramek najwyżej.
+const coverageFile = join(import.meta.dir, "../context/changes/final-polish/coverage.md");
+const coverage = new Map<string, { route: string; who: string | null }>();
+for (const line of (await Bun.file(coverageFile).text()).split("\n")) {
+  const row = /^\| `([^`]+)` \| `([^`]+)` \| [^|]+ \| `([^`]+)` \|/.exec(line);
+  if (!row) continue;
+  const [, route, who, name] = row;
+  if (coverage.has(name)) throw new Error(`Powtórzony wiersz w coverage.md: ${name}`);
+  coverage.set(name, { route, who: who === "anonim" ? null : who });
+}
+
+const results: Record<string, unknown>[] = [];
+const visited = new Set<string>();
+const errors: string[] = [];
+// Limity zaznaczeń na pomocniczym zrzucie.
 const EVIDENCE: Record<string, number> = { contrast: 12, tiny: 30, lineLength: 6, target24: 20, target44: 30, primary: 12, nestedBox: 30, box: 60, pill: 60, pillLink: 60, shadow: 60, overflow: 10, unlabeled: 10 };
 
-async function stop(who: string | null, path: string, name: string) {
-  if (only && !only.includes(name)) return;
-  for (const v of VIEWS) {
-    const ctx = await browser.newContext({ viewport: { width: v.width, height: v.height }, deviceScaleFactor: v.scale, locale: "pl-PL" });
+async function responseOfForm(page: Page, form: NonNullable<CaptureOptions["form"]>) {
+  const submit = page.locator(form.button ?? `form[action="${form.action}"] button[type=submit]`).first();
+  for (const [name, value] of Object.entries(form.fields ?? {})) {
+    await page.locator(`form[action="${form.action}"] [name="${name}"]`).fill(value);
+  }
+  if (form.checks) {
+    const inputs = page.locator(form.checks.selector);
+    for (let i = 0; i < form.checks.count; i++) await inputs.nth(i).check();
+  }
+  if (form.omitSubmitter) await submit.evaluate((el) => el.removeAttribute("name"));
+  const [response] = await Promise.all([
+    page.waitForResponse((res) => res.request().method() === "POST" && new URL(res.url()).pathname === form.action),
+    submit.click(),
+  ]);
+  await page.waitForLoadState("load");
+  return response;
+}
+
+async function focusAfterTabs(page: Page, tabs: number) {
+  for (let i = 0; i < tabs; i++) await page.keyboard.press("Tab");
+  return page.evaluate(() => {
+    const el = document.querySelector(":focus-visible");
+    if (!el) return { visible: false, element: null };
+    const style = getComputedStyle(el);
+    const painted = (color: string) => color !== "transparent" && !/^rgba\([^)]*, 0\)$/.test(color);
+    const outline = !["none", "hidden"].includes(style.outlineStyle) && parseFloat(style.outlineWidth) > 0 && painted(style.outlineColor);
+    const shadow = style.boxShadow !== "none" && (style.boxShadow.match(/rgba?\([^)]*\)/g) ?? []).some(painted);
+    const rect = el.getBoundingClientRect();
+    const onScreen = rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.right > 0 && rect.top < innerHeight && rect.left < innerWidth;
+    return {
+      visible: onScreen && (outline || shadow),
+      element: el.tagName,
+      label: el.getAttribute("aria-label") || el.textContent?.trim().slice(0, 100),
+      outline: style.outline,
+      boxShadow: style.boxShadow,
+    };
+  });
+}
+
+const sharedContext = singleProcess ? await browser.newContext({ locale: "pl-PL" }) : undefined;
+
+async function capture(who: string | null, path: string, name: string, width: number, options: CaptureOptions) {
+  const id = `${name}-${width}`;
+  const height = width < 768 ? 800 : 900;
+  const ctx = sharedContext ?? await browser.newContext({ viewport: { width, height }, deviceScaleFactor: width < 768 ? 2 : 1, locale: "pl-PL", acceptDownloads: true });
+  try {
+    if (sharedContext) await ctx.clearCookies();
     if (who) await ctx.addCookies([{ name: "person_id", value: who, url: base }]);
+    if (options.tour) await ctx.addCookies([{ name: "mocena_tour", value: options.tour, url: base }]);
     const page = await ctx.newPage();
-    await page.goto(base + path);
+    await page.setViewportSize({ width, height });
+    await page.route(`${base}/**`, async (route) => {
+      const request = route.request();
+      const headers = await request.allHeaders();
+      // Przechwycona nawigacja może nie przekazać nagłówka Cookie.
+      const cookies = await ctx.cookies(request.url());
+      if (cookies.length) headers.cookie = cookies.map(({ name, value }) => `${name}=${value}`).join("; ");
+      const res = await local.request(request.url(), {
+        method: request.method(), headers, body: request.postData(),
+      });
+      await route.fulfill({
+        status: res.status,
+        headers: Object.fromEntries(res.headers),
+        body: Buffer.from(await res.arrayBuffer()),
+      });
+    });
+    page.setDefaultTimeout(5000);
+    let status: number;
+    let responsePath: string;
+    let redirectStatus: number | undefined;
+    const evidence: Record<string, string | string[]> = {};
+    if (options.download) {
+      const download = await local.request(base + path, { headers: who ? { cookie: `person_id=${who}` } : {} });
+      const formats = {
+        csv: { type: "text/csv", title: "Eksport CSV" },
+        ics: { type: "text/calendar", title: "Zaproszenie ICS" },
+        json: { type: "application/json", title: "Eksport oceny JSON" },
+      };
+      const format = formats[options.download];
+      const contentType = download.headers.get("content-type");
+      if (!contentType?.startsWith(format.type)) {
+        throw new Error(`Oczekiwano pliku ${options.download}, otrzymano ${contentType}`);
+      }
+      const content = await download.text();
+      const file = `${id}.${options.download}`;
+      await Bun.write(join(outDir, file), content);
+      evidence.download = file;
+      // Załącznik sam nie ma widoku HTML. Pokazujemy rzeczywistą treść odpowiedzi.
+      await page.setContent("<!doctype html><html lang=pl><meta charset=utf-8><title></title><main><h1></h1><pre style='white-space:pre-wrap;overflow-wrap:anywhere'></pre></main></html>");
+      await page.evaluate(({ name, content }) => {
+        document.title = name;
+        document.querySelector("h1")!.textContent = name;
+        document.querySelector("pre")!.textContent = content;
+      }, { name: format.title, content: options.download === "json" ? JSON.stringify(JSON.parse(content), null, 2) : content });
+      status = download.status;
+      responsePath = path;
+    } else {
+      if (options.redirect) {
+        const res = await local.request(base + path, { headers: who ? { cookie: `person_id=${who}` } : {} });
+        redirectStatus = res.status;
+        if (redirectStatus !== 302 || res.headers.get("location") !== options.redirect) {
+          throw new Error(`Oczekiwano 302 do ${options.redirect}`);
+        }
+      }
+      const visitedPage: BrowserResponse | null = await page.goto(base + (options.redirect ?? path));
+      if (!visitedPage) throw new Error("Nawigacja bez odpowiedzi HTTP");
+      const response = options.form ? await responseOfForm(page, options.form) : visitedPage;
+      status = response.status();
+      responsePath = new URL(response.url()).pathname;
+    }
+    if (status !== (options.status ?? 200)) throw new Error(`HTTP ${status}, oczekiwano ${options.status ?? 200}`);
+    if (options.check) {
+      const body = await page.locator("body").innerText();
+      if (!body.includes(options.check)) throw new Error(`Brak tekstu „${options.check}”`);
+    }
+    if (options.selector && !(await page.locator(options.selector).count())) {
+      throw new Error(`Brak elementu ${options.selector}`);
+    }
+    if (options.tour) {
+      const guide = page.locator("#tour-guide:visible, #tour-guide-m:visible");
+      const summary = guide.locator("details:not([open]) > summary");
+      if (await summary.count()) await summary.first().click();
+    }
     if (extraCss) await page.addStyleTag({ content: extraCss });
-    const id = `${name}-${v.width}`;
-    await page.screenshot({ path: join(outDir, `${id}.jpg`), fullPage: true, type: "jpeg", quality: 72 });
-    const m = (await page.evaluate(MEASURE)) as Measured;
-    const evidence: Record<string, string> = {};
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    let hover: { selector: string; method: string; styleChanged: boolean } | undefined;
+    if (options.hover) {
+      const target = page.locator(options.hover).first();
+      const style = () => target.evaluate((el) => {
+        const css = getComputedStyle(el);
+        return [css.backgroundColor, css.color, css.borderColor, css.textDecorationLine, css.boxShadow].join(" ");
+      });
+      const before = await style();
+      await target.hover();
+      hover = { selector: options.hover, method: "pointer", styleChanged: before !== await style() };
+      if (!(await target.evaluate((el) => el.matches(":hover"))) && !hover.styleChanged) {
+        // Chromium w trybie jednego procesu potrafi dostarczyć ruch myszy bez włączenia :hover.
+        // Wymuszenie stanu przez DevTools stosuje reguły CSS tej samej kontrolki.
+        const cdp = await ctx.newCDPSession(page);
+        await cdp.send("DOM.enable");
+        await cdp.send("CSS.enable");
+        const { root } = await cdp.send("DOM.getDocument");
+        const { nodeId } = await cdp.send("DOM.querySelector", { nodeId: root.nodeId, selector: options.hover });
+        await cdp.send("CSS.forcePseudoState", { nodeId, forcedPseudoClasses: ["hover"] });
+        hover.method = "chromium-pseudo-state";
+        hover.styleChanged = before !== await style();
+      }
+    }
+    const focus = options.tabs ? await focusAfterTabs(page, options.tabs) : undefined;
+    const viewportShot = !!(options.tabs || options.hover);
+    if (options.print) await page.emulateMedia({ media: "print" });
+    const screenshot = `${id}.jpg`;
+    const measured = await page.evaluate<Measured>(MEASURE);
+    await page.screenshot({ path: join(outDir, screenshot), fullPage: !viewportShot, type: "jpeg", quality: 72 });
+    if (options.print) {
+      const pdf = `${id}.pdf`;
+      await page.pdf({ path: join(outDir, pdf), format: "A4", printBackground: true, preferCSSPageSize: true });
+      const raster = Bun.spawnSync(["pdftoppm", "-r", "120", "-png", join(outDir, pdf), join(outDir, id)]);
+      if (raster.exitCode !== 0) throw new Error(`pdftoppm: ${raster.stderr.toString()}`);
+      const pages = [...new Bun.Glob(`${id}-*.png`).scanSync(outDir)].sort();
+      if (!pages.length) throw new Error("Brak obrazów stron PDF");
+      evidence.pdf = pdf;
+      evidence.pages = pages;
+    }
     for (const [key, cap] of Object.entries(EVIDENCE)) {
-      const list = (m.off[key] ?? []).slice(0, cap);
+      const list = (measured.off[key] ?? []).slice(0, cap);
       if (!list.length) continue;
       await page.evaluate(`${DRAW}(${JSON.stringify(list)})`);
-      const y0 = Math.max(0, Math.min(...list.map((r) => r.y)) - 60);
-      const h = Math.min(m.pageHeight - y0, v.height);
+      const y = Math.max(0, Math.min(...list.map((rect) => rect.y)) - 60);
       const file = `${id}--${key}.jpg`;
-      await page.screenshot({ path: join(outDir, file), fullPage: true, clip: { x: 0, y: y0, width: v.width, height: h }, type: "jpeg", quality: 62 });
-      await page.evaluate(`document.getElementById("__audit").remove()`);
+      await page.screenshot({ path: join(outDir, file), fullPage: true, clip: { x: 0, y, width, height: Math.min(measured.pageHeight - y, height) }, type: "jpeg", quality: 62 });
+      await page.evaluate(() => document.getElementById("__audit")?.remove());
       evidence[key] = file;
     }
-    // Próba rozmycia: czy widać jeden element poziomu 1 i grupy.
-    await page.evaluate(`document.documentElement.style.filter = "blur(${v.width === 360 ? 3 : 5}px)"`);
+    await page.evaluate((px) => { document.documentElement.style.filter = `blur(${px}px)`; }, width < 768 ? 3 : 5);
     await page.screenshot({ path: join(outDir, `${id}--blur.jpg`), type: "jpeg", quality: 60 });
-    results.push({ id, name, who, path, width: v.width, metrics: m.metrics, counts: Object.fromEntries(Object.entries(m.off).map(([k, l]) => [k, l.length])), evidence });
-    await ctx.close();
+    results.push({
+      id, name, who, path, finalUrl: responsePath, width, status, redirectStatus, screenshot, focus, hover,
+      kind: options.print ? "print" : options.download ? "download" : "screen",
+      metrics: measured.metrics, counts: Object.fromEntries(Object.entries(measured.off).map(([key, list]) => [key, list.length])), evidence,
+    });
+  } finally {
+    if (sharedContext) await Promise.all(ctx.pages().map((page) => page.close()));
+    else await ctx.close();
+  }
+}
+
+function routeMatches(route: string, path: string) {
+  const segments = route.split("/").map((segment) => {
+    if (!segment.startsWith(":")) return segment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return /^:[^{]+\{(.*)\}$/.exec(segment)?.[1] ?? "[^/]+";
+  });
+  return new RegExp(`^${segments.join("/")}$`).test(new URL(path, base).pathname);
+}
+
+async function stop(who: string | null, path: string, name: string, options: CaptureOptions = {}) {
+  if (visited.has(name)) throw new Error(`Powtórzony scenariusz ${name}`);
+  visited.add(name);
+  const row = coverage.get(name);
+  if (!row || row.who !== who || (row.route !== "(brak trasy)" && !routeMatches(row.route, path))) {
+    errors.push(`${name}: coverage.md nie odpowiada żądaniu GET ${path} (${who ?? "anonim"})`);
+  }
+  if (only && !only.includes(name)) return;
+  const atWidth = async (width: number) => {
+    try {
+      await capture(who, path, name, width, options);
+    } catch (error) {
+      const message = `${name}-${width}: ${error}`;
+      errors.push(message);
+      console.error(message);
+    }
+  };
+  if (sharedContext) {
+    for (const width of widths) await atWidth(width);
+  } else {
+    await Promise.all(widths.map(atWidth));
   }
   console.log(`ekran: ${name}`);
 }
 
 try {
-  // Krok 1: początek cyklu (9.12.2024).
-  await stop(null, "/account", "account");
-  await stop("marek", "/", "home-marek");
-  await stop("marek", `/cycles/${CYCLE}/part1`, "part1-edit");
-  const extra = ["orientacja-na-klienta", "myslenie-analityczne"];
-  await post("marek", `/cycles/${CYCLE}/part1/submit`, { additional: extra, "expectation[orientacja-na-klienta]": "Kompletne odpowiedzi dla interesantów, z numerem sprawy." });
-  await stop("marek", `/cycles/${CYCLE}/part1`, "part1-submitted");
-  await stop("marek", `/cycles/${CYCLE}/cards/opening`, "card-opening");
-  await stop("piotr", "/", "home-piotr");
-  await stop("piotr", `/cycles/${CYCLE}/part1`, "part1-to-confirm");
-  await post("piotr", `/cycles/${CYCLE}/part1/confirm`, {});
-  await stop("piotr", `/cycles/${CYCLE}/part1`, "part1-confirmed");
-
-  // Krok 2: notatka ze zmianą zadań (11.03.2026).
-  await setDate("2026-03-11");
-  await stop("marek", "/people/piotr/notes/new", "note-form");
-  const note = await post("marek", "/people/piotr/notes", { criterion_id: "wspolpraca", text: "Po odejściu koleżanki 9 marca przejął jej kolejkę wniosków i spisał, co jest otwarte.", rating: "good", task_change: "1", date: "2026-03-11" });
-  const question = note.headers.get("location") ?? "";
-  if (question.includes("/task-change")) {
-    await stop("marek", question, "task-change-question");
-    await post("marek", question, { answer: "yes" });
-    await stop("marek", question, "task-change-card");
+  await auditScenarios(stop, post);
+  for (const name of only ?? coverage.keys()) {
+    if (!visited.has(name)) errors.push(`Brak scenariusza: ${name}`);
   }
-  await stop("marek", "/notes", "notes-list");
-
-  // Krok 3: nieobecności i oś czasu (10.11.2026).
-  await setDate("2026-11-10");
-  await stop("joanna", `/cycles/${CYCLE}/absences`, "absence-form");
-  await post("joanna", `/cycles/${CYCLE}/absences`, { from: "2026-10-05", to: "2026-10-16", excused: "1" });
-  await post("joanna", `/cycles/${CYCLE}/absences`, { from: "2026-10-19", to: "2026-11-06", excused: "1" });
-  await stop("joanna", `/cycles/${CYCLE}/timeline`, "timeline");
-
-  // Krok 4: przed rozmową i ocena (21.11.2026).
-  await setDate("2026-11-21");
-  await stop("marek", "/", "home-marek-late");
-  await stop("marek", `/cycles/${CYCLE}/before-meeting`, "before-meeting");
-  await stop("marek", `/cycles/${CYCLE}/cards/assessment-conversation`, "card-assessment");
-  await stop("marek", `/cycles/${CYCLE}/assessment`, "assessment-empty");
-  const criteria = [...regulation.sheets.C.mandatoryCriteria, ...extra];
-  const draft: Record<string, string> = { justification: "Trzy odpowiedzi wyszły po terminie (notatki z 11.02.2025 i 26.08.2026).", developmentConclusions: "Rozmowa o priorytetach i podziale kolejki wniosków.", interviewDate: "2026-11-21" };
-  for (const id of criteria) draft[`score[${id}]`] = id === "rzetelnosc" ? "1" : "7";
-  await post("marek", `/cycles/${CYCLE}/assessment`, draft);
-  await stop("marek", `/cycles/${CYCLE}/assessment`, "assessment-draft");
-  await post("marek", `/cycles/${CYCLE}/assessment/approve`, draft);
-  await stop("marek", `/cycles/${CYCLE}/assessment`, "assessment-approved");
-
-  // Krok 5: potwierdzenie zapoznania i kadry (22.11.2026).
-  await setDate("2026-11-22");
-  await stop("piotr", `/cycles/${CYCLE}/assessment`, "assessment-piotr");
-  await post("piotr", `/cycles/${CYCLE}/assessment/acknowledge`, {});
-  await stop("piotr", `/cycles/${CYCLE}/assessment`, "assessment-acknowledged");
-  await stop("joanna", "/hr", "hr");
-  await stop("joanna", "/hr/people", "hr-people");
-  await stop("marek", `/cycles/${CYCLE}/sheet`, "sheet");
-  await stop("marek", "/tour", "tour");
-  await stop("marek", "/no-such-page", "error-404");
+  const documented = new Set([...coverage.values()].map((row) => row.route));
+  for (const route of app.routes.filter((route) => route.method === "GET")) {
+    if (!documented.has(route.path)) errors.push(`Brak trasy GET w coverage.md: ${route.path}`);
+  }
+} catch (error) {
+  errors.push(String(error));
+  console.error(error);
 } finally {
   await browser.close();
-  server.stop(true);
   rmSync(dir, { recursive: true, force: true });
+  results.sort((a, b) => String(a.name).localeCompare(String(b.name)) || Number(a.width) - Number(b.width));
+  writeFileSync(join(outDir, "metrics.json"), JSON.stringify(results, null, 1));
+  writeFileSync(join(outDir, "capture-errors.json"), JSON.stringify(errors, null, 1));
+  console.log(`Zapisano ${results.length} pomiarów w ${outDir}; błędy zapisu: ${errors.length}`);
 }
-
-writeFileSync(join(outDir, "metrics.json"), JSON.stringify(results, null, 1));
-console.log(`Zapisano ${results.length} pomiarów w ${outDir}`);
-process.exit(0);
+process.exitCode = errors.length ? 1 : 0;
