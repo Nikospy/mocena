@@ -63,7 +63,7 @@ const BODY: Record<TourStopId, Body> = {
       { text: "Przy nazwisku Piotra nie ma punktów ani etykiet." },
     ],
     tryIt: "Wpisz „Piotr przejął kolejkę wniosków po odejściu kolegi”, wybierz kryterium Rzetelność i zapisz.",
-    basis: basis(d.positionChangeMinMonths.basis),
+    basis: basis("§ 9 ust. 1"),
     screen: () => "/people/piotr/notes/new",
   },
   "3": {
@@ -90,7 +90,7 @@ const BODY: Record<TourStopId, Body> = {
     ],
     tryIt: "Postaw „1” przy Rzetelności i kliknij „Wstaw do uzasadnienia”.",
     note: "„1” stawiamy na pokaz, żeby było widać regułę.",
-    basis: basis(rules.approval.justification.basis),
+    basis: basis("§ 11 ust. 1 pkt 4"),
     screen: (c) => `/cycles/${c}/assessment`,
   },
   "5": {
