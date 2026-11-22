@@ -81,25 +81,25 @@ Testy: `src/routes/polish2-d.test.ts`: formularze zawierają datę słownie dla 
 
 #### Automated
 
-- [x] 1.1 Testy fazy i cały zestaw: `bun test src/routes/polish2-a.test.ts`, `bun test` — c5edf52
+- [x] 1.1 Testy fazy i cały zestaw: `bun test src/routes/polish2-a.test.ts`, `bun test` — 52ebe00
 
 ### Phase 2: Kadry i fikcja zapoznania
 
 #### Automated
 
-- [x] 2.1 Testy fazy i cały zestaw: `bun test src/routes/polish2-b.test.ts`, `bun test` — 49a620e
+- [x] 2.1 Testy fazy i cały zestaw: `bun test src/routes/polish2-b.test.ts`, `bun test` — e0e3416
 
 ### Phase 3: Przewodnik, układ, nagranie
 
 #### Automated
 
-- [x] 3.1 Testy fazy i cały zestaw: `bun test src/routes/tour.test.ts`, `bun test` — 1e1f958
+- [x] 3.1 Testy fazy i cały zestaw: `bun test src/routes/tour.test.ts`, `bun test` — 1c88b65
 
 ### Phase 4: Pola dat
 
 #### Automated
 
-- [x] 4.1 Testy fazy i cały zestaw: `bun test src/routes/polish2-d.test.ts`, `bun test` — 65b38d9
+- [x] 4.1 Testy fazy i cały zestaw: `bun test src/routes/polish2-d.test.ts`, `bun test` — 07e5bbc
 
 #### Manual
 

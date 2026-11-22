@@ -84,8 +84,8 @@ Wszystko widać na osi czasu, na stronie głównej, w kadrach i w arkuszu.
 
 #### Automated
 
-- [x] 1.1 Testy zmiany terminu przechodzą: `bun test src/routes/deadline-change.test.ts` — d377aab
-- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — d377aab
+- [x] 1.1 Testy zmiany terminu przechodzą: `bun test src/routes/deadline-change.test.ts` — f58b23d
+- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — f58b23d
 
 #### Manual
 

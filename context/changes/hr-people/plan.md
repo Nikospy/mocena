@@ -78,8 +78,8 @@ Plaster S-17 (decyzja 13i, czynności 23, 24, 26, 27, 28, 29 z `docs/coverage.md
 
 #### Automated
 
-- [x] 1.1 Testy kadr przechodzą: `bun test src/routes/hr-people.test.ts` — 6f8c9c4
-- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — 6f8c9c4
+- [x] 1.1 Testy kadr przechodzą: `bun test src/routes/hr-people.test.ts` — 07ff0e5
+- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — 07ff0e5
 
 #### Manual
 

@@ -61,8 +61,8 @@ Pozycje 1–5.
 
 #### Automated
 
-- [x] 1.1 Testy pierwszego wrażenia przechodzą: `bun test src/first-impression.test.ts` — 1614905
-- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — 1614905
+- [x] 1.1 Testy pierwszego wrażenia przechodzą: `bun test src/first-impression.test.ts` — e3190e4
+- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — e3190e4
 
 #### Manual
 

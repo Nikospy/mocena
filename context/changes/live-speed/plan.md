@@ -57,8 +57,8 @@ Pozycje 1–4.
 ## Pomiary
 
 Lokalnie (Bun 1.4.4, linux x64):
-- `GET /`, `POST /tour/1`, `/tour/4`, `/tour/5b`, `style.css`, font, przed zmianami: `bun src/local.tsx`, 3 przebiegi, mediana/p90 ms: `GET /` 1/295, `POST /tour/1` 37/43, `/tour/4` 36/39, `/tour/5b` 39/48, `style.css` 1/2, font 1/1 (commit `b66243e`, skrypt `scripts/measure-live.ts`). Wynik „po” dla tych tras nie został zapisany; po wdrożeniu uzupełnia autor.
-- `applyTourStop` ×7 (bun:sqlite `:memory:`, mediana z 15 przebiegów): przed 15,8 ms, po 14,7 ms (commit `f25be63`).
+- `GET /`, `POST /tour/1`, `/tour/4`, `/tour/5b`, `style.css`, font, przed zmianami: `bun src/local.tsx`, 3 przebiegi, mediana/p90 ms: `GET /` 1/295, `POST /tour/1` 37/43, `/tour/4` 36/39, `/tour/5b` 39/48, `style.css` 1/2, font 1/1 (commit `8736d42`, skrypt `scripts/measure-live.ts`). Wynik „po” dla tych tras nie został zapisany; po wdrożeniu uzupełnia autor.
+- `applyTourStop` ×7 (bun:sqlite `:memory:`, mediana z 15 przebiegów): przed 15,8 ms, po 14,7 ms (commit `61a171e`).
 - `runSeed` na świeżej bazie: przed 2,8 ms, po 2,7 ms (bez zmian istotnych).
 
 Notatka: zysk przy `applyTourStop` jest mały (około 6%), bo seedy już używały `prepare` i jednej transakcji. Migawki stanu bazowego nie dodano (zysk ~2 ms na krok nie uzasadnia ryzyka zmiany stanu). Główny koszt na żywej stronie leży prawdopodobnie w zimnym starcie Durable Object i sieci, a nie w odbudowie danych [INFERENCE: do potwierdzenia pomiarem na żywej stronie].
@@ -74,9 +74,9 @@ Próg testu `src/live-speed.test.ts`: 19 ms (15,8 ms + 20%). To strażnik regres
 
 #### Automated
 
-- [x] 1.1 Testy szybkości i stanu przechodzą: `bun test src/live-speed.test.ts src/tour/state.test.ts src/demo-check/run.test.ts` — f25be63
-- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — f25be63
+- [x] 1.1 Testy szybkości i stanu przechodzą: `bun test src/live-speed.test.ts src/tour/state.test.ts src/demo-check/run.test.ts` — 61a171e
+- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — 61a171e
 
 #### Manual
 
-- [x] 1.3 Pomiar na żywej stronie po wdrożeniu — 9850183
+- [x] 1.3 Pomiar na żywej stronie po wdrożeniu — 3b7c86d

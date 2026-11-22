@@ -1,6 +1,6 @@
 # Pokrycie pomiaru całości
 
-Stan wyjściowy zmierzono na `main` `6923342`. Dla każdego z 306 wierszy zapisano pomiar przy pięciu szerokościach. W kolumnie „Stan wyjściowy” kody po szerokości oznaczają niespełnione progi. Szczegółowe wartości liczbowe są w raporcie generowanym przez `scripts/design-report.ts`.
+Stan wyjściowy zmierzono na `main` `79c2db6`. Dla każdego z 306 wierszy zapisano pomiar przy pięciu szerokościach. W kolumnie „Stan wyjściowy” kody po szerokości oznaczają niespełnione progi. Szczegółowe wartości liczbowe są w raporcie generowanym przez `scripts/design-report.ts`.
 
 Mediana T1 (próg ≤ 30% tekstu poniżej 16 px) w kolejności 320, 360, 768, 1024 i 1440 px wynosi 51%, 51%, 51%, 46%, 46%.
 

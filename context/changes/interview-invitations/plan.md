@@ -66,8 +66,8 @@ Plaster S-16 (decyzja 13i, czynności 17 i 18 z `docs/coverage.md`). Dziś są k
 
 #### Automated
 
-- [x] 1.1 Testy zaproszeń przechodzą: `bun test src/routes/invitations.test.ts` — 5e633d6
-- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — 5e633d6
+- [x] 1.1 Testy zaproszeń przechodzą: `bun test src/routes/invitations.test.ts` — 14473aa
+- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — 14473aa
 
 #### Manual
 

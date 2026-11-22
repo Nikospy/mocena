@@ -92,8 +92,8 @@ Zakazy treści:
 
 #### Automated
 
-- [x] 1.1 Test materiałów przechodzi: `bun test src/pitch.test.ts` — 82431ec
-- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — 82431ec
+- [x] 1.1 Test materiałów przechodzi: `bun test src/pitch.test.ts` — 92df7d2
+- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — 92df7d2
 
 #### Manual
 
