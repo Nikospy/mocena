@@ -108,7 +108,7 @@ function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; er
   const status = extra.status ?? 200;
   const base = { viewer: cx.person, person: cx.appraisee, today: today() };
   if (state.stage === "no_part1") {
-    return c.html(<AssessmentMessage {...base} text="Ocena nie może powstać bez potwierdzonej części I." />, status);
+    return c.html(<AssessmentMessage {...base} text="Ocena nie może powstać bez potwierdzonej części I." action={{ label: "Przejdź do części I", href: `/cycles/${cx.cycle.id}/part1` }} />, status);
   }
   const appraiser = isAppraiser(cx);
   if (state.stage === "draft" && !appraiser) {

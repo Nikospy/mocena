@@ -728,3 +728,7 @@ details.disc > .area { margin-block-start: var(--sp-50); }
 .hr-table td:nth-child(5) { min-inline-size: 15rem; }
 .hr-table .basis .art { white-space: normal; overflow-wrap: break-word; }
 .hr-table details.disc > summary { min-block-size: var(--sp-500); }
+/* 2.2 zdanie wspólne pod listą pozycji */
+.shared-prompt { margin-block-start: var(--sp-100); }
+/* 2.5 pigułki przepisów w liście braków nie łamią linii w środku */
+.miss .basis .art { white-space: nowrap; }

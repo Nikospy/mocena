@@ -70,9 +70,18 @@ function Chevron() {
   return <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6" /></svg>;
 }
 
-/** Liczby dla całego urzędu, bez nazwisk i bez podziału na komórki. */
+/** Liczby dla całego urzędu, bez nazwisk i bez podziału na komórki. Gdy wszystkie są zerami, jedno zdanie zamiast kafli. */
 export function StatsBlock(props: { stats: OfficeStats }) {
   const s = props.stats;
+  const total = Object.values(s.byStep).reduce((a, n) => a + (n ?? 0), 0) + s.onTime + s.late + s.overdueOpen;
+  if (total === 0) {
+    return (
+      <section class="card" id="statystyki">
+        <h2>Terminowość w urzędzie (bez nazwisk)</h2>
+        <p>Nie ma jeszcze cykli ani ocen do policzenia.</p>
+      </section>
+    );
+  }
   return (
     <section class="card" id="statystyki">
       <h2>Terminowość w urzędzie (bez nazwisk)</h2>
@@ -193,7 +202,7 @@ export function HrOverviewView(props: { viewer: Person; today: string; cards: Re
     <Layout title="Stan cykli" person={props.viewer} today={props.today}>
       <section class="card hdr slim">
         <h1>Stan cykli</h1>
-        <p class="cap">Najnowszy cykl każdej osoby, od najbliższego terminu.</p>
+        <p class="cap">Najpierw cykle, które wymagają działania, na końcu zamknięte. W każdej grupie od najbliższego terminu.</p>
       </section>
       {props.awarded ? (
         <div class="st ok" role="status">

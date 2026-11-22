@@ -68,7 +68,7 @@
       }
     ],
     "texts": {
-      "formIntro": "Forma rozwoju do rozważenia. Możesz ją przenieść do wniosków rozwojowych oceny albo wybrać inną.",
+      "formIntro": "Forma rozwoju z katalogu urzędu, do rozważenia.",
       "no": "Zapisano odpowiedź „Nie”. Pytanie nie wróci.",
       "ifYes": "Po „Tak” pojawi się karta rozmowy po zmianie zadań i propozycja formy rozwoju z katalogu urzędu.",
       "ifNo": "Po „Nie” nic się nie zmienia, a pytanie nie wróci."
@@ -98,8 +98,8 @@
     "purpose": "Zestawienie z Twoich własnych notatek i dat. Niczego nie ocenia; podpowiada, o co zapytać.",
     "texts": {
       "boundary": "Zaznaczono zmianę zadań w notatce z {date}.",
-      "bothSides": "Przy kryterium „{criterion}” masz notatki sprzed zmiany zadań i po niej. Zapytaj, co się zmieniło po przejęciu nowych zadań.",
-      "noNotes": "Przy kryterium „{criterion}” nie masz żadnej notatki. Zapytaj, jak pracownik widzi to kryterium, i dopisz notatkę po rozmowie.",
+      "bothSides": "Przy kryterium „{criterion}” są notatki sprzed zmiany zadań i po niej.",
+      "noNotes": "Przy kryterium „{criterion}” nie ma żadnej notatki.",
       "pending": "To stała zmiana zadań?",
       "feedbackNever": "Brak zapisanej informacji zwrotnej dla {gen}.",
       "feedbackLast": "Ostatnia informacja zwrotna dla {gen}: {date}.",

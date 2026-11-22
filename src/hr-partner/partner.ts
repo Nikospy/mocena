@@ -157,7 +157,7 @@ export function beforeMeetingSummary(i: BeforeMeetingInput): BeforeMeetingSummar
     : {
         text: fillTemplate(text("beforeMeeting", "feedbackNever"), { gen }),
         prompt: "O jakim dobrym fakcie możesz powiedzieć?",
-        action: { label: "Docenienie", href: `/cycles/${i.cycleId}/appreciation` },
+        action: { label: "Karta docenienia", href: `/cycles/${i.cycleId}/appreciation` },
       };
 
   return {

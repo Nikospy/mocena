@@ -3,7 +3,7 @@ import "../hr/links";
 import { cycleLinks } from "../cycle-links";
 import { getDb } from "../db";
 import { recordEvent, visibleEvents, visibleEventsOfType } from "../events";
-import { cycleState } from "../hr/cycle-state";
+import { cycleState, type CycleStep } from "../hr/cycle-state";
 import { fullNameForm } from "../hr-partner/partner";
 import { mandatoryGradeOf } from "../hr/history";
 import { latestCycles } from "../hr/latest-cycles";
@@ -15,6 +15,7 @@ import { HrOverviewView, type StateRow } from "../views/hr-overview";
 
 const app = new Hono();
 
+const CLOSED_STEPS = new Set<CycleStep>(["acknowledged", "fiction", "objection_resolved"]);
 export function overviewData(viewer: Person) {
   const rows: StateRow[] = latestCycles().map((c) => ({
     cycleId: c.id,
@@ -25,7 +26,14 @@ export function overviewData(viewer: Person) {
     today: today(),
     links: cycleLinks(c, viewer),
   }));
-  rows.sort((a, b) => (a.state.deadline?.date ?? "9999").localeCompare(b.state.deadline?.date ?? "9999") || a.personName.localeCompare(b.personName));
+  // Najpierw cykle wymagające działania, zamknięte (zapoznanie, fikcja, rozpatrzony sprzeciw) na końcu; w grupie od najbliższego terminu.
+  const closed = (r: StateRow) => (CLOSED_STEPS.has(r.state.step) ? 1 : 0);
+  rows.sort(
+    (a, b) =>
+      closed(a) - closed(b) ||
+      (a.state.deadline?.date ?? "9999").localeCompare(b.state.deadline?.date ?? "9999") ||
+      a.personName.localeCompare(b.personName),
+  );
   const people = getDb().query("SELECT id, name FROM people WHERE appointed = 1 ORDER BY name").all() as { id: string; name: string }[];
   const cards = people.flatMap((p) => {
     const grade = mandatoryGradeOf(p.id);

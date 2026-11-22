@@ -154,13 +154,16 @@ export function ObjectionClock(props: { deadline: string; today: string; mine: b
   );
 }
 
-export function AssessmentMessage(props: { viewer: Person; person: Person; today: string; text: string; status?: number }) {
+export function AssessmentMessage(props: { viewer: Person; person: Person; today: string; text: string; status?: number; action?: { label: string; href: string } }) {
   return (
     <Layout title="Ocena" person={props.viewer} today={props.today}>
       <section class="card">
         <h1>Ocena okresowa: {props.person.name}</h1>
         <p class="st info">{props.text}</p>
-        <div class="btns"><a class="btn" href="/">Wróć na stronę główną</a></div>
+        <div class="btns">
+          {props.action ? <a class="btn primary" href={props.action.href}>{props.action.label}</a> : null}
+          <a class="btn" href="/">Wróć na stronę główną</a>
+        </div>
       </section>
     </Layout>
   );

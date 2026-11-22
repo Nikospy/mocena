@@ -21,7 +21,7 @@ export function CriterionNotes(props: { criterionId: string; notes: Note[]; warn
       ) : (
         <ul class="note-list" aria-label={`Notatki: ${name}`}>
           {props.notes.map((n) => (
-            <NoteItem note={n} showCriterion={false} insert={formatNoteForInsert(n, name)} />
+            <NoteItem note={n} showCriterion={false} insert={formatNoteForInsert(n)} />
           ))}
         </ul>
       )}

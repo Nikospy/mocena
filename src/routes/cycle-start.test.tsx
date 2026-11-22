@@ -27,7 +27,7 @@ describe("krok 1 pokazu", () => {
     expect(r.status).toBe(302);
     expect(r.headers.get("location")).toBe(`/cycles/${piotr}/part1`);
     const html = await (await as(app, "marek", `/cycles/${piotr}/part1`)).text();
-    expect(html).toContain("Arkusz C");
+    expect(html).toContain("arkusz C");
     expect(html).toContain("§ 3 ust. 4");
     expect(html.match(/bo w opisie stanowiska jest obowiązek/g)).toHaveLength(3);
     expect(html).toContain("ustawienie urzędu");

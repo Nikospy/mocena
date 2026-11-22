@@ -112,7 +112,7 @@ export function Part1View(p: Part1ViewProps) {
       <section class="card hdr" aria-label="Cykl oceny">
         <div class={p.links.length > 3 ? "hdr-top many" : "hdr-top"}>
           <div class="hdr-id">
-            <p class="cap">Część I oceny · Arkusz {p.sheet} <LegalBasis basis={p.sheetBasis} /></p>
+            <p class="cap">Część I oceny · arkusz {p.sheet} <LegalBasis basis={p.sheetBasis} /></p>
             <h1>{p.employeeName}</h1>
           </div>
           {p.links.length ? (

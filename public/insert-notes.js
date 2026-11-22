@@ -1,4 +1,4 @@
-// „Wstaw”: dopisuje zaznaczone notatki na końcu pola docelowego. Niczego nie wysyła i nie zapisuje.
+// „Wstaw”: dopisuje zaznaczone notatki na końcu pola docelowego, każdą jako osobny akapit z datą. Niczego nie wysyła i nie zapisuje.
 document.addEventListener("click", function (e) {
   var btn = e.target && e.target.closest ? e.target.closest("button[data-target]") : null;
   if (!btn) return;
@@ -8,7 +8,7 @@ document.addEventListener("click", function (e) {
   if (!boxes.length) return;
   var lines = boxes.map(function (b) { return b.getAttribute("data-insert"); });
   var current = field.value.replace(/\s+$/, "");
-  field.value = (current ? current + "\n" : "") + lines.join("\n");
+  field.value = (current ? current + "\n\n" : "") + lines.join("\n\n");
   boxes.forEach(function (b) { b.checked = false; });
   field.dispatchEvent(new Event("input", { bubbles: true }));
 });
