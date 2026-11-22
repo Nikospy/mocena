@@ -137,3 +137,20 @@ describe("wniosek ocenianego", () => {
     expect(await html(app, "joanna", "/hr")).toContain("Wniosek ocenianego o zmianę terminu");
   });
 });
+
+describe("termin po zmianie to data z pisma (ustalenie 1 audytu)", () => {
+  test("nieobecność wliczona przed zmianą nie dolicza się drugi raz; późniejsza nowa dalej przedłuża", async () => {
+    const { app, db } = createTestApp({ today: "2026-11-21" });
+    expect(effectiveDeadline("cycle-ewa").date).toBe("2027-06-02");
+    const res = await call(app, "marek", `/cycles/cycle-ewa/deadline-change`, { case: "2", newDate: "2027-08-02", reason: "Planowana dłuższa nieobecność ocenianej" });
+    expect(res.status).toBe(303);
+    expect(effectiveDeadline("cycle-ewa").date).toBe("2027-08-02");
+    expect(await html(app, "marek", "/")).toContain("02.08.2027");
+    expect(await html(app, "marek", "/")).not.toContain("14.02.2028");
+    // nowa nieobecność wpisana po zmianie terminu dalej przedłuża
+    const ewa = db.query("SELECT person_id FROM cycles WHERE id = 'cycle-ewa'").get() as { person_id: string };
+    db.query("INSERT INTO absences (person_id, date_from, date_to, excused, recorded_on, recorded_by) VALUES (?, '2026-09-01', '2026-10-31', 1, '2026-11-24', 'joanna')").run(ewa.person_id);
+    expect(effectiveDeadline("cycle-ewa", { asOf: "2026-11-23" }).date).toBe("2027-08-02");
+    expect(effectiveDeadline("cycle-ewa", { asOf: "2026-11-25" }).date > "2027-08-02").toBe(true);
+  });
+});
