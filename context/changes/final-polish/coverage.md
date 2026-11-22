@@ -25,6 +25,12 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/account` | `joanna` | wybór konta po zalogowaniu | `account-joanna` |
 | `/account` | `admin` | wybór konta po zalogowaniu | `account-admin` |
 | `/account` | `dyrektor-urzedu` | wybór konta po zalogowaniu | `account-dyrektor-urzedu` |
+| `/about` | `anonim` | Wdrożenie i dane | `about-anonim` |
+| `/about` | `marek` | Wdrożenie i dane | `about-marek` |
+| `/about` | `piotr` | Wdrożenie i dane | `about-piotr` |
+| `/about` | `joanna` | Wdrożenie i dane | `about-joanna` |
+| `/about` | `admin` | Wdrożenie i dane | `about-admin` |
+| `/about` | `dyrektor-urzedu` | Wdrożenie i dane | `about-dyrektor-urzedu` |
 | `/cycles/:id` | `marek` | przekierowanie do części I | `cycle-marek` |
 | `/cycles/:id` | `piotr` | przekierowanie do części I | `cycle-piotr` |
 | `/cycles/:id` | `admin` | 403 · odmowa | `cycle-403` |
@@ -126,6 +132,7 @@ Identyfikator w ostatniej kolumnie daje plik `<identyfikator>-<szerokość>.jpg`
 | `/people/:personId/notes/new` | `anna` | formularz czynnego zastępcy | `note-substitute` |
 | `/people/:personId/notes/new` | `admin` | 403 · odmowa | `note-403` |
 | `/people/:personId/notes/new` | `marek` | 404 · brak zasobu | `note-404` |
+| `/notes` | `marek` | notatki pokazowe ukryte przed potwierdzeniem kryteriów | `notes-before-criteria` |
 | `/notes` | `marek` | notatki | `notes-list` |
 | `/notes` | `marek` | po zapisaniu notatki | `notes-saved` |
 | `/notes` | `marek` | po wysłaniu informacji | `notes-feedback-sent` |

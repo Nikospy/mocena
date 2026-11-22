@@ -68,6 +68,7 @@ export async function auditScenarios(shot: Capture, post: Post) {
   await shot(null, "/account", "account");
   await roles("/account", "account", [M, P, H, A, D]);
   await invalid(null, "/account", "account-error", "/account", { omitSubmitter: true });
+  await roles("/about", "about", [null, M, P, H, A, D], { check: "Wdrożenie i dane" });
   await shot(M, "/", "home-marek");
   await keyboard(M, "/", "home");
   await shot(M, "/", "hover-primary", { hover: "main .btn.primary" });
@@ -86,6 +87,7 @@ export async function auditScenarios(shot: Capture, post: Post) {
   }
   await roles(cycle, "cycle", [M, P], { redirect: part1 });
   await shot(M, part1, "part1-edit", { selector: ".p1-form" });
+  await shot(M, "/notes", "notes-before-criteria", { check: "Wyznacz kryteria" });
   await invalid(M, part1, "part1-error", part1 + "/submit", {
     button: 'button[formaction$="/part1/submit"]',
     checks: { selector: 'input[name="additional"]', count: 4 },
