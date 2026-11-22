@@ -1080,6 +1080,8 @@ section[aria-labelledby="h-dev"] > h3 { margin-block-start: var(--sp-300); paddi
 .n-form > .err-sum + * { margin-block-start: 0; }
 .field-err { display: block; color: var(--red-200); font-weight: var(--w-bold); font-size: var(--f-p); line-height: var(--lh-p); max-inline-size: 66ch; }
 .field { display: grid; gap: var(--sp-100); }
+/* pole jednowierszowe: 48 px (data, godzina, tekst, lista); textarea zostaje wyższa */
+input.area, select.area, .area.line { block-size: var(--hit); min-block-size: var(--hit); padding-block: 0; }
 .field > .lbl { margin-block-end: 0; }
 :is(.field, fieldset, [role="radiogroup"]):has(> .field-err) { border-inline-start: var(--sp-50) solid var(--red-100); padding-inline-start: var(--sp-200); }
 .area[aria-invalid="true"], select[aria-invalid="true"], input[aria-invalid="true"]:not([type="radio"], [type="checkbox"]) { border-color: var(--red-100); }
