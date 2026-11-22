@@ -1,9 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { CODE_LICENSE } from "./content";
 import { createTestApp } from "./test-helpers";
 
 describe("strona /about „Wdrożenie i dane”", () => {
-  test("wersja reguł i data obowiązywania, ciasteczka, braki integracji, repo i licencja ze stałej", async () => {
+  test("wersja reguł i data obowiązywania, ciasteczka, braki integracji, repo, prawa do kodu i licencja biblioteki", async () => {
     const { app } = createTestApp({ today: "2026-11-21" });
     const res = await app.request("/about");
     expect(res.status).toBe(200);
@@ -19,7 +18,9 @@ describe("strona /about „Wdrożenie i dane”", () => {
       "mocena_tour",
       "github.com/Nikospy/mocena",
       "Open Sans",
-      CODE_LICENSE,
+      "Prawa autorskie do kodu ma autor.",
+      "pisemną umową",
+      "Hono, na licencji MIT",
     ]) {
       expect(html).toContain(t);
     }
@@ -29,6 +30,7 @@ describe("strona /about „Wdrożenie i dane”", () => {
     expect(html).toContain("Notatkę widzi tylko jej autor.");
     expect(html).not.toContain("bez treści notatek");
     expect(html).not.toContain("wstawia skrypt");
+    expect(html).not.toContain("do ustalenia");
     // Repo jest publiczne: bez prywatnych ścieżek i adresów e-mail.
     expect(html).not.toMatch(/\/Users\//);
     expect(html).not.toMatch(/[\w.]+@[\w.]+/);
