@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { getDb } from "../db";
+import { isDemoMode } from "../settings";
 import { PERSON_COOKIE } from "../people";
 import { TOUR_COOKIE } from "../tour/context";
 import { applyTourStop, isTourStopId } from "../tour/state";
@@ -9,6 +10,8 @@ import { TourDone } from "../views/tour-done";
 import { TourEntry } from "../views/tour-entry";
 
 const app = new Hono();
+
+app.use("/tour/*", (c, next) => isDemoMode() ? next() : c.text("Ta funkcja jest dostępna w pokazie.", 403));
 
 const COOKIE_OPTS = { path: "/", httpOnly: true, sameSite: "Lax" } as const;
 

@@ -14,4 +14,4 @@ local.route("/", app);
 local.notFound(notFoundHandler);
 local.onError(app.errorHandler);
 
-export default local;
+export default Object.assign(local, { hostname: "127.0.0.1" });

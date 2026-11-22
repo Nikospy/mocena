@@ -7,7 +7,7 @@ import { rules } from "../engine/rules";
 import { recordEvent, visibleEvents } from "../events";
 import { personById, type Person } from "../people";
 import { officeSettings } from "../office-settings";
-import { today } from "../settings";
+import { isDemoMode, today } from "../settings";
 import { assessmentHistory, visibleCyclesOf } from "./history";
 
 export type Sheet = "A" | "B" | "C";
@@ -115,8 +115,12 @@ export function readForm(body: Record<string, unknown>): PersonForm {
   };
 }
 
-/** `existing`: edytowana osoba; `hasCycle`: osoba ma już cykl, więc data zatrudnienia nie otwiera nowego. */
-export function validateForm(f: PersonForm, opts: { personId?: string; hasCycle: boolean; needsSupervisor: boolean }): FormErrors {
+export function canRegisterStandaloneAppraiser(f: PersonForm): boolean {
+  return !isDemoMode() && f.is_appraiser && !f.supervisor_id && !f.hired_on && !f.prev_on;
+}
+
+/** `hasCycle`: osoba ma już cykl, więc data zatrudnienia nie otwiera nowego. */
+export function validateForm(f: PersonForm, opts: { personId?: string; hasCycle: boolean; needsSupervisor: boolean; allowNoCycle?: boolean }): FormErrors {
   const e: FormErrors = {};
   const now = today();
   if (!f.name) e.name = "Wpisz imię i nazwisko.";
@@ -139,7 +143,7 @@ export function validateForm(f: PersonForm, opts: { personId?: string; hasCycle:
   if (f.prev_level && !LEVELS.includes(f.prev_level)) e.prev_level = "Wybierz poziom z listy.";
   if (f.grade && !GRADES.includes(Number(f.grade))) e.grade = "Wybierz stopień z listy.";
   if (f.grade && !f.grade_on) e.grade_on = "Podaj datę przyznania stopnia.";
-  if (!opts.hasCycle && !f.hired_on && !f.prev_on) {
+  if (!opts.hasCycle && !opts.allowNoCycle && !f.hired_on && !f.prev_on) {
     e.form = "Podaj datę zatrudnienia na czas nieokreślony albo datę i wynik ostatniej oceny. Od niej system liczy termin.";
   }
   return e;
@@ -191,16 +195,16 @@ function startCycle(personId: string, appraiserId: string, f: PersonForm, actorI
   return cycleId;
 }
 
-export function createPerson(f: PersonForm, actorId: string): { personId: string; cycleId: string } {
+export function createPerson(f: PersonForm, actorId: string): { personId: string; cycleId: string | null } {
   const db = getDb();
   return db.transaction(() => {
     const personId = freeId("people", slug(f.name));
     const { kind, grade, gradeOn } = personColumns(f);
     db.query(
       `INSERT INTO people (id, name, role, position_title, unit, supervisor_id, has_account, appointed, civil_service_grade, grade_awarded_on, position_kind)
-       VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?)`,
-    ).run(personId, f.name, f.is_appraiser ? "appraiser" : "employee", f.position_title, f.unit, f.supervisor_id || null, f.appointed ? 1 : 0, grade, gradeOn, kind);
-    return { personId, cycleId: startCycle(personId, f.supervisor_id, f, actorId) };
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ).run(personId, f.name, f.is_appraiser ? "appraiser" : "employee", f.position_title, f.unit, f.supervisor_id || null, isDemoMode() ? 0 : 1, f.appointed ? 1 : 0, grade, gradeOn, kind);
+    return { personId, cycleId: f.supervisor_id ? startCycle(personId, f.supervisor_id, f, actorId) : null };
   })();
 }
 

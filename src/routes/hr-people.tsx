@@ -3,9 +3,9 @@ import { openCycle } from "../cycles";
 import { visibleCyclesOf } from "../hr/history";
 import { EXPORT_HEADER, planImport } from "../hr/csv-import";
 import { ImportView } from "../views/hr-import";
-import { createPerson, deleteEmployee, employeeDeletionBlock, emptyForm, formFromPerson, listPeople, readForm, supervisorCandidates, unitOptions, updatePerson, validateForm, type FormErrors, type PersonForm, type Sort } from "../hr/people";
+import { canRegisterStandaloneAppraiser, createPerson, deleteEmployee, employeeDeletionBlock, emptyForm, formFromPerson, listPeople, readForm, supervisorCandidates, unitOptions, updatePerson, validateForm, type FormErrors, type PersonForm, type Sort } from "../hr/people";
 import { currentPerson, personById, type Person } from "../people";
-import { today } from "../settings";
+import { isDemoMode, today } from "../settings";
 import { Layout } from "../views/layout";
 import { PageHeader } from "../views/components";
 import { PeopleListView, PersonFormView } from "../views/hr-people";
@@ -41,6 +41,7 @@ function renderForm(c: Context, viewer: Person, o: { title: string; action: stri
       values={o.values}
       errors={o.errors ?? {}}
       supervisors={supervisorCandidates(o.person?.id)}
+      canSkipCycle={!isDemoMode() && !hasCycle && (!o.person || o.person.role === "appraiser")}
       units={unitOptions()}
       hasCycle={hasCycle}
       hasOpenCycle={o.person ? openCycle(o.person.id) !== null : false}
@@ -86,7 +87,8 @@ app.post("/hr/people", async (c) => {
   const viewer = hrGuard(c);
   if (viewer instanceof Response) return viewer;
   const values = readForm(await c.req.parseBody());
-  const errors = validateForm(values, { hasCycle: false, needsSupervisor: true });
+  const standalone = canRegisterStandaloneAppraiser(values);
+  const errors = validateForm(values, { hasCycle: false, needsSupervisor: !standalone, allowNoCycle: standalone });
   if (Object.keys(errors).length > 0) return renderForm(c, viewer, { title: "Nowy pracownik", action: "/hr/people", values, errors, status: 422 });
   const { personId } = createPerson(values, viewer.id);
   return c.redirect(`/hr/people?saved=${personId}`, 303);
@@ -113,7 +115,12 @@ app.post("/hr/people/:id/edit", async (c) => {
   const values = readForm(await c.req.parseBody());
   const open = openCycle(person.id);
   const hasCycle = visibleCyclesOf(person.id).length > 0;
-  const errors = validateForm(values, { personId: person.id, hasCycle, needsSupervisor: open !== null || (!hasCycle && !!(values.hired_on || values.prev_on)) });
+  const errors = validateForm(values, {
+    personId: person.id,
+    hasCycle,
+    needsSupervisor: open !== null || (!hasCycle && !!(values.hired_on || values.prev_on)),
+    allowNoCycle: !hasCycle && person.role === "appraiser" && canRegisterStandaloneAppraiser(values),
+  });
   if (Object.keys(errors).length > 0) {
     return renderForm(c, viewer, { title: `Edycja: ${person.name}`, action: `/hr/people/${person.id}/edit`, values, errors, person, status: 422 });
   }
