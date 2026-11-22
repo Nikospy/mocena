@@ -26,7 +26,7 @@ describe("przewodnik pokazu", () => {
     const { app } = createTestApp();
     const { res, text } = await html(app, "/");
     expect(res.status).toBe(200);
-    expect(text).toContain("Ten asystent nie pisze oceny.");
+    expect(text).toContain("Ten asystent prowadzi ocenę od pierwszej notatki do arkusza.");
     expect(text).toContain("Rozpocznij pokaz");
     for (const n of [1, 2, 3, 4, 5]) expect(text).toContain(`action="/tour/${n}"`);
     expect(text.match(/<form[^>]*action="\/tour\/\d"/g)?.length).toBe(6); // 5 kart + „Rozpocznij pokaz”
