@@ -238,7 +238,7 @@ describe("krok 5 pokazu: potwierdzenie i zegar", () => {
     expect(events("assessment_acknowledged")).toHaveLength(1);
     const successor = openCycle("piotr")!;
     expect(successor.id).not.toBe(piotr);
-    expect(effectiveDeadline(successor.id).date).toBe("2027-05-21");
+    expect(effectiveDeadline(successor.id).date).toBe("2027-05-22");
   });
 });
 
@@ -321,7 +321,7 @@ describe("fikcja zapoznania i wgląd kadr", () => {
     expect(closing()).toHaveLength(1);
     const successor = openCycle("piotr")!;
     expect(successor.id).not.toBe(piotr);
-    expect(effectiveDeadline(successor.id).date).toBe("2027-05-22");
+    expect(effectiveDeadline(successor.id).date).toBe("2027-05-23");
   });
 
   test("potwierdzenie, potem fikcja: 409; równoczesne żądania zostawiają jedno zdarzenie końcowe", async () => {

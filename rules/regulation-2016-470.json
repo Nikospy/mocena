@@ -114,7 +114,8 @@
     "reassessmentAfterNegativeMonths": {
       "value": 6,
       "basis": "art. 81 ust. 9 ustawy",
-      "from": "dzień zapoznania się z oceną"
+      "from": "dzień zapoznania się z oceną",
+      "timing": "pierwszy dzień po dniu, w którym upływa 6 miesięcy od zapoznania się z oceną negatywną"
     },
     "objectionDays": {
       "value": 7,

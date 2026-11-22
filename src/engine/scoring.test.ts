@@ -92,7 +92,11 @@ describe("terminy (art. 81 i 83 ustawy, § 7, art. 110–115 KC)", () => {
   });
   test("koniec miesiąca: 31 sierpnia + 6 miesięcy to ostatni dzień lutego", () => {
     expect(addMonths("2026-08-31", 6)).toBe("2027-02-28");
-    expect(periodEndAfterNegative("2026-08-31")).toBe("2027-02-28");
+  });
+  test("ponowna ocena przypada w pierwszym dniu po upływie 6 miesięcy", () => {
+    expect(periodEndAfterNegative("2015-02-15")).toBe("2015-08-16");
+    expect(periodEndAfterNegative("2026-11-22")).toBe("2027-05-23");
+    expect(periodEndAfterNegative("2026-08-31")).toBe("2027-03-01");
   });
   test("nieobecność dłuższa niż miesiąc wydłuża termin o swój czas", () => {
     expect(nextAssessmentDeadline("2026-01-10", 45)).toBe("2028-02-24");

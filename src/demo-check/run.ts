@@ -497,6 +497,7 @@ const tourStops: TourStopCheck[] = [
       const cycle = cycleIdFor(home.html, "Piotr Wójcik");
       if (cycle === "cycle-piotr" || cycle === "cycle-piotr-2022") throw new Mismatch("nowego cyklu", cycle);
       includes(home.html, "§ 7 pkt 2", "sprawa Marka z terminem kryteriów po ocenie negatywnej");
+      includes(home.html, "Termin ponownej oceny: 23.05.2027", "pierwszy dzień po upływie 6 miesięcy od zapoznania");
       return "stopień Tomasza do 14.12.2026, zapoznanie Piotra, sprzeciw i kryteria nowego cyklu do 30.11.2026";
     },
   },

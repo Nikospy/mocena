@@ -89,9 +89,9 @@ export function criteriaTalkDeadline(from: string, afterNegative = false): strin
   return toWorkingDay(addDays(from, days));
 }
 
-/** Art. 81 ust. 9 ustawy: ponowna ocena po upływie 6 miesięcy od zapoznania się z oceną negatywną. Zwraca dzień, w którym mija 6 miesięcy. */
+/** Art. 81 ust. 9 ustawy: poradnik KPRM (s. 13–14) wskazuje pierwszy dzień po upływie 6 miesięcy. */
 export function periodEndAfterNegative(acknowledgedOn: string): string {
-  return addMonths(acknowledgedOn, D.reassessmentAfterNegativeMonths.value);
+  return addDays(addMonths(acknowledgedOn, D.reassessmentAfterNegativeMonths.value), 1);
 }
 
 /** Art. 89 ust. 2 ustawy: stopień służbowy z mocy prawa w 30 dni od zapoznania się z drugą oceną. */
