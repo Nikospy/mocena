@@ -150,3 +150,27 @@ describe("proces 2: zaproszenie e-mailem (mailto) obok pliku .ics", () => {
     expect(await html(app, "piotr", r.headers.get("location")!)).not.toContain("mailto:");
   });
 });
+
+describe("proces 2: przypomnienia słowami przy sprawach z terminem", () => {
+  test("dueWords: 7 dni, jutro, dziś, po terminie; dalej niż 7 dni nic", async () => {
+    const { dueWords } = await import("../due-words");
+    expect(dueWords("2026-11-28", "2026-11-21")).toBe("Do terminu zostało 7 dni.");
+    expect(dueWords("2026-11-29", "2026-11-21")).toBeNull();
+    expect(dueWords("2026-11-22", "2026-11-21")).toBe("Termin mija jutro.");
+    expect(dueWords("2026-11-21", "2026-11-21")).toBe("Termin mija dziś.");
+    expect(dueWords("2026-11-20", "2026-11-21")).toBe("Termin minął 1 dzień temu.");
+    expect(dueWords("2026-11-16", "2026-11-21")).toBe("Termin minął 5 dni temu.");
+  });
+
+  test("strona główna oceniającego, ocenianego i kadr 21.11.2026: termin 27.11 słowami", async () => {
+    const { app } = createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } });
+    for (const who of ["marek", "piotr", "joanna"]) {
+      expect(await html(app, who, "/")).toContain("Do terminu zostało 6 dni.");
+    }
+  });
+
+  test("po terminie: oceniający widzi, ile dni minęło", async () => {
+    const { app } = createTestApp({ today: "2026-11-30", seedOptions: { afterStep1: true } });
+    expect(await html(app, "marek", "/")).toContain("Termin minął 3 dni temu.");
+  });
+});

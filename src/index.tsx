@@ -2,6 +2,7 @@ import { Hono, type NotFoundHandler } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { getDb } from "./db";
 import { runSeed } from "./seed";
+import { dueWords } from "./due-words";
 import { homeOptions, homeTasks } from "./home-tasks";
 import { PERSON_COOKIE, currentPerson, personById, roleLabel, type Person } from "./people";
 import { today } from "./settings";
@@ -95,6 +96,7 @@ app.get("/", (c) => {
                       {t.due < today() ? "po terminie od" : "do"} <b>{formatDate(t.due)}</b> {t.basis ? <LegalBasis basis={t.basis} /> : null}
                     </p>
                   ) : null}
+                  {t.due && dueWords(t.due, today()) ? <p class="cap" role="note">{dueWords(t.due, today())}</p> : null}
                 </div>
                 {t.post || t.secondary ? (
                   <div class="btns">
