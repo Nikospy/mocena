@@ -68,8 +68,8 @@ Równolegle powstają S-08 (`guided-demo-tour`, pliki `src/tour/*`, `layout.tsx`
 
 #### Automated
 
-- [ ] 1.1 Test przebiegu pokazu przechodzi: `bun test src/demo-check/run.test.ts`
-- [ ] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run`
+- [x] 1.1 Test przebiegu pokazu przechodzi: `bun test src/demo-check/run.test.ts` — 91ae85c
+- [x] 1.2 Cały zestaw, dane pokazowe i wersja Cloudflare: `bun test`, `bun run seed`, `wrangler deploy --dry-run` — 91ae85c
 
 #### Manual
 
