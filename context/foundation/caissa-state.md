@@ -23,8 +23,8 @@ Zgoda na start budowy: wiadomość autora 22.11 ok. 00:30 („Okej, będziemy ru
 
 ## Aktywna praca
 
-Na main: F-01, S-01, S-02, S-04, S-06, wdrożenie. W toku: S-05, S-03.
+Na main i w sieci: F-01, S-01–S-06 oraz poprawki wyglądu czterech grup ekranów (S-07 w toku). Push na GitHub po każdym etapie (decyzja 13g). W toku (subagenci): przegląd wyglądu i przebiegu na żywej stronie; trzy warianty wyglądu przewodnika pokazu do oceny autora.
 
 ## Następny ruch
 
-Po lądowaniu F-01: zrzuty ekranu startowego 360 i 1440 px do akceptacji autora, równolegle S-01.
+Autor wybiera wariant przewodnika (S-08), potem plan i budowa S-08; równolegle S-09 z listy przeglądu. Potem S-10 (automat pokazu 2x), S-11 (nagranie, PDF, README, teksty zgłoszenia). Granica nowych funkcji 07:00, oddanie 11:00, push najpóźniej 10:30.
