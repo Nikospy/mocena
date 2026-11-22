@@ -1,6 +1,6 @@
 import { GRADES, LEVELS, OUTCOME_LABEL, SHEETS, suggestSheet, type FormErrors, type PersonForm, type PersonRow, type Sort } from "../hr/people";
 import type { Person } from "../people";
-import { LegalBasis } from "./components";
+import { LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
 const SORTS: { id: Sort; label: string }[] = [
@@ -13,10 +13,7 @@ const SHEET_LABEL: Record<string, string> = { A: "A: kierownik urzędu", B: "B: 
 export function PeopleListView(props: { viewer: Person; today: string; rows: PersonRow[]; q: string; sort: Sort; saved?: string; deleted?: boolean }) {
   return (
     <Layout title="Pracownicy" person={props.viewer} today={props.today}>
-      <section class="card hdr slim">
-        <h1>Pracownicy</h1>
-        <p class="cap">Dane, z których system liczy arkusz i termin oceny. Termin pochodzi z przepisów, nie z oceny osoby.</p>
-      </section>
+      <PageHeader title="Pracownicy" lead="Dane, z których system liczy arkusz i termin oceny. Termin pochodzi z przepisów, nie z oceny osoby." />
       {props.deleted ? <p class="st ok" role="status">Usunięto dane pracownika.</p> : null}
       {props.saved ? (
         <div class="st ok" role="status">
@@ -40,7 +37,7 @@ export function PeopleListView(props: { viewer: Person; today: string; rows: Per
         <nav class="hr-links" aria-label="Sortowanie">
           <span class="cap">Sortuj:</span>
           {SORTS.map((s) => (
-            <a class="btn link-chip" href={`/hr/people?sort=${s.id}${props.q ? `&q=${encodeURIComponent(props.q)}` : ""}`} aria-current={props.sort === s.id ? "true" : undefined}>
+            <a href={`/hr/people?sort=${s.id}${props.q ? `&q=${encodeURIComponent(props.q)}` : ""}`} aria-current={props.sort === s.id ? "true" : undefined}>
               {s.label}
             </a>
           ))}
@@ -83,8 +80,8 @@ export function PeopleListView(props: { viewer: Person; today: string; rows: Per
                     </td>
                     <td data-label="Działania">
                       <div class="hr-links">
-                        <a class="btn link-chip" href={`/hr/people/${r.id}/edit`}>Edytuj</a>
-                        <a class="btn link-chip" href={`/people/${r.id}/history`}>Historia ocen</a>
+                        <a href={`/hr/people/${r.id}/edit`}>Edytuj</a>
+                        <a href={`/people/${r.id}/history`}>Historia ocen</a>
                       </div>
                     </td>
                   </tr>
@@ -134,8 +131,8 @@ export function PersonFormView(props: {
   const suggested = suggestSheet(v.position_title);
   return (
     <Layout title={props.title} person={props.viewer} today={props.today}>
+      <PageHeader title={props.title} />
       <section class="card form-card">
-        <h1>{props.title}</h1>
         {e.form ? <p class="st bad" role="alert">{e.form}</p> : null}
         <form method="post" action={props.action} class="abs-form">
           <div>
@@ -234,9 +231,9 @@ export function PersonFormView(props: {
           </fieldset>
           <button class="btn primary full" type="submit">Zapisz</button>
           <p>
-            <a class="btn link-chip" href="/hr/people">Wróć do listy</a>
-            {props.personId ? <a class="btn link-chip" href={`/people/${props.personId}/history`}>Historia ocen</a> : null}
-            {props.personId && props.viewer.role === "hr" ? <a class="btn link-chip" href={`/hr/people/${props.personId}/delete`}>Usuń dane pracownika</a> : null}
+            <a href="/hr/people">Wróć do listy</a>
+            {props.personId ? <a href={`/people/${props.personId}/history`}>Historia ocen</a> : null}
+            {props.personId && props.viewer.role === "hr" ? <a href={`/hr/people/${props.personId}/delete`}>Usuń dane pracownika</a> : null}
           </p>
         </form>
       </section>

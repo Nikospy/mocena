@@ -29,9 +29,11 @@ test("samodzielny pokaz pokazuje tylko widoczne dane i prowadzi do części I", 
 
 test("sprawa wskazuje słownie przekroczony termin dopiero następnego dnia", async () => {
   const { app } = createTestApp({ today: "2024-12-27" });
-  expect(await html(app, "marek", "/")).toContain("do <b>27.12.2024</b>");
+  const dueDay = await html(app, "marek", "/");
+  expect(dueDay).toContain("<b>termin dziś</b><span>do 27.12.2024");
+  expect(dueDay).not.toContain("po terminie");
   await call(app, "marek", "/demo/date", { date: "2024-12-28" });
-  expect(await html(app, "marek", "/")).toContain("po terminie od <b>27.12.2024</b>");
+  expect(await html(app, "marek", "/")).toContain("<b>po terminie od 1 dnia</b><span>termin minął 27.12.2024");
 });
 
 test("Barbara może wybrać konto, rozpatrzyć wniosek Anny i zobaczyć statystyki bez listy osób", async () => {

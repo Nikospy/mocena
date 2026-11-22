@@ -5,6 +5,7 @@ import { createPerson, deleteEmployee, employeeDeletionBlock, emptyForm, formFro
 import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
 import { Layout } from "../views/layout";
+import { PageHeader } from "../views/components";
 import { PeopleListView, PersonFormView } from "../views/hr-people";
 
 const app = new Hono();
@@ -105,10 +106,12 @@ app.get("/hr/people/:id/delete", (c) => {
   const blocked = employeeDeletionBlock(g.person);
   return c.html(
     <Layout title="Potwierdzenie usunięcia danych" person={g.viewer} today={today()}>
-      <section class="card">
-        <h1>Usunąć dane pracownika {g.person.name}?</h1>
-        {blocked ? <p role="alert">{blocked}</p> : <>
-          <p>Usuniesz kartotekę, oceny, notatki i pozostałe dane tej osoby. Tego działania nie można cofnąć.</p>
+      <PageHeader
+        title={<>Usunąć dane pracownika {g.person.name}?</>}
+        lead={blocked ? undefined : "Usuniesz kartotekę, oceny, notatki i pozostałe dane tej osoby. Tego działania nie można cofnąć."}
+      />
+      <section>
+        {blocked ? <p class="st bad" role="alert">{blocked}</p> : <>
           <form method="post" action={`/hr/people/${g.person.id}/delete`} class="btns">
             <button type="submit" name="confirmed" value="1" class="btn primary">Usuń dane pracownika</button>
             <a class="btn" href={`/hr/people/${g.person.id}/edit`}>Anuluj</a>

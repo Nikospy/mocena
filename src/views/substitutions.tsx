@@ -1,4 +1,5 @@
 import type { Person } from "../people";
+import { PageHeader } from "./components";
 import type { Substitution } from "../substitutions";
 import { Layout, formatDate } from "./layout";
 
@@ -18,10 +19,7 @@ export function SubstitutionsView(props: {
   const e = props.errors ?? {};
   return (
     <Layout title="Zastępstwa" person={props.viewer} today={props.today}>
-      <section class="card hdr slim">
-        <h1>Zastępstwa oceniających</h1>
-        <p class="cap">W czasie zastępstwa osoba zastępująca widzi zespół nieobecnego i prowadzi czynności oceniającego.</p>
-      </section>
+      <PageHeader title="Zastępstwa oceniających" lead="W czasie zastępstwa osoba zastępująca widzi zespół nieobecnego i prowadzi czynności oceniającego." />
       <section class="hint">
         <p class="voice hint-v">Podpowiedź · poradnik KPRM</p>
         <p>To praktyka z poradnika KPRM, nie przepis.</p>

@@ -1,5 +1,5 @@
 import type { Child } from "hono/jsx";
-import { roleLabel, type Person } from "../people";
+import { DEMO_DIRECTOR_GENERAL_ID, roleLabel, type Person } from "../people";
 import { currentTour } from "../tour/context";
 import { stopById, stopScreenPath } from "../tour/stops";
 import { Head } from "./head";
@@ -78,6 +78,7 @@ export function navFor(person: Person): NavItem[] {
     return [
       { label: "Sprawy", href: "/", icon: ICON.tasks, section: (p) => p.startsWith("/cycles/") || (p.startsWith("/people/") && !p.endsWith("/notes/new")) },
       { label: "Notatki", href: "/notes", icon: ICON.notes, section: (p) => p.startsWith("/notes/") || p.endsWith("/notes/new") },
+      ...(person.id === DEMO_DIRECTOR_GENERAL_ID ? [{ label: "Statystyki", href: "/office/statistics", icon: ICON.cycles }] : []),
     ];
   return [
     { label: "Sprawy", href: "/", icon: ICON.tasks, section: under("/cycles/") },
@@ -191,6 +192,12 @@ export function Layout(props: { title: string; person: Person | null; today: str
           </div>
         </header>
         <main class={nav.length ? "wrap has-nav" : "wrap"} id="main">{props.children}</main>
+        <footer class={nav.length ? "foot has-nav" : "foot"}>
+          <div class="foot-in">
+            <a href="/about">Wdrożenie i dane</a>
+            <a href="https://github.com/Nikospy/mocena">Kod źródłowy</a>
+          </div>
+        </footer>
         {tourStop ? (
           <>
             <TourPanel stop={tourStop} screenPath={stopScreenPath(tourStop)} onScreen={tour.path === stopScreenPath(tourStop)} dateLabel={formatDateLong(tourStop.date)} dateOf={formatDateLong} />

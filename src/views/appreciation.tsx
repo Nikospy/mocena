@@ -1,4 +1,5 @@
 import type { Card } from "../content";
+import { PageHeader } from "./components";
 import type { Note } from "../notes/repo";
 import type { Person } from "../people";
 import { NoteItem } from "./components/note-item";
@@ -18,12 +19,8 @@ export function AppreciationView(props: {
   const { card } = props;
   return (
     <Layout title={card.title} person={props.viewer} today={props.today}>
-      <section class="card hdr">
-        <p class="voice src">Karta rozmowy</p>
-        <h1>{card.title}</h1>
-        {props.sentence ? <div class="st info"><div><b>{props.sentence}</b></div></div> : null}
-        <p class="cap">{card.purpose}</p>
-      </section>
+      <PageHeader context="Karta rozmowy" title={card.title} lead={card.purpose} />
+      {props.sentence ? <div class="st info"><div><b>{props.sentence}</b></div></div> : null}
       <section class="card b-sec">
         <h2>Jak to zrobić</h2>
         <ul class="note-list">{card.questions?.map((q) => <li class="note-item"><p>{q}</p></li>)}</ul>

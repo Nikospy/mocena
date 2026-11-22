@@ -93,7 +93,7 @@ describe("zasada 7: przy nazwisku nic poza nazwiskiem", () => {
     for (const h of headings) expect(h).toMatch(/^[^\d:()]+$/);
     for (const [id, name] of [["piotr", "Piotr Wójcik"], ["maria", "Maria Dąbrowska"]]) {
       const html = await (await call(app, "marek", `/people/${id}/notes/new`)).text();
-      expect(html).toContain(`<h1 class="n-title">Nowa notatka: ${name}</h1>`);
+      expect(html).toContain(`<h1>Nowa notatka: ${name}</h1>`);
     }
   });
 });

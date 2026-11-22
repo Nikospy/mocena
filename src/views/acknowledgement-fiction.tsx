@@ -1,6 +1,6 @@
 import { rules } from "../engine/rules";
 import type { Person } from "../people";
-import { LegalBasis } from "./components";
+import { LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
 export type FictionViewProps = {
@@ -18,10 +18,7 @@ export function FictionView(p: FictionViewProps) {
   const v = p.values ?? { reason: "", deliveryMethod: "in_person", deliveredOn: p.today };
   return (
     <Layout title="Fikcja zapoznania" person={p.viewer} today={p.today}>
-      <section class="card hdr">
-        <p class="voice src">Ocena okresowa · zapoznanie</p>
-        <h1>Stwierdzenie fikcji zapoznania: {p.person.name}</h1>
-      </section>
+      <PageHeader context="Ocena okresowa · zapoznanie" title={<>Stwierdzenie fikcji zapoznania: {p.person.name}</>} />
       <section class="card b-sec">
         <div class="st info">
           <div>

@@ -5,7 +5,7 @@ import { romanGrade, type MandatoryGrade } from "../engine/grades";
 import type { CycleState, CycleStep } from "../hr/cycle-state";
 import type { OfficeStats } from "../hr/stats";
 import type { Person } from "../people";
-import { LegalBasis } from "./components";
+import { LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
 const DOW_ACC = ["niedzielę", "poniedziałek", "wtorek", "środę", "czwartek", "piątek", "sobotę"];
@@ -120,7 +120,7 @@ const VISIBLE_LINKS = 3;
 function HrLinks(props: { links: CycleLink[]; printHref: string | null }) {
   const all = [...props.links.map((l) => ({ href: l.href, label: l.label })), ...(props.printHref ? [{ href: props.printHref, label: "Drukuj / pobierz PDF" }] : [])];
   const link = (l: { href: string; label: string }) => (
-    <a class="btn link-chip" href={l.href}>
+    <a href={l.href}>
       {l.label}
     </a>
   );
@@ -212,15 +212,16 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
 export function HrOverviewView(props: { viewer: Person; today: string; cards: ReminderProps[]; rows: StateRow[]; stats: OfficeStats; awarded?: { dative: string; date: string } }) {
   return (
     <Layout title="Stan cykli" person={props.viewer} today={props.today}>
-      <section class="card hdr slim">
-        <h1>Stan cykli</h1>
-        <p class="cap">Najpierw cykle, które wymagają działania, na końcu zamknięte. W każdej grupie od najbliższego terminu.</p>
-      </section>
-      <nav class="hr-links hr-tools" aria-label="Dane i zestawienia">
-        <a class="btn" href="/hr/people">Pracownicy</a>
-        <a class="btn" href="/hr/substitutions">Zastępstwa</a>
-        <a class="btn" href="/hr/export.csv" download>Pobierz zestawienie (CSV)</a>
-      </nav>
+      <PageHeader
+        title="Stan cykli"
+        lead="Najpierw cykle, które wymagają działania, na końcu zamknięte. W każdej grupie od najbliższego terminu."
+        linksLabel="Dane i zestawienia"
+        links={
+          <a href="/hr/export.csv" download>
+            Pobierz zestawienie (CSV)
+          </a>
+        }
+      />
       {props.awarded ? (
         <div class="st ok" role="status">
           <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>

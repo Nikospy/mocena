@@ -1,6 +1,6 @@
 import type { Person } from "../people";
 import type { TimelineEntry } from "../timeline";
-import { LegalBasis, RulesVersion } from "./components";
+import { LegalBasis, RulesVersion, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
 export function TimelineView(props: {
@@ -15,12 +15,7 @@ export function TimelineView(props: {
 }) {
   return (
     <Layout title={`Oś czasu: ${props.personName}`} person={props.viewer} today={props.today}>
-      <section class="card hdr slim" aria-label="Cykl oceny">
-        <div class="hdr-id">
-          <p class="cap">Oś czasu cyklu oceny</p>
-          <h1>{props.personName}</h1>
-        </div>
-      </section>
+      <PageHeader title={<>Oś czasu: {props.personName}</>} />
       {props.notice ? (
         <p class="st info" role="status">
           {props.notice}
@@ -52,7 +47,7 @@ export function TimelineView(props: {
                   </span>
                 ) : null}
                 {e.detail ? <p class="cap">{e.detail}</p> : null}
-                {e.href ? <a class="btn link-chip" href={e.href}>Pismo o zmianie terminu</a> : null}
+                {e.href ? <a href={e.href}>Pismo o zmianie terminu</a> : null}
                 <LegalBasis basis={e.basis} />
               </div>
             </li>

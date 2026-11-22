@@ -1,4 +1,5 @@
 import type { Person } from "../people";
+import { PageHeader } from "./components";
 import { Layout } from "./layout";
 
 export type SuggestionSourcesData = {
@@ -13,8 +14,7 @@ export function SuggestionSourcesView(props: { viewer: Person; today: string; da
   return (
     <Layout title="Skąd biorą się podpowiedzi" person={props.viewer} today={props.today}>
       <section class="n-state sources">
-        <h1 class="n-title">Skąd biorą się podpowiedzi</h1>
-        <p>{d.intro}</p>
+        <PageHeader title="Skąd biorą się podpowiedzi" lead={d.intro} />
         <div class="st ok" role="status">
           <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
           <div><b>Teraz działa: {props.modeLabel}</b></div>
