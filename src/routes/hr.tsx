@@ -14,6 +14,7 @@ import { cycleById, previousCycleOf } from "../cycles";
 import { currentPerson, DEMO_DIRECTOR_GENERAL_ID, personById, type Person } from "../people";
 import { today } from "../settings";
 import { Layout } from "../views/layout";
+import { PageHeader } from "../views/components";
 import { HrOverviewView, StatsBlock, type StateRow } from "../views/hr-overview";
 
 const app = new Hono();
@@ -28,7 +29,7 @@ app.get("/office/statistics", (c) => {
   if (viewer.id !== DEMO_DIRECTOR_GENERAL_ID) return c.text("Ten ekran widzi dyrektor generalny urzędu.", 403);
   return c.html(
     <Layout title="Terminowość w urzędzie" person={viewer} today={today()}>
-      <h1>Statystyki urzędu</h1>
+      <PageHeader title="Statystyki urzędu" />
       <StatsBlock stats={officeStats()} />
     </Layout>,
   );

@@ -116,7 +116,7 @@ describe("kody odpowiedzi i zasady", () => {
     expect(JSON.stringify(rows(db))).not.toContain("urlop");
     expect(JSON.stringify(db.query("SELECT payload FROM events WHERE type = 'absence_recorded'").all())).not.toContain("urlop");
     const tl = await html(app, "joanna", `/cycles/${PIOTR}/timeline`);
-    expect(tl).toMatch(/<h1>Piotr Wójcik<\/h1>/);
+    expect(tl).toMatch(/<h1>Oś czasu: Piotr Wójcik<\/h1>/);
   });
 });
 

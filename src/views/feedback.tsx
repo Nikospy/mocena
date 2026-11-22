@@ -1,4 +1,5 @@
 import type { FeedbackMessage } from "../notes/repo";
+import { PageHeader } from "./components";
 import type { Person } from "../people";
 import { Layout, formatDate } from "./layout";
 
@@ -7,7 +8,7 @@ export function FeedbackView(props: { viewer: Person; today: string; messages: (
   return (
     <Layout title="Informacja zwrotna" person={props.viewer} today={props.today}>
       <section class="n-state">
-        <h1 class="n-title">Informacja zwrotna</h1>
+        <PageHeader title="Informacja zwrotna" />
         {props.messages.length === 0 ? <p class="cap">Nie masz jeszcze informacji zwrotnej.</p> : null}
         {props.messages.map((m) => (
           <article class="card fb-msg">

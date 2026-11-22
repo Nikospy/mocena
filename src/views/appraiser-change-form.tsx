@@ -1,4 +1,5 @@
 import type { Person } from "../people";
+import { PageHeader } from "./components";
 import { rules } from "../engine/rules";
 import { Layout } from "./layout";
 
@@ -16,9 +17,8 @@ export function AppraiserChangeFormView(props: {
 }) {
   return (
     <Layout title={`Zmiana oceniającego: ${props.personName}`} person={props.viewer} today={props.today}>
+      <PageHeader title={<>Zmień oceniającego: {props.personName}</>} lead={<>Obecny oceniający: {props.currentName}</>} />
       <section class="card form-card">
-        <h1>Zmień oceniającego: {props.personName}</h1>
-        <p class="cap">Obecny oceniający: {props.currentName}</p>
         <form method="post" action={`/cycles/${props.cycleId}/appraiser`} class="abs-form">
           <div>
             <label class="lbl" for="appraiser_id">Nowy oceniający</label>

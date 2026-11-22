@@ -1,5 +1,6 @@
 import { card } from "../content";
 import { criterion } from "../engine/scoring";
+import { PageHeader } from "./components";
 import { fillTemplate, fullMonthsBetween, nameForm } from "../hr-partner/partner";
 import type { Note } from "../notes/repo";
 import type { Person } from "../people";
@@ -35,7 +36,7 @@ function NoteCard(props: { note: Note }) {
       </p>
       <p class="note-text">{n.text}</p>
       <div class="btns">
-        <a class="btn sm-btn" href={`/notes/${n.id}/feedback`}>Przekaż pracownikowi</a>
+        <a class="btn text" href={`/notes/${n.id}/feedback`}>Przekaż pracownikowi</a>
       </div>
     </li>
   );
@@ -46,7 +47,7 @@ export function NotesListView(props: { viewer: Person; today: string; groups: No
   return (
     <Layout title="Notatki o zespole" person={props.viewer} today={props.today}>
       <section class="n-state notes-team">
-        <h1 class="n-title">Notatki o zespole</h1>
+        <PageHeader title="Notatki o zespole" />
         {props.saved ? <div class="st ok" role="status">{OK_ICON}<div><b>Zapisano notatkę</b></div></div> : null}
         {props.sent ? <div class="st ok" role="status">{OK_ICON}<div><b>Wysłano pracownikowi</b></div></div> : null}
         {props.groups.length === 0 ? <p class="cap">Nie masz jeszcze notatek.</p> : null}
