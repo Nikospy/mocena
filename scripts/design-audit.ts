@@ -79,6 +79,7 @@ const MEASURE = String.raw`(() => {
   const push = (k, r) => { (off[k] = off[k] || []).push(r); };
 
   // Tekst: węzły tekstowe z widocznym prostokątem.
+  const mainContent = document.querySelector("main");
   const texts = [];
   const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   while (tw.nextNode()) {
@@ -90,10 +91,15 @@ const MEASURE = String.raw`(() => {
     texts.push({ el, t, rects, cs });
   }
   const sizes = {}, weights = {}, colors = {}, lefts = {}; let chars = 0, bold = 0, small = 0, tiny = 0, upper = 0;
+  let mainChars = 0, mainSmall = 0;
   const lowContrast = []; let unknownBg = 0;
   for (const x of texts) {
     const n = x.t.length, fs = parseFloat(x.cs.fontSize), fw = +x.cs.fontWeight;
     chars += n; inc(sizes, fs, n); inc(weights, fw, n); if (fw >= 600) bold += n; if (fs < 16) small += n; if (fs <= 12) tiny += n;
+    if (mainContent?.contains(x.el)) {
+      mainChars += n;
+      if (fs < 16) mainSmall += n;
+    }
     if (x.cs.textTransform === "uppercase") upper += n;
     if (fs <= 12) push("tiny", box(x.rects[0], fs + "px"));
     inc(lefts, Math.round(x.rects[0].left), 1);
@@ -165,7 +171,7 @@ const MEASURE = String.raw`(() => {
   }
 
   // Odstępy pionowe między sąsiadami w treści.
-  const gaps = {}; const main = document.querySelector("main") || document.body;
+  const gaps = {}; const main = mainContent || document.body;
   for (const p of [main, ...main.querySelectorAll("*")]) {
     const kids = [...p.children].filter((c) => shown(c) && !getComputedStyle(c).display.startsWith("inline") && getComputedStyle(c).position !== "absolute" && getComputedStyle(c).position !== "fixed");
     for (let i = 1; i < kids.length; i++) { const a = kids[i - 1].getBoundingClientRect(), b = kids[i].getBoundingClientRect(); const g = Math.round(b.top - a.bottom); if (g >= 0 && g < 200 && Math.abs(a.left - b.left) < 4) inc(gaps, g, 1); }
@@ -203,6 +209,7 @@ const MEASURE = String.raw`(() => {
       sizeCount: Object.keys(sizes).length,
       weights: sorted(weights).map(([k, v]) => [Number(k), pct(v)]),
       boldPct: pct(bold), under16Pct: pct(small), tinyPct: pct(tiny), upperPct: pct(upper),
+      under16PctMain: mainChars ? Math.round(mainSmall * 100 / mainChars) : null,
       textColors: sorted(colors).map(([k, v]) => [k, pct(v)]), textColorCount: Object.keys(colors).length,
       contrastFails: lowContrast.length, worstContrast: lowContrast[0] ? +lowContrast[0].cr.toFixed(2) : null, unknownBg,
       maxCpl, longLineBlocks: longLines.length,

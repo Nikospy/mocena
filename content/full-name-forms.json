@@ -8,5 +8,7 @@
   "Anna Kwiatkowska": { "gen": "Anny Kwiatkowskiej", "dat": "Annie Kwiatkowskiej", "ins": "Anną Kwiatkowską", "loc": "Annie Kwiatkowskiej" },
   "Joanna Mazur": { "gen": "Joanny Mazur", "dat": "Joannie Mazur", "ins": "Joanną Mazur", "loc": "Joannie Mazur" },
   "Jerzy Malinowski": { "gen": "Jerzego Malinowskiego", "dat": "Jerzemu Malinowskiemu", "ins": "Jerzym Malinowskim", "loc": "Jerzym Malinowskim" },
-  "Barbara Szymańska": { "gen": "Barbary Szymańskiej", "dat": "Barbarze Szymańskiej", "ins": "Barbarą Szymańską", "loc": "Barbarze Szymańskiej" }
+  "Barbara Szymańska": { "gen": "Barbary Szymańskiej", "dat": "Barbarze Szymańskiej", "ins": "Barbarą Szymańską", "loc": "Barbarze Szymańskiej" },
+  "Irena Maj": { "gen": "Ireny Maj", "dat": "Irenie Maj", "ins": "Ireną Maj", "loc": "Irenie Maj" },
+  "Jan Krawiec": { "gen": "Jana Krawca", "dat": "Janowi Krawcowi", "ins": "Janem Krawcem", "loc": "Janie Krawcu" }
 }

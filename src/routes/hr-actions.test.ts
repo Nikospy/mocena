@@ -42,7 +42,7 @@ describe("rozstrzygnięcie sprzeciwu", () => {
     expect(visibleEvents("cycle-katarzyna").filter((e) => e.type === "objection_resolved")).toHaveLength(0);
     const r = await call(app, "joanna", url, { outcome: "rejected" });
     expect(r.status).toBe(303);
-    expect(await html(app, "joanna", "/hr")).toContain("sprzeciw nieuwzględniony");
+    expect(await html(app, "joanna", "/hr")).toContain("nieuwzględniony");
     expect((await call(app, "joanna", url, { outcome: "rejected" })).status).toBe(409);
     expect(visibleEvents("cycle-katarzyna").filter((e) => e.type === "objection_resolved")).toHaveLength(1);
   });

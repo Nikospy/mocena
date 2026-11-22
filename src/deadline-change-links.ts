@@ -9,7 +9,7 @@ import { formatDate } from "./views/layout";
 registerCycleLinks((cycle, viewer) => {
   const base = `/cycles/${cycle.id}/deadline-change`;
   if (canChangeDeadline(viewer, cycle)) return [{ label: "Zmień termin oceny", href: base }];
-  if (viewer.id === cycle.person_id && canRequestChange(viewer, cycle)) return [{ label: "Wnioskuj o zmianę terminu", href: `${base}/request` }];
+  if (viewer.id === cycle.person_id && canRequestChange(viewer, cycle)) return [{ label: "Wniosek o zmianę terminu oceny", href: `${base}/request` }];
   if (viewer.id === cycle.person_id && requestState(cycle.id)) return [{ label: "Wniosek o zmianę terminu", href: `${base}/request` }];
   return [];
 });
@@ -43,9 +43,9 @@ registerHomeTasks((person) => {
       : d.type === "deadline_change_rejected"
         ? `Wniosek z ${formatDate(st.request.date)} odrzucony. Powód: ${d.payload.reason}`
         : `Wniosek z ${formatDate(st.request.date)} przyjęty. Nowy termin oceny: ${formatDate(d.payload.newDeadline)}.`;
-    tasks.push({ title: "Twój wniosek o zmianę terminu", heading: "Twój wniosek o zmianę terminu", detail, action: "Zobacz wniosek", href, quiet: true });
+    tasks.push({ title: "Wniosek o zmianę terminu oceny", heading: "Wniosek o zmianę terminu oceny", detail, action: "Otwórz wniosek", href, standing: true });
   } else if (own && deadlineChangeBlocked(own) === null) {
-    tasks.push({ title: "Wnioskuj o zmianę terminu", href: `/cycles/${own.id}/deadline-change/request`, quiet: true, detail: "Możesz wnioskować o zmianę terminu oceny (art. 81 ust. 8 pkt 4 ustawy)." });
+    tasks.push({ title: "Wniosek o zmianę terminu oceny", action: "Złóż wniosek", href: `/cycles/${own.id}/deadline-change/request`, standing: true, detail: "Możesz wnioskować o zmianę terminu oceny (art. 81 ust. 8 pkt 4 ustawy)." });
   }
   return tasks;
 });

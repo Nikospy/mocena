@@ -7,6 +7,7 @@ import { criterion, POINTS, type AssessmentResult } from "../engine/scoring";
 import type { Person } from "../people";
 import { ConfirmationBlock, LegalBasis, RulesVersion, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
+import { romanGrade } from "../engine/grades";
 import type { JSX } from "hono/jsx/jsx-runtime";
 
 export type Slots = {
@@ -14,6 +15,8 @@ export type Slots = {
   justificationTools?: JSX.Element;
   conclusionsTools?: JSX.Element;
   beforeForm?: JSX.Element;
+  /** Odnośniki do rzędu odnośników nagłówka strony (np. karta rozmowy oceniającej). */
+  headerLinks?: JSX.Element;
 };
 
 export const REASON_LABEL = { could_not: "nie mógł potwierdzić", would_not: "nie chciał potwierdzić" } as const;
@@ -101,7 +104,7 @@ export function ResultPanel(props: { result: ResultLike | null; scores?: { name:
       </div>
       <p class="avg-line">
         <b>Średnia {mean2(r.mean)}</b>
-        {meanDoesNotDecide ? " — nie zmienia wyniku" : null}
+        {meanDoesNotDecide ? " – nie zmienia wyniku" : null}
       </p>
       <p class="cap">
         <RulesVersion version={version} href={props.cycleId ? `/cycles/${props.cycleId}/timeline` : undefined} />
@@ -165,11 +168,11 @@ export function AssessmentMessage(props: { viewer: Person; person: Person; today
   return (
     <Layout title="Ocena" person={props.viewer} today={props.today}>
       <PageHeader title={<>Ocena okresowa: {props.person.name}</>} />
-      <section class="card">
+      <section class="am-msg">
         <p class="st info">{props.text}</p>
         <div class="btns">
           {props.action ? <a class="btn primary" href={props.action.href}>{props.action.label}</a> : null}
-          <a class="btn" href="/">Wróć na stronę główną</a>
+          <a class={props.action ? "btn text" : "btn"} href="/">Wróć do spraw</a>
         </div>
       </section>
     </Layout>
@@ -199,11 +202,13 @@ export type AssessmentViewProps = {
   shifted?: { text: string } | null;
 };
 
-function Header(p: { person: Person; sheet: string; period: string }) {
+function Header(p: { person: Person; sheet: string; period: string; links?: JSX.Element }) {
   return (
     <PageHeader
       context={<>{p.person.position_title ?? ""} · arkusz {p.sheet} · {p.period}</>}
       title={<>Ocena okresowa: {p.person.name}</>}
+      linksLabel="Cykl oceny"
+      links={p.links}
     />
   );
 }
@@ -258,7 +263,7 @@ function EditForm(p: AssessmentViewProps) {
               <label for="interviewDate">
                 <h2>Data rozmowy oceniającej</h2>
               </label>
-              <input class="area" type="date" id="interviewDate" name="interviewDate" max={p.today} value={d.interviewDate ?? p.today} />
+              <input class="area date-field" type="date" id="interviewDate" name="interviewDate" max={p.today} value={d.interviewDate ?? p.today} />
             </section>
 
             <section class="card tx-card">
@@ -287,7 +292,7 @@ function EditForm(p: AssessmentViewProps) {
 
             {p.gradeOption === "not_applicable" ? null : (
               <section class="card tx-card" id="grade-request">
-                <h2>Wniosek o następny stopień służbowy</h2>
+                <h2>Wniosek o kolejny stopień służbowy</h2>
                 {p.gradeOption === "no_only" ? (
                   <p>Wniosek o stopień: nie. Nie można go dołączyć przy ocenie negatywnej ani przy najwyższym stopniu.</p>
                 ) : (
@@ -295,14 +300,14 @@ function EditForm(p: AssessmentViewProps) {
                     <div class="seg fit">
                       <label>
                         <input type="radio" name="gradeRequestAttached" value="1" checked={d.gradeRequest.attached} />
-                        <span>Tak</span>
+                        <span>Dołączam wniosek</span>
                       </label>
                       <label>
                         <input type="radio" name="gradeRequestAttached" value="0" checked={!d.gradeRequest.attached} />
-                        <span>Nie</span>
+                        <span>Bez wniosku</span>
                       </label>
                     </div>
-                    {p.grade !== null ? <p class="cap">Stopień docelowy: {p.grade + 1}</p> : null}
+                    {p.grade !== null ? <p class="cap">Stopień docelowy: {romanGrade(p.grade + 1)}</p> : null}
                     <label class="lbl" for="gradeMotivation">Umotywowanie wniosku</label>
                     <textarea class="area" id="gradeMotivation" name="gradeMotivation" rows={3}>{d.gradeRequest.motivation}</textarea>
                   </>
@@ -315,7 +320,7 @@ function EditForm(p: AssessmentViewProps) {
             <ResultPanel result={p.result} scores={scoreRows(p.criteria, d.scores)} cycleId={p.cycleId} />
             <BlockerList blockers={p.blockers} />
             <div class="decide">
-              <button type="submit" class="btn full">Zapisz</button>
+              <button type="submit" class="btn full">Zapisz szkic oceny</button>
               <button type="submit" class="btn primary full" formaction={`/cycles/${p.cycleId}/assessment/approve`}>
                 Zatwierdź ocenę
               </button>
@@ -345,10 +350,7 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
                   <h3>{c.name}</h3>
                   <p class="kind">{c.kind === "mandatory" ? "obowiązkowe" : "dodatkowe"}</p>
                 </div>
-                <div class="scorebox">
-                  <p class="big">{c.score}</p>
-                  <p class="lvl">{LEVELS.get(c.score) ?? ""}</p>
-                </div>
+                <p class="o-score"><b class="big">{c.score}</b> <span>{LEVELS.get(c.score) ?? ""}</span></p>
               </div>
             </article>
           ))}
@@ -363,15 +365,14 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
         </section>
         {s.gradeRequest.attached ? (
           <section class="card tx-card">
-            <h2>Wniosek o następny stopień służbowy</h2>
-            <p>Stopień docelowy: {s.gradeRequest.targetGrade}</p>
+            <h2>Wniosek o kolejny stopień służbowy</h2>
+            <p>Stopień docelowy: {romanGrade(s.gradeRequest.targetGrade)}</p>
             <p>{s.gradeRequest.motivation}</p>
           </section>
         ) : null}
       </div>
       <aside class="side first" aria-label="Wynik i potwierdzenia">
         <ResultPanel result={s.result} scores={s.criteria} cycleId={p.cycleId} version={s.rulesVersion.version} />
-        <a class="btn" href={`/cycles/${p.cycleId}/assessment/export.json`} download>Pobierz ocenę (JSON)</a>
         {st.objectionDeadline ? <ObjectionClock deadline={st.objectionDeadline} today={p.today} mine={mine} /> : null}
         {p.canAcknowledge ? (
           <form method="post" action={`/cycles/${p.cycleId}/assessment/acknowledge`} class="decide">
@@ -384,17 +385,13 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
             <a class="btn full" href={`/cycles/${p.cycleId}/assessment/fiction`}>Stwierdź fikcję zapoznania</a>
           </div>
         ) : null}
-        <section class="card b-facts">
-          <p>
-            Okres oceny: {formatDate(s.periodFrom)} – {formatDate(s.periodTo)}
-          </p>
-          <p>
-            Rozmowa oceniająca: {formatDate(s.interviewDate)}
-          </p>
-          <p>
-            Termin oceny: <b>{formatDate(s.deadline.date)}</b> <LegalBasis basis={s.deadline.basis} />
-          </p>
-          <ConfirmationBlock kind="confirmation" name={s.confirmation.name} place={s.confirmation.place} date={s.confirmation.date} />
+        <a class="btn o-export" href={`/cycles/${p.cycleId}/assessment/export.json`} download>Pobierz ocenę jako plik danych (JSON)</a>
+        <dl class="card b-facts o-facts">
+          <div><dt>Okres oceny</dt><dd>{formatDate(s.periodFrom)}–{formatDate(s.periodTo)}</dd></div>
+          <div><dt>Rozmowa oceniająca</dt><dd>{formatDate(s.interviewDate)}</dd></div>
+          <div><dt>Termin oceny</dt><dd><b>{formatDate(s.deadline.date)}</b> <LegalBasis basis={s.deadline.basis} /></dd></div>
+          <div><dt>Zatwierdzenie oceny</dt><dd><ConfirmationBlock kind="confirmation" name={s.confirmation.name} place={s.confirmation.place} date={s.confirmation.date} /></dd></div>
+          <div><dt>Zapoznanie z oceną</dt><dd>
           {st.stage === "acknowledged" && st.acknowledgement ? (
             <ConfirmationBlock kind="confirmation" name={st.acknowledgement.name} place={st.acknowledgement.place} date={st.acknowledgement.date} />
           ) : st.stage === "fiction" && st.fiction ? (
@@ -409,7 +406,8 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
           ) : (
             <ConfirmationBlock kind="confirmation" />
           )}
-        </section>
+          </dd></div>
+        </dl>
       </aside>
     </div>
   );
@@ -420,7 +418,7 @@ export function AssessmentView(p: AssessmentViewProps) {
   const period = `okres od ${formatDate(snap?.periodFrom ?? p.periodFrom)} do ${formatDate(snap?.periodTo ?? p.today)}`;
   return (
     <Layout title="Ocena" person={p.viewer} today={p.today}>
-      <Header person={p.person} sheet={snap?.sheet ?? p.sheet} period={period} />
+      <Header person={p.person} sheet={snap?.sheet ?? p.sheet} period={period} links={p.slots?.headerLinks} />
       {p.shifted ? (
         <p class="st info" id="deadline-shift">
           <span>

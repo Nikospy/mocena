@@ -6,6 +6,7 @@ import { romanGrade } from "../engine/grades";
 import { rules } from "../engine/rules";
 import { recordEvent, visibleEvents } from "../events";
 import { personById, type Person } from "../people";
+import { officeSettings } from "../office-settings";
 import { today } from "../settings";
 import { assessmentHistory, visibleCyclesOf } from "./history";
 
@@ -47,6 +48,12 @@ export function sheetOf(p: Pick<Person, "position_kind">): Sheet | null {
 
 function isIsoDate(v: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v)) && new Date(v).toISOString().slice(0, 10) === v;
+}
+
+/** Komórki do wyboru: lista z ustawień urzędu i komórki już wpisane w kartotece (żeby edycja starszego wpisu nie gubiła wartości). */
+export function unitOptions(): string[] {
+  const fromDb = (getDb().query("SELECT DISTINCT unit FROM people WHERE unit IS NOT NULL AND unit <> ''").all() as { unit: string }[]).map((r) => r.unit);
+  return [...new Set([...(officeSettings().organizationalUnits ?? []), ...fromDb])].sort((a, b) => a.localeCompare(b, "pl"));
 }
 
 export function supervisorCandidates(exceptId?: string): Person[] {
@@ -115,7 +122,8 @@ export function validateForm(f: PersonForm, opts: { personId?: string; hasCycle:
   if (!f.name) e.name = "Wpisz imię i nazwisko.";
   else if (f.name.length > 120) e.name = "Imię i nazwisko może mieć najwyżej 120 znaków.";
   if (!f.position_title) e.position_title = "Wpisz stanowisko.";
-  if (!f.unit) e.unit = "Wpisz komórkę organizacyjną.";
+  if (!f.unit) e.unit = "Wybierz komórkę organizacyjną.";
+  else if (!unitOptions().includes(f.unit)) e.unit = "Wybierz komórkę organizacyjną z listy.";
   if (f.sheet && !SHEETS.includes(f.sheet as Sheet)) e.sheet = "Wybierz typ arkusza: A, B albo C.";
   if (f.supervisor_id) {
     if (f.supervisor_id === opts.personId || !supervisorCandidates().some((p) => p.id === f.supervisor_id)) e.supervisor_id = "Wybierz przełożonego z listy.";
@@ -123,7 +131,7 @@ export function validateForm(f: PersonForm, opts: { personId?: string; hasCycle:
   for (const k of ["hired_on", "prev_on", "grade_on"] as const) {
     if (!f[k]) continue;
     if (!isIsoDate(f[k])) e[k] = "Podaj poprawną datę.";
-    else if (f[k] > now) e[k] = "Data nie może być późniejsza niż dziś.";
+    else if (f[k] > now) e[k] = "Wpisz datę nie późniejszą niż dzisiejsza.";
   }
   if (f.prev_on && !e.prev_on) {
     if (f.prev_outcome !== "positive" && f.prev_outcome !== "negative") e.prev_outcome = "Wybierz wynik oceny: pozytywna albo negatywna.";
@@ -278,7 +286,7 @@ export function lastAssessmentOf(personId: string): { on: string; outcome: "posi
 }
 
 export function employeeDeletionBlock(person: Person): string | null {
-  if (person.role === "hr" || person.role === "admin") return "Tego konta nie można usunąć z listy pracowników.";
+  if (person.role === "hr" || person.role === "admin") return "Konta kadr i administratora nie można usunąć: bez niego nikt nie obsłuży systemu.";
   const db = getDb();
   const supervises = db.query("SELECT 1 FROM people WHERE supervisor_id = ? AND id <> ?").get(person.id, person.id);
   const assesses = db.query("SELECT 1 FROM cycles WHERE appraiser_id = ? AND person_id <> ?").get(person.id, person.id);
@@ -288,7 +296,7 @@ export function employeeDeletionBlock(person: Person): string | null {
       AND (json_extract(e.payload, '$.from_id') = ? OR json_extract(e.payload, '$.to_id') = ?)
   `).get(person.id, person.id, person.id);
   if (supervises || assesses || wasAppraiser) {
-    return "Nie można usunąć tej osoby. Jej dane są potrzebne w cyklach lub kartotekach innych pracowników.";
+    return "Nie można usunąć tej osoby. Jej dane są potrzebne w cyklach albo kartotekach innych pracowników.";
   }
   return null;
 }

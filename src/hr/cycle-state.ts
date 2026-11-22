@@ -34,12 +34,21 @@ export type CycleState = {
 };
 
 const OUTCOME_TEXT = {
-  changed: "zmiana oceny",
-  redone: "ponowne sporządzenie oceny",
-  rejected: "sprzeciw nieuwzględniony",
+  changed: "uwzględniony, zmiana oceny",
+  redone: "uwzględniony, ponowne sporządzenie oceny",
+  rejected: "nieuwzględniony",
 } as const;
 
 const D = rules.deadlines;
+
+/** Po rozstrzygnięciu „ponowne sporządzenie oceny”: termin rozpatrzenia sprzeciwu (14 dni od wniesienia, art. 83 ust. 3 ustawy) obejmuje drugą ocenę. */
+export function reassessmentDeadline(cycleId: string): { date: string; basis: string[] } | null {
+  const ev = visibleEvents(cycleId);
+  const resolved = ev.filter((e) => e.type === "objection_resolved").pop();
+  const filed = ev.filter((e) => e.type === "objection_filed").pop();
+  if (!resolved || resolved.payload.outcome !== "redone" || !filed) return null;
+  return { date: objectionReviewDeadline(filed.date), basis: [D.objectionReviewDays.basis] };
+}
 
 export function cycleState(cycleId: string): CycleState {
   const ev = visibleEvents(cycleId);
@@ -49,9 +58,21 @@ export function cycleState(cycleId: string): CycleState {
   const resolved = last("objection_resolved");
   if (resolved) {
     const o = resolved.payload.outcome as keyof typeof OUTCOME_TEXT;
+    const redo = reassessmentDeadline(cycleId);
+    if (o === "redone" && redo) {
+      return {
+        step: "objection_resolved",
+        text: "Sprzeciw rozpatrzony: ponowne sporządzenie oceny. Sprawa u oceniającego",
+        more: "Termin rozpatrzenia sprzeciwu obejmuje sporządzenie oceny po raz drugi. Uwzględnienie sprzeciwu nie może obniżyć oceny ani jej elementów. Od ponownej oceny znów przysługuje sprzeciw.",
+        deadline: redo,
+        deadlineLabel: "Ponowna ocena do",
+        overdue: redo.date < now,
+        since: resolved.date,
+      };
+    }
     return {
       step: "objection_resolved",
-      text: o === "rejected" ? "Sprzeciw rozpatrzony: sprzeciw nieuwzględniony" : `Sprzeciw rozpatrzony: ${OUTCOME_TEXT[o] ?? o}`,
+      text: `Sprzeciw rozpatrzony: ${OUTCOME_TEXT[o] ?? o}`,
       since: resolved.date,
     };
   }
@@ -61,7 +82,7 @@ export function cycleState(cycleId: string): CycleState {
       step: "objection_filed",
       text: `Sprzeciw wniesiony ${formatDate(filed.date)} do ${filed.payload.to}`,
       deadline: { date: objectionReviewDeadline(filed.date), basis: [D.objectionReviewDays.basis] },
-      deadlineLabel: "Rozpatrzenie do",
+      deadlineLabel: "Rozpatrzenie sprzeciwu do",
       since: filed.date,
     };
   }
@@ -71,9 +92,9 @@ export function cycleState(cycleId: string): CycleState {
     const f = s.fiction;
     return {
       step: "fiction",
-      text: `Fikcja zapoznania stwierdzona ${formatDate(f.eventDate)} przez oceniającego: oceniany ${REASON_LABEL[f.reason]}. Kopię arkusza doręczono ${METHOD_LABEL[f.deliveryMethod]} ${formatDate(f.deliveredOn)}`,
+      text: `Fikcja zapoznania wpisana ${formatDate(f.eventDate)} przez oceniającego: oceniany ${REASON_LABEL[f.reason]}. Kopię arkusza doręczono ${METHOD_LABEL[f.deliveryMethod]} ${formatDate(f.deliveredOn)}`,
       deadline: { date: f.objectionDeadline, basis: [D.objectionDays.basis] },
-      deadlineLabel: "System liczy sprzeciw do",
+      deadlineLabel: "Sprzeciw do",
       since: f.eventDate,
     };
   }
@@ -107,7 +128,7 @@ export function cycleState(cycleId: string): CycleState {
   const p1 = part1Status(cycleId);
   if (p1.state === "confirmed") {
     const d = effectiveDeadline(cycleId);
-    return { step: "in_period", text: "Okres oceny", deadline: d, deadlineLabel: "Termin oceny", overdue: d.date < now, since: p1.confirmedOn };
+    return { step: "in_period", text: "Okres oceny trwa", deadline: d, deadlineLabel: "Termin oceny", overdue: d.date < now, since: p1.confirmedOn };
   }
   if (p1.state === "submitted") {
     const days = p1.waitingDays ?? 0;
