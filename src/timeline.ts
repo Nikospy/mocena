@@ -66,7 +66,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
       else sentences.push("Nie dłużej niż miesiąc: termin bez zmian.");
       entries.push({
         date: m.from,
-        title: `Nieobecność ${formatRange(m.from, m.to)} (${m.days} dni)`,
+        title: `Nieobecność ${formatRange(m.from, m.to)} (${m.days === 1 ? "1 dzień" : `${m.days} dni`})`,
         detail: sentences.join(" "),
         basis: [EXTENDS],
         kind: "fact",
@@ -119,7 +119,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
     } else if (e.type === "part1_submitted") {
       entries.push({ date: e.date, title: "Część I przekazana ocenianemu", detail: "Kryteria oceny i oczekiwania wobec pracownika.", basis: x.criteriaBasis ?? [], kind: "fact" });
     } else if (e.type === "part1_confirmed") {
-      entries.push({ date: e.date, title: "Część I: potwierdzenie zapoznania z kryteriami", basis: [], kind: "fact" });
+      entries.push({ date: e.date, title: "Potwierdzenie części I przez ocenianego", basis: [], kind: "fact" });
     } else if (e.type === "invitation_sent") {
       entries.push({ date: e.date, title: invitationHeadline({ ...x, id: e.id, sentOn: e.date, confirmedOn: null }), basis: [], kind: "fact" });
     } else if (e.type === "invitation_confirmed") {
@@ -130,7 +130,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
       const fiction = e.type === "acknowledgement_fiction";
       entries.push({
         date: fiction ? (x.deliveredOn ?? e.date) : e.date,
-        title: fiction ? "Uznanie oceny za doręczoną" : "Zapoznanie z oceną",
+        title: fiction ? "Fikcja zapoznania z oceną" : "Zapoznanie z oceną",
         basis: [rules.deadlines.objectionDays.basis],
         kind: "fact",
       });

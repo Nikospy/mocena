@@ -144,7 +144,7 @@ describe("1.10 wersja reguł po ludzku", () => {
     const { app } = createTestApp({ today: "2026-11-21", seedOptions: { afterStep1: true } });
     await call(app, "marek", `/cycles/${PIOTR}/assessment`, scores());
     const h = await html(app, "marek", `/cycles/${PIOTR}/assessment`);
-    expect(text(h)).toContain("Zasady z rozporządzenia z 2016 r., wersja 1");
+    expect(text(h)).toContain("Wersja reguł 1");
     expect(h).toContain('title="Identyfikator wersji: 2016-470/1"');
     expect(text(h)).not.toContain("2016-470/1");
   });
