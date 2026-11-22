@@ -1145,6 +1145,96 @@ section[aria-labelledby="h-dev"] > h3 { margin-block-start: var(--sp-300); paddi
 /* === screens: forms-states === */
 /* Notatka, lista notatek, docenienie, informacja zwrotna oraz wspólne stany błędów formularzy. */
 /* Reguły tej grupy dopisuj bezpośrednio pod tą linią. */
+/* Błędy formularza (ErrorSummary, FieldError, invalid() z components.tsx; wzór GOV.UK).
+   Podsumowanie: biała powierzchnia z czerwoną obwódką nad formularzem, odnośniki do pól.
+   Pole z błędem: czerwony obrys, komunikat między etykietą a polem, grupa pola z czerwoną kreską po lewej. */
+.err-sum { display: flex; align-items: flex-start; gap: var(--sp-150); background: var(--white); border: 2px solid var(--red-100); border-radius: var(--card-r);
+  padding: calc(var(--sp-300) - 2px); color: var(--text); }
+.err-sum:focus, .err-sum:focus-visible { outline: 2px solid transparent; box-shadow: none; }
+.err-sum > .ico { color: var(--red-100); }
+.err-sum h2 { font-size: var(--f-h5); line-height: var(--lh-h5); font-weight: var(--w-bold); }
+.err-sum h2 + * { margin-block-start: var(--sp-100); }
+.err-sum p { max-inline-size: 66ch; }
+.err-sum ul { list-style: none; padding: 0; display: grid; gap: 0; margin-block-start: var(--sp-100); }
+.err-sum a { display: inline-flex; align-items: center; min-block-size: var(--sp-400); color: var(--red-200); font-weight: var(--w-bold); text-decoration: underline; text-decoration-thickness: 1px; }
+.err-sum + * { margin-block-start: var(--sp-300); }
+.n-form > .err-sum + * { margin-block-start: 0; }
+.field-err { display: block; color: var(--red-200); font-weight: var(--w-bold); font-size: var(--f-p); line-height: var(--lh-p); max-inline-size: 66ch; }
+.field { display: grid; gap: var(--sp-100); }
+/* pole jednowierszowe: 48 px (data, godzina, tekst, lista); textarea zostaje wyższa */
+input.area, select.area, .area.line { block-size: var(--hit); min-block-size: var(--hit); padding-block: 0; }
+.field > .lbl { margin-block-end: 0; }
+:is(.field, fieldset, [role="radiogroup"]):has(> .field-err) { border-inline-start: var(--sp-50) solid var(--red-100); padding-inline-start: var(--sp-200); }
+.area[aria-invalid="true"], select[aria-invalid="true"], input[aria-invalid="true"]:not([type="radio"], [type="checkbox"]) { border-color: var(--red-100); }
+.area[aria-invalid="true"]:focus-visible { border-color: var(--red-100); }
+.tok:has([aria-invalid="true"]) { border-color: var(--red-100); box-shadow: inset 0 0 0 1px var(--red-100); }
+.hero-field:has(textarea[aria-invalid="true"]) { border: 2px solid var(--red-100); padding: calc(var(--sp-300) - 1px); }
+.hero-field .field-err { margin-block-start: var(--sp-100); }
+
+/* Formularz notatki i informacji zwrotnej: pola w jednym rytmie, przycisk w przepływie na komputerze, przyklejony tylko na telefonie */
+.nf-date .area { block-size: var(--hit); min-block-size: var(--hit); padding-block: 0; max-inline-size: var(--side-w); }
+.nf-date .date-words { margin: 0; }
+.n-form .hero-foot .cap { color: var(--text-2); }
+.n-form .nf-group { margin-block: var(--sp-200) var(--sp-100); }
+.n-form [role="radiogroup"] > .lbl + .nf-group { margin-block-start: 0; }
+.n-form [role="radiogroup"] > .field-err { margin-block-end: var(--sp-100); }
+/* kryterium: jedna postać – lista pól jednokrotnego wyboru (wzór GOV.UK radios) w kolumnach, bez ramki wokół każdej nazwy */
+.n-form .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--side-w) * .7)), 1fr)); gap: 0 var(--sp-300); }
+.n-form .chip span { gap: var(--sp-150); padding: var(--sp-100) 0; border: 0; border-radius: 0; background: none; color: var(--text); line-height: var(--lh-p); }
+.n-form .chip span::before { content: ""; flex: none; inline-size: var(--sp-300); block-size: var(--sp-300); border: 2px solid var(--border-strong); border-radius: 50%; background: var(--white); box-sizing: border-box; }
+.n-form .chip .ico, .n-form .chip input:checked + span .ico { display: none; }
+.n-form .chip input:checked + span { background: none; color: var(--text); font-weight: var(--w-bold); }
+.n-form .chip input:checked + span::before { border-color: var(--primary); background: var(--primary); box-shadow: inset 0 0 0 var(--sp-50) var(--white); }
+.n-form .chip input:focus-visible + span { box-shadow: none; text-decoration: underline; text-underline-offset: .2em; }
+.n-form .chip input:focus-visible + span::before { box-shadow: var(--focus); }
+.n-form .chip input:checked:focus-visible + span::before { box-shadow: inset 0 0 0 var(--sp-50) var(--white), var(--focus); }
+.n-form .chip:active span { border: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .n-form .chip:hover input:not(:checked) + span { background: none; }
+  .n-form .chip:hover input:not(:checked) + span::before { border-color: var(--primary); }
+}
+.nf-back { margin-block-start: var(--sp-300); }
+.nf-back a { display: inline-flex; align-items: center; min-block-size: var(--hit); font-weight: var(--w-bold); }
+@media (max-width: 767px) { .nf-actions .btn { inline-size: 100%; } .nf-back { margin-block-start: var(--sp-100); } }
+@media (min-width: 768px) {
+  .nf-actions { position: static; margin: 0; padding: 0; background: none; }
+  .nf-actions::before { content: none; }
+  .nf-actions .btn { min-inline-size: calc(var(--side-w) / 2); }
+}
+/* źródło informacji zwrotnej: cytat notatki bez ramki, z kreską po lewej */
+.fb-page .fb-src { display: grid; gap: var(--sp-100); }
+.fb-page .fb-src > * + * { margin-block-start: 0; }
+.fb-src blockquote { border-inline-start: var(--sp-50) solid var(--border); padding-inline-start: var(--sp-200); }
+.fb-page .fb-src + .n-form { margin-block-start: var(--sp-400); }
+.fb-page .hero-field > .cap { margin-block-start: var(--sp-50); }
+.fb-page .cap, .fb-page .privacy { font-size: var(--f-p); line-height: var(--lh-p); }
+.fb-page .privacy { align-items: flex-start; }
+.fb-page .privacy .ico { margin-block-start: var(--sp-50); }
+.n-form .hero-foot .cap { font-size: var(--f-p); line-height: var(--lh-p); }
+
+/* Notatki o zespole: jedna akcja na osobę w postaci z obrysem, osoby bez notatek w jednej zwartej liście */
+.pn-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-100) var(--sp-300); }
+.pn-acts > a:not(.btn) { display: inline-flex; align-items: center; min-block-size: var(--sp-500); font-weight: var(--w-bold); }
+.pn-silence { color: var(--text-2); }
+.pn-rows { list-style: none; padding: 0; display: grid; }
+.pn-rows > li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-100) var(--sp-300); padding-block: var(--sp-200); border-block-start: 1px solid var(--line); }
+.pn-rows > li:first-child { border-block-start: 0; padding-block-start: 0; }
+.pn-rows > li:last-child { padding-block-end: 0; }
+.pn-who { display: grid; gap: var(--sp-50); min-inline-size: 0; }
+.pn-who span { color: var(--text-2); }
+.person-notes .note-item .btns { margin-block-start: calc(var(--sp-100) * -1); }
+.person-notes .note-item .btn.text { padding-inline: 0; min-block-size: var(--sp-500); border-radius: var(--r-50); font-weight: var(--w-regular); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
+
+/* stany puste i sukces: jedno zdanie, co się stało, i drugie, co dalej */
+.nl-empty { display: grid; gap: var(--sp-50); padding-block: var(--sp-300); max-inline-size: 66ch; }
+.st.ok small { font-size: var(--f-p); line-height: var(--lh-p); }
+
+/* Docenienie */
+.ap-empty { display: grid; gap: var(--sp-200); }
+.ap-back { margin-block-start: var(--sp-300); }
+.ap-back a { display: inline-flex; align-items: center; min-block-size: var(--hit); font-weight: var(--w-bold); }
+.b-sec .note-item .btn.text { padding-inline: 0; justify-self: start; }
+
 
 /* --- koniec sekcji forms-states (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
 /* . */
