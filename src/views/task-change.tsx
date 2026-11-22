@@ -2,15 +2,15 @@ import type { Card } from "../content";
 import type { DevelopmentForm } from "../office-settings";
 import type { Note } from "../notes/repo";
 import type { Person } from "../people";
-import { LegalBasis, PageHeader } from "./components";
+import { ErrorSummary, FieldError, LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 import { criterion } from "../engine/scoring";
 
 /** Formularz pytania; używany też na ekranie „Przed rozmową” przy zaległej odpowiedzi. */
-export function TaskChangeForm(props: { note: Note }) {
+export function TaskChangeForm(props: { note: Note; error?: string }) {
   return (
-    <form method="post" action={`/notes/${props.note.id}/task-change`} class="btns">
-      <button class="btn primary" type="submit" name="answer" value="yes">Tak, stała zmiana</button>
+    <form method="post" action={`/notes/${props.note.id}/task-change`} class="btns" aria-describedby={props.error ? "answer-error" : undefined}>
+      <button class="btn primary" type="submit" name="answer" value="yes" id={props.error ? "answer" : undefined}>Tak, stała zmiana</button>
       <button class="btn" type="submit" name="answer" value="no">Nie, chwilowe zastępstwo</button>
     </form>
   );
@@ -23,6 +23,7 @@ export function TaskChangeQuestionView(props: { viewer: Person; today: string; n
     <Layout title="To stała zmiana zadań?" person={props.viewer} today={props.today}>
       <PageHeader context={<>Notatka z {formatDate(n.date)}</>} title="To stała zmiana zadań?" />
       <section class="card q-hero">
+        <ErrorSummary errors={{ answer: props.error }} title="Wybierz odpowiedź" />
         <p>W tej notatce zaznaczono zmianę zadań {props.subjectGenitive}.</p>
         <blockquote class="note-quote">
           <p class="note-text">{n.text}</p>
@@ -32,8 +33,8 @@ export function TaskChangeQuestionView(props: { viewer: Person; today: string; n
           {ifYes ? <li>{ifYes}</li> : null}
           {ifNo ? <li>{ifNo}</li> : null}
         </ul>
-        {props.error ? <p class="req" role="alert">{props.error}</p> : null}
-        <TaskChangeForm note={n} />
+        <FieldError id="answer" message={props.error} />
+        <TaskChangeForm note={n} error={props.error} />
         <a class="btn text b-later" href="/notes">Zdecyduję później</a>
       </section>
     </Layout>

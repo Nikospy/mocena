@@ -99,7 +99,7 @@ app.post("/notes/:noteId/task-change", async (c) => {
   const answer = raw === "yes" || raw === "no" ? raw : null;
   if (!answer) {
     return c.html(
-      <TaskChangeQuestionView viewer={g.viewer} today={today()} note={g.note} card={card("taskChange")} subjectGenitive={subjectGenitive(g.note)} error="Wybierz „Tak” albo „Nie”." />,
+      <TaskChangeQuestionView viewer={g.viewer} today={today()} note={g.note} card={card("taskChange")} subjectGenitive={subjectGenitive(g.note)} error="Wybierz „Tak, stała zmiana” albo „Nie, chwilowe zastępstwo”." />,
       422,
     );
   }
