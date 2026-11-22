@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { assessmentState } from "../assessment/state";
 import { effectiveDeadline, previousCycleOf } from "../cycles";
+import { part1DeadlinesAfterObjection } from "../cycles/part1";
 import { cycleState } from "../hr/cycle-state";
 import { latestCycles, pendingReassessmentPredecessor } from "../hr/latest-cycles";
 import { EXPORT_HEADER } from "../hr/csv-import";
@@ -33,12 +34,13 @@ app.get("/hr/export.csv", (c) => {
     const objectionState = previous ? assessmentState(previous.id) : latest;
     const objection = objectionState.objection?.resolvedOn ? null : objectionState.objectionDeadline;
     const last = lastAssessmentOf(cycle.person_id);
+    const previousDeadline = part1DeadlinesAfterObjection(cycle.id, deadline.date)?.previous;
     return [
       person?.name ?? cycle.person_id,
       person?.position_title ?? "",
       person?.unit ?? "",
       personById(cycle.appraiser_id)?.name ?? cycle.appraiser_id,
-      state.text,
+      previousDeadline ? `${state.text}. Termin przekazany w części I: ${formatDate(previousDeadline.date)}.` : state.text,
       formatDate(deadline.date),
       objection ? formatDate(objection) : "",
       last ? formatDate(last.on) : "",

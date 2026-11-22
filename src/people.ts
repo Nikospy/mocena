@@ -33,7 +33,7 @@ const PROCESS_ROLE: Record<"appraiser" | "employee", Record<"f" | "m", string>> 
 export function roleLabel(p: Pick<Person, "role" | "gender">): string {
   if (p.role === "hr") return "kadry";
   if (p.role === "admin") return "administrator";
-  return PROCESS_ROLE[p.role][p.gender ?? "m"];
+  return PROCESS_ROLE[p.role][p.gender === "f" ? "f" : "m"];
 }
 
 export function personById(id: string): Person | null {

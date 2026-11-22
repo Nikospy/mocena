@@ -2,6 +2,7 @@ import { actsAsAppraiser } from "./substitutions";
 // Oś czasu cyklu oceny: fakty z widocznych wpisów i terminy wyliczone z przepisów (te widać także w przyszłości).
 import { registerCycleLinks } from "./cycle-links";
 import { cycleById, cycleDeadlineDetails, openCycle, visibleAbsences, type Cycle } from "./cycles";
+import { part1DeadlinesAfterObjection } from "./cycles/part1";
 import { romanGrade } from "./engine/grades";
 import { OBJECTION_OUTCOME_TEXT } from "./assessment/state";
 import { rules, rulesVersion } from "./engine/rules";
@@ -176,14 +177,15 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
   } else {
     const changed = details.change !== null;
     const extended = details.deadline !== details.base;
+    const previous = part1DeadlinesAfterObjection(cycleId, details.deadline)?.previous;
+    const changeNote = changed
+      ? `Termin zmieniony przez oceniającego z ${formatDate(details.change!.from)}${details.extensionDays > 0 ? ", dodatkowo przedłużony z powodu nieobecności dłuższej niż miesiąc" : ""}.`
+      : extended ? `Termin bazowy ${formatDate(details.base)} przedłużony z powodu nieobecności dłuższej niż miesiąc.` : "";
+    const previousNote = previous ? `Termin przekazany w części I: ${formatDate(previous.date)}.` : "";
     entries.push({
       date: details.deadline,
       title: "Termin oceny",
-      detail: changed
-        ? `Termin zmieniony przez oceniającego z ${formatDate(details.change!.from)}${details.extensionDays > 0 ? ", dodatkowo przedłużony z powodu nieobecności dłuższej niż miesiąc" : ""}.`
-        : extended
-          ? `Termin bazowy ${formatDate(details.base)} przedłużony z powodu nieobecności dłuższej niż miesiąc.`
-          : undefined,
+      detail: [changeNote, previousNote].filter(Boolean).join(" ") || undefined,
       basis: details.basis,
       kind: "deadline",
       struck: changed ? details.change!.from : extended ? details.base : undefined,

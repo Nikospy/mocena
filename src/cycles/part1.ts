@@ -29,6 +29,19 @@ export function part1Status(cycleId: string): {
   return { state: rows ? "draft" : "not_started" };
 }
 
+/** Rozróżnia termin przekazany przed rozstrzygnięciem sprzeciwu i bieżący termin następnego cyklu. */
+export function part1DeadlinesAfterObjection(cycleId: string, currentDate?: string) {
+  const events = visibleEvents(cycleId);
+  const startedAt = events.findLastIndex((event) => event.type === "cycle_started");
+  const reason = events[startedAt]?.payload.reason;
+  if (reason !== "previous_assessment_changed" && reason !== "previous_assessment_redone") return null;
+  const submitted = events.slice(0, startedAt).find((event) => event.type === "part1_submitted")?.payload;
+  if (!submitted?.dueDate) return null;
+  const current = currentDate ?? effectiveDeadline(cycleId).date;
+  if (submitted.dueDate === current) return null;
+  return { current, previous: { date: submitted.dueDate as string, basis: (submitted.dueDateBasis ?? []) as string[] } };
+}
+
 /**
  * Początek okresu podlegania ocenie w części II arkusza: dzień ustalenia kryteriów
  * (potwierdzenie części I, a gdy go brak: przekazanie części I). Termin oceny liczy się osobno (art. 81 ust. 4 ustawy).

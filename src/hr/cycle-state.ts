@@ -1,7 +1,7 @@
 import { OBJECTION_OUTCOME_TEXT as OUTCOME_TEXT, assessmentState } from "../assessment/state";
 import { cycleById, effectiveDeadline } from "../cycles";
 import { pendingRequest } from "../deadline-change";
-import { part1Status } from "../cycles/part1";
+import { part1DeadlinesAfterObjection, part1Status } from "../cycles/part1";
 import { criteriaTalkDeadline, objectionReviewDeadline } from "../engine/deadlines";
 import { rules } from "../engine/rules";
 import { visibleEvents } from "../events";
@@ -30,7 +30,7 @@ export type CycleState = {
   /** Termin sporządzenia oceny minął (tylko kroki przed zatwierdzeniem oceny). */
   overdue?: boolean;
   since?: string;
-  /** Drugi termin w wierszu, np. ponowna ocena po ocenie negatywnej (art. 81 ust. 9 ustawy). */
+  /** Drugi termin w wierszu, np. ponowna ocena po negatywnej albo termin przekazany w części I. */
   second?: { label: string; date: string; basis: string[] };
   /** Dalszy ciąg opisu stanu: w tabeli zwinięty pod „Szczegóły”. */
   more?: string;
@@ -137,7 +137,12 @@ export function cycleState(cycleId: string): CycleState {
   const p1 = part1Status(cycleId);
   if (p1.state === "confirmed") {
     const d = effectiveDeadline(cycleId);
-    return { step: "in_period", text: "Okres oceny trwa", deadline: d, deadlineLabel: "Termin oceny", overdue: d.date < now, since: p1.confirmedOn };
+    const previous = part1DeadlinesAfterObjection(cycleId, d.date)?.previous;
+    return {
+      step: "in_period", text: "Okres oceny trwa", deadline: d, deadlineLabel: "Termin oceny",
+      overdue: d.date < now, since: p1.confirmedOn,
+      ...(previous ? { second: { label: "Termin przekazany w części I", ...previous } } : {}),
+    };
   }
   if (p1.state === "submitted") {
     const days = p1.waitingDays ?? 0;

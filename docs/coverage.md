@@ -1,6 +1,6 @@
 # Pokrycie listy czynności organizatora
 
-Organizator zadania podał 30 czynności procesu oceny okresowej. Kryterium sukcesu prototypu: co najmniej 15 działa, a pozostałe mają widoczny stan albo są jawnie nazwane jako poza prototypem. Ten dokument pokazuje, jak wygląda to w kodzie (stan na 22.11.2026, `bun test`: 395 testów przechodzi). Opisy czynności są skrótami autora, nie brzmieniem z materiałów organizatora.
+Organizator zadania podał 30 czynności procesu oceny okresowej. Kryterium sukcesu prototypu: co najmniej 15 działa, a pozostałe mają widoczny stan albo są jawnie nazwane jako poza prototypem. Ten dokument pokazuje, jak wygląda to w kodzie (stan na 22.11.2026, `bun test`: 397 testów przechodzi). Opisy czynności są skrótami autora, nie brzmieniem z materiałów organizatora.
 
 ## Podsumowanie
 
