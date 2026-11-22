@@ -3,6 +3,7 @@ import { rmSync } from "node:fs";
 import { createSchema, setDb } from "./db";
 import { seedBase } from "./seed/base";
 import { seedPart1 } from "./seed/part1";
+import { seedAssessments } from "./seed/assessments";
 
 export type SeedOptions = { liveStep2?: boolean; afterStep1?: boolean };
 
@@ -12,7 +13,8 @@ export function runSeed(db: Database, options: SeedOptions = {}): void {
   createSchema(db);
   seedBase(opts);
   seedPart1(opts);
-  // Kolejne plastry dopisują tu swoje moduły: notes, assessments, absences.
+  // Kolejne plastry dopisują tu swoje moduły w kolejności: notes, assessments, absences.
+  seedAssessments();
 }
 
 if (import.meta.main) {

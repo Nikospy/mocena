@@ -535,3 +535,25 @@ h2, h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w
 .st-none:empty { display: none; }
 .verdict-box .reason { padding-inline-start: var(--sp-250); }
 .crit .scorebox .big { font-size: var(--f-h2); line-height: var(--lh-h2); font-weight: var(--w-bold); }
+
+/* S-06 hr-overview-and-print */
+.sheet-doc > * + * { margin-block-start: var(--sp-300); }
+.sheet-part > * + * { margin-block-start: var(--sp-150); }
+.sheet-field p { font-weight: var(--w-bold); }
+.sheet-field .lbl { margin-block-end: var(--sp-50); }
+.sheet-actions > * + * { margin-block-start: var(--sp-100); }
+.sheet-confirms { display: grid; gap: var(--sp-200); }
+@media (min-width: 760px) { .sheet-confirms { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sheet-matrix { inline-size: 100%; border-collapse: collapse; font-size: var(--f-c1); line-height: var(--lh-c1); }
+.sheet-matrix th, .sheet-matrix td { border: 1px solid var(--border-strong); padding: var(--sp-100); text-align: center; vertical-align: middle; }
+.sheet-matrix th[scope="row"], .sheet-matrix thead th:first-child { text-align: start; }
+.sheet-matrix small { display: block; font-weight: var(--w-regular); color: var(--text-3); }
+.sheet-notice > * + * { margin-block-start: var(--sp-100); }
+.print-footer { padding-block: var(--sp-200); border-block-start: 1px solid var(--line); }
+.hr-scroll { overflow-x: auto; }
+.hr-table { inline-size: 100%; min-inline-size: 720px; border-collapse: collapse; font-size: var(--f-c1); line-height: var(--lh-c1); }
+.hr-table th, .hr-table td { padding: var(--sp-150) var(--sp-100); text-align: start; vertical-align: top; border-block-end: 1px solid var(--line); }
+.hr-table thead th { color: var(--text-3); font-weight: var(--w-bold); }
+.hr-links { display: grid; gap: var(--sp-50); }
+.hr-stats { display: grid; gap: var(--sp-100); }
+.hr-actions { display: flex; flex-wrap: wrap; gap: var(--sp-100); }

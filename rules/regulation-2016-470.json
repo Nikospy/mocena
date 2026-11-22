@@ -135,6 +135,11 @@
     "positionChangeMinMonths": {
       "value": 6,
       "basis": "art. 81 ust. 6 ustawy"
+    },
+    "mandatoryGradeDays": {
+      "value": 30,
+      "basis": "art. 89 ust. 2 ustawy",
+      "from": "dzień zapoznania się z oceną"
     }
   },
   "criteria": [

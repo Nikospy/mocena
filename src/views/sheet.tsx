@@ -1,0 +1,270 @@
+import type { CycleLink } from "../cycle-links";
+import { METHOD_LABEL, REASON_LABEL } from "./assessment";
+import { rules } from "../engine/rules";
+import { criterion } from "../engine/scoring";
+import type { SheetData } from "../hr/sheet-data";
+import type { Person } from "../people";
+import { ConfirmationBlock, LegalBasis } from "./components";
+import { Layout, formatDate } from "./layout";
+
+const DASH = "—";
+
+export function SheetField(props: { label: string; children?: unknown }) {
+  const empty = props.children === null || props.children === undefined || props.children === "";
+  return (
+    <div class="sheet-field">
+      <span class="lbl">{props.label}</span>
+      <p>{empty ? DASH : (props.children as any)}</p>
+    </div>
+  );
+}
+
+export function PrintButton(props: { part1Href?: string }) {
+  return (
+    <div class="no-print sheet-actions">
+      <div class="btns">
+        <button class="btn primary" type="button" onclick="window.print()">
+          Drukuj / pobierz PDF
+        </button>
+        {props.part1Href ? (
+          <a class="btn text" href={props.part1Href}>
+            Drukuj część I
+          </a>
+        ) : null}
+      </div>
+      <p class="cap">Zapis do PDF wybierasz w oknie druku.</p>
+    </div>
+  );
+}
+
+export function ScoreMatrix(props: { rows: { id: string; kind: string; score: number | null }[] }) {
+  return (
+    <table class="sheet-matrix">
+      <thead>
+        <tr>
+          <th scope="col">Kryterium</th>
+          {rules.partialScale.map((s) => (
+            <th scope="col">
+              {s.points}
+              <small>{s.name}</small>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {props.rows.length === 0 ? (
+          <tr>
+            <td colspan={rules.partialScale.length + 1}>{DASH}</td>
+          </tr>
+        ) : (
+          props.rows.map((r) => (
+            <tr>
+              <th scope="row">
+                {criterion(r.id).name}
+                <small>{r.kind === "mandatory" ? "obowiązkowe" : "dodatkowe"}</small>
+              </th>
+              {rules.partialScale.map((s) => (
+                <td>{r.score === s.points ? "X" : ""}</td>
+              ))}
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  );
+}
+
+function Basis(props: { d: { date: string; basis: string[] } }) {
+  return (
+    <>
+      {formatDate(props.d.date)} <LegalBasis basis={props.d.basis} />
+    </>
+  );
+}
+
+function mean2(n: number): string {
+  return n.toFixed(2).replace(".", ",");
+}
+
+function PartyFields(props: { p: { name: string; positionTitle: string | null; unit: string | null }; sheet: string | null }) {
+  return (
+    <>
+      <SheetField label="Imię i nazwisko">{props.p.name}</SheetField>
+      <SheetField label="Stanowisko">{props.p.positionTitle}</SheetField>
+      {props.sheet === "A" ? null : <SheetField label="Komórka organizacyjna">{props.p.unit}</SheetField>}
+    </>
+  );
+}
+
+function Confirm(props: { c: { place: string; date: string; name: string } | null }) {
+  return props.c ? <ConfirmationBlock kind="confirmation" name={props.c.name} place={props.c.place} date={props.c.date} /> : <p class="sign">{DASH}</p>;
+}
+
+export function SheetFooter(props: { d: SheetData }) {
+  const { d } = props;
+  return (
+    <footer class="print-footer cap">
+      Arkusz {d.sheet ?? DASH} · wersja reguł {d.rulesVersion.version} z {formatDate(d.rulesVersion.effectiveFrom)} ({d.rulesVersion.act}) · stan na {formatDate(d.asOf)} · potwierdzenia złożono w systemie mOcena
+    </footer>
+  );
+}
+
+export function SheetView(props: { viewer: Person; today: string; data: SheetData; links: CycleLink[] }) {
+  const d = props.data;
+  const p1 = d.part1;
+  const p2 = d.part2;
+  const only1 = d.partOnly === 1;
+  const sheetHref = `/cycles/${d.cycleId}/sheet`;
+  return (
+    <Layout title="Arkusz oceny" person={props.viewer} today={props.today}>
+      <article class="sheet-doc">
+        <header class="hdr slim">
+          <h1>Arkusz oceny okresowej {d.sheet ? `(arkusz ${d.sheet})` : ""}</h1>
+          <p class="cap">{d.officeName}</p>
+          <div class="no-print">
+            <PrintButton part1Href={only1 ? undefined : `${sheetHref}?part=1`} />
+            {only1 ? (
+              <a class="btn text" href={sheetHref}>
+                Cały arkusz
+              </a>
+            ) : null}
+            {props.links.length ? (
+              <p class="cap">
+                {props.links.map((l) => (
+                  <a href={l.href}>{l.label} </a>
+                ))}
+              </p>
+            ) : null}
+          </div>
+        </header>
+
+        <section class="card sheet-part">
+          <h2>Część I</h2>
+          <SheetField label="Urząd">{d.officeName}</SheetField>
+          <h3>Oceniany</h3>
+          <PartyFields p={p1.appraisee} sheet={d.sheet} />
+          <h3>Oceniający</h3>
+          <PartyFields p={p1.appraiser} sheet={d.sheet} />
+          <h3>Kryteria obowiązkowe</h3>
+          {p1.mandatory.length ? (
+            <ul>{p1.mandatory.map((c) => <li>{criterion(c.id).name}</li>)}</ul>
+          ) : (
+            <p>{DASH}</p>
+          )}
+          <h3>Kryteria dodatkowe</h3>
+          {p1.additional.length ? (
+            <ul>
+              {p1.additional.map((c) => (
+                <li>
+                  {criterion(c.id).name}
+                  {c.expectation ? <small class="cap"> · oczekiwanie: {c.expectation}</small> : null}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>{DASH}</p>
+          )}
+          <SheetField label="Termin sporządzenia oceny">{p1.dueDate ? <Basis d={p1.dueDate} /> : null}</SheetField>
+          {p1.deadlineNote ? (
+            <p class="cap">
+              {p1.deadlineNote.label}: <Basis d={p1.deadlineNote.deadline} />
+            </p>
+          ) : null}
+          <p>Oświadczam, że przeprowadzono rozmowę o kryteriach i terminie oceny (§ 5 ust. 1 rozporządzenia) oraz że oceniany zapoznał się z kryteriami i terminem.</p>
+          <div class="sheet-confirms">
+            <div>
+              <span class="lbl">Potwierdzenie oceniającego</span>
+              <Confirm c={p1.appraiserConfirmation} />
+            </div>
+            <div>
+              <span class="lbl">Potwierdzenie ocenianego</span>
+              <Confirm c={p1.appraiseeConfirmation} />
+            </div>
+          </div>
+        </section>
+
+        {only1 ? null : (
+          <>
+            <section class="card sheet-part">
+              <h2>Część II</h2>
+              <SheetField label="Data rozmowy oceniającej">{p2.interviewDate ? formatDate(p2.interviewDate) : null}</SheetField>
+              <SheetField label="Okres podlegania ocenie">
+                od {formatDate(p2.periodFrom)} do {p2.periodTo ? formatDate(p2.periodTo) : DASH}
+              </SheetField>
+              <h3>Oceny cząstkowe</h3>
+              <ScoreMatrix rows={p2.rows} />
+              <SheetField label="Średnia ocen cząstkowych">{p2.mean === null ? null : mean2(p2.mean)}</SheetField>
+              <h3>Ogólny poziom spełniania kryteriów</h3>
+              <table class="sheet-matrix">
+                <tbody>
+                  <tr>
+                    {rules.overallLevels.map((l) => (
+                      <td>
+                        {l.name}
+                        <b>{p2.overallLevel === l.name ? " X" : ""}</b>
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+              <h3>Ocena okresowa</h3>
+              <table class="sheet-matrix">
+                <tbody>
+                  <tr>
+                    <td>POZYTYWNA {p2.outcome === "positive" ? "X" : ""}</td>
+                    <td>NEGATYWNA {p2.outcome === "negative" ? "X" : ""}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <section class="card sheet-part">
+              <h2>Dalsza część</h2>
+              <SheetField label="Uzasadnienie przyznanej oceny">{p2.justification}</SheetField>
+              <SheetField label="Wnioski do indywidualnego programu rozwoju zawodowego">{p2.developmentConclusions}</SheetField>
+              {p2.previous === null ? null : (
+                <SheetField label="Dane poprzedniej oceny">
+                  {p2.previous === "none"
+                    ? "brak w systemie"
+                    : `${formatDate(p2.previous.approvedOn)}, ${p2.previous.outcome === "positive" ? "pozytywna" : "negatywna"}, ${p2.previous.overallLevel}`}
+                </SheetField>
+              )}
+              <SheetField label="Czy dołączono wniosek o kolejny stopień służbowy">
+                {p2.gradeRequest === "yes" ? "TAK" : p2.gradeRequest === "no" ? "NIE" : p2.gradeRequest === "not_applicable" ? "NIE DOTYCZY" : null}
+              </SheetField>
+              <SheetField label="Dane oceniającego">{p1.appraiser.name}</SheetField>
+              <div class="sheet-confirms">
+                <div>
+                  <span class="lbl">Potwierdzenie oceniającego</span>
+                  <Confirm c={p2.appraiserConfirmation} />
+                </div>
+                <div>
+                  <span class="lbl">Potwierdzenie ocenianego (rozmowa oceniająca, zapoznanie z oceną i wnioskami)</span>
+                  {p2.fiction ? (
+                    <ConfirmationBlock
+                      kind="fiction"
+                      name={p2.fiction.appraiserName}
+                      reason={REASON_LABEL[p2.fiction.reason]}
+                      deliveryMethod={METHOD_LABEL[p2.fiction.deliveryMethod]}
+                      deliveredOn={p2.fiction.deliveredOn}
+                      date={p2.fiction.date}
+                    />
+                  ) : (
+                    <Confirm c={p2.appraiseeConfirmation} />
+                  )}
+                </div>
+              </div>
+              <section class="rule sheet-notice" id="pouczenie">
+                <h3>Pouczenie</h3>
+                <p>
+                  Od oceny przysługuje sprzeciw do {p2.objectionTo} w terminie 7 dni od dnia zapoznania się z oceną (art. 83 ust. 1 ustawy).
+                </p>
+              </section>
+            </section>
+          </>
+        )}
+        <SheetFooter d={d} />
+      </article>
+    </Layout>
+  );
+}

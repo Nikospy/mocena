@@ -23,6 +23,7 @@ export function Layout(props: { title: string; person: Person | null; today: str
         <title>{props.title} · mOcena</title>
         <link rel="stylesheet" href="/rodzina.css" />
         <link rel="stylesheet" href="/style.css" />
+        <link rel="stylesheet" href="/print.css" media="print" />
       </head>
       <body>
         <header class="top">
