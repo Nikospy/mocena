@@ -86,11 +86,11 @@ app.post("/people/:personId/notes", async (c) => {
   const taskChange = str(body.task_change) !== "";
   const errors: Partial<Record<"criterion_id" | "text" | "date", string>> = {};
   if (!CRITERIA.some((k) => k.id === criterionId)) errors.criterion_id = "Wybierz kryterium.";
-  if (text.length < 1 || text.length > 2000) errors.text = text ? "Notatka może mieć najwyżej 2000 znaków." : "Wpisz, co się wydarzyło.";
+  if (text.length < 1 || text.length > 2000) errors.text = text ? "Notatka może mieć najwyżej 2000 znaków." : "Wpisz, co się stało.";
   const rawDate = str(body.date).trim();
   const date = rawDate || today();
-  if (!isIsoDate(date)) errors.date = "Podaj poprawną datę.";
-  else if (date > today()) errors.date = "Data nie może być późniejsza niż dziś.";
+  if (!isIsoDate(date)) errors.date = "Wybierz datę z kalendarza.";
+  else if (date > today()) errors.date = "Wybierz dzisiejszą albo wcześniejszą datę.";
   const values: NoteFormValues = { criterion_id: criterionId, text: str(body.text), rating, task_change: taskChange, date };
   if (Object.keys(errors).length > 0) {
     const suggestion = taskChange ? await suggestForNote(text) : null;

@@ -1,5 +1,5 @@
 import { CRITERIA } from "../engine/scoring";
-import { PageHeader } from "./components";
+import { ErrorSummary, FieldError, PageHeader, invalid } from "./components";
 import type { Person } from "../people";
 import type { NoteSuggestion } from "../suggestions";
 import { Layout, formatDateLong } from "./layout";
@@ -37,26 +37,21 @@ export function NoteFormView(props: {
       <section class="enter">
         <PageHeader title={<>Nowa notatka: {props.subject.name}</>} />
         <form method="post" action={`/people/${props.subject.id}/notes`} class="n-form" id="note-form">
-          <div class="who-block">
-            <div class="who-row">
-              <div class="tok">
-                <span class="k">O kim</span>
-                <span class="v">{props.subject.name}</span>
-              </div>
-              <label class="tok" for="date">
-                <span class="k">Kiedy</span>
-                <input class="tok-date" type="date" id="date" name="date" max={props.today} value={v.date} aria-describedby="date-words" />
-              </label>
-            </div>
+          <ErrorSummary errors={{ date: e.date, text: e.text, criterion_id: e.criterion_id }} />
+
+          <div class="field nf-date">
+            <label class="lbl" for="date">Kiedy</label>
+            <FieldError id="date" errors={e} />
+            <input class="area" type="date" id="date" name="date" max={props.today} value={v.date} {...invalid("date", e, "date-words")} />
             <p class="date-words" id="date-words" data-date-words-for="date">{v.date ? formatDateLong(v.date) : ""}</p>
-            {e.date ? <p class="st bad" role="alert">{e.date}</p> : null}
           </div>
 
           <div class="card hero-field">
             <label for="text"><h2>Co się stało</h2></label>
-            <textarea id="text" name="text" rows={5} aria-invalid={e.text ? "true" : undefined}>{v.text}</textarea>
-            {e.text ? <p class="st bad" role="alert">{e.text}</p> : null}
+            <FieldError id="text" errors={e} />
+            <textarea id="text" name="text" rows={5} {...invalid("text", e, "text-privacy")}>{v.text}</textarea>
             <div class="hero-foot">
+              <p class="cap" id="text-privacy">Pracownik nie widzi notatki na swoim koncie. Na wniosek urząd mu ją wydaje.</p>
               <p class="sign">
                 <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5" /><path d="M5 20a7 7 0 0 1 14 0" /></svg>
                 {props.viewer.name} · {formatDateLong(props.today)}
@@ -65,22 +60,22 @@ export function NoteFormView(props: {
           </div>
 
           <div class="n-fields">
-            <div role="radiogroup" aria-labelledby="l-krit">
+            <div role="radiogroup" aria-labelledby="l-krit" {...(e.criterion_id ? { "aria-describedby": "criterion_id-error" } : {})}>
               <span class="lbl" id="l-krit">Kryterium</span>
-              {props.groups.map((g) => (
+              <FieldError id="criterion_id" errors={e} />
+              {props.groups.map((g, gi) => (
                 <>
-                  {props.groups.length > 1 ? <p class="cap">{g.label}</p> : null}
+                  {props.groups.length > 1 ? <p class="cap nf-group">{g.label}</p> : null}
                   <div class="chips">
-                    {g.ids.map((id) => (
+                    {g.ids.map((id, i) => (
                       <label class="chip">
-                        <input type="radio" name="criterion_id" value={id} checked={v.criterion_id === id} />
+                        <input type="radio" name="criterion_id" value={id} id={gi === 0 && i === 0 ? "criterion_id" : undefined} checked={v.criterion_id === id} />
                         <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>{CRITERIA.find((c) => c.id === id)?.name ?? id}</span>
                       </label>
                     ))}
                   </div>
                 </>
               ))}
-              {e.criterion_id ? <p class="st bad" role="alert">{e.criterion_id}</p> : null}
             </div>
             <div role="radiogroup" aria-labelledby="l-tb">
               <span class="lbl" id="l-tb">To było</span>
@@ -98,7 +93,7 @@ export function NoteFormView(props: {
           </div>
 
           <div class="hint">
-            <p class="voice hint-v"><span>Podpowiedź · możesz odznaczyć</span></p>
+            <p class="voice hint-v"><span>Podpowiedź (ustawienie urzędu)</span></p>
             <label class="cb">
               <input type="checkbox" id="task_change" name="task_change" value="1" checked={v.task_change} aria-describedby="task-change-hint" />
               <span class="box">
@@ -111,11 +106,11 @@ export function NoteFormView(props: {
             </label>
           </div>
 
-          <div class="actionbar">
-            <button class="btn primary full" type="submit">Zapisz notatkę</button>
+          <div class="actionbar nf-actions">
+            <button class="btn primary" type="submit">Zapisz notatkę</button>
           </div>
         </form>
-        <p class="again"><a class="btn text" href="/notes">Notatki o zespole</a></p>
+        <p class="nf-back"><a href="/notes">Wróć do notatek o zespole</a></p>
       </section>
       <script src="/note-form.js" defer></script>
       <script src="/date-words.js" defer></script>
