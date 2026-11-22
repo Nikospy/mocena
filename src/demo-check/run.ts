@@ -491,7 +491,13 @@ const tourStops: TourStopCheck[] = [
       includes(r.html, "14.12.2026", "termin przyznania stopnia 14.12.2026");
       const tl = await s.get("/cycles/cycle-piotr/timeline");
       includes(tl.html, "30.11.2026", "termin sprzeciwu 30.11.2026 po zapoznaniu 22.11.2026");
-      return "stopień Tomasza do 14.12.2026, zapoznanie Piotra 22.11.2026, sprzeciw do 30.11.2026";
+      includes(r.html, /Rozmowa o kryteriach do:\s*30\.11\.2026/, "termin kryteriów nowego cyklu Piotra");
+      await s.login("marek");
+      const home = await s.get("/");
+      const cycle = cycleIdFor(home.html, "Piotr Wójcik");
+      if (cycle === "cycle-piotr" || cycle === "cycle-piotr-2022") throw new Mismatch("nowego cyklu", cycle);
+      includes(home.html, "§ 7 pkt 2", "sprawa Marka z terminem kryteriów po ocenie negatywnej");
+      return "stopień Tomasza do 14.12.2026, zapoznanie Piotra, sprzeciw i kryteria nowego cyklu do 30.11.2026";
     },
   },
 ];
