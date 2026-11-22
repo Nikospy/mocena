@@ -1,5 +1,7 @@
 # final-polish: poprawki przed oddaniem (22.11.2026)
 
+Stan: **zarchiwizowana 22.11.2026** — zmiana zakończona, wszystkie paczki scalone na `main`; zlecenia robocze paczek i spis pomiaru wyglądu (`coverage.md`) zostają jako dokumentacja.
+
 Decyzja autora z 22.11 ok. 03:15: „z twojego przeglądu naprawiamy wszystko, co tam było do zaznaczenia i poprawy, oraz naprawiamy wszystko, co ten grog nam tutaj pokazał”.
 
 Źródła: przegląd wyglądu (17 punktów, pomiar `scripts/design-audit.ts`) i zewnętrzny audyt wymogów zadania. Praca idzie w ośmiu paczkach równolegle, każda na swojej gałęzi i w swoim worktree:

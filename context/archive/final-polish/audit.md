@@ -2,7 +2,7 @@
 
 Cel: żaden ekran ani stan aplikacji nie zostaje bez zrzutu i pomiaru. Pierwszy przegląd objął tylko 27 stanów z pokazu; autor: „całość, dosłownie CAŁOŚĆ naszego projektu ma być na doskonałym poziomie, żadnego więcej pomijania”. Zasady wspólne: `change.md`.
 
-Wolno zmieniać: `scripts/design-audit.ts` (jesteś jego właścicielem; paczka „wygląd” go nie rusza), nowe pliki w `scripts/`, `context/changes/final-polish/coverage.md`. Kodu aplikacji i CSS nie zmieniasz.
+Wolno zmieniać: `scripts/design-audit.ts` (jesteś jego właścicielem; paczka „wygląd” go nie rusza), nowe pliki w `scripts/`, `context/archive/final-polish/coverage.md`. Kodu aplikacji i CSS nie zmieniasz.
 
 1. **Spis powierzchni** w `coverage.md`: tabela wszystkich tras GET z `src/routes/` i `src/index.tsx` × role, które mają do nich dostęp × stany (pusty, wypełniony, po błędzie walidacji, po sukcesie, zablokowany, 403/404). Każdy wiersz ma nazwę zrzutu. Trasa bez zrzutu to błąd tej paczki.
 2. **Rozszerz skrypt**, żeby robił zrzut i pomiar każdego wiersza spisu:

@@ -90,7 +90,7 @@ Skrypt wywołuje `wrangler deploy` na podstawie `wrangler.jsonc`. Każdy widz do
 - `rules/`: przepisy i ustawienia urzędu w plikach JSON z wersją
 - `public/`: style i fonty
 - `scripts/`: skrypty pomocnicze
-- `context/`: dokumentacja projektu, w tym decyzje, PRD i plany zmian. Katalogi `context/changes/<nazwa>/` zawierają plany i zlecenia kolejnych zmian, a `context/changes/final-polish/` zawiera zlecenia końcowych poprawek i spis pomiarów wyglądu.
+- `context/`: dokumentacja projektu, w tym decyzje, PRD i plany zmian. Katalogi `context/changes/<nazwa>/` zawierają plany i zlecenia kolejnych zmian, a `context/archive/final-polish/` zawiera zarchiwizowane zlecenia końcowych poprawek i spis pomiarów wyglądu.
 - `README.md`, `package.json`, `wrangler.jsonc`: opis, skrypty i konfiguracja wdrożenia
 
 Dokumentacja projektu: [decyzje](context/foundation/decisions.md), [PRD](context/foundation/prd.md), [roadmapa](context/foundation/roadmap.md).
