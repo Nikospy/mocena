@@ -119,7 +119,7 @@ export function TourPanel(props: TourPanelProps) {
   const hint = nextHint(props);
   return (
     <>
-      <aside class="gpanel" aria-label="Przewodnik pokazu">
+      <aside class="gpanel" id="tour-guide" tabindex={-1} aria-label="Przewodnik pokazu">
         <Head {...props} />
         <Body {...props} withSelectors />
         <div class="gp-f">
@@ -128,7 +128,7 @@ export function TourPanel(props: TourPanelProps) {
           <small>{hint}</small>
         </div>
       </aside>
-      <aside class="gmob" aria-label="Przewodnik pokazu (telefon)">
+      <aside class="gmob" id="tour-guide-m" tabindex={-1} aria-label="Przewodnik pokazu (telefon)">
         <details data-gmob>
           <summary>
             <span class="gm-t">{props.stop.title}</span>

@@ -850,3 +850,13 @@ body.tour-on .nav { display: none; }
 .skip-link { position: absolute; inset-inline-start: var(--sp-100); inset-block-start: var(--sp-100); z-index: 100; padding: var(--sp-100) var(--sp-200); background: var(--surface); color: var(--primary); border-radius: var(--r-300); font-weight: var(--w-semibold, 600); transform: translateY(-200%); }
 .skip-link:focus, .skip-link:focus-visible { transform: none; }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: none; box-shadow: var(--focus); }
+
+/* review-polish-2-3 */
+.gp-b h2, .gm-t, .e-h1 { text-wrap: balance; }
+.gp-f .btn.primary, .gm-bar .btn.primary { white-space: nowrap; font-size: var(--f-c1); line-height: var(--lh-c1); padding-inline: var(--sp-150); }
+.gp-f .btn.primary > span { white-space: nowrap; }
+.gpanel:focus, .gmob:focus { outline: none; }
+.demo-today { color: var(--text-2); }
+.e-done { inline-size: 100%; margin-inline: auto; }
+.e-more .btn.text { padding-inline: 0; justify-content: flex-start; }
+.e-more .btn.text:hover { background: none; text-decoration: underline; }

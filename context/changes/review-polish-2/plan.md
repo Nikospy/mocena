@@ -93,7 +93,7 @@ Testy: `src/routes/polish2-d.test.ts`: formularze zawierają datę słownie dla 
 
 #### Automated
 
-- [ ] 3.1 Testy fazy i cały zestaw: `bun test src/routes/tour.test.ts`, `bun test`
+- [x] 3.1 Testy fazy i cały zestaw: `bun test src/routes/tour.test.ts`, `bun test`
 
 ### Phase 4: Pola dat
 
