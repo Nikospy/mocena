@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { getDb } from "./db";
-import { call, html } from "./routes/hr-test-helpers";
-import { createTestApp } from "./test-helpers";
+import { getDb } from "../db";
+import { call, html } from "./hr-test-helpers";
+import { createTestApp } from "../test-helpers";
 
 const criteria = () => getDb().query("SELECT * FROM cycle_criteria WHERE cycle_id = 'cycle-piotr' ORDER BY criterion_id").all();
 

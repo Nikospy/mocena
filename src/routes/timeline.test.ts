@@ -20,3 +20,11 @@ describe("GET /cycles/:id/timeline", () => {
     expect(h).toContain("art. 81 ust. 4 ustawy");
   });
 });
+
+describe("oś Ewy po zmianie oceniającego", () => {
+  test("2024-12-09: wpis z § 9 ust. 3 na koncie Marka, brak na koncie Ewy", async () => {
+    const { app } = createTestApp({ today: "2024-12-09" });
+    expect(await html(app, "marek", "/cycles/cycle-ewa/timeline")).toContain("§ 9 ust. 3");
+    expect(await html(app, "ewa", "/cycles/cycle-ewa/timeline")).not.toContain("§ 9 ust. 3");
+  });
+});
