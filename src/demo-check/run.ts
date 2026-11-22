@@ -165,7 +165,7 @@ const steps: Step[] = [
       includes(home.html, "27.12.2024", "termin rozmowy o kryteriach 27.12.2024 na stronie głównej Marka");
       ctx.cycleId = cycleIdFor(home.html, "Piotr Wójcik");
       const part1 = await s.get(`/cycles/${ctx.cycleId}/part1`);
-      includes(part1.html, /Arkusz C\b/, "arkusz C");
+      includes(part1.html, /arkusz C\b/i, "arkusz C");
       await s.post(`/cycles/${ctx.cycleId}/part1/criteria`, part1Form());
       await s.post(`/cycles/${ctx.cycleId}/part1/submit`, part1Form());
       await s.get(`/cycles/${ctx.cycleId}/cards/opening`);
