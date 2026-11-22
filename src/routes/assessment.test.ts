@@ -376,3 +376,31 @@ describe("dodatki: podgląd, pole wniosku o stopień, data rozmowy", () => {
     expect((events("assessment_approved")[0].payload as AssessmentSnapshot).interviewDate).toBe("2026-11-20");
   });
 });
+
+describe("S-04: notatki w formularzu oceny", () => {
+  test("krok 4: notatki przy kryteriach, jedno ostrzeżenie, karta rozmowy i odnośniki", async () => {
+    const app = fresh();
+    const html = await (await call(app, "marek", `/cycles/${piotr}/assessment`)).text();
+    expect(html).toContain("Orientacja na klienta/interesanta, 04.08.2025: Interesant dzwonił");
+    expect(html).toContain("<h1>Piotr Wójcik</h1>");
+    expect(html).toContain('data-target="developmentConclusions"');
+    expect(html.match(/Wszystkie notatki przy tym kryterium są z ostatniego miesiąca/g)).toHaveLength(1);
+    const think = html.slice(html.indexOf('data-crit="myslenie-analityczne"'));
+    expect(think.slice(0, think.indexOf("</article>"))).toContain("Brak notatek przy tym kryterium");
+    expect(html).toContain(`/cycles/${piotr}/cards/assessment-conversation`);
+    expect((await call(app, "piotr", `/cycles/${piotr}/assessment`)).status).toBe(200);
+    const pHtml = await (await call(app, "piotr", `/cycles/${piotr}/assessment`)).text();
+    expect(pHtml).not.toContain("Pismo do gminy");
+
+    const card = await call(app, "marek", `/cycles/${piotr}/cards/assessment-conversation`);
+    expect(card.status).toBe(200);
+    const cardHtml = await card.text();
+    expect(cardHtml).toContain("§ 10");
+    expect(cardHtml).toContain("kierunki dalszego rozwoju zawodowego");
+    expect((await call(app, "piotr", `/cycles/${piotr}/cards/assessment-conversation`)).status).toBe(403);
+
+    const part1 = await (await call(app, "marek", `/cycles/${piotr}/part1`)).text();
+    expect(part1).toContain(`/cycles/${piotr}/cards/assessment-conversation`);
+    expect(await (await call(app, "piotr", `/cycles/${piotr}/part1`)).text()).not.toContain("assessment-conversation");
+  });
+});

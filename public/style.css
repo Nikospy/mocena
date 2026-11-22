@@ -557,3 +557,11 @@ h2, h3 { font-size: var(--f-h6); line-height: var(--lh-h6); font-weight: var(--w
 .hr-links { display: grid; gap: var(--sp-50); }
 .hr-stats { display: grid; gap: var(--sp-100); }
 .hr-actions { display: flex; flex-wrap: wrap; gap: var(--sp-100); }
+/* S-04 notes-and-justification */
+.note-list { list-style: none; padding: 0; display: grid; gap: var(--sp-150); }
+.note-item { display: grid; gap: var(--sp-100); padding: var(--sp-150); border: 1px solid var(--line); border-radius: var(--ctl-r); background: var(--white); }
+.note-item .cb { min-block-size: 0; }
+.note-body { display: grid; gap: var(--sp-50); min-inline-size: 0; }
+.note-text { overflow-wrap: anywhere; }
+.crit-notes { display: grid; gap: var(--sp-150); margin-block-start: var(--sp-200); }
+.insert-tools { display: grid; gap: var(--sp-150); margin-block-end: var(--sp-200); }

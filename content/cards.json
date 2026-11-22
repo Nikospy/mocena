@@ -22,5 +22,29 @@
         "whatToDo": "Zapisz jedno konkretne zachowanie, które oceniający zobaczy, gdy kryterium jest spełnione."
       }
     ]
+  },
+  "assessment": {
+    "title": "Karta rozmowy oceniającej",
+    "purpose": "Rozmowa przed wystawieniem oceny: oceniający i oceniany wracają do całego okresu oceny, do faktów z notatek i do dalszego rozwoju.",
+    "questions": [
+      "Co w minionym okresie szło dobrze i dlaczego?",
+      "Które kryteria spełniałeś najlepiej, a przy których oczekiwania nie zostały osiągnięte?",
+      "Jakie cele z tego okresu udało się zrealizować, a jakie nie?",
+      "Jakiego wsparcia lub szkolenia potrzebujesz w następnym okresie?"
+    ],
+    "hardSituations": [
+      {
+        "situation": "Oceniany nie zgadza się z faktem, o którym mówi notatka.",
+        "whatToDo": "Wysłuchaj jego wersji, sprawdź datę i okoliczności; do uzasadnienia wpisz to, co potrafisz potwierdzić."
+      },
+      {
+        "situation": "Przy kryterium masz notatki tylko z ostatnich tygodni.",
+        "whatToDo": "Przypomnij sobie, co działo się wcześniej w okresie oceny, i zapytaj ocenianego; ocena obejmuje cały okres."
+      },
+      {
+        "situation": "Rozmowa schodzi na sprawy osobiste albo zdrowie.",
+        "whatToDo": "Wróć do pracy i kryteriów; sprawy osobiste nie należą do uzasadnienia oceny."
+      }
+    ]
   }
 }
