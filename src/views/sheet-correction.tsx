@@ -1,6 +1,6 @@
 import { CORRECTABLE_FIELDS, type CorrectableField, type CorrectionErrors, type SheetCorrection } from "../assessment/corrections";
 import type { Person } from "../people";
-import { PageHeader } from "./components";
+import { ErrorSummary, FieldError, PageHeader, invalid } from "./components";
 import { Layout, formatDate } from "./layout";
 
 const show = (field: CorrectableField, v: string) => (v ? (CORRECTABLE_FIELDS[field].kind === "date" ? formatDate(v) : v) : "—");
@@ -58,25 +58,26 @@ export function CorrectionFormView(props: {
         <section class="card form-card ct-form" aria-labelledby="h-corr-form">
           <h2 id="h-corr-form">Popraw pole</h2>
           <form method="post" action={`/cycles/${props.cycleId}/sheet/correction`} class="abs-form">
-            <div>
+            <ErrorSummary errors={{ field: e.field, value: e.value, reason: e.reason }} />
+            <div class="field">
               <label class="lbl" for="field">Pole do poprawienia</label>
-              <select class="area" id="field" name="field" aria-invalid={e.field ? "true" : undefined}>
+              <FieldError id="field" errors={e} />
+              <select class="area" id="field" name="field" {...invalid("field", e)}>
                 <option value="">Wybierz pole</option>
                 {fields.map((f) => (
                   <option value={f} selected={v.field === f}>{CORRECTABLE_FIELDS[f].label}</option>
                 ))}
               </select>
-              {e.field ? <p class="st bad" role="alert">{e.field}</p> : null}
             </div>
-            <div>
+            <div class="field">
               <label class="lbl" for="value">Poprawna wartość (data w postaci DD.MM.RRRR)</label>
-              <textarea class="area" id="value" name="value" rows={4} aria-invalid={e.value ? "true" : undefined}>{v.value}</textarea>
-              {e.value ? <p class="st bad" role="alert">{e.value}</p> : null}
+              <FieldError id="value" errors={e} />
+              <textarea class="area" id="value" name="value" rows={4} {...invalid("value", e)}>{v.value}</textarea>
             </div>
-            <div>
+            <div class="field">
               <label class="lbl" for="reason">Powód korekty</label>
-              <textarea class="area" id="reason" name="reason" rows={2} aria-invalid={e.reason ? "true" : undefined}>{v.reason}</textarea>
-              {e.reason ? <p class="st bad" role="alert">{e.reason}</p> : null}
+              <FieldError id="reason" errors={e} />
+              <textarea class="area" id="reason" name="reason" rows={2} {...invalid("reason", e)}>{v.reason}</textarea>
             </div>
             <p class="ct-actions">
               <button class="btn primary" type="submit">Zapisz korektę</button>
