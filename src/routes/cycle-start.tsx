@@ -1,4 +1,4 @@
-import { actsAsAppraiser } from "../substitutions";
+import { actsAsAppraiser, personsAppraisedBy } from "../substitutions";
 import { Hono, type Context } from "hono";
 import { card } from "../content";
 import { visibleCycleById, effectiveDeadline, openCycle, type Cycle } from "../cycles";
@@ -15,7 +15,6 @@ import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
 import { suggestCriteria } from "../suggestions";
 import { OpeningCardView, Part1View } from "../views/part1";
-import { getDb } from "../db";
 import { formatDate } from "../views/layout";
 import { activeInvitations, canInvite } from "../invitations";
 import { InvitationBlock } from "../views/invitation";
@@ -34,9 +33,9 @@ registerCycleLinks((cycle, person) =>
 registerHomeTasks((person) => {
   const tasks: HomeTask[] = [];
   if (person.role === "appraiser") {
-    for (const personId of appraiseeIds(person.id)) {
+    for (const personId of personsAppraisedBy(person.id)) {
       const cycle = openCycle(personId);
-      if (!cycle || cycle.appraiser_id !== person.id) continue;
+      if (!cycle || !actsAsAppraiser(cycle.appraiser_id, person.id)) continue;
       const { state } = part1Status(cycle.id);
       if (state === "submitted") {
         const submittedOn = part1Status(cycle.id).submittedOn;
@@ -73,10 +72,6 @@ registerHomeTasks((person) => {
   }
   return tasks;
 });
-
-function appraiseeIds(appraiserId: string): string[] {
-  return (getDb().query("SELECT DISTINCT person_id FROM cycles WHERE appraiser_id = ?").all(appraiserId) as { person_id: string }[]).map((r) => r.person_id);
-}
 
 const app = new Hono();
 

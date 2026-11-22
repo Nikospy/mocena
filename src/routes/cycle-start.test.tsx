@@ -152,6 +152,20 @@ describe("część I: stany formularza", () => {
     expect(html).toContain("Odznacz pozostałe.");
   });
 
+  test("zastępca widzi „Wyznacz kryteria” w czasie zastępstwa, po jego końcu nie; oceniający ma ją dalej", async () => {
+    const { app, db } = createTestApp({ today: "2026-11-22", seedOptions: { afterStep1: true } });
+    db.query("INSERT INTO substitutions (absent_id, substitute_id, date_from, date_to, recorded_on, recorded_by) VALUES ('marek', 'anna', '2026-11-01', '2026-12-31', '2026-11-01', 'joanna')").run();
+    // Sprawa „Wyznacz kryteria” istnieje, dopóki część I nie jest przekazana: cofamy zdarzenia kroku 1.
+    db.query("DELETE FROM events WHERE cycle_id = 'cycle-piotr' AND type IN ('part1_submitted', 'part1_confirmed')").run();
+    // Widok dzieli sprawę na nagłówek i osobę: para „Wyznacz kryteria oceny … Piotr Wójcik”.
+    const pair = (html: string) => /Wyznacz kryteria oceny[\s\S]{0,300}Piotr Wójcik/.test(html);
+    expect(pair(await (await as(app, "anna", "/")).text())).toBe(true);
+    expect(pair(await (await as(app, "marek", "/")).text())).toBe(true);
+    expect((await as(app, "joanna", "/demo/date", "date=2027-01-01")).status).toBe(303);
+    expect(await (await as(app, "anna", "/")).text()).not.toContain("Wyznacz kryteria oceny");
+    expect(pair(await (await as(app, "marek", "/")).text())).toBe(true);
+  });
+
   test("brak rodzaju stanowiska: 422 ze zdaniem, odnośnik do kartoteki tylko u kadr", async () => {
     const { app, db } = createTestApp({ today: "2024-12-09" });
     db.query("UPDATE people SET position_kind = NULL WHERE id = 'piotr'").run();
