@@ -46,7 +46,7 @@ const BODY: Record<TourStopId, Body> = {
   "1b": {
     title: "Piotr potwierdza kryteria",
     short: "notatka",
-    lead: "Piotr zna kryteria i oczekiwania na początku okresu oceny, a nie dopiero przy ocenie. Potwierdza je jednym kliknięciem.",
+    lead: "Piotr zna kryteria i oczekiwania na początku okresu podlegania ocenie, a nie dopiero przy ocenie. Potwierdza je jednym kliknięciem.",
     look: [
       { text: "Przycisk potwierdzenia.", selector: 'form[action$="/part1/confirm"] button' },
       { text: "Po potwierdzeniu miejscowość, data i nazwisko wpisują się same, a kryteria się blokują.", selector: ".sheet" },

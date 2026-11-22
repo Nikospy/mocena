@@ -37,6 +37,17 @@ export function formatRange(from: string, to: string): string {
 
 const EXTENDS = `${rules.deadlines.longAbsenceOverMonths.basis}`;
 
+/** Pierwszy wpis osi: dzień, od którego liczy się termin oceny (art. 81 ust. 4 albo ust. 9 ustawy). */
+function startEntry(cycleId: string, periodStart: string, kind: string): TimelineEntry {
+  const p = visibleEvents(cycleId).filter((e) => e.type === "cycle_started" || e.type === "previous_assessment_recorded").pop()?.payload ?? {};
+  if (kind === "after_negative") {
+    return { date: periodStart, title: "Zapoznanie z oceną negatywną: od niego liczy się termin ponownej oceny", basis: [rules.deadlines.reassessmentAfterNegativeMonths.basis], kind: "fact" };
+  }
+  const basis = [rules.deadlines.assessmentEveryMonths.basis];
+  if (p.previousAssessmentOn) return { date: periodStart, title: "Poprzednia ocena: od niej liczy się termin 24 miesięcy", basis, kind: "fact" };
+  return { date: periodStart, title: "Początek cyklu: od tego dnia liczy się termin 24 miesięcy", basis, kind: "fact" };
+}
+
 export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] {
   const cycle = cycleById(cycleId);
   if (!cycle) throw new Error(`Brak cyklu ${cycleId}`);
@@ -44,10 +55,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
   const events = visibleEvents(cycleId);
   const approved = events.find((e) => e.type === "assessment_approved");
   const details = cycleDeadlineDetails(cycleId);
-  const entries: TimelineEntry[] = [
-    { date: cycle.period_start, title: "Początek okresu oceny", basis: [rules.deadlines.assessmentEveryMonths.basis], kind: "fact" },
-  ];
-
+  const entries: TimelineEntry[] = [startEntry(cycleId, cycle.period_start, details.kind)];
   if (full) {
     const rows = visibleAbsences(cycle.person_id);
     const recordedAfterApproval = (id: number, recordedOn: string): boolean => {
@@ -168,6 +176,12 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
       struck: changed ? details.change!.from : extended ? details.base : undefined,
     });
   }
+  // Okres podlegania ocenie (część II arkusza) biegnie od ustalenia kryteriów; termin oceny liczy się osobno.
+  const criteriaSet = events.find((e) => e.type === "part1_confirmed") ?? events.find((e) => e.type === "part1_submitted");
+  if (criteriaSet) {
+    entries.push({ date: criteriaSet.date, title: "Początek okresu podlegania ocenie", detail: "Od ustalenia kryteriów do sporządzenia oceny. Ten okres obejmuje ocena w części II arkusza.", basis: [rules.deadlines.assessmentPeriodFrom.basis.split(";")[0]], kind: "fact" });
+  }
+
   return entries.sort((a, b) => a.date.localeCompare(b.date) || (a.kind === b.kind ? 0 : a.kind === "fact" ? -1 : 1));
 }
 

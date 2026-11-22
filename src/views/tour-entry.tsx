@@ -59,7 +59,7 @@ export function TourEntry() {
       </div>
       <section class="card axis-card" aria-labelledby="h-ax">
         <h2 id="h-ax">Dwa lata Piotra w pięciu chwilach</h2>
-        <p class="sub">Sama ocena to ostatni tydzień. Asystent pracuje przez cały okres od 27 listopada 2024 do 27 listopada 2026.</p>
+        <p class="sub">Sama ocena to ostatni tydzień. Asystent pracuje przez cały cykl, od poprzedniej oceny 27 listopada 2024 do terminu oceny.</p>
         <div class="ax2">
           <span class="memo-l">Ostatnie tygodnie (powiększone) – tyle pamięta przełożony</span>
           <span class="memo"></span>
