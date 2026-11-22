@@ -39,6 +39,7 @@ bun install
 bun run dev      # serwer z przeładowaniem
 bun test         # testy silnika i tras
 bun run seed     # dane pokazowe (powstaje w zmianie rules-engine-and-demo-data)
+bun run scripts/design-audit.ts <outDir>   # pomiar wyglądu na ekranach pokazu (360 i 1440 px): pismo, kontrast, cele, długość wiersza, ramki
 ```
 
 Trasy sprawdzaj w testach przez `app.request()`, bez uruchamiania serwera.
@@ -47,7 +48,7 @@ Trasy sprawdzaj w testach przez `app.request()`, bez uruchamiania serwera.
 
 - **Kod:** jest starter Hono (`src/index.ts`, `GET /`) i silnik z nazwami po polsku: `reguly/rozporzadzenie-2016-470.json`, `src/silnik/ocena.ts`, `src/silnik/terminy.ts`, `src/silnik/ocena.test.ts` (19 testów przechodzi). Ekranów, bazy i danych pokazowych jeszcze nie ma.
 - **Plany:** wszystkie siedem zmian ma gotowy `plan.md` po czterech recenzjach krzyżowych. Wspólne nazwy są w rozdziale „Kontrakt wspólny dla wszystkich plastrów” planu F-01.
-- **Wygląd:** autor przyjął design system („wygląd A”, rodzina mObywatel) 22.11 ok. 00:05. Jest w repo: tokeny `public/rodzina.css`, komponenty `public/style.css`, fonty `public/fonts/`. Wzorce układu i zachowania ekranów: `context/design/mockups/*.html` (notatka, ocena, oś czasu). Ekrany używają tych klas i tokenów, bez własnych kolorów i rozmiarów. Zmiana przyjętego wyglądu wymaga pytania do autora.
+- **Wygląd:** autor przyjął design system („wygląd A”, rodzina mObywatel) 22.11 ok. 00:05. Jest w repo: tokeny `public/rodzina.css`, komponenty `public/style.css`, fonty `public/fonts/`. Wzorce układu i zachowania ekranów: `context/design/mockups/*.html` (notatka, ocena, oś czasu). Ekrany używają tych klas i tokenów, bez własnych kolorów i rozmiarów. Decyzja autora z 22.11 ok. 02:50: „wygląd A to tylko szkielet, można go zmieniać dowolnie, byle by to były zmiany na lepsze”. Zmiany wyglądu sprawdzasz pomiarem `scripts/design-audit.ts` (liczby przed i po) i pokazujesz autorowi na zrzutach.
 
 ## Start budowy po poleceniu autora
 
