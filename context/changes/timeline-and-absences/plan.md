@@ -360,13 +360,13 @@ Ręcznie: krok 3 pokazu i oś Ewy z wersji 5-minutowej, na komputerze i telefoni
 
 #### Automated
 
-- [ ] 1.1 Testy silnika przechodzą: `bun test src/engine`
-- [ ] 1.2 Przykład organizatora daje nieobecność 05.10–06.11.2026 (33 dni) i termin 2026-12-30
-- [ ] 1.3 Próg na końcu miesiąca, druga nieobecność w przedłużeniu, zaokrąglenie po przedłużeniu (14.03.2024 → 2026-04-16) i termin ponownej oceny z `periodEndAfterNegative`
-- [ ] 1.4 Ten sam termin 30.12.2026 w `effectiveDeadline`, na `/hr` i na osi po dwóch wpisach
-- [ ] 1.5 Ścieżka `/hr` → „Wpisz nieobecność” → oś → drugi wpis bez `/cycles/:id/part1`, odpowiedzi 303; oceniany widzi termin i podstawę bez dat nieobecności
-- [ ] 1.6 Brak rodzaju nieobecności w tabeli, formularzu i zapisie; brak liczb i etykiet przy nazwisku
-- [ ] 1.7 Po widocznym `assessment_approved` oś pokazuje termin z migawki, a później wpisana nieobecność zapisuje się (303) ze zdaniem o niezmienionym terminie; cykl zamknięty 409, walidacja 422
+- [x] 1.1 Testy silnika przechodzą: `bun test src/engine` — 89fa6ed
+- [x] 1.2 Przykład organizatora daje nieobecność 05.10–06.11.2026 (33 dni) i termin 2026-12-30 — 89fa6ed
+- [x] 1.3 Próg na końcu miesiąca, druga nieobecność w przedłużeniu, zaokrąglenie po przedłużeniu (14.03.2024 → 2026-04-16) i termin ponownej oceny z `periodEndAfterNegative` — 89fa6ed
+- [x] 1.4 Ten sam termin 30.12.2026 w `effectiveDeadline`, na `/hr` i na osi po dwóch wpisach — 89fa6ed
+- [x] 1.5 Ścieżka `/hr` → „Wpisz nieobecność” → oś → drugi wpis bez `/cycles/:id/part1`, odpowiedzi 303; oceniany widzi termin i podstawę bez dat nieobecności — 89fa6ed
+- [x] 1.6 Brak rodzaju nieobecności w tabeli, formularzu i zapisie; brak liczb i etykiet przy nazwisku — 89fa6ed
+- [x] 1.7 Po widocznym `assessment_approved` oś pokazuje termin z migawki, a później wpisana nieobecność zapisuje się (303) ze zdaniem o niezmienionym terminie; cykl zamknięty 409, walidacja 422 — 89fa6ed
 
 #### Manual
 
@@ -376,10 +376,10 @@ Ręcznie: krok 3 pokazu i oś Ewy z wersji 5-minutowej, na komputerze i telefoni
 
 #### Automated
 
-- [ ] 2.1 Dane pokazowe wgrywają się bez błędu: `bun run seed`
-- [ ] 2.2 Zmiana oceniającego Ewy widoczna na osi Marka (§ 9 ust. 3), niewidoczna na osi Ewy; `appraiser_id` Ewy bez zmian
-- [ ] 2.3 Nieobecność Ewy niewidoczna 2026-08-27, widoczna 2026-08-28 i 2026-08-29 (termin 2027-06-02)
-- [ ] 2.4 Zmiana oceniającego z formularza zostawia kryteria, przenosi `appraiser_id` i dostęp (`src/routes/appraiser.test.ts`)
+- [x] 2.1 Dane pokazowe wgrywają się bez błędu: `bun run seed` — c3c4dad
+- [x] 2.2 Zmiana oceniającego Ewy widoczna na osi Marka (§ 9 ust. 3), niewidoczna na osi Ewy; `appraiser_id` Ewy bez zmian — c3c4dad
+- [x] 2.3 Nieobecność Ewy niewidoczna 2026-08-27, widoczna 2026-08-28 i 2026-08-29 (termin 2027-06-02) — c3c4dad
+- [x] 2.4 Zmiana oceniającego z formularza zostawia kryteria, przenosi `appraiser_id` i dostęp (`src/routes/appraiser.test.ts`) — c3c4dad
 
 #### Manual
 
@@ -389,7 +389,7 @@ Ręcznie: krok 3 pokazu i oś Ewy z wersji 5-minutowej, na komputerze i telefoni
 
 #### Automated
 
-- [x] 3.1 Przypomnienie o terminie pojawia się 30 dni przed terminem (c60dfd9)
+- [x] 3.1 Przypomnienie o terminie pojawia się 30 dni przed terminem — c60dfd9
 
 #### Manual
 
