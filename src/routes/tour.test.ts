@@ -100,7 +100,7 @@ describe("przewodnik pokazu", () => {
     expect(cycle.id).not.toBe("cycle-piotr");
     expect(visibleEvents(cycle.id).find((e) => e.type === "cycle_started")?.date).toBe("2026-11-22");
     const hr = await html(app, "/hr", cookies(stop));
-    expect(hr.text).toMatch(/Rozmowa o kryteriach do:\s*30\.11\.2026/);
+    expect(hr.text).toMatch(/Rozmowa o kryteriach do:\s*(<[^>]+>)*30\.11\.2026/);
     expect(hr.text).toContain("§ 7 pkt 2");
     const home = await html(app, "/", "person_id=marek");
     expect(home.text).toContain("Wyznacz kryteria");

@@ -491,7 +491,7 @@ const tourStops: TourStopCheck[] = [
       includes(r.html, "14.12.2026", "termin przyznania stopnia 14.12.2026");
       const tl = await s.get("/cycles/cycle-piotr/timeline");
       includes(tl.html, "30.11.2026", "termin sprzeciwu 30.11.2026 po zapoznaniu 22.11.2026");
-      includes(r.html, /Rozmowa o kryteriach do:\s*30\.11\.2026/, "termin kryteriów nowego cyklu Piotra");
+      includes(r.html, /Rozmowa o kryteriach do:\s*(<[^>]+>)*30\.11\.2026/, "termin kryteriów nowego cyklu Piotra");
       await s.login("marek");
       const home = await s.get("/");
       const cycle = cycleIdFor(home.html, "Piotr Wójcik");

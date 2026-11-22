@@ -14,8 +14,10 @@ describe("przejście z /hr do arkuszy wgranych osób (22.11.2026)", () => {
 
   test("arkusze Tomasza, Katarzyny i Anny otwierają się z /hr z potwierdzeniami", async () => {
     const overview = await html(app, "joanna", "/hr");
-    const links = hrefs(overview);
-    for (const c of ["cycle-tomasz", "cycle-katarzyna", "cycle-anna"]) expect(links).toContain(`/cycles/${c}/sheet`);
+    for (const c of ["cycle-tomasz", "cycle-katarzyna", "cycle-anna"]) {
+      expect(overview).toContain(`href="/cycles/${c}/part1"`);
+      expect(hrefs(await html(app, "joanna", `/cycles/${c}/part1`))).toContain(`/cycles/${c}/sheet`);
+    }
 
     const tomasz = await html(app, "joanna", "/cycles/cycle-tomasz/sheet");
     expect(tomasz).toContain("Potwierdzenie w systemie: Rzeszów, 02.12.2024, Anna Kwiatkowska");

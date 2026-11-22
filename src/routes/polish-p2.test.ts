@@ -60,10 +60,10 @@ describe("2.7 sortowanie /hr", () => {
     const { app } = createTestApp({ today: "2026-11-22", seedOptions: { afterStep1: true } });
     await approveAndAcknowledgePiotr(app);
     const h = await html(app, "joanna", "/hr");
-    const at = (name: string) => h.indexOf(`<th scope="row">${name}</th>`);
+    const at = (name: string) => h.indexOf(`">${name}</a></th>`);
     const open = ["Anna Kwiatkowska", "Ewa Nowak", "Katarzyna Lewandowska"].map(at);
     const closed = [
-      h.lastIndexOf('<th scope="row">Piotr Wójcik</th>'),
+      h.lastIndexOf('">Piotr Wójcik</a></th>'),
       at("Tomasz Kamiński"),
     ];
     expect([...open, ...closed].every((i) => i > 0)).toBe(true);

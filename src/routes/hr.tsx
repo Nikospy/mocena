@@ -21,7 +21,7 @@ import { HrOverviewView, StatsBlock, type StateRow } from "../views/hr-overview"
 const app = new Hono();
 
 registerHomeTasks((person) => person.id === DEMO_DIRECTOR_GENERAL_ID
-  ? [{ title: "Terminowość w urzędzie", href: "/office/statistics", action: "Zobacz statystyki" }]
+  ? [{ title: "Terminowość w urzędzie", href: "/office/statistics", action: "Otwórz terminowość w urzędzie" }]
   : []);
 
 app.get("/office/statistics", (c) => {
@@ -30,8 +30,8 @@ app.get("/office/statistics", (c) => {
   if (viewer.id !== DEMO_DIRECTOR_GENERAL_ID) return c.text("Ten ekran widzi dyrektor generalny urzędu.", 403);
   return c.html(
     <Layout title="Terminowość w urzędzie" person={viewer} today={today()}>
-      <PageHeader title="Statystyki urzędu" />
-      <StatsBlock stats={officeStats()} />
+      <PageHeader title="Terminowość w urzędzie" lead="Ile ocen powstało w terminie i na jakim etapie są cykle w całym urzędzie." />
+      <StatsBlock stats={officeStats()} title="Liczby dla całego urzędu (bez nazwisk)" />
     </Layout>,
   );
 });

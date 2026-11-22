@@ -23,6 +23,12 @@ describe("strona /about „Wdrożenie i dane”", () => {
     ]) {
       expect(html).toContain(t);
     }
+    // każde zdanie prawdą o kodzie: eksport jednej oceny, plik kalendarza, notatki widzi tylko autor
+    expect(html).toContain("JSON");
+    expect(html).toContain(".ics");
+    expect(html).toContain("Notatkę widzi tylko jej autor.");
+    expect(html).not.toContain("bez treści notatek");
+    expect(html).not.toContain("wstawia skrypt");
     // Repo jest publiczne: bez prywatnych ścieżek i adresów e-mail.
     expect(html).not.toMatch(/\/Users\//);
     expect(html).not.toMatch(/[\w.]+@[\w.]+/);

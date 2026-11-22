@@ -12,11 +12,11 @@ describe("ekran kadr /hr (krok 5 pokazu)", () => {
   test("karta obowiązku urzędu: pole Urzędnik, termin, stopień, podstawa", async () => {
     const h = await html(app, "joanna", "/hr");
     expect(h).toContain("Obowiązek urzędu: stopień służbowy z mocy prawa");
-    expect(h).toMatch(/Urzędnik<\/span>\s*<p>Tomasz Kamiński<\/p>/);
+    expect(h).toContain("<dt>Urzędnik mianowany</dt><dd>Tomasz Kamiński</dd>");
     expect(h).toContain("14.12.2026");
     expect(h).toContain("sobotę 12.12.2026");
     expect(h).toContain("art. 89 ust. 2");
-    expect(h).toContain("Stopień V → VI");
+    expect(h).toContain('<dt>Stopień</dt><dd class="tnum">V → VI</dd>');
     expect(h).toContain("To obowiązek, nie wniosek");
   });
 
@@ -39,11 +39,13 @@ describe("ekran kadr /hr (krok 5 pokazu)", () => {
     expect(h).not.toContain("negatywna");
   });
 
-  test("każdy wiersz ma odnośniki Arkusz i Historia ocen; start Joanny prowadzi do /hr", async () => {
+  test("nazwisko w wierszu prowadzi do cyklu, a tam są Arkusz i Historia ocen; start Joanny prowadzi do /hr", async () => {
     const h = await html(app, "joanna", "/hr");
     for (const [cycle, person] of [["cycle-tomasz", "tomasz"], ["cycle-katarzyna", "katarzyna"], ["cycle-anna", "anna"], ["cycle-piotr", "piotr"]]) {
-      expect(h).toContain(`href="/cycles/${cycle}/sheet"`);
-      expect(h).toContain(`href="/people/${person}/history"`);
+      expect(h).toContain(`href="/cycles/${cycle}/part1"`);
+      const hub = await html(app, "joanna", `/cycles/${cycle}/part1`);
+      expect(hub).toContain(`href="/cycles/${cycle}/sheet"`);
+      expect(hub).toContain(`href="/people/${person}/history"`);
     }
     expect(await html(app, "joanna", "/")).toContain('href="/hr"');
   });
@@ -71,7 +73,7 @@ describe("karta stopnia a data systemowa", () => {
   });
 
   test("cykl Anny widoczny od 16.12.2024", async () => {
-    expect(await html(createTestApp({ today: "2024-12-15" }).app, "joanna", "/hr")).not.toContain("Anna Kwiatkowska</th>");
-    expect(await html(createTestApp({ today: "2024-12-16" }).app, "joanna", "/hr")).toContain("Anna Kwiatkowska</th>");
+    expect(await html(createTestApp({ today: "2024-12-15" }).app, "joanna", "/hr")).not.toContain("Anna Kwiatkowska</a></th>");
+    expect(await html(createTestApp({ today: "2024-12-16" }).app, "joanna", "/hr")).toContain("Anna Kwiatkowska</a></th>");
   });
 });

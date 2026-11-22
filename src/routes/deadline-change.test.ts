@@ -134,6 +134,6 @@ describe("wniosek ocenianego", () => {
 
   test("wgrany wniosek Anny jest widoczny na /hr jako stan z prawdziwego zdarzenia", async () => {
     const { app } = createTestApp({ today: "2026-11-21" });
-    expect(await html(app, "joanna", "/hr")).toContain("Wniosek o zmianę terminu");
+    expect(await html(app, "joanna", "/hr")).toContain("Wniosek ocenianego o zmianę terminu");
   });
 });
