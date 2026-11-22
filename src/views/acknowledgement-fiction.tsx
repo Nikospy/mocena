@@ -1,4 +1,5 @@
 import { rules } from "../engine/rules";
+import { fictionReasonLabel } from "./assessment";
 import type { Person } from "../people";
 import { ErrorSummary, FieldError, LegalBasis, PageHeader, invalid, type FormErrors } from "./components";
 import { Layout, formatDate } from "./layout";
@@ -17,6 +18,7 @@ export type FictionViewProps = {
 export function FictionView(p: FictionViewProps) {
   const v = p.values ?? { reason: "", deliveryMethod: "in_person", deliveredOn: p.today };
   const e = p.errors ?? {};
+  const assessed = p.person.gender === "f" ? "Oceniana" : "Oceniany";
   return (
     <Layout title="Fikcja zapoznania" person={p.viewer} today={p.today}>
       <PageHeader context="Ocena okresowa · zapoznanie" title={<>Stwierdzenie fikcji zapoznania: {p.person.name}</>} />
@@ -31,11 +33,11 @@ export function FictionView(p: FictionViewProps) {
           <div class="chips">
             <label class="chip">
               <input type="radio" name="reason" id="reason" value="could_not" checked={v.reason === "could_not"} />
-              <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Oceniany nie mógł potwierdzić zapoznania</span>
+              <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>{assessed} {fictionReasonLabel("could_not", p.person.gender)} zapoznania</span>
             </label>
             <label class="chip">
               <input type="radio" name="reason" value="would_not" checked={v.reason === "would_not"} />
-              <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Oceniany nie chciał potwierdzić zapoznania</span>
+              <span><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>{assessed} {fictionReasonLabel("would_not", p.person.gender)} zapoznania</span>
             </label>
           </div>
           </div>

@@ -197,3 +197,20 @@ test("notatka przypisana do następnego cyklu pozostaje po przesunięciu jego po
   expect(notesForCycle(next.id, "anna").map((n) => n.text)).toContain(note);
   expect(notesForCycle(next.id, "marek").map((n) => n.text)).not.toContain(note);
 });
+
+test("fikcja zapoznania z drugą oceną odmienia opis według ocenianej", async () => {
+  const app = await redone();
+  expect((await call(app, "anna", `${CYCLE}/assessment/approve`, form([5, 5, 5, 5, 5]))).status).toBe(303);
+  setToday("2026-11-24");
+  const formPage = await html(app, "anna", `${CYCLE}/assessment/fiction`);
+  expect(formPage).toContain("Oceniana nie mogła potwierdzić zapoznania");
+  expect(formPage).toContain("Oceniana nie chciała potwierdzić zapoznania");
+  expect((await call(app, "anna", `${CYCLE}/assessment/fiction`, { reason: "could_not", deliveryMethod: "post", deliveredOn: "2026-11-22" })).status).toBe(303);
+  for (const path of [`${CYCLE}/assessment`, `${CYCLE}/sheet`, "/hr"]) {
+    expect(await html(app, "joanna", path)).toContain("nie mogła potwierdzić");
+  }
+  const assessment = await html(app, "katarzyna", `${CYCLE}/assessment`);
+  expect(assessment).toContain("22.11.2026");
+  expect(assessment).toContain("24.11.2026");
+  expect(assessment).toContain("01.12.2026");
+});

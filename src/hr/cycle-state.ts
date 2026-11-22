@@ -1,12 +1,13 @@
 import { OBJECTION_OUTCOME_TEXT as OUTCOME_TEXT, assessmentState } from "../assessment/state";
-import { effectiveDeadline } from "../cycles";
+import { cycleById, effectiveDeadline } from "../cycles";
 import { pendingRequest } from "../deadline-change";
 import { part1Status } from "../cycles/part1";
 import { criteriaTalkDeadline, objectionReviewDeadline } from "../engine/deadlines";
 import { rules } from "../engine/rules";
 import { visibleEvents } from "../events";
 import { formatDate } from "../views/layout";
-import { REASON_LABEL, METHOD_LABEL } from "../views/assessment";
+import { fictionReasonLabel, METHOD_LABEL } from "../views/assessment";
+import { personById, roleLabel } from "../people";
 import { today } from "../settings";
 
 export type CycleStep =
@@ -90,9 +91,12 @@ export function cycleState(cycleId: string): CycleState {
   const s = s0;
   if (s.stage === "fiction" && s.fiction) {
     const f = s.fiction;
+    const cycle = cycleById(cycleId);
+    const gender = cycle ? personById(cycle.person_id)?.gender ?? null : null;
+    const assessed = roleLabel({ role: "employee", gender });
     return {
       step: "fiction",
-      text: `Fikcja zapoznania wpisana ${formatDate(f.eventDate)} przez oceniającego${second}: oceniany ${REASON_LABEL[f.reason]}. Kopię arkusza doręczono ${METHOD_LABEL[f.deliveryMethod]} ${formatDate(f.deliveredOn)}`,
+      text: `Fikcja zapoznania wpisana ${formatDate(f.eventDate)} przez oceniającego${second}: ${assessed} ${fictionReasonLabel(f.reason, gender)}. Kopię arkusza doręczono ${METHOD_LABEL[f.deliveryMethod]} ${formatDate(f.deliveredOn)}`,
       deadline: { date: f.objectionDeadline, basis: [D.objectionDays.basis] },
       deadlineLabel: "Sprzeciw do",
       since: f.eventDate,

@@ -15,7 +15,7 @@ import { computeAssessment, criterion, POINTS } from "../engine/scoring";
 import { recordEvent } from "../events";
 import { shiftedDeadlineSentence } from "../deadline-shift";
 import { officeSettings } from "../office-settings";
-import { currentPerson, personById, type Person } from "../people";
+import { currentPerson, personById, roleLabel, type Person } from "../people";
 import { setting, today } from "../settings";
 import { AssessmentMessage, AssessmentView, BlockerList, ResultPanel } from "../views/assessment";
 import { FictionView } from "../views/acknowledgement-fiction";
@@ -336,7 +336,13 @@ app.post("/cycles/:id/assessment/fiction", async (c) => {
   const body = await c.req.parseBody();
   const values = { reason: str(body.reason), deliveryMethod: str(body.deliveryMethod), deliveredOn: str(body.deliveredOn) };
   const errors: Record<string, string> = {};
-  if (!REASONS.includes(values.reason)) errors.reason = "Wybierz, czy oceniany nie mógł, czy nie chciał potwierdzić zapoznania.";
+  if (!REASONS.includes(values.reason)) {
+    const gender = g.appraisee.gender;
+    const assessed = roleLabel({ role: "employee", gender });
+    errors.reason = gender === "f"
+      ? `Wybierz, czy ${assessed} nie mogła, czy nie chciała potwierdzić zapoznania.`
+      : `Wybierz, czy ${assessed} nie mógł, czy nie chciał potwierdzić zapoznania.`;
+  }
   const approvedOn = assessmentState(g.cycle.id).approvedOn ?? today();
   const dateOk = isIsoDate(values.deliveredOn) && values.deliveredOn >= approvedOn && values.deliveredOn <= today();
   if (!METHODS.includes(values.deliveryMethod)) errors.deliveryMethod = "Wybierz, jak doręczono kopię arkusza.";

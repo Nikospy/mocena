@@ -1,4 +1,4 @@
-import { OBJECTION_OUTCOME_TEXT, objectionRecipientFor, type ObjectionFacts, type AssessmentDraft, type AssessmentSnapshot, type AssessmentStateData } from "../assessment/state";
+import { OBJECTION_OUTCOME_TEXT, objectionRecipientFor, type ObjectionFacts, type Fiction, type AssessmentDraft, type AssessmentSnapshot, type AssessmentStateData } from "../assessment/state";
 import { objectionReviewDeadline } from "../engine/deadlines";
 import { verdictText } from "../assessment/verdict";
 import type { CycleCriterion } from "../cycles/part1";
@@ -20,7 +20,12 @@ export type Slots = {
   headerLinks?: JSX.Element;
 };
 
-export const REASON_LABEL = { could_not: "nie mógł potwierdzić", would_not: "nie chciał potwierdzić" } as const;
+export function fictionReasonLabel(reason: Fiction["reason"], gender: Person["gender"]): string {
+  const labels = gender === "f"
+    ? { could_not: "nie mogła potwierdzić", would_not: "nie chciała potwierdzić" }
+    : { could_not: "nie mógł potwierdzić", would_not: "nie chciał potwierdzić" };
+  return labels[reason];
+}
 export const METHOD_LABEL = { in_person: "osobiście", post: "pocztą", email: "pocztą elektroniczną" } as const;
 
 export const LEVELS = new Map<number, string>(rules.partialScale.map((s) => [s.points, s.name]));
@@ -432,7 +437,7 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
             <ConfirmationBlock
               kind="fiction"
               name={p.person.name}
-              reason={REASON_LABEL[st.fiction.reason]}
+              reason={fictionReasonLabel(st.fiction.reason, p.person.gender)}
               deliveryMethod={METHOD_LABEL[st.fiction.deliveryMethod]}
               deliveredOn={st.fiction.deliveredOn}
               date={st.fiction.eventDate}
