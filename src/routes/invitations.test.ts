@@ -45,12 +45,12 @@ describe("zaproszenia na rozmowy", () => {
     const { app, db } = createTestApp();
     await call(app, "marek", `/cycles/${PIOTR}/invitations`, OPENING);
     const [ev] = sent(db);
-    expect(await html(app, "marek", "/")).toContain("Wysłane 9.12, czeka na potwierdzenie");
+    expect(await html(app, "marek", "/")).toContain("Wysłano 09.12.2024. Czeka na potwierdzenie ocenianego.");
 
     const c = await call(app, "piotr", `/cycles/${PIOTR}/invitations/${ev.id}/confirm`, {});
     expect(c.status).toBe(303);
     expect((await call(app, "marek", `/cycles/${PIOTR}/invitations/${ev.id}/confirm`, {})).status).toBe(403);
-    expect(await html(app, "marek", `/cycles/${PIOTR}/cards/opening`)).toContain("Potwierdzone przez Piotra 9.12");
+    expect(await html(app, "marek", `/cycles/${PIOTR}/cards/opening`)).toContain("Potwierdzone przez ocenianego 09.12.2024.");
     expect(await html(app, "piotr", "/")).not.toContain("Potwierdzam termin");
     const tl = await html(app, "marek", `/cycles/${PIOTR}/timeline`);
     expect(tl).toContain("Zaproszenie na rozmowę o kryteriach");
@@ -97,7 +97,7 @@ describe("zaproszenia na rozmowy", () => {
     expect(timeline).toContain("Zaproszenie na rozmowę o kryteriach");
     expect(timeline).not.toContain("Zaproszenie na rozmowę oceniającą");
     const card = await html(app, "marek", "/cycles/cycle-ewa/cards/opening");
-    expect(card).toContain("Potwierdzone przez Ewy 2.12");
+    expect(card).toContain("Potwierdzone przez ocenianego 02.12.2024.");
     expect(card).toContain("Zmień datę rozmowy");
     expect(await html(app, "marek", `/cycles/${PIOTR}/cards/assessment-conversation`)).toContain("Zaproś na rozmowę");
     expect(await html(app, "marek", `/cycles/${PIOTR}/invitations/new?kind=assessment`)).toContain("§ 10");

@@ -32,20 +32,20 @@ registerHomeTasks((person) => {
       });
     }
     if (stage === "approved") {
-      tasks.push({ title: `Czeka na potwierdzenie zapoznania: ${name}`, href: `/cycles/${cycle.id}/assessment` });
+      tasks.push({ title: `Ocena czeka na zapoznanie: ${name}`, href: `/cycles/${cycle.id}/assessment`, action: "Otwórz ocenę" });
       tasks.push({
         title: `Oceniany nie potwierdza zapoznania: ${name}`,
         heading: "Oceniany nie potwierdza zapoznania?",
         person: name,
-        detail: "Fikcję zapoznania stwierdza oceniający: wpis zapisuje powód i sposób doręczenia kopii arkusza. Kadry zobaczą ten wpis.",
-        action: "Stwierdź fikcję zapoznania",
+        detail: "Fikcję zapoznania wpisuje oceniający: wpis zapisuje powód i sposób doręczenia kopii arkusza. Kadry zobaczą ten wpis.",
+        action: "Wpisz fikcję zapoznania",
         href: `/cycles/${cycle.id}/assessment/fiction`,
       });
     }
   }
   const own = openCycle(person.id);
   if (own && assessmentState(own.id).stage === "approved") {
-    tasks.push({ title: "Zapoznaj się z oceną", href: `/cycles/${own.id}/assessment` });
+    tasks.push({ title: "Zapoznaj się z oceną", href: `/cycles/${own.id}/assessment`, action: "Przeczytaj ocenę" });
   }
 
   // Własny, najnowszy cykl: wynik po zapoznaniu albo najbliższy termin, żeby strona nie była pusta.
@@ -61,22 +61,22 @@ registerHomeTasks((person) => {
       const addressee = recipient ? ` do ${recipient}` : "";
       const open = st.objectionDeadline >= today();
       tasks.push({
-        title: "Twoja ocena",
+        title: "Ocena okresowa",
         person: level ? `${verdict}, ${level}` : verdict,
         detail: open ? `Sprzeciw${addressee} możesz złożyć w ustawowym terminie.` : `Termin sprzeciwu minął ${formatDate(st.objectionDeadline)}.`,
         due: open ? st.objectionDeadline : undefined,
         basis: open ? rules.deadlines.objectionDays.basis : undefined,
-        action: "Zobacz ocenę",
+        action: "Otwórz ocenę",
         href,
       });
     } else if (mine.id === openCycle(person.id)?.id && st.stage !== "approved") {
       const d = cycleDeadlineDetails(mine.id);
       tasks.push({
-        title: "Nic na Ciebie nie czeka",
-        detail: "Twój termin oceny:",
+        title: "Teraz nie masz spraw do załatwienia",
+        detail: `Termin oceny: ${formatDate(d.deadline)}.`,
         due: d.deadline,
         basis: d.basis.join(", "),
-        action: "Zobacz część I",
+        action: "Otwórz część I",
         href: `/cycles/${mine.id}/part1`,
         quiet: true,
       });

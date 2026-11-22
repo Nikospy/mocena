@@ -180,7 +180,7 @@ describe("proces 2: wersja przepisów na stronie administratora", () => {
 
 describe("proces 2: import pracowników z CSV i komórka z listy", () => {
   const CSV = [
-    "﻿Osoba;Stanowisko;Komórka;Oceniający;Stan procesu;Termin oceny;Termin sprzeciwu;Data ostatniej oceny;Wynik ostatniej oceny",
+    "﻿Osoba;Stanowisko;Komórka;Oceniający;Stan cyklu;Termin oceny;Termin sprzeciwu;Data ostatniej oceny;Wynik ostatniej oceny",
     "Jan Nowicki;Specjalista;Wydział Kadr i Szkoleń;Marek Zieliński;;;;10.03.2025;pozytywna",
     "Piotr Wójcik;Starszy specjalista;Wydział Organizacyjny;Marek Zieliński;Okres oceny;27.11.2026;;27.11.2024;pozytywna",
     "Ola Bez;Referent;Wydział Nieistniejący;Marek Zieliński;;;;10.03.2025;pozytywna",

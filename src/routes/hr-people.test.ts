@@ -126,7 +126,7 @@ describe("zestawienie CSV", () => {
     const text = await r.text();
     expect(text.charCodeAt(0)).toBe(0xfeff);
     const lines = text.slice(1).trimEnd().split("\r\n");
-    expect(lines[0]).toBe("Osoba;Stanowisko;Komórka;Oceniający;Stan procesu;Termin oceny;Termin sprzeciwu;Data ostatniej oceny;Wynik ostatniej oceny");
+    expect(lines[0]).toBe("Osoba;Stanowisko;Komórka;Oceniający;Stan cyklu;Termin oceny;Termin sprzeciwu;Data ostatniej oceny;Wynik ostatniej oceny");
     const piotr = lines.find((l) => l.startsWith("Piotr Wójcik;"))!;
     expect(piotr).toContain(";Starszy specjalista;Wydział Organizacyjny;Marek Zieliński;");
     expect(piotr.endsWith(";27.11.2024;pozytywna")).toBe(true);

@@ -6,6 +6,7 @@ import { recordEvent } from "../events";
 import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
 import { AppraiserChangeFormView } from "../views/appraiser-change-form";
+import { errorPage } from "../views/error-page";
 
 const app = new Hono();
 
@@ -15,8 +16,8 @@ function guard(c: Context): Response | Ctx {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
   const cycle = visibleCycleById(c.req.param("id") ?? "");
-  if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
-  if (viewer.role !== "hr") return c.text("Oceniającego zmieniają kadry.", 403);
+  if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
+  if (viewer.role !== "hr") return errorPage(c, "Oceniającego zmieniają kadry.", 403);
   return { viewer, cycle };
 }
 
@@ -59,7 +60,7 @@ app.post("/cycles/:id/appraiser", async (c) => {
   const g = guard(c);
   if (g instanceof Response) return g;
   const { viewer, cycle } = g;
-  if (!isOpen(cycle)) return c.text("Cykl jest zamknięty, oceniającego nie zmienia się.", 409);
+  if (!isOpen(cycle)) return errorPage(c, "Cykl jest zamknięty. Oceniającego zmienia się tylko w otwartym cyklu.", 409);
   const body = await c.req.parseBody();
   const to = typeof body.appraiser_id === "string" ? body.appraiser_id : "";
   if (!candidates(cycle).some((p) => p.id === to)) return render(c, g, "Wybierz nowego oceniającego z listy.", 422);

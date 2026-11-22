@@ -263,6 +263,7 @@ async function responseOfForm(page: Page, form: NonNullable<CaptureOptions["form
     for (let i = 0; i < form.checks.count; i++) await inputs.nth(i).check();
   }
   if (form.omitSubmitter) await submit.evaluate((el) => el.removeAttribute("name"));
+  if (form.noValidate) await page.locator(`form[action="${form.action}"]`).first().evaluate((el) => ((el as HTMLFormElement).noValidate = true));
   const [response] = await Promise.all([
     page.waitForResponse((res) => res.request().method() === "POST" && new URL(res.url()).pathname === form.action),
     submit.click(),

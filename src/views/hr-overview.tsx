@@ -5,7 +5,7 @@ import { romanGrade, type MandatoryGrade } from "../engine/grades";
 import type { CycleState, CycleStep } from "../hr/cycle-state";
 import type { OfficeStats } from "../hr/stats";
 import type { Person } from "../people";
-import { LegalBasis, PageHeader } from "./components";
+import { ErrorSummary, FieldError, LegalBasis, PageHeader, errorId, invalid, type FormErrors } from "./components";
 import { Layout, formatDate } from "./layout";
 
 const DOW_ACC = ["niedzielę", "poniedziałek", "wtorek", "środę", "czwartek", "piątek", "sobotę"];
@@ -207,7 +207,10 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
 }
 
 /** Sprzeciwy czekające na wynik rozpatrzenia: nad tabelą, jeden formularz na sprzeciw (trasa POST /cycles/:id/objection-outcome). */
-export function ObjectionsBlock(props: { rows: StateRow[] }) {
+/** Klucz błędu wyboru wyniku w formularzu jednego sprzeciwu (pole i komunikat przy nim). */
+export const objectionField = (cycleId: string) => `outcome-${cycleId}`;
+
+export function ObjectionsBlock(props: { rows: StateRow[]; errors?: FormErrors }) {
   const open = props.rows.filter((r) => r.state.step === "objection_filed");
   if (open.length === 0) return null;
   return (
@@ -224,15 +227,16 @@ export function ObjectionsBlock(props: { rows: StateRow[] }) {
               <Deadline r={r} />
             </p>
           </div>
-          <fieldset class="hr-obj-pick">
+          <fieldset class="hr-obj-pick" aria-describedby={props.errors?.[objectionField(r.cycleId)] ? errorId(objectionField(r.cycleId)) : undefined}>
             <legend class="lbl">Wynik rozpatrzenia sprzeciwu</legend>
+            <FieldError id={objectionField(r.cycleId)} errors={props.errors} />
             {[
               ["changed", "Uwzględniony: zmiana oceny"],
               ["redone", "Uwzględniony: ponowne sporządzenie oceny"],
               ["rejected", "Nieuwzględniony"],
             ].map(([value, label], i) => (
               <label class="cb">
-                <input type="radio" name="outcome" value={value} required={i === 0} />
+                <input type="radio" name="outcome" value={value} required={i === 0} id={i === 0 ? objectionField(r.cycleId) : undefined} aria-invalid={invalid(objectionField(r.cycleId), props.errors)["aria-invalid"]} />
                 <span class="box" aria-hidden="true"></span>
                 <span class="cbt">{label}</span>
               </label>
@@ -245,7 +249,7 @@ export function ObjectionsBlock(props: { rows: StateRow[] }) {
   );
 }
 
-export function HrOverviewView(props: { viewer: Person; today: string; cards: ReminderProps[]; rows: StateRow[]; stats: OfficeStats; awarded?: { dative: string; date: string } }) {
+export function HrOverviewView(props: { viewer: Person; today: string; cards: ReminderProps[]; rows: StateRow[]; stats: OfficeStats; awarded?: { dative: string; date: string }; errors?: FormErrors }) {
   return (
     <Layout title="Stan cykli" person={props.viewer} today={props.today}>
       <PageHeader
@@ -258,6 +262,7 @@ export function HrOverviewView(props: { viewer: Person; today: string; cards: Re
           </a>
         }
       />
+      <ErrorSummary errors={props.errors} title="Nie odnotowano wyniku rozpatrzenia" />
       {props.awarded ? (
         <div class="st ok" role="status">
           <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
@@ -267,7 +272,7 @@ export function HrOverviewView(props: { viewer: Person; today: string; cards: Re
       {props.cards.map((c) => (
         <ReminderCard {...c} />
       ))}
-      <ObjectionsBlock rows={props.rows} />
+      <ObjectionsBlock rows={props.rows} errors={props.errors} />
       <section class="card hr-cyclecard" aria-labelledby="h-cycles">
         <h2 id="h-cycles">Cykle oceny</h2>
         <CycleStateTable rows={props.rows} />

@@ -6,6 +6,7 @@ import { criterion } from "../engine/scoring";
 import type { SheetData } from "../hr/sheet-data";
 import type { Person } from "../people";
 import { ConfirmationBlock, LegalBasis, PageHeader } from "./components";
+import { inSentence } from "../assessment/corrections";
 import { Layout, formatDate } from "./layout";
 
 const DASH = "—";
@@ -311,7 +312,7 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
                   {d.corrections.map((c) => (
                     <li>
                       <SheetField label={`${formatDate(c.date)}, ${c.actorName}: ${c.label}`}>
-                        {`Było: ${c.field === "interviewDate" && c.from ? formatDate(c.from) : c.from || DASH}. Jest: ${c.field === "interviewDate" ? formatDate(c.to) : c.to}. Powód: ${c.reason}`}
+                        {`Było: ${c.field === "interviewDate" && c.from ? formatDate(c.from) : inSentence(c.from) || DASH}. Jest: ${c.field === "interviewDate" ? formatDate(c.to) : inSentence(c.to)}. Powód: ${c.reason}`}
                       </SheetField>
                     </li>
                   ))}

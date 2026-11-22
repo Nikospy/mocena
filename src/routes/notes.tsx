@@ -20,6 +20,7 @@ import { NoteFormView, type CriteriaGroup, type NoteFormValues } from "../views/
 import { NotesListView, type NoteGroup } from "../views/notes-list";
 import { activeInvitations, canInvite } from "../invitations";
 import { InvitationBlock } from "../views/invitation";
+import { errorPage } from "../views/error-page";
 
 /** Adres przekierowania po zapisie notatki. Notatka ze zmianą zadań prowadzi na pytanie S-05. */
 export function afterNoteSaved(note: Note): string {
@@ -66,8 +67,8 @@ function writeGuard(c: Context): { viewer: Person; subject: Person } | Response 
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
   const subject = personById(c.req.param("personId") ?? "");
-  if (!subject) return c.text("Nie ma takiej osoby.", 404);
-  if (!canWriteNoteAbout(viewer.id, subject.id)) return c.text("Brak uprawnień do pisania notatek o tej osobie.", 403);
+  if (!subject) return errorPage(c, "Nie ma takiej osoby w danych urzędu.", 404);
+  if (!canWriteNoteAbout(viewer.id, subject.id)) return errorPage(c, "Notatki o tej osobie pisze jej oceniający albo przełożony.", 403);
   return { viewer, subject };
 }
 
@@ -116,7 +117,7 @@ app.post("/people/:personId/notes", async (c) => {
 
 /** Podpowiedź na żywo dla formularza. Niczego nie zapisuje, więc odpowiada 200. */
 app.post("/suggestions/note", async (c) => {
-  if (!currentPerson(c)) return c.text("Brak uprawnień.", 403);
+  if (!currentPerson(c)) return errorPage(c, "Wybierz konto, żeby dostać podpowiedź.", 403);
   const body = await c.req.parseBody();
   return c.json(await suggestForNote(str(body.text)));
 });
@@ -144,6 +145,8 @@ app.get("/notes", (c) => {
     const needsCriteria = cycle && ["not_started", "draft"].includes(part1Status(cycle.id).state);
     groups.push({ person, notes: own, canWrite, cycleAction: needsCriteria ? "Wyznacz kryteria" : undefined, cycleHref: cycle && cycle.appraiser_id === viewer.id ? `/cycles/${cycle.id}` : undefined });
   }
+  // Oceniany bez zespołu i bez własnych notatek nie ma tu czego oglądać: strona odmowy z wyjściem do jego spraw.
+  if (groups.length === 0 && viewer.role !== "appraiser") return errorPage(c, "Notatki o zespole prowadzą oceniający i przełożeni. Twoje sprawy są na liście spraw.", 403);
   const latest = (g: NoteGroup) => g.notes[0]?.date ?? "";
   groups.sort((a, b) => latest(b).localeCompare(latest(a)) || a.person.name.localeCompare(b.person.name, "pl"));
   return c.html(<NotesListView viewer={viewer} today={today()} groups={groups} saved={c.req.query("saved") !== undefined} sent={c.req.query("sent") !== undefined} />);
@@ -156,8 +159,8 @@ function feedbackGuard(c: Context): { viewer: Person; note: Note; subject: Perso
   const id = Number(c.req.param("id"));
   const note = Number.isInteger(id) ? noteById(id) : null;
   const subject = note ? personById(note.subject_id) : null;
-  if (!note || !subject) return c.text("Nie ma takiej notatki.", 404);
-  if (note.author_id !== viewer.id) return c.text("Brak uprawnień do tej notatki.", 403);
+  if (!note || !subject) return errorPage(c, "Nie ma takiej notatki. Mogła zostać usunięta.", 404);
+  if (note.author_id !== viewer.id) return errorPage(c, "Notatkę widzi tylko jej autor.", 403);
   return { viewer, note, subject };
 }
 
@@ -187,8 +190,8 @@ app.get("/cycles/:id/cards/assessment-conversation", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
   const cycle = visibleCycleById(c.req.param("id") ?? "");
-  if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
-  if (cycle.appraiser_id !== viewer.id) return c.text("Brak uprawnień do tego cyklu.", 403);
+  if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
+  if (cycle.appraiser_id !== viewer.id) return errorPage(c, "Ten ekran widzi oceniający tego cyklu.", 403);
   return c.html(
     <AssessmentCardView
       viewer={viewer}

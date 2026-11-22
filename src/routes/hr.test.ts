@@ -59,7 +59,13 @@ describe("ekran kadr /hr (krok 5 pokazu)", () => {
   test("dostęp: Piotr 403, bez konta przekierowanie na /account", async () => {
     const r = await call(app, "piotr", "/hr");
     expect(r.status).toBe(403);
-    expect(await r.text()).toBe("Ten ekran widzą kadry.");
+    const h = await r.text();
+    // Strona błędu w układzie: nagłówek, zdanie z trasy, wyjście do spraw i zmiana konta.
+    expect(r.headers.get("content-type")).toContain("text/html");
+    expect(h).toContain("Nie masz dostępu do tego ekranu");
+    expect(h).toContain("Ten ekran widzą kadry.");
+    expect(h).toContain('href="/account"');
+    expect(h).toContain("Wróć do spraw");
     expect((await app.request("/hr", { redirect: "manual" })).headers.get("location")).toBe("/account");
   });
 });

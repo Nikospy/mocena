@@ -16,7 +16,8 @@ import { currentPerson, DEMO_DIRECTOR_GENERAL_ID, personById, type Person } from
 import { today } from "../settings";
 import { Layout } from "../views/layout";
 import { PageHeader } from "../views/components";
-import { HrOverviewView, StatsBlock, type StateRow } from "../views/hr-overview";
+import { HrOverviewView, StatsBlock, objectionField, type StateRow } from "../views/hr-overview";
+import { errorPage } from "../views/error-page";
 
 const app = new Hono();
 
@@ -27,7 +28,7 @@ registerHomeTasks((person) => person.id === DEMO_DIRECTOR_GENERAL_ID
 app.get("/office/statistics", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  if (viewer.id !== DEMO_DIRECTOR_GENERAL_ID) return c.text("Ten ekran widzi dyrektor generalny urzędu.", 403);
+  if (viewer.id !== DEMO_DIRECTOR_GENERAL_ID) return errorPage(c, "Ten ekran widzi dyrektor generalny urzędu. Zmień konto na „Barbara Szymańska”.", 403);
   return c.html(
     <Layout title="Terminowość w urzędzie" person={viewer} today={today()}>
       <PageHeader title="Terminowość w urzędzie" lead="Ile ocen powstało w terminie i na jakim etapie są cykle w całym urzędzie." />
@@ -52,7 +53,7 @@ export function overviewData(viewer: Person) {
     today: today(),
     links: [
       ...cycleLinks(c, viewer),
-      ...(assessmentState(c.id).snapshot ? [{ label: "Pobierz ocenę (JSON)", href: `/cycles/${c.id}/assessment/export.json` }] : []),
+      ...(assessmentState(c.id).snapshot ? [{ label: "Pobierz ocenę do systemu kadrowego (plik JSON)", href: `/cycles/${c.id}/assessment/export.json` }] : []),
     ],
   }));
   // Najpierw cykle wymagające działania, zamknięte (zapoznanie, fikcja, rozpatrzony sprzeciw) na końcu; w grupie od najbliższego terminu.
@@ -74,7 +75,7 @@ export function overviewData(viewer: Person) {
 app.get("/hr", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  if (viewer.role !== "hr") return c.text("Ten ekran widzą kadry.", 403);
+  if (viewer.role !== "hr") return errorPage(c, "Ten ekran widzą kadry.", 403);
   const { rows, cards, stats } = overviewData(viewer);
   // Komunikat po „Odnotuj przyznanie stopnia”: tylko gdy taki wpis naprawdę istnieje.
   const awardedId = c.req.query("awarded");
@@ -92,11 +93,11 @@ const OUTCOMES = ["changed", "redone", "rejected"];
 app.post("/hr/grades/:personId", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  if (viewer.role !== "hr") return c.text("Tę czynność wykonują kadry.", 403);
+  if (viewer.role !== "hr") return errorPage(c, "Tę czynność wykonują kadry.", 403);
   const person = personById(c.req.param("personId"));
-  if (!person) return c.text("Nie ma takiej osoby.", 404);
+  if (!person) return errorPage(c, "Nie ma takiej osoby w danych urzędu.", 404);
   const grade = mandatoryGradeOf(person.id);
-  if (!grade || grade.toGrade === null) return c.text("Nie ma obowiązku przyznania stopnia albo został już odnotowany.", 409);
+  if (!grade || grade.toGrade === null) return errorPage(c, "Przyznanie stopnia jest już odnotowane albo obowiązek nie powstał. Wróć do „Stan cykli”.", 409);
   recordEvent("mandatory_grade_awarded", grade.cycleId, viewer.id, { personId: person.id, fromGrade: grade.fromGrade, toGrade: grade.toGrade, basis: grade.basis });
   return c.redirect(`/hr?awarded=${person.id}`, 303);
 });
@@ -104,15 +105,22 @@ app.post("/hr/grades/:personId", (c) => {
 app.post("/cycles/:id/objection-outcome", async (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  if (viewer.role !== "hr") return c.text("Tę czynność wykonują kadry.", 403);
+  if (viewer.role !== "hr") return errorPage(c, "Tę czynność wykonują kadry.", 403);
   const cycle = cycleById(c.req.param("id"));
-  if (!cycle || !visibleEvents(cycle.id).some((e) => e.type === "cycle_started")) return c.text("Nie ma takiego cyklu.", 404);
+  if (!cycle || !visibleEvents(cycle.id).some((e) => e.type === "cycle_started")) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
   const body = await c.req.parseBody();
   const outcome = typeof body.outcome === "string" ? body.outcome : "";
-  if (!OUTCOMES.includes(outcome)) return c.text("Nieznane rozstrzygnięcie sprzeciwu.", 422);
+  if (!OUTCOMES.includes(outcome)) {
+    // Ten sam ekran z formularzem sprzeciwu, komunikat przy polu wyboru wyniku (422).
+    const { rows, cards, stats } = overviewData(viewer);
+    // Bez formularza tego sprzeciwu na ekranie komunikat stoi tylko w podsumowaniu (klucz „_” nie robi odnośnika).
+    const field = rows.some((r) => r.cycleId === cycle.id && r.state.step === "objection_filed") ? objectionField(cycle.id) : "_outcome";
+    const errors = { [field]: "Wybierz wynik rozpatrzenia sprzeciwu: zmiana oceny, ponowne sporządzenie oceny albo nieuwzględnienie sprzeciwu." };
+    return c.html(<HrOverviewView viewer={viewer} today={today()} cards={cards} rows={rows} stats={stats} errors={errors} />, 422);
+  }
   const ev = visibleEvents(cycle.id);
   if (!ev.some((e) => e.type === "objection_filed") || ev.some((e) => e.type === "objection_resolved")) {
-    return c.text("Sprzeciw nie czeka na rozstrzygnięcie.", 409);
+    return errorPage(c, "Ten sprzeciw jest już rozpatrzony albo nie został wniesiony. Wróć do „Stan cykli”.", 409);
   }
   recordEvent("objection_resolved", cycle.id, viewer.id, { outcome });
   return c.redirect("/hr", 303);

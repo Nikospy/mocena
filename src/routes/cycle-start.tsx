@@ -19,11 +19,12 @@ import { getDb } from "../db";
 import { formatDate } from "../views/layout";
 import { activeInvitations, canInvite } from "../invitations";
 import { InvitationBlock } from "../views/invitation";
+import { errorPage } from "../views/error-page";
 
 const isParty = (c: Cycle, p: Person) => actsAsAppraiser(c.appraiser_id, p.id) || c.person_id === p.id;
 
 registerCycleLinks((cycle, person) =>
-  isParty(cycle, person) ? [{ label: "Karta rozmowy rozpoczynającej", href: `/cycles/${cycle.id}/cards/opening` }] : [],
+  isParty(cycle, person) ? [{ label: "Karta rozmowy o kryteriach", href: `/cycles/${cycle.id}/cards/opening` }] : [],
 );
 
 registerCycleLinks((cycle, person) =>
@@ -86,8 +87,8 @@ function guard(c: Context, opts: { hrRead?: boolean } = {}): Response | Ctx {
   const person = currentPerson(c);
   if (!person) return c.redirect("/account");
   const cycle = visibleCycleById(c.req.param("id") ?? "");
-  if (!cycle) return c.text("Nie ma takiego cyklu.", 404);
-  if (!isParty(cycle, person) && !(opts.hrRead && person.role === "hr")) return c.text("Brak uprawnień do tego cyklu.", 403);
+  if (!cycle) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
+  if (!isParty(cycle, person) && !(opts.hrRead && person.role === "hr")) return errorPage(c, "Ten cykl oceny widzą oceniany, jego oceniający i kadry.", 403);
   return { cycle, person };
 }
 
@@ -176,7 +177,7 @@ const LOCKED = "Część I jest już przekazana. Kryteriów i terminu nie można
 async function write(c: Context, submit: boolean) {
   const g = guard(c);
   if (g instanceof Response) return g;
-  if (!actsAsAppraiser(g.cycle.appraiser_id, g.person.id)) return c.text("Tylko bieżący oceniający może wyznaczyć kryteria.", 403);
+  if (!actsAsAppraiser(g.cycle.appraiser_id, g.person.id)) return errorPage(c, "Kryteria wyznacza bieżący oceniający.", 403);
   if (isPart1Locked(g.cycle.id)) return renderPart1(c, g, { errors: [LOCKED], status: 409 });
   const input = readInput(await c.req.parseBody({ all: true }));
   const res = (submit ? submitPart1 : saveCriteria)(g.cycle.id, g.person.id, input);
@@ -190,7 +191,7 @@ app.post("/cycles/:id/part1/submit", (c) => write(c, true));
 app.post("/cycles/:id/part1/confirm", (c) => {
   const g = guard(c);
   if (g instanceof Response) return g;
-  if (g.cycle.person_id !== g.person.id) return c.text("Tylko oceniany może potwierdzić część I.", 403);
+  if (g.cycle.person_id !== g.person.id) return errorPage(c, "Część I potwierdza oceniany.", 403);
   const res = confirmPart1(g.cycle.id, g.person.id);
   if (!res.ok) return renderPart1(c, g, { errors: res.errors, status: 409 });
   return c.redirect(`/cycles/${g.cycle.id}/part1`, 303);

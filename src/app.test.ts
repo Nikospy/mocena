@@ -41,7 +41,12 @@ describe("trasy F-01", () => {
 
   test("POST /account z nieznaną osobą daje 422", async () => {
     const { app } = createTestApp();
-    expect((await login(app, "nie-ma")).status).toBe(422);
+    const r = await login(app, "nie-ma");
+    expect(r.status).toBe(422);
+    const h = await r.text();
+    expect(h).toContain('href="#acc-first"');
+    expect(h).toContain('id="person_id-error"');
+    expect(h).toMatch(/id="acc-first"[^>]*aria-invalid="true"/);
   });
 
   test("POST /demo/date: późniejsza przesuwa, wcześniejsza i równa dają 422", async () => {
@@ -49,7 +54,13 @@ describe("trasy F-01", () => {
     const ok = await app.request("/demo/date", form("2025-06-02"));
     expect(ok.status).toBe(303);
     expect(today()).toBe("2025-06-02");
-    expect((await app.request("/demo/date", form("2025-01-01"))).status).toBe(422);
+    const bad = await app.request("/demo/date", form("2025-01-01"));
+    expect(bad.status).toBe(422);
+    const h = await bad.text();
+    expect(h).toMatch(/<details class="demo-date" open/);
+    expect(h).toMatch(/id="demo-date"[^>]*aria-invalid="true"/);
+    expect(h).toContain('id="date-error"');
+    expect(h).toContain('href="#demo-date"');
     expect((await app.request("/demo/date", form("2025-06-02"))).status).toBe(422);
     expect((await app.request("/demo/date", form("2025-02-30"))).status).toBe(422);
     expect(today()).toBe("2025-06-02");

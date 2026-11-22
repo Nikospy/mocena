@@ -8,10 +8,11 @@ import { applyTourStop, isTourStopId } from "../tour/state";
 import { cycleIdOf, stopById, stopScreenPath } from "../tour/stops";
 import { TourDone } from "../views/tour-done";
 import { TourEntry } from "../views/tour-entry";
+import { errorPage } from "../views/error-page";
 
 const app = new Hono();
 
-app.use("/tour/*", (c, next) => isDemoMode() ? next() : c.text("Ta funkcja jest dostępna w pokazie.", 403));
+app.use("/tour/*", (c, next) => isDemoMode() ? next() : errorPage(c, "Ta funkcja działa tylko w trybie pokazu.", 403));
 
 const COOKIE_OPTS = { path: "/", httpOnly: true, sameSite: "Lax" } as const;
 
@@ -35,25 +36,25 @@ app.post("/tour/extra/:id", (c) => {
   let path: string;
   if (id === "ewa-timeline") {
     const stop = stopById("5b");
-    if (!stop) return c.text("Nie ma takiego dodatku.", 404);
+    if (!stop) return errorPage(c, "Nie ma takiego kroku pokazu.", 404, <a href="/tour">Wróć do pokazu</a>);
     applyTourStop(db, stop);
     const ewa = cycleIdOf("ewa");
-    if (!ewa) return c.text("Nie ma takiego dodatku.", 404);
+    if (!ewa) return errorPage(c, "Nie ma takiego kroku pokazu.", 404, <a href="/tour">Wróć do pokazu</a>);
     personId = "joanna";
     path = `/cycles/${ewa}/timeline`;
   } else if (id === "fiction") {
     const stop = stopById("5");
-    if (!stop) return c.text("Nie ma takiego dodatku.", 404);
+    if (!stop) return errorPage(c, "Nie ma takiego kroku pokazu.", 404, <a href="/tour">Wróć do pokazu</a>);
     applyTourStop(db, stop);
     const piotr = cycleIdOf("piotr");
-    if (!piotr) return c.text("Nie ma takiego dodatku.", 404);
+    if (!piotr) return errorPage(c, "Nie ma takiego kroku pokazu.", 404, <a href="/tour">Wróć do pokazu</a>);
     personId = "marek";
     path = `/cycles/${piotr}/assessment/fiction`;
   } else if (id === "sources") {
     personId = "admin";
     path = "/admin/suggestion-sources";
   } else {
-    return c.text("Nie ma takiego dodatku.", 404);
+    return errorPage(c, "Nie ma takiego kroku pokazu.", 404, <a href="/tour">Wróć do pokazu</a>);
   }
   deleteCookie(c, TOUR_COOKIE, { path: "/" });
   setCookie(c, PERSON_COOKIE, personId, COOKIE_OPTS);
@@ -63,7 +64,7 @@ app.post("/tour/extra/:id", (c) => {
 app.post("/tour/:stop", (c) => {
   const id = c.req.param("stop");
   const stop = isTourStopId(id) ? stopById(id) : null;
-  if (!stop) return c.text("Nie ma takiego przystanku.", 404);
+  if (!stop) return errorPage(c, "Nie ma takiego kroku pokazu.", 404, <a href="/tour">Wróć do pokazu</a>);
   applyTourStop(getDb(), stop);
   setCookie(c, PERSON_COOKIE, stop.personId, COOKIE_OPTS);
   setCookie(c, TOUR_COOKIE, stop.id, COOKIE_OPTS);

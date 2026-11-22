@@ -1,5 +1,6 @@
 import type { Child } from "hono/jsx";
-import type { Person } from "../people";
+import type { Context } from "hono";
+import { currentPerson, type Person } from "../people";
 import { Layout } from "./layout";
 import { PageHeader } from "./components";
 
@@ -63,4 +64,13 @@ export function ServerErrorPage() {
       </section>
     </Layout>
   );
+}
+
+/**
+ * `errorPage(c, message, status)`: odpowiedź trasy z błędem jako strona dla człowieka: ten sam kod stanu, układ z menu bieżącego konta, jedno zdanie.
+ * Pliki (CSV, ICS) i odpowiedzi dla `fetch` z `public/*.js` zostają przy `c.text`.
+ */
+export function errorPage(c: Context, message: string, status: ErrorStatus, extra?: Child) {
+  // String() renderuje widok od razu, więc wynik jest gotową odpowiedzią (strażnicy tras sprawdzają `instanceof Response`).
+  return c.html(String(<ErrorPage status={status} message={message} person={currentPerson(c)} extra={extra} />), status);
 }

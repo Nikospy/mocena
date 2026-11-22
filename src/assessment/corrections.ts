@@ -75,3 +75,6 @@ export function validateCorrection(input: CorrectionInput, current: Record<Corre
   if (Object.keys(errors).length) return { ok: false, errors };
   return { ok: true, field: input.field as CorrectableField, value };
 }
+
+/** Wartość wstawiana w zdanie „Było: … . Jest: … .”: bez kropki na końcu, żeby nie powstało „komórkami.. Jest:”. */
+export const inSentence = (v: string): string => v.replace(/[.\s]+$/, "");

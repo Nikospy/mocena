@@ -28,7 +28,8 @@ import { TourEntry } from "./views/tour-entry";
 import { Layout, formatDate } from "./views/layout";
 import { NotFoundPage, ServerErrorPage } from "./views/error-page";
 import { AboutPage } from "./views/about";
-import { LegalBasis, PageHeader } from "./views/components";
+import { ErrorSummary, FieldError, LegalBasis, PageHeader, invalid } from "./views/components";
+import { errorPage } from "./views/error-page";
 
 const app = new Hono();
 
@@ -46,13 +47,13 @@ const CHEVRON_R = (
   </svg>
 );
 
-function AccountRow(props: { a: ReturnType<typeof accounts>[number] }) {
+function AccountRow(props: { a: ReturnType<typeof accounts>[number]; first?: boolean; error?: string }) {
   const { a } = props;
   const role = roleLabel(a);
   const title = a.position_title && a.position_title !== role ? a.position_title : null;
   return (
     <li>
-      <button class="acc" type="submit" name="person_id" value={a.id}>
+      <button class="acc" type="submit" name="person_id" value={a.id} id={props.first ? "acc-first" : undefined} {...(props.error ? invalid("person_id", { person_id: props.error }) : {})}>
         <span class="acc-main"><b>{a.name}</b><span class="cap">{title ? `${title} · ${role}` : role}</span></span>
         {CHEVRON_R}
       </button>
@@ -85,17 +86,18 @@ function AccountScreen(props: { error?: string }) {
           title={demo ? "Wybierz konto pokazowe" : "Wybierz konto"}
           lead={demo ? "Każde konto pokazuje ekrany jednej osoby w cyklu oceny. Konto zmienisz w każdej chwili w menu przy nazwisku." : undefined}
         />
-        {props.error ? <p class="st bad" role="alert">{props.error}</p> : null}
+        <ErrorSummary errors={props.error ? { person_id: props.error } : undefined} fields={{ person_id: "acc-first" }} title="Nie wybrano konta" />
         <form method="post" action="/account" class="acc-form">
+          <FieldError id="person_id" message={props.error} />
           {demo ? <h2 class="acc-h" id="acc-tour">Osoby z pokazu</h2> : null}
           {demo ? (
             <ul class="acc-grid" aria-labelledby="acc-tour">
-              {tourAccounts.map((a) => <AccountRow a={a} />)}
+              {tourAccounts.map((a, i) => <AccountRow a={a} first={i === 0} error={props.error} />)}
             </ul>
           ) : null}
           {demo ? <h2 class="acc-h" id="acc-other">Pozostałe konta</h2> : null}
           <ul class="acc-grid" aria-labelledby={demo ? "acc-other" : undefined}>
-            {others.map((a) => <AccountRow a={a} />)}
+            {others.map((a, i) => <AccountRow a={a} first={!tourAccounts.length && i === 0} error={props.error} />)}
           </ul>
         </form>
         {demo ? (
@@ -240,7 +242,7 @@ app.post("/account", async (c) => {
 });
 
 app.post("/demo/restart", (c) => {
-  if (!isDemoMode()) return c.text("Ta funkcja jest dostępna w pokazie.", 403);
+  if (!isDemoMode()) return errorPage(c, "Ta funkcja działa tylko w trybie pokazu.", 403);
   const db = getDb();
   db.transaction(() => {
     const tables = db
@@ -255,19 +257,21 @@ app.post("/demo/restart", (c) => {
 });
 
 app.post("/demo/date", async (c) => {
-  if (!isDemoMode()) return c.text("Ta funkcja jest dostępna w pokazie.", 403);
+  if (!isDemoMode()) return errorPage(c, "Ta funkcja działa tylko w trybie pokazu.", 403);
   const body = await c.req.parseBody();
   const date = typeof body.date === "string" ? body.date : "";
   const valid = /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(Date.parse(date)) && new Date(date).toISOString().slice(0, 10) === date;
   if (!valid || date <= today()) {
+    // Pasek pokazu wraca rozwinięty, z komunikatem przy polu daty; podsumowanie nad treścią prowadzi do pola.
     const person = currentPerson(c);
+    const message = "Podaj datę późniejszą niż dzisiejsza: data pokazu przesuwa się tylko do przodu.";
     return c.html(
-      <Layout title="Data systemowa" person={person} today={today()}>
+      <Layout title="Nie zmieniono daty" person={person} today={today()} demoDateError={message}>
         <PageHeader title="Nie zmieniono daty" />
-        <section class="card">
-          <p class="req" role="alert">Data systemowa może tylko przesuwać się do przodu: podaj datę późniejszą niż bieżąca.</p>
-          <a class="btn text" href="/">Wróć na stronę główną</a>
-        </section>
+        <ErrorSummary errors={{ date: message }} fields={{ date: "demo-date" }} title="Nie zmieniono daty pokazu" />
+        <p class="err-back">
+          <a href="/">Wróć do spraw</a>
+        </p>
       </Layout>,
       422,
     );
