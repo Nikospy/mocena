@@ -26,3 +26,27 @@ test("sprawa wskazuje słownie przekroczony termin dopiero następnego dnia", as
   await call(app, "marek", "/demo/date", { date: "2024-12-28" });
   expect(await html(app, "marek", "/")).toContain("po terminie od <b>27.12.2024</b>");
 });
+
+test("Barbara może wybrać konto, rozpatrzyć wniosek Anny i zobaczyć statystyki bez listy osób", async () => {
+  const { app } = createTestApp({ today: "2026-11-22" });
+  expect(await (await app.request("/account")).text()).toContain('value="dyrektor-urzedu"');
+  expect((await call(app, "anna", "/account", { person_id: "dyrektor-urzedu" })).status).toBe(303);
+  const home = await html(app, "dyrektor-urzedu", "/");
+  expect(home).toContain("Rozpatrz wniosek");
+  expect(home).toContain('href="/cycles/cycle-anna/deadline-change"');
+  expect(home).toContain('href="/office/statistics"');
+
+  const stats = await html(app, "dyrektor-urzedu", "/office/statistics");
+  expect(stats).toContain('id="statystyki"');
+  expect(stats).toContain('class="stat"');
+  expect(stats).not.toMatch(/Anna Kwiatkowska|Piotr Wójcik|Tomasz Kamiński/);
+  expect((await call(app, "marek", "/office/statistics")).status).toBe(403);
+  expect((await call(app, "dyrektor-urzedu", "/hr")).status).toBe(403);
+
+  const decision = await call(app, "dyrektor-urzedu", "/cycles/cycle-anna/deadline-change", {
+    case: "4", newDate: "2027-03-15", reason: "Zmiana stanowiska pracy",
+  });
+  expect(decision.status).toBe(303);
+  expect(decision.headers.get("location")).toMatch(/\/letter$/);
+  expect(await html(app, "dyrektor-urzedu", "/")).not.toContain("Rozpatrz wniosek");
+});

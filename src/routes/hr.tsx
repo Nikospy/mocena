@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import "../hr/links";
+import { registerHomeTasks } from "../home-tasks";
 import { cycleLinks } from "../cycle-links";
 import { getDb } from "../db";
 import { recordEvent, visibleEvents, visibleEventsOfType } from "../events";
@@ -9,11 +10,29 @@ import { mandatoryGradeOf } from "../hr/history";
 import { latestCycles } from "../hr/latest-cycles";
 import { officeStats } from "../hr/stats";
 import { cycleById, previousCycleOf } from "../cycles";
-import { currentPerson, personById, type Person } from "../people";
+import { currentPerson, DEMO_DIRECTOR_GENERAL_ID, personById, type Person } from "../people";
 import { today } from "../settings";
-import { HrOverviewView, type StateRow } from "../views/hr-overview";
+import { Layout } from "../views/layout";
+import { HrOverviewView, StatsBlock, type StateRow } from "../views/hr-overview";
 
 const app = new Hono();
+
+registerHomeTasks((person) => person.id === DEMO_DIRECTOR_GENERAL_ID
+  ? [{ title: "Terminowość w urzędzie", href: "/office/statistics", action: "Zobacz statystyki" }]
+  : []);
+
+app.get("/office/statistics", (c) => {
+  const viewer = currentPerson(c);
+  if (!viewer) return c.redirect("/account");
+  if (viewer.id !== DEMO_DIRECTOR_GENERAL_ID) return c.text("Ten ekran widzi dyrektor generalny urzędu.", 403);
+  return c.html(
+    <Layout title="Terminowość w urzędzie" person={viewer} today={today()}>
+      <h1>Statystyki urzędu</h1>
+      <StatsBlock stats={officeStats()} />
+    </Layout>,
+  );
+});
+
 
 const CLOSED_STEPS = new Set<CycleStep>(["acknowledged", "fiction", "objection_resolved"]);
 export function overviewData(viewer: Person) {
