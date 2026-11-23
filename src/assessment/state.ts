@@ -47,7 +47,12 @@ export const OBJECTION_OUTCOME_TEXT = {
 } as const;
 
 /** Wniesiony sprzeciw i jego rozstrzygnięcie (zdarzenia `objection_filed`, `objection_resolved`). */
-export type ObjectionFacts = { filedOn: string; resolvedOn: string | null; outcome: keyof typeof OBJECTION_OUTCOME_TEXT | null };
+export type ObjectionFacts = {
+  filedOn: string;
+  resolvedOn: string | null;
+  outcome: keyof typeof OBJECTION_OUTCOME_TEXT | null;
+  reason?: string;
+};
 
 export type Acknowledgement = { place: string; date: string; name: string; objectionDeadline: string };
 export type Fiction = { reason: "could_not" | "would_not"; deliveryMethod: "in_person" | "post" | "email"; deliveredOn: string; objectionDeadline: string };
@@ -170,6 +175,9 @@ function round(ev: Ev[], start: AssessmentStateData): AssessmentStateData {
   }
   const filed = ev.filter((e) => e.type === "objection_filed").pop();
   const resolved = ev.filter((e) => e.type === "objection_resolved").pop();
-  if (filed) s.objection = { filedOn: filed.date, resolvedOn: resolved?.date ?? null, outcome: resolved?.payload.outcome ?? null };
+  if (filed) {
+    const reason = typeof filed.payload?.reason === "string" && filed.payload.reason.trim() ? filed.payload.reason.trim() : undefined;
+    s.objection = { filedOn: filed.date, resolvedOn: resolved?.date ?? null, outcome: resolved?.payload.outcome ?? null, ...(reason ? { reason } : {}) };
+  }
   return s;
 }

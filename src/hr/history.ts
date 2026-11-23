@@ -75,6 +75,7 @@ export function mandatoryGradeOf(personId: string): MandatoryGrade | null {
         outcome: h.outcome,
         overallLevel: h.overallLevel,
         acknowledgedOn: h.acknowledgedOn,
+        rulesVersion: h.rulesVersion.version,
       })),
     },
     today(),

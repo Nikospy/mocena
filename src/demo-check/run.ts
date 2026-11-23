@@ -139,6 +139,18 @@ async function openCycleAndConfirm(s: Session): Promise<string> {
   return id;
 }
 
+/** Oceny zaznaczone w formularzu oceny (szkic): `score[id]` → wartość. */
+function checkedScores(html: string): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const m of html.matchAll(/<input\b[^>]*>/g)) {
+    const tag = m[0];
+    const name = /name="score\[([^\]]+)\]"/.exec(tag);
+    const value = /value="(\d+)"/.exec(tag);
+    if (name && value && /\bchecked\b/.test(tag)) out[name[1]] = Number(value[1]);
+  }
+  return out;
+}
+
 function criteriaIn(html: string): string[] {
   return [...new Set([...html.matchAll(/name="score\[([^\]]+)\]"/g)].map((m) => m[1]))];
 }
@@ -450,10 +462,22 @@ const tourStops: TourStopCheck[] = [
     title: "Nieobecność przesuwa termin",
     next: "4",
     location: "/cycles/cycle-piotr/absences",
-    facts: async (_s, r) => {
+    facts: async (s, r) => {
       includes(r.html, 'action="/cycles/cycle-piotr/absences"', "formularz nieobecności");
-      excludes(r.html, "05.10.2026", "wpisana nieobecność Piotra");
-      return "10.11.2026, żadnej nieobecności Piotra";
+      includes(r.html, "05.10.2026–16.10.2026", "pierwsza nieobecność Piotra już wpisana");
+      excludes(r.html, "Liczone jako jedna", "złączenie przed zapisem drugiej nieobecności");
+      includes(r.html, /id="from"[^>]*value="2026-10-19"/, "formularz z datą początku drugiej nieobecności 19.10.2026");
+      includes(r.html, /id="to"[^>]*value="2026-11-06"/, "formularz z datą końca drugiej nieobecności 06.11.2026");
+      const saved = await s.post("/cycles/cycle-piotr/absences", [["from", "2026-10-19"], ["to", "2026-11-06"], ["excused", "1"]]);
+      equal(saved.location, "/cycles/cycle-piotr/timeline?saved=extended", "jedno kliknięcie „Zapisz nieobecność” przedłuża termin");
+      const tl = await s.get(saved.location!);
+      const absences = tl.html.match(/Nieobecność \d{2}\.\d{2}\.\d{4}–\d{2}\.\d{2}\.\d{4}/g) ?? [];
+      equal(absences.length, 1, "liczba nieobecności na osi czasu po zapisie");
+      includes(absences[0], "05.10.2026–06.11.2026", "jedna nieobecność 05.10–06.11.2026");
+      const again = await s.get("/cycles/cycle-piotr/absences");
+      includes(again.html, "Liczone jako jedna: 05.10.2026–06.11.2026", "ekran nieobecności: złączenie po zapisie");
+      excludes(again.html, 'value="2026-10-19"', "formularz wpisany drugi raz po zapisie");
+      return "10.11.2026, pierwsza nieobecność wpisana, druga w formularzu; po jednym zapisie jedna nieobecność 05.10–06.11.2026";
     },
   },
   {
@@ -465,10 +489,23 @@ const tourStops: TourStopCheck[] = [
       includes(r.html, 'name="score[rzetelnosc]"', "pole punktów przy Rzetelności");
       includes(r.html, "11.03.2026", "notatka z 11.03.2026");
       excludes(r.html, "/assessment/acknowledge", "zapoznanie (ocena jeszcze niezatwierdzona)");
+      const ids = criteriaIn(r.html);
+      const draft = checkedScores(r.html);
+      equal(draft["rzetelnosc"], undefined, "szkic: Rzetelność bez oceny");
+      equal(Object.keys(draft).length, ids.length - 1, "szkic: oceny przy wszystkich kryteriach oprócz Rzetelności");
+      if (!Object.values(draft).every((v) => v === 5)) throw new Mismatch("szkic: 5 przy pozostałych kryteriach", JSON.stringify(draft));
+      excludes(r.html, /res neg/, "wynik negatywny przed „1” przy Rzetelności");
+      const preview = await s.post(
+        "/cycles/cycle-piotr/assessment/preview",
+        assessmentForm(ids, { ...draft, rzetelnosc: 1 }, "2026-11-21"),
+        200,
+      );
+      includes(preview.html, /res neg/, "wynik negatywny po jednej „1” przy Rzetelności");
+      includes(preview.html, "4,43", "średnia 4,43 przy wyniku negatywnym");
       const tl = await s.get("/cycles/cycle-piotr/timeline");
       includes(tl.html, "05.10.2026–06.11.2026", "jedna nieobecność 05.10–06.11.2026");
       includes(tl.html, "33 dni", "nieobecność 33 dni");
-      return "formularz oceny, dwie nieobecności jako jedna 05.10–06.11.2026 (33 dni)";
+      return "szkic z 5 przy 6 kryteriach, po „1” przy Rzetelności wynik negatywny (średnia 4,43), nieobecność 05.10–06.11.2026 (33 dni)";
     },
   },
   {

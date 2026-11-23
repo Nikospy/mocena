@@ -101,7 +101,7 @@ Miejsca na ekranie „Skąd biorą się podpowiedzi”:
 | # | Miejsce | Co robiłby model w tle | W prototypie |
 |---|---|---|---|
 | 1 | zapis notatki | wstępnie zaznacza pole „Zmiana zadań pracownika” | działa na liście słów |
-| 2 | zapis notatki | ostrzega, że notatka zawiera dane o zdrowiu | tylko pokazane jako miejsce |
+| 2 | zapis notatki | ostrzega, że notatka zawiera dane szczególne (zdrowie, rodzina, wyznanie) | działa na liście słów (aktualizacja 23.11.2026) |
 | 3 | zapis notatki | podpowiada kryterium, którego notatka dotyczy | tylko pokazane jako miejsce |
 | 4 | zapis notatki | „podobna notatka już jest” | tylko pokazane jako miejsce |
 | 5 | karta rozmowy | dopasowuje formę rozwoju z katalogu | tylko pokazane jako miejsce |
@@ -117,7 +117,9 @@ Adapter powstaje w plastrze notatek (S-04), ekran w plastrze HR partnera (S-05).
 
 **Czego nie mówić.** Że KPRM pilotuje PLLuM (niepotwierdzone). Kwot i dat projektów państwowych bez sprawdzenia u źródła.
 
-**Odrzucono.** Uruchomienie modelu w prototypie. Działające ostrzeżenie o danych o zdrowiu jako dodatkowa funkcja.
+**Odrzucono.** Uruchomienie modelu w prototypie. Działające ostrzeżenie o danych o zdrowiu jako dodatkowa funkcja *(zastąpione aktualizacją poniżej)*.
+
+**Aktualizacja (23.11.2026).** 23.11.2026: po audycie autor zgodził się włączyć ostrzeżenie oparte na liście słów (bez modelu) — zastępuje odrzucenie powyżej. Wykrycie słowa z listy urzędu (zdrowie, życie rodzinne, wyznanie — art. 9 RODO) wyświetla ostrzeżenie i wstrzymuje zapis (422) do usunięcia fragmentu albo świadomego potwierdzenia; system niczego nie usuwa automatycznie.
 
 ## 10. Decyzje z dialogu przed budową (21.11.2026, 21:30–22:50)
 
@@ -181,6 +183,13 @@ Autor: „samo kodowanie szybko nam teraz idzie wiec mozna powiedziec ze mamy mn
 - **13g. Push na GitHub po każdym sprawdzonym etapie**, po kontroli, że w repo nie ma prywatnych ścieżek ani materiałów organizatora. Zmienia decyzję 8c (push tylko przez autora) na ten czas.
 - **13h. Wygląd przewodnika: wejście V3 (oś dwóch lat z pięcioma przystankami) i krok V2 (karta boczna z numerowaną listą „Na co patrzeć”, na telefonie zwijana karta u dołu).** Wzorzec: `context/design/mockups/tour/`. Odrzucono: pasek u góry (V1), przyciemniony ekran z dymkiem (V3 krok).
 - **13i. Dobudowujemy do pełnej wersji trzy uproszczone czynności (autor, 22.11 ok. 03:15):** zmiana terminu oceny przez oceniającego i wniosek ocenianego o zmianę terminu z rozpatrzeniem; zaproszenia na rozmowę o kryteriach i rozmowę oceniającą; dane i lista pracowników w kadrach (wyszukiwanie, sortowanie, edycja danych, zastępstwa, eksport zestawienia). Sprzeciw zostaje uproszczony. Nagranie robimy na końcu według wzoru autora. Autor: na ekranach jest za dużo tekstu (szczegóły dopisze). Odrzucono: ogłaszanie „ostatniej rundy”; poprawki trwają do oddania.
+- **13j. Sprzeciw w aplikacji i jego widoczność (23.11.2026, po audycie):** oceniany wnosi sprzeciw z uzasadnieniem bezpośrednio w aplikacji (`/cycles/:id/objection/new`), a dyrektor generalny urzędu (rozpoznawany po roli `director_general` albo stanowisku „Dyrektor generalny…”) lub kadry rozstrzygają go w 14 dni. Zgodnie z art. 83 ust. 1–3 ustawy sprzeciw jest kierowany do dyrektora generalnego urzędu, a nie do oceniającego — dlatego uzasadnienie sprzeciwu widzą oceniany, rozpatrujący (DG) i kadry, lecz nie oceniający; wgląd DG w zaskarżoną ocenę trwa wyłącznie do rozstrzygnięcia sprzeciwu. Od oceny zmienionej lub sporządzonej ponownie po sprzeciwie kolejny sprzeciw nie przysługuje (409, art. 83 ust. 5 — sąd pracy).
+
+## 14. Zmiany po audycie (23.11.2026)
+
+- **14a. Pierwsza ocena (art. 37–38 ustawy o służbie cywilnej) jest jawnie poza zakresem prototypu.** Powód: audyt zgłoszenia (cecha Z10). Dotyczy pracownika zatrudnionego na czas określony, ma odrębny tryb i wzór arkusza z innego rozporządzenia; zadanie dotyczy oceny okresowej. Pierwszy cykl oceny okresowej po zatrudnieniu na czas nieokreślony jest obsłużony. Wykluczenie jest w README, `docs/coverage.md` i na stronie `/about`. Odrzucono: budowę osobnej ścieżki pierwszej oceny.
+- **14b. Nowelizacja reguł z interfejsu jest wersjonowana i niezmienna (audyt, cecha W03, 23.11.2026).** Zmienia ustalenie z wcześniejszej wersji W03, w której publikacja nadpisywała jeden pakiet, a zatwierdzona ocena zachowywała tylko napis wersji. Teraz każdy opublikowany pakiet leży w tabeli `rule_versions` pod swoją wersją (powtórzenie wersji z inną treścią to 422), zatwierdzona ocena i jej arkusz czytają pakiet wersji zapisanej w ocenie, a `effectiveFrom` wybiera pakiet obowiązujący wg `today()`. Walidacja obejmuje tylko to, co silnik umie (terminy, nazwy, opisy, podstawy prawne); struktura (kryteria, arkusze, punkty skali, progi poziomów) wymaga zmiany programu. Odrzucono: edycję dowolnej struktury z UI oraz ciche uzupełnianie brakujących sekcji.
+- **14c. Dopisek „(ponowna ocena)” w tabeli kadr (23.11.2026).** W kolumnie „Stan cyklu” na ekranie `/hr` (i w odpowiadającej kolumnie zestawienia CSV) cykl wszczęty po ocenie negatywnej (art. 81 ust. 9 ustawy, § 7 pkt 2 rozporządzenia) ma dopisek „(ponowna ocena)”, aby odróżnić nowy cykl od poprzedniego, zamkniętego cyklu tej samej osoby. Nie łamie zasady 7 z `AGENTS.md`: opisuje tryb procedury w kolumnie stanu cyklu, a nie jest etykietą ani wskaźnikiem przy nazwisku pracownika i nie nazywa wyniku oceny (na `/hr` nie padają słowa „pozytywna”, „negatywna” ani nazwy poziomów). Odrzucono: dopisek przy nazwisku w kolumnie „Oceniany” oraz podawanie wyniku poprzedniej oceny w tabeli kadr.
 
 ## Pytania otwarte (do mentorów organizatora)
 

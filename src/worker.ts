@@ -48,6 +48,11 @@ export default {
     const cookies = request.headers.get("Cookie") ?? "";
     const existing = cookies.match(new RegExp(`(?:^|;\\s*)${SESSION_COOKIE}=([\\w-]+)`))?.[1];
 
+    // Health check: answered by a fixed Durable Object (its name cannot match the cookie pattern), so it needs no cookie and creates no visitor session.
+    if (url.pathname === "/healthz" && (request.method === "GET" || request.method === "HEAD")) {
+      return env.DEMO_SESSION.get(env.DEMO_SESSION.idFromName("internal:healthz")).fetch(request);
+    }
+
     if (url.pathname === "/demo/restart" && request.method === "POST") {
       const headers = new Headers({ Location: "/account" });
       headers.append("Set-Cookie", sessionCookie(crypto.randomUUID()));

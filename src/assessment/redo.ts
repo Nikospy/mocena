@@ -27,4 +27,4 @@ export function redoLoweringErrors(first: AssessmentSnapshot, scores: Record<str
   return errors;
 }
 
-export const REDO_BASIS = rules.objectionRedo.basis;
+export const redoBasis = (): string => rules.objectionRedo.basis;

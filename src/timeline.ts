@@ -4,7 +4,7 @@ import { registerCycleLinks } from "./cycle-links";
 import { cycleById, cycleDeadlineDetails, openCycle, visibleAbsences, type Cycle } from "./cycles";
 import { part1DeadlinesAfterObjection } from "./cycles/part1";
 import { romanGrade } from "./engine/grades";
-import { OBJECTION_OUTCOME_TEXT } from "./assessment/state";
+import { OBJECTION_OUTCOME_TEXT, assessmentInForce } from "./assessment/state";
 import { rules, rulesVersion } from "./engine/rules";
 import { visibleEvents } from "./events";
 import { personById, type Person } from "./people";
@@ -37,7 +37,7 @@ export function formatRange(from: string, to: string): string {
   return `${formatDate(from)}–${formatDate(to)}`;
 }
 
-const EXTENDS = `${rules.deadlines.longAbsenceOverMonths.basis}`;
+const extendsBasis = (): string => rules.deadlines.longAbsenceOverMonths.basis;
 
 /** Pierwszy wpis osi: dzień, od którego liczy się termin oceny (art. 81 ust. 4 albo ust. 9 ustawy). */
 function startEntry(cycleId: string, periodStart: string, kind: string): TimelineEntry {
@@ -46,8 +46,8 @@ function startEntry(cycleId: string, periodStart: string, kind: string): Timelin
     return { date: periodStart, title: "Zapoznanie z oceną negatywną: od niego liczy się termin ponownej oceny", basis: [rules.deadlines.reassessmentAfterNegativeMonths.basis], kind: "fact" };
   }
   const basis = [rules.deadlines.assessmentEveryMonths.basis];
-  if (p.previousAssessmentOn) return { date: periodStart, title: "Poprzednia ocena: od niej liczy się termin 24 miesięcy", basis, kind: "fact" };
-  return { date: periodStart, title: "Początek cyklu: od tego dnia liczy się termin 24 miesięcy", basis, kind: "fact" };
+  if (p.previousAssessmentOn) return { date: periodStart, title: `Poprzednia ocena: od niej liczy się termin ${rules.deadlines.assessmentEveryMonths.value} miesięcy`, basis, kind: "fact" };
+  return { date: periodStart, title: `Początek cyklu: od tego dnia liczy się termin ${rules.deadlines.assessmentEveryMonths.value} miesięcy`, basis, kind: "fact" };
 }
 
 export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] {
@@ -78,7 +78,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
         date: m.from,
         title: `Nieobecność ${formatRange(m.from, m.to)} (${m.days === 1 ? "1 dzień" : `${m.days} dni`})`,
         detail: sentences.join(" "),
-        basis: [EXTENDS],
+        basis: [extendsBasis()],
         kind: "fact",
       });
     }
@@ -87,7 +87,7 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
         date: r.date_from,
         title: `Nieobecność nieusprawiedliwiona ${formatRange(r.date_from, r.date_to)}`,
         detail: "Nie przedłuża terminu (art. 81 ust. 7 dotyczy nieobecności usprawiedliwionej).",
-        basis: [EXTENDS],
+        basis: [extendsBasis()],
         kind: "fact",
       });
     }
@@ -200,10 +200,9 @@ export function buildTimeline(cycleId: string, viewer: Person): TimelineEntry[] 
   return entries.sort((a, b) => a.date.localeCompare(b.date) || (a.kind === b.kind ? 0 : a.kind === "fact" ? -1 : 1));
 }
 
-/** Wersja reguł: z części I, gdy jest przekazana, inaczej bieżąca. */
+/** Wersja reguł, według której liczona jest oś: obowiązującej oceny, a bez niej obowiązująca dziś. */
 export function timelineRulesVersion(cycleId: string): { version: string; effectiveFrom: string } {
-  const sent = visibleEvents(cycleId).find((e) => e.type === "part1_submitted")?.payload?.rulesVersion;
-  return sent?.version ? sent : rulesVersion();
+  return assessmentInForce(cycleId).snapshot?.rulesVersion ?? rulesVersion();
 }
 
 registerCycleLinks((cycle, viewer) => {

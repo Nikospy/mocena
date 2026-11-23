@@ -1,4 +1,4 @@
-import { GRADES, LEVELS, OUTCOME_LABEL, SHEETS, suggestSheet, type FormErrors, type PersonForm, type PersonRow, type Sort } from "../hr/people";
+import { GRADES, levelNames, OUTCOME_LABEL, SHEETS, suggestSheet, type FormErrors, type PersonForm, type PersonRow, type Sort } from "../hr/people";
 import type { Person } from "../people";
 import { ErrorSummary as SharedErrorSummary, LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
@@ -275,7 +275,7 @@ export function PersonFormView(props: {
               <label class="lbl" for="prev_level">Poziom ogólny (jeśli znany)</label>
               <select class="area" id="prev_level" name="prev_level" {...invalid("prev_level", e.prev_level)}>
                 <option value="">Bez poziomu</option>
-                {LEVELS.map((l) => (
+                {levelNames().map((l) => (
                   <option value={l} selected={v.prev_level === l}>{l}</option>
                 ))}
               </select>

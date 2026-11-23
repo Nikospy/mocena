@@ -1,6 +1,7 @@
 import { errorPage } from "../views/error-page";
 import { Hono, type Context } from "hono";
 import { visibleCycleById, openCycle, type Cycle } from "../cycles";
+import { part1Status } from "../cycles/part1";
 import { registerCycleLinks } from "../cycle-links";
 import { getDb } from "../db";
 import { recordEvent, visibleEvents } from "../events";
@@ -66,14 +67,14 @@ registerHomeTasks((person) => {
   return tasks;
 });
 
-registerCycleLinks((cycle, person) =>
-  canInvite(person, cycle)
-    ? [
-        { label: "Zaproś na rozmowę o kryteriach", href: `/cycles/${cycle.id}/invitations/new?kind=opening` },
-        { label: "Zaproś na rozmowę oceniającą", href: `/cycles/${cycle.id}/invitations/new?kind=assessment` },
-      ]
-    : [],
-);
+registerCycleLinks((cycle, person) => {
+  if (!canInvite(person, cycle)) return [];
+  const links = [{ label: "Zaproś na rozmowę o kryteriach", href: `/cycles/${cycle.id}/invitations/new?kind=opening` }];
+  if (part1Status(cycle.id, { currentRound: true }).state === "confirmed") {
+    links.push({ label: "Zaproś na rozmowę oceniającą", href: `/cycles/${cycle.id}/invitations/new?kind=assessment` });
+  }
+  return links;
+});
 
 const app = new Hono();
 

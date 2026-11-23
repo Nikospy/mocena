@@ -1,17 +1,16 @@
 // Blokady zatwierdzenia oceny. Czysta logika: ta sama lista służy ekranowi i odmowie na serwerze.
 import type { AssessmentDraft } from "../assessment/state";
-import { rules } from "./rules";
+import { activeRules } from "./rules";
 import { computeAssessment, criterion, POINTS, type Outcome } from "./scoring";
 
 /** `items`: nazwy kryteriów zebrane w jednej linii (np. „Brakuje ocen cząstkowych: 7”). */
 export type Blocker = { field: string; message: string; basis: string; items?: string[] };
 export type GradeRequestOption = "not_applicable" | "no_only" | "yes_or_no";
 
-const A = rules.approval;
-
 export function gradeRequestOptions(p: { appointed: boolean; grade: number | null; outcome: Outcome | null }): GradeRequestOption {
+  const maxGrade = activeRules().approval.gradeRequest.maxGrade;
   if (!p.appointed) return "not_applicable";
-  if (p.outcome === "negative" || (p.grade !== null && p.grade >= A.gradeRequest.maxGrade)) return "no_only";
+  if (p.outcome === "negative" || (p.grade !== null && p.grade >= maxGrade)) return "no_only";
   return "yes_or_no";
 }
 
@@ -53,16 +52,17 @@ export function approvalBlockers(input: { criteria: string[]; draft: AssessmentD
   }
 
   const outcome = complete && criteria.length > 0 ? computeAssessment(draft.scores) : null;
+  const approval = activeRules().approval;
 
   if (!draft.developmentConclusions.trim()) {
     out.push({
       field: "developmentConclusions",
       message: "Wpisz wnioski do indywidualnego programu rozwoju zawodowego",
-      basis: A.developmentConclusions.basis,
+      basis: approval.developmentConclusions.basis,
     });
   }
   if (outcome?.justificationRequired && !draft.justification.trim()) {
-    out.push({ field: "justification", message: "Przy ocenie negatywnej uzasadnienie jest wymagane", basis: A.justification.basis });
+    out.push({ field: "justification", message: "Przy ocenie negatywnej uzasadnienie jest wymagane", basis: approval.justification.basis });
   }
   if (input.sheet === "A" && !draft.objectionRecipient?.trim()) {
     out.push({ field: "objectionRecipient", message: "Wpisz, do kogo przysługuje sprzeciw.", basis: "załącznik nr 2 do rozporządzenia" });
@@ -70,13 +70,13 @@ export function approvalBlockers(input: { criteria: string[]; draft: AssessmentD
   if (draft.gradeRequest.attached) {
     const opt = gradeRequestOptions({ appointed, grade, outcome: outcome?.outcome ?? null });
     if (opt === "not_applicable") {
-      out.push({ field: "gradeRequest", message: "Wniosku o stopień nie można dołączyć: osoba nie jest urzędnikiem mianowanym", basis: A.gradeRequest.basis });
+      out.push({ field: "gradeRequest", message: "Wniosku o stopień nie można dołączyć: osoba nie jest urzędnikiem mianowanym", basis: approval.gradeRequest.basis });
     } else if (opt === "no_only") {
       const why = outcome?.outcome === "negative" ? "ocena jest negatywna" : "osoba ma już najwyższy stopień";
-      out.push({ field: "gradeRequest", message: `Wniosku o stopień nie można dołączyć: ${why}`, basis: A.gradeRequest.basis });
+      out.push({ field: "gradeRequest", message: `Wniosku o stopień nie można dołączyć: ${why}`, basis: approval.gradeRequest.basis });
     }
     if (!draft.gradeRequest.motivation.trim()) {
-      out.push({ field: "gradeMotivation", message: "Brakuje umotywowania wniosku o stopień", basis: A.gradeRequest.basis });
+      out.push({ field: "gradeMotivation", message: "Brakuje umotywowania wniosku o stopień", basis: approval.gradeRequest.basis });
     }
   }
   return out;

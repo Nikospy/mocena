@@ -6,7 +6,13 @@ import app, { notFoundHandler } from "./index";
 // Bun-only entry: static files from ./public (on Workers they come from the assets binding).
 const local = new Hono();
 local.use("/*", async (_c, next) => {
-  ensureDefaultDb();
+  try {
+    ensureDefaultDb();
+  } catch (error) {
+    // A broken database file must not turn the health check into an HTML 500.
+    if (new URL(_c.req.url).pathname !== "/healthz") throw error;
+    return _c.json({ status: "error", db: "error" }, 503);
+  }
   await next();
 });
 local.use("/*", serveStatic({ root: "./public" }));

@@ -86,8 +86,19 @@ test("tylko uprawnione konto pobiera jedną zatwierdzoną ocenę", async () => {
   const path = "/cycles/cycle-piotr/assessment/export.json";
   expect((await call(app, "marek", path)).status).toBe(404);
   await approveAndAcknowledgePiotr(app);
-  expect(await html(app, "piotr", "/cycles/cycle-piotr/assessment")).toContain(`href="${path}"`);
-  expect(await html(app, "joanna", "/hr")).toContain(`href="${path}"`);
+  const piotrAssessment = await html(app, "piotr", "/cycles/cycle-piotr/assessment");
+  expect(piotrAssessment).toContain('<a class="btn o-export" href="/cycles/cycle-piotr/sheet?print=1">Drukuj / pobierz arkusz (PDF)</a>');
+  expect(piotrAssessment).toContain(`<p class="cap"><a href="${path}" download="">Pobierz dane oceny (JSON)</a></p>`);
+  expect(piotrAssessment).not.toContain("do systemu kadrowego");
+  expect(piotrAssessment).not.toContain("Pobierz ocenę jako plik danych (JSON)");
+  const marekAssessment = await html(app, "marek", "/cycles/cycle-piotr/assessment");
+  expect(marekAssessment).toContain('<a class="btn o-export" href="/cycles/cycle-piotr/sheet?print=1">Drukuj / pobierz arkusz (PDF)</a>');
+  expect(marekAssessment).toContain(`<p class="cap"><a href="${path}" download="">Pobierz dane oceny (JSON)</a></p>`);
+  const joannaAssessment = await html(app, "joanna", "/cycles/cycle-piotr/assessment");
+  expect(joannaAssessment).toContain(`<p class="cap"><a href="${path}" download="">Pobierz ocenę do systemu kadrowego (JSON)</a></p>`);
+  const hrPage = await html(app, "joanna", "/hr");
+  expect(hrPage).toContain(`<a href="${path}" download="">Pobierz ocenę do systemu kadrowego (JSON)</a>`);
+  expect(hrPage).not.toContain("Ocena (plik JSON)");
   expect((await call(app, "ewa", path)).status).toBe(403);
   const response = await call(app, "joanna", path);
   expect(response.headers.get("content-disposition")).toBe("attachment; filename=ocena.json");
@@ -130,4 +141,55 @@ test("kadry usuwają dane jednej osoby dopiero po potwierdzeniu", async () => {
   expect(db.query("SELECT 1 FROM absences WHERE person_id = 'piotr'").get()).toBeNull();
   expect((await call(app, "joanna", "/cycles/cycle-piotr/assessment/export.json")).status).toBe(404);
   expect((await call(app, "joanna", "/cycles/cycle-tomasz/assessment/export.json")).status).toBe(200);
+});
+
+test("statystyki dyrektora generalnego ukrywają grupy poniżej progu 5 osób i pokazują agregaty od 5 osób", async () => {
+  const { app, db } = createTestApp({ today: "2026-11-22" });
+
+  // W danych pokazowych żadna z komórek ani etapów z 1–4 osobami nie powinna ujawniać dokładnej liczby.
+  const initial = await html(app, "dyrektor-urzedu", "/office/statistics");
+  expect(initial).toContain("za mało danych (poniżej progu 5 osób)");
+  expect(initial).toContain("ustawienie urzędu");
+  expect(initial).not.toMatch(/Anna Kwiatkowska|Piotr Wójcik|Tomasz Kamiński/);
+
+  // Dodajemy 5 różnych osób w jednej komórce z otwartym cyklem (etap criteria_due) i 1 osobę w innej komórce.
+  // Przy dokładnie jednej małej grupie w podziale wtórne ukrywanie ukrywa także najmniejszą z pozostałych,
+  // a gdy małe grupy są co najmniej dwie (lub żadna), duża grupa (≥ 5 osób) pokazuje agregat.
+  for (let i = 1; i <= 5; i++) {
+    db.query(
+      "INSERT INTO people (id, name, role, unit, position_kind) VALUES (?, ?, 'employee', 'Wydział Audytu Testowego', 'staff')",
+    ).run(`stat-p-${i}`, `Osoba Testowa ${i}`);
+    db.query(
+      "INSERT INTO cycles (id, person_id, appraiser_id, period_start, sheet) VALUES (?, ?, 'marek', '2026-11-01', 'C')",
+    ).run(`stat-c-${i}`, `stat-p-${i}`);
+    db.query(
+      "INSERT INTO events (type, cycle_id, actor_id, date, payload) VALUES ('cycle_started', ?, 'marek', '2026-11-01', ?)",
+    ).run(`stat-c-${i}`, JSON.stringify({ reason: "hired", periodStart: "2026-11-01" }));
+  }
+
+  const withLargeGroup = await html(app, "dyrektor-urzedu", "/office/statistics");
+  expect(withLargeGroup).toMatch(
+    /<li class="stat"><span class="stat-label">Wydział Audytu Testowego<span class="vh">:<\/span><\/span> <b class="stat-n tnum">5<\/b><\/li>/,
+  );
+  expect(withLargeGroup).toMatch(
+    /<li class="stat"><span class="stat-label">Kryteria do wyznaczenia<span class="vh">:<\/span><\/span> <b class="stat-n tnum">[5-9]<\/b><\/li>/,
+  );
+  expect(withLargeGroup).not.toContain("Osoba Testowa 1");
+
+  // Przypadek A10/B1/C1 z recenzji: przy 12 cyklach w jednym etapie i komórkach 10/1/1 żadna z komórek nie ujawnia liczby.
+  db.exec("DELETE FROM events; DELETE FROM cycles; DELETE FROM cycle_criteria;");
+  const units = [...Array.from({ length: 10 }, () => "Wydział Alfa"), "Wydział Beta", "Wydział Gamma"];
+  units.forEach((unit, idx) => {
+    db.query("INSERT INTO people (id, name, role, unit, position_kind) VALUES (?, ?, 'employee', ?, 'staff')").run(`x-p-${idx}`, `X ${idx}`, unit);
+    db.query("INSERT INTO cycles (id, person_id, appraiser_id, period_start, sheet) VALUES (?, ?, 'marek', '2026-11-01', 'C')").run(`x-c-${idx}`, `x-p-${idx}`);
+    db.query("INSERT INTO events (type, cycle_id, actor_id, date, payload) VALUES ('cycle_started', ?, 'marek', '2026-11-01', ?)").run(
+      `x-c-${idx}`,
+      JSON.stringify({ reason: "hired", periodStart: "2026-11-01" }),
+    );
+  });
+  const a10b1c1 = await html(app, "dyrektor-urzedu", "/office/statistics");
+  expect(a10b1c1).toMatch(
+    /<li class="stat"><span class="stat-label">Wydział Alfa<span class="vh">:<\/span><\/span> <span class="stat-n cap">za mało danych \(poniżej progu 5 osób\)<\/span><\/li>/,
+  );
+  expect(a10b1c1).not.toMatch(/Wydział Alfa<\/span> <b class="stat-n tnum">10<\/b>/);
 });

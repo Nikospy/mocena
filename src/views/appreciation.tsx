@@ -38,7 +38,7 @@ export function AppreciationView(props: {
         ) : null}
       </section>
       <section class="card b-sec">
-        <h2>Fakty z Twoich notatek</h2>
+        <h2>Fakty z twoich notatek</h2>
         {props.notes.length === 0 ? (
           <div class="ap-empty">
             <p>{card.texts?.noNotes}</p>

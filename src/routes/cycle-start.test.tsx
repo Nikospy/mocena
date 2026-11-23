@@ -66,6 +66,10 @@ describe("krok 1 pokazu", () => {
       const html = await (await as(app, who, `/cycles/${piotr}/part1`)).text();
       expect(html).toContain("Termin przekazany w części I");
       expect(html).toContain("27.11.2026");
+      if (who === "piotr") {
+        expect(html).toContain("Miejscowość, data i twoje imię i nazwisko wpiszą się same.");
+        expect(html).not.toContain("Twoje imię");
+      }
     }
     expect((await as(app, "marek", `/cycles/${piotr}/part1/criteria`, good)).status).toBe(409);
     expect((await as(app, "marek", `/cycles/${piotr}/part1/submit`, good)).status).toBe(409);

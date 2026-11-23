@@ -7,7 +7,10 @@ import { visibleEvents, type AppEvent } from "./events";
 import type { Person } from "./people";
 import { today } from "./settings";
 
-export const DC = rules.deadlineChange;
+/** Reguły zmiany terminu oceny z obowiązującego pakietu, czytane przy użyciu. */
+export const DC: typeof rules.deadlineChange = new Proxy({} as typeof rules.deadlineChange, {
+  get: (_t, prop) => Reflect.get(rules.deadlineChange, prop),
+});
 export type DeadlineCase = (typeof DC.cases)[number];
 
 export function deadlineCase(n: number): DeadlineCase | undefined {
@@ -38,7 +41,7 @@ export function deadlineChangeBlocked(cycle: Cycle): Blocked {
   }
   const six = sixMonthsPassed(cycle);
   if (!six.ok) {
-    return { code: "six_months", message: `Od ostatniej oceny (${since(six.since)}) nie minęło jeszcze 6 miesięcy, więc zmiana terminu jest niedozwolona. Najwcześniej od ${since(addDay(six.earliest))}.` };
+    return { code: "six_months", message: `Od ostatniej oceny (${since(six.since)}) nie minęło jeszcze ${DC.minMonths} miesięcy, więc zmiana terminu jest niedozwolona. Najwcześniej od ${since(addDay(six.earliest))}.` };
   }
   return null;
 }

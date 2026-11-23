@@ -50,12 +50,19 @@ describe("applyTourStop", () => {
     expect(s2).toMatchObject({ part1: "confirmed", hasMarchNote: false, absences: 0, stage: "draft", demoDate: "2026-03-11" });
 
     const s3 = state(db, "3");
-    expect(s3).toMatchObject({ part1: "confirmed", hasMarchNote: true, absences: 0, stage: "draft", demoDate: "2026-11-10" });
+    expect(s3).toMatchObject({ part1: "confirmed", hasMarchNote: true, absences: 1, stage: "draft", demoDate: "2026-11-10" });
+    expect(db.query("SELECT date_from, date_to FROM absences WHERE person_id = 'piotr'").get()).toEqual({ date_from: "2026-10-05", date_to: "2026-10-16" });
     expect(s3.notes).toBe(s2.notes + 1);
     expect(visibleEvents("cycle-piotr").some((e) => e.type === "task_change_answered" && e.payload.answer === "yes")).toBe(true);
 
     const s4 = state(db, "4");
     expect(s4).toMatchObject({ part1: "confirmed", hasMarchNote: true, absences: 2, stage: "draft", demoDate: "2026-11-21" });
+    // Szkic Marka: 5 przy każdym kryterium oprócz Rzetelności, żeby jedna „1” od razu dała wynik.
+    const draft = assessmentState("cycle-piotr").draft!;
+    const ids = (db.query("SELECT criterion_id FROM cycle_criteria WHERE cycle_id = 'cycle-piotr'").all() as { criterion_id: string }[]).map((r) => r.criterion_id);
+    expect(draft.scores["rzetelnosc"]).toBeUndefined();
+    expect(Object.keys(draft.scores).sort()).toEqual(ids.filter((id) => id !== "rzetelnosc").sort());
+    expect(Object.values(draft.scores).every((v) => v === 5)).toBe(true);
 
     const s5 = state(db, "5");
     expect(s5).toMatchObject({ absences: 2, stage: "approved", demoDate: "2026-11-22" });

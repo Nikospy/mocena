@@ -298,10 +298,10 @@ export function SheetView(props: { viewer: Person; today: string; data: SheetDat
                 {d.sheet === "A" ? (
                   <>
                     <SheetField label="Sprzeciw przysługuje do:">{p2.objectionTo}</SheetField>
-                    <p>Na wniesienie sprzeciwu jest 7 dni od dnia zapoznania się z oceną (art. 83 ust. 1 ustawy).</p>
+                    <p>Na wniesienie sprzeciwu jest {rules.deadlines.objectionDays.value} dni od dnia zapoznania się z oceną ({rules.deadlines.objectionDays.basis}).</p>
                   </>
                 ) : (
-                  <p>Od oceny przysługuje sprzeciw do {p2.objectionTo} w terminie 7 dni od dnia zapoznania się z oceną (art. 83 ust. 1 ustawy).</p>
+                  <p>Od oceny przysługuje sprzeciw do {p2.objectionTo} w terminie {rules.deadlines.objectionDays.value} dni od dnia zapoznania się z oceną ({rules.deadlines.objectionDays.basis}).</p>
                 )}
               </section>
             </section>

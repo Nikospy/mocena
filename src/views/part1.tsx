@@ -212,7 +212,7 @@ export function Part1View(p: Part1ViewProps) {
               <section class="card p1-confirmation">
                 <h2>Potwierdzenie części I</h2>
                 <ConfirmationBlock kind="confirmation" {...p.confirmation} />
-                {p.canConfirm ? <p class="cap">Miejscowość, data i Twoje imię i nazwisko wpiszą się same.</p> : null}
+                {p.canConfirm ? <p class="cap">Miejscowość, data i twoje imię i nazwisko wpiszą się same.</p> : null}
               </section>
             ) : null}
             {p.canConfirm ? (

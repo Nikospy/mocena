@@ -5,7 +5,7 @@ import type { CycleCriterion } from "../cycles/part1";
 import type { Blocker, GradeRequestOption } from "../engine/approval";
 import { rules, rulesVersion } from "../engine/rules";
 import { criterion, POINTS, type AssessmentResult } from "../engine/scoring";
-import type { Person } from "../people";
+import { isDirectorGeneral, type Person } from "../people";
 import { ConfirmationBlock, ErrorSummary, FieldError, type FormErrors, LegalBasis, PageHeader, RulesVersion, invalid } from "./components";
 import { Layout, formatDate } from "./layout";
 import { romanGrade } from "../engine/grades";
@@ -27,8 +27,11 @@ export function fictionReasonLabel(reason: Fiction["reason"], gender: Person["ge
   return labels[reason];
 }
 export const METHOD_LABEL = { in_person: "osobiście", post: "pocztą", email: "pocztą elektroniczną" } as const;
+export const HR_JSON_EXPORT_LABEL = "Pobierz ocenę do systemu kadrowego (JSON)";
+export const ASSESSMENT_JSON_EXPORT_LABEL = "Pobierz dane oceny (JSON)";
 
-export const LEVELS = new Map<number, string>(rules.partialScale.map((s) => [s.points, s.name]));
+/** Nazwy ocen cząstkowych obowiązujących reguł (czytane przy użyciu, nie przy imporcie). */
+export const LEVELS = { get: (points: number): string | undefined => rules.partialScale.find((s) => s.points === points)?.name };
 
 export function PersonIco() {
   return (
@@ -217,6 +220,7 @@ export type AssessmentViewProps = {
   errorTitle?: string;
   canAcknowledge?: boolean;
   canFiction?: boolean;
+  canExport?: boolean;
   /** Termin przesunięty przez nieobecność (silnik): zdanie i odnośnik do osi czasu. */
   shifted?: { text: string } | null;
   /** Sprzeciw uwzględniony z nakazem ponownego sporządzenia oceny: termin drugiej oceny. */
@@ -248,7 +252,7 @@ function EditForm(p: AssessmentViewProps) {
             <section aria-labelledby="h-crits">
               <div class="list-h">
                 <h2 id="h-crits" tabindex={-1}>Kryteria i oceny cząstkowe</h2>
-                <p class="cap">1 znacznie poniżej · 3 poniżej · 5 na poziomie · 7 powyżej · 9 znacznie powyżej oczekiwań</p>
+                <p class="cap">{rules.partialScale.map((s) => `${s.points} ${s.name}`).join(" · ")}</p>
               </div>
               <div class="card sheet">
                 {p.criteria.map((c) => {
@@ -376,6 +380,17 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
   const st = p.state;
   const mine = p.viewer.id === p.person.id;
   const recipient = objectionRecipientFor(s.sheet, s.objectionRecipient);
+  const canFileObjection =
+    mine &&
+    (st.stage === "acknowledged" || st.stage === "fiction") &&
+    !!st.objectionDeadline &&
+    p.today <= st.objectionDeadline &&
+    !st.objection &&
+    !s.changedOnObjection &&
+    st.redo === null;
+  // Art. 83 ust. 1–3 ustawy: sprzeciw kierowany jest do dyrektora generalnego urzędu, nie do oceniającego,
+  // więc treść uzasadnienia sprzeciwu widzą oceniany, rozpatrujący (DG) i kadry — nie oceniający.
+  const canSeeObjectionReason = mine || p.viewer.role === "hr" || isDirectorGeneral(p.viewer);
   return (
     <div class="o-grid">
       <div class="o-main">
@@ -413,6 +428,17 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
         <ResultPanel result={s.result} scores={s.criteria} cycleId={p.cycleId} version={s.rulesVersion.version} />
         {s.sheet === "A" && recipient && !st.objectionDeadline ? <p class="cap">Sprzeciw przysługuje do: {recipient}</p> : null}
         {st.objectionDeadline ? <ObjectionClock deadline={st.objectionDeadline} today={p.today} mine={mine} recipient={recipient} gender={p.person.gender} objection={st.objection} /> : null}
+        {canFileObjection ? (
+          <div class="decide">
+            <a class="btn full" href={`/cycles/${p.cycleId}/objection/new`}>Wnieś sprzeciw</a>
+          </div>
+        ) : null}
+        {st.objection?.reason && canSeeObjectionReason ? (
+          <section class="card tx-card" aria-labelledby="h-obj-reason">
+            <h2 id="h-obj-reason">Uzasadnienie sprzeciwu</h2>
+            <p>{st.objection.reason}</p>
+          </section>
+        ) : null}
         {p.canAcknowledge ? (
           <form method="post" action={`/cycles/${p.cycleId}/assessment/acknowledge`} class="decide">
             <p class="cap">Potwierdzenie zapoznania z oceną: <LegalBasis basis={rules.approval.acknowledgement.basis} /></p>
@@ -424,7 +450,7 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
             <a class="btn full" href={`/cycles/${p.cycleId}/assessment/fiction`}>Wpisz fikcję zapoznania</a>
           </div>
         ) : null}
-        <a class="btn o-export" href={`/cycles/${p.cycleId}/assessment/export.json`} download>Pobierz ocenę jako plik danych (JSON)</a>
+        {p.canExport ? <a class="btn o-export" href={`/cycles/${p.cycleId}/sheet?print=1`}>Drukuj / pobierz arkusz (PDF)</a> : null}
         <dl class="card b-facts o-facts">
           <div><dt>Okres oceny</dt><dd>{formatDate(s.periodFrom)}–{formatDate(s.periodTo)}</dd></div>
           <div><dt>Rozmowa oceniająca</dt><dd>{formatDate(s.interviewDate)}</dd></div>
@@ -447,6 +473,13 @@ function SnapshotView(p: AssessmentViewProps & { snapshot: AssessmentSnapshot })
           )}
           </dd></div>
         </dl>
+        {p.canExport ? (
+          <p class="cap">
+            <a href={`/cycles/${p.cycleId}/assessment/export.json`} download>
+              {p.viewer.role === "hr" ? HR_JSON_EXPORT_LABEL : ASSESSMENT_JSON_EXPORT_LABEL}
+            </a>
+          </p>
+        ) : null}
       </aside>
     </div>
   );

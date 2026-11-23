@@ -36,7 +36,7 @@ export function ObjectionChangeView(p: {
             <section aria-labelledby="h-crits">
               <div class="list-h">
                 <h2 id="h-crits" tabindex={-1}>Oceny cząstkowe po zmianie</h2>
-                <p class="cap">1 znacznie poniżej · 3 poniżej · 5 na poziomie · 7 powyżej · 9 znacznie powyżej oczekiwań</p>
+                <p class="cap">{rules.partialScale.map((s) => `${s.points} ${s.name}`).join(" · ")}</p>
               </div>
               <div class="card sheet">
                 {p.first.criteria.map((c) => (

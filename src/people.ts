@@ -9,7 +9,7 @@ export const DEMO_DIRECTOR_GENERAL_ID = "dyrektor-urzedu";
 export type Person = {
   id: string;
   name: string;
-  role: "appraiser" | "employee" | "hr" | "admin";
+  role: "appraiser" | "employee" | "hr" | "admin" | "director_general";
   position_title: string | null;
   unit: string | null;
   supervisor_id: string | null;
@@ -29,10 +29,18 @@ const PROCESS_ROLE: Record<"appraiser" | "employee", Record<"f" | "m", string>> 
   employee: { f: "oceniana", m: "oceniany" },
 };
 
-/** Rola w procesie oceny w formie zgodnej z osobą (pole `gender`); kadry i administrator bez zmian. */
+/** Czy osoba pełni funkcję dyrektora generalnego urzędu: rola `director_general`, stanowisko „Dyrektor generalny…” (działa po `bun run init`) albo konto pokazowe DG. */
+export function isDirectorGeneral(p: Pick<Person, "id" | "role" | "position_title">): boolean {
+  if (p.role === "director_general") return true;
+  if (p.id === DEMO_DIRECTOR_GENERAL_ID) return true;
+  return p.role === "appraiser" && typeof p.position_title === "string" && /^dyrektor generalny\b/i.test(p.position_title.trim());
+}
+
+/** Rola w procesie oceny w formie zgodnej z osobą (pole `gender`); kadry, dyrektor generalny i administrator bez zmian. */
 export function roleLabel(p: Pick<Person, "role" | "gender">): string {
   if (p.role === "hr") return "kadry";
   if (p.role === "admin") return "administrator";
+  if (p.role === "director_general") return "dyrektor generalny urzędu";
   return PROCESS_ROLE[p.role][p.gender === "f" ? "f" : "m"];
 }
 

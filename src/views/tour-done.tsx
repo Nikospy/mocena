@@ -1,6 +1,8 @@
 import { rules } from "../engine/rules";
 import { TourShell } from "./tour-entry";
 
+export const COVERAGE_SUMMARY = { working: 28, simplified: 2, total: 30 } as const;
+
 const SEEN = [
   "Kryteria wybiera oceniający, system podpowiada je z powodem.",
   "Fakty zapisuje się w dniu zdarzenia, nie z pamięci po dwóch latach.",
@@ -24,6 +26,10 @@ export function TourDone() {
               </li>
             ))}
           </ol>
+          <p class="cap">
+            {COVERAGE_SUMMARY.working} z {COVERAGE_SUMMARY.total} czynności organizatora działa ({COVERAGE_SUMMARY.simplified} uproszczone), a silnik i trasy sprawdza pełny zestaw testów (<code>bun test</code>) –{" "}
+            <a href="https://github.com/Nikospy/mocena/blob/main/docs/coverage.md">sprawdź w mapie wymagań</a>.
+          </p>
         </section>
         <section class="card e-card">
           <h2>Warto zobaczyć jeszcze</h2>

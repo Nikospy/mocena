@@ -1,6 +1,6 @@
 // Reguły oceny okresowej z rozporządzenia PRM z 4 kwietnia 2016 r. (Dz.U. 2016 poz. 470).
 // Zasada produktu: wynik liczy ten kod, nigdy model językowy.
-import { rules } from "./rules";
+import { activeRules, rules } from "./rules";
 
 export type Sheet = "A" | "B" | "C";
 export type Outcome = "positive" | "negative";
@@ -14,37 +14,49 @@ export interface Criterion {
   description: string[];
 }
 
+/** Kryteria pakietu domyślnego. Identyfikatory są stałe we wszystkich wersjach (zmiana struktury wymaga zmiany programu); nazwy i opisy czytaj przez `allCriteria()` albo `criterion()`. */
 export const CRITERIA: Criterion[] = rules.criteria;
 
+/** Kryteria obowiązujących reguł, w chwili wywołania. */
+export function allCriteria(): Criterion[] {
+  return activeRules().criteria;
+}
+
+/** Nazwy ocen cząstkowych (1, 3, 5, 7, 9) obowiązujących reguł, w chwili wywołania. */
+export function partialLevelName(points: number): string {
+  return activeRules().partialScale.find((s) => s.points === points)?.name ?? "";
+}
+
 export function criterion(id: string): Criterion {
-  const c = CRITERIA.find((x) => x.id === id);
+  const c = activeRules().criteria.find((x) => x.id === id);
   if (!c) throw new Error(`Nie ma kryterium „${id}” w załączniku nr 1`);
   return c;
 }
 
 /** § 4: kryteria obowiązkowe zależą od arkusza (A, B, C). */
 export function mandatoryCriteria(sheet: Sheet): string[] {
-  return [...rules.sheets[sheet].mandatoryCriteria];
+  return [...activeRules().sheets[sheet].mandatoryCriteria];
 }
 
 /** Kryteria, które oceniający może dobrać do danego arkusza (§ 5 ust. 2). */
 export function selectableCriteria(sheet: Sheet): string[] {
   const mandatory = new Set(mandatoryCriteria(sheet));
-  return CRITERIA.map((c) => c.id).filter((id) => !mandatory.has(id));
+  return activeRules().criteria.map((c) => c.id).filter((id) => !mandatory.has(id));
 }
 
 /** Zwraca listę problemów z zestawem kryteriów dodatkowych. Pusta lista = zestaw zgodny z § 5 ust. 2. */
 export function validateAdditionalCriteria(sheet: Sheet, ids: string[]): string[] {
+  const r = activeRules();
   const problems: string[] = [];
   const mandatory = new Set(mandatoryCriteria(sheet));
-  if (ids.length > rules.maxAdditionalCriteria) {
-    problems.push(`Wybierz najwyżej ${rules.maxAdditionalCriteria} kryteria dodatkowe (§ 5 ust. 2). Odznacz pozostałe.`);
+  if (ids.length > r.maxAdditionalCriteria) {
+    problems.push(`Wybierz najwyżej ${r.maxAdditionalCriteria} kryteria dodatkowe (§ 5 ust. 2). Odznacz pozostałe.`);
   }
   if (new Set(ids).size !== ids.length) {
     problems.push("To samo kryterium dodatkowe wybrano dwa razy. Zaznacz je tylko raz.");
   }
   for (const id of ids) {
-    if (!CRITERIA.some((c) => c.id === id)) problems.push(`Kryterium „${id}” nie ma w załączniku nr 1.`);
+    if (!r.criteria.some((c) => c.id === id)) problems.push(`Kryterium „${id}” nie ma w załączniku nr 1.`);
     else if (mandatory.has(id)) problems.push(`Kryterium „${criterion(id).name}” jest już obowiązkowe w arkuszu ${sheet}. Odznacz je na liście dodatkowych.`);
   }
   return problems;
@@ -81,12 +93,10 @@ export function computeAssessment(scores: Record<string, number>): AssessmentRes
   const count = entries.length;
   const sum = entries.reduce((s, [, p]) => s + p, 0);
 
-  let overallLevel: string;
-  if (sum <= 2 * count) overallLevel = "znacznie poniżej oczekiwań";
-  else if (sum <= 4 * count) overallLevel = "poniżej oczekiwań";
-  else if (sum <= 6 * count) overallLevel = "na poziomie oczekiwań";
-  else if (sum <= 8 * count) overallLevel = "powyżej oczekiwań";
-  else overallLevel = "znacznie powyżej oczekiwań";
+  // Progi poziomów są w kodzie (§ 11 ust. 1 pkt 2), nazwy poziomów w pakiecie reguł danej wersji.
+  const names = activeRules().overallLevels.map((l) => l.name);
+  const levelIndex = sum <= 2 * count ? 0 : sum <= 4 * count ? 1 : sum <= 6 * count ? 2 : sum <= 8 * count ? 3 : 4;
+  const overallLevel = names[levelIndex];
 
   const reasons: string[] = [];
   const ones = entries.filter(([, p]) => p === 1).map(([id]) => criterion(id).name);
@@ -95,11 +105,11 @@ export function computeAssessment(scores: Record<string, number>): AssessmentRes
     reasons.push(`Ogólny poziom spełniania kryteriów: ${overallLevel} (§ 11 ust. 1 pkt 4).`);
   }
   if (ones.length > 0) {
-    reasons.push(`Ocena cząstkowa „znacznie poniżej oczekiwań” za: ${ones.join(", ")} (§ 11 ust. 1 pkt 4).`);
+    reasons.push(`Ocena cząstkowa „${partialLevelName(1)}” za: ${ones.join(", ")} (§ 11 ust. 1 pkt 4).`);
   }
   const outcome: Outcome = meanTooLow || ones.length > 0 ? "negative" : "positive";
   if (outcome === "positive") {
-    reasons.push(`Ogólny poziom: ${overallLevel}, bez oceny cząstkowej „znacznie poniżej oczekiwań” (§ 11 ust. 1 pkt 3).`);
+    reasons.push(`Ogólny poziom: ${overallLevel}, bez oceny cząstkowej „${partialLevelName(1)}” (§ 11 ust. 1 pkt 3).`);
   }
 
   return {

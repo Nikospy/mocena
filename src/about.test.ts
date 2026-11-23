@@ -36,6 +36,20 @@ describe("strona /about „Wdrożenie i dane”", () => {
     expect(html).not.toMatch(/[\w.]+@[\w.]+/);
   });
 
+  test("jawnie wyklucza pierwszą ocenę z art. 37–38", async () => {
+    const { app } = createTestApp({ today: "2026-11-21" });
+    const html = await (await app.request("/about")).text();
+    expect(html).toContain("Poza zakresem prototypu");
+    expect(html).toContain("art. 37–38");
+    expect(html).toContain("urząd prowadzi ją poza systemem");
+  });
+
+  test("linkuje zestawienie licencji", async () => {
+    const { app } = createTestApp({ today: "2026-11-21" });
+    const html = await (await app.request("/about")).text();
+    expect(html).toContain("docs/licenses.md");
+  });
+
   test("działa niezależnie od konta i bez konta", async () => {
     const { app } = createTestApp({ today: "2026-11-21" });
     for (const cookie of ["", "person_id=joanna", "person_id=piotr"]) {

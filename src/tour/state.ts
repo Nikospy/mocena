@@ -1,3 +1,4 @@
+import { resetRulesCache } from "../engine/rules";
 // Stany danych przewodnika pokazu: przed każdym przystankiem baza jest budowana od zera funkcjami domenowymi i seedami.
 import { buildAssessmentSnapshot } from "../assessment/snapshot";
 import { assessmentState, type AssessmentDraft } from "../assessment/state";
@@ -46,6 +47,7 @@ function clearAllTables(db: Db): void {
     .all() as { name: string }[];
   for (const t of tables) db.prepare(`DELETE FROM "${t.name}"`).run();
   db.prepare("DELETE FROM sqlite_sequence").run();
+  resetRulesCache();
 }
 
 function answerTaskChange(db: Db): void {
@@ -56,14 +58,31 @@ function answerTaskChange(db: Db): void {
   seedEvent("task_change_answered", note.cycle_id, note.author_id, { noteId: note.id, answer: "yes", developmentFormId: suggestDevelopmentForm(note).id }, note.date);
 }
 
-function recordPiotrAbsences(db: Db): void {
+/** Nieobecności Piotra z kroku 3: dwie, rozdzielone weekendem. */
+const PIOTR_ABSENCES = [
+  { from: "2026-10-05", to: "2026-10-16" },
+  { from: "2026-10-19", to: "2026-11-06" },
+] as const;
+
+/** Druga nieobecność, którą formularz w kroku 3 ma już wpisaną: zapis robi widz jednym kliknięciem. */
+export const STEP3_PREFILL = PIOTR_ABSENCES[1];
+
+function recordPiotrAbsences(db: Db, count: number = PIOTR_ABSENCES.length): void {
   const on = "2026-11-10";
-  for (const [from, to] of [["2026-10-05", "2026-10-16"], ["2026-10-19", "2026-11-06"]]) {
+  for (const { from, to } of PIOTR_ABSENCES.slice(0, count)) {
     const r = db
       .query("INSERT INTO absences (person_id, date_from, date_to, excused, recorded_on, recorded_by) VALUES ('piotr', ?, ?, 1, ?, 'joanna')")
       .run(from, to, on);
     seedEvent("absence_recorded", CYCLE, "joanna", { absence_id: Number(r.lastInsertRowid), notified: ["marek", "piotr"] }, on);
   }
+}
+
+/** Szkic Marka z 20.11.2026 (krok 4): 5 przy każdym kryterium oprócz Rzetelności, więc jedna „1” od razu daje wynik. */
+const DRAFT_ON = "2026-11-20";
+function draftPiotr(): void {
+  const scores = Object.fromEntries(cycleCriteria(CYCLE).filter((c) => c.id !== "rzetelnosc").map((c) => [c.id, 5]));
+  const draft: AssessmentDraft = { scores, justification: "", developmentConclusions: "", interviewDate: null, gradeRequest: { attached: false, motivation: "" } };
+  seedEvent("assessment_draft_saved", CYCLE, "marek", draft, DRAFT_ON);
 }
 
 /** Ocena z „1” przy Rzetelności (krok 4 scenariusza), uzasadnienie złożone z notatek o Rzetelności, wnioski do programu rozwoju. */
@@ -109,9 +128,9 @@ function build(db: Db, id: TourStopId): void {
   if (id === "2") return runSeed(db, { liveStep2: true, afterStep1: true });
   runSeed(db, { afterStep1: true });
   answerTaskChange(db);
-  if (id === "3") return;
+  if (id === "3") return recordPiotrAbsences(db, 1);
   recordPiotrAbsences(db);
-  if (id === "4") return;
+  if (id === "4") return draftPiotr();
   approvePiotr(db);
 }
 

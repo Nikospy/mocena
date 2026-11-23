@@ -166,8 +166,10 @@ test("kadry, CSV i statystyki pokazują drugą ocenę aż do zapoznania", async 
     const overview = await html(app, "joanna", "/hr");
     expect(overview.match(/>Katarzyna Lewandowska<\/a>/g)).toHaveLength(1);
     expect(overview).toMatch(/Ponowna ocena do: <b[^>]*>04\.12\.2026<\/b>/);
+    expect(officeStats().pendingReassessments).toBe(1);
     const office = await html(app, "dyrektor-urzedu", "/office/statistics");
-    expect(office).toContain("Ponowne sporządzenie oceny lub zapoznanie z nią");
+    // 1 osoba poniżej progu 5 osób: ukryty wiersz nie zdradza obecności pojedynczej sprawy.
+    expect(office).not.toContain("Ponowne sporządzenie oceny lub zapoznanie z nią");
     expect(office).not.toContain("Katarzyna Lewandowska");
 
     expect((await call(app, "anna", `${CYCLE}/assessment/approve`, form([5, 5, 5, 5, 5]))).status).toBe(303);

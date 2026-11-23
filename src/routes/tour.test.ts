@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
 import { openCycle } from "../cycles";
 import { visibleEvents } from "../events";
@@ -31,9 +32,26 @@ describe("przewodnik pokazu", () => {
     const { res, text } = await html(app, "/");
     expect(res.status).toBe(200);
     expect(text).toContain("Ten asystent prowadzi ocenę od pierwszej notatki do arkusza.");
+    expect(text).toContain('<p class="e-ctx">5 kroków · 3 min · bez modelu językowego</p>');
     expect(text).toContain("Rozpocznij pokaz");
     for (const n of [1, 2, 3, 4, 5]) expect(text).toContain(`action="/tour/${n}"`);
     expect(text.match(/<form[^>]*action="\/tour\/\d"/g)?.length).toBe(6); // 5 kart + „Rozpocznij pokaz”
+  });
+
+  test("oś na telefonie pokazuje odstępy „15/8 miesięcy notatek” między właściwymi krokami", async () => {
+    const { app } = createTestApp();
+    const { text } = await html(app, "/");
+    const mob = text.slice(text.indexOf('<ol class="e-mob">'));
+    const s1 = mob.indexOf("Kryteria na początku cyklu");
+    const g15 = mob.indexOf("15 miesięcy notatek");
+    const s2 = mob.indexOf("Notatka w dniu, w którym coś się stało");
+    const g8 = mob.indexOf("8 miesięcy notatek");
+    const s3 = mob.indexOf("Nieobecność przesuwa termin");
+    expect(s1).toBeGreaterThan(-1);
+    expect(g15).toBeGreaterThan(s1);
+    expect(s2).toBeGreaterThan(g15);
+    expect(g8).toBeGreaterThan(s2);
+    expect(s3).toBeGreaterThan(g8);
   });
 
   test("POST /tour/4: 303 na ocenę Piotra, ciasteczka konta i przewodnika", async () => {
@@ -65,7 +83,7 @@ describe("przewodnik pokazu", () => {
       const res = await post(app, `/tour/${id}`);
       const page = await html(app, res.headers.get("location")!, cookies(res));
       window.document.body.innerHTML = page.text;
-      const look = stopById(id)!.look[0];
+      const look = stopById(id)!.look.find((l) => l.selector === (id === "1" ? ".rule" : ".crit-notes-d > summary"))!;
       const element = window.document.querySelector(`main ${look.selector}`)!;
       if (id === "1") {
         expect(element.textContent).toContain(expected);
@@ -87,6 +105,76 @@ describe("przewodnik pokazu", () => {
     const note = await post(app, "/tour/2");
     const page = await html(app, note.headers.get("location")!, cookies(note));
     expect(page.text).not.toContain("§ 9 ust. 1");
+    await window.close();
+  });
+
+  test("każdy przystanek ze „Spróbuj” wskazuje miejsce działania, które jest na jego ekranie", async () => {
+    const { app } = createTestApp();
+    const window = new Window();
+    for (const id of TOUR_STOP_IDS) {
+      const stop = stopById(id)!;
+      if (!stop.tryIt) continue;
+      expect(stop.tryTarget).toBeTruthy();
+      const res = await post(app, `/tour/${id}`);
+      const page = await html(app, res.headers.get("location")!, cookies(res));
+      window.document.body.innerHTML = page.text;
+      expect(window.document.querySelector(`main ${stop.tryTarget}`), `przystanek ${id}: ${stop.tryTarget}`).not.toBeNull();
+      expect(window.document.querySelector("#tour-guide [data-try-selector]")?.getAttribute("data-try-selector")).toBe(stop.tryTarget!);
+    }
+    await window.close();
+  });
+
+  test("szuflada na telefonie: otwarta przy wejściu, z etykietą „Opis kroku” i „Spróbuj” przed listą", async () => {
+    const { app } = createTestApp();
+    const window = new Window();
+    const res = await post(app, "/tour/2");
+    const page = await html(app, res.headers.get("location")!, cookies(res));
+    window.document.body.innerHTML = page.text;
+    const details = window.document.querySelector("#tour-guide-m details")!;
+    expect(details.hasAttribute("open")).toBe(true);
+    expect(details.getAttribute("data-gmob")).toBe("2");
+    expect(details.querySelector("summary")!.textContent).toContain("Opis kroku");
+    for (const panel of ["#tour-guide", "#tour-guide-m"]) {
+      const labels = [...window.document.querySelectorAll(`${panel} .gp-b .lbl`)].map((l) => l.textContent);
+      expect(labels).toEqual(["Spróbuj", "Na co patrzeć"]);
+    }
+    await window.close();
+  });
+
+  test("licznik idzie naprzód także między częściami kroku 1 i 5", async () => {
+    const { app } = createTestApp();
+    const expected: Record<string, string> = {
+      "1": "Krok 1 z 5 · część 1 z 2",
+      "1b": "Krok 1 z 5 · część 2 z 2",
+      "2": "Krok 2 z 5",
+      "5": "Krok 5 z 5 · część 1 z 2",
+      "5b": "Krok 5 z 5 · część 2 z 2",
+    };
+    for (const [id, label] of Object.entries(expected)) {
+      const res = await post(app, `/tour/${id}`);
+      const { text } = await html(app, res.headers.get("location")!, cookies(res));
+      expect(text).toContain(`<b>${label}</b>`);
+      expect(text).toContain(`Opis kroku · ${label} · `);
+    }
+  });
+
+  test("ramki kroków 1b i 5b trafiają w opisane elementy", async () => {
+    const { app } = createTestApp();
+    const window = new Window();
+    const facts: Record<string, string[]> = {
+      "1b": ["Potwierdzenie części I", "Potwierdzam rozmowę, kryteria i termin oceny"],
+      "5b": ["Tomasz", "Sprzeciw do rozpatrzenia", "23.05.2027", "Drukuj / pobierz PDF"],
+    };
+    for (const [id, texts] of Object.entries(facts)) {
+      const stop = stopById(id)!;
+      const res = await post(app, `/tour/${id}`);
+      const page = await html(app, res.headers.get("location")!, cookies(res));
+      window.document.body.innerHTML = page.text;
+      expect(stop.look.map((l, i) => {
+        const found = window.document.querySelectorAll(`main ${l.selector}`);
+        return found.length === 1 ? found[0].textContent!.includes(texts[i]) : `${l.selector}: ${found.length}`;
+      })).toEqual(texts.map(() => true));
+    }
     await window.close();
   });
 
@@ -114,6 +202,7 @@ describe("przewodnik pokazu", () => {
     expect(cycle.id).not.toBe("cycle-piotr");
     expect(visibleEvents(cycle.id).find((e) => e.type === "cycle_started")?.date).toBe("2026-11-22");
     const hr = await html(app, "/hr", cookies(stop));
+    expect(hr.text).toContain("Kryteria do wyznaczenia (ponowna ocena)");
     expect(hr.text).toMatch(/Rozmowa o kryteriach do:\s*(<[^>]+>)*30\.11\.2026/);
     expect(hr.text).toContain("§ 7 pkt 2");
     // Krok 5b panelu: data ponownej oceny także na ekranie kadr, z przepisem.
@@ -156,6 +245,14 @@ describe("przewodnik pokazu", () => {
     const c = cookies(await post(app, "/tour/5b"));
     const { text } = await html(app, "/tour/done", c);
     expect(text).toContain("Koniec pokazu");
+    const coverageRows = [...readFileSync("docs/coverage.md", "utf8").matchAll(/^\|\s*([1-9]|[12]\d|30)\s*\|[^|]+\|\s*(działa|uproszczone)\s*\|/gm)];
+    const working = coverageRows.filter((m) => m[2] === "działa").length;
+    const simplified = coverageRows.filter((m) => m[2] === "uproszczone").length;
+    expect(coverageRows).toHaveLength(30);
+    expect(text).toContain(`${working} z ${coverageRows.length} czynności organizatora działa (${simplified} uproszczone)`);
+    expect(text).toContain("pełny zestaw testów (<code>bun test</code>)");
+    expect(text).not.toMatch(/\b\d+\s+test(y|ów)\b/i);
+    expect(text).toContain('href="https://github.com/Nikospy/mocena/blob/main/docs/coverage.md"');
     expect(text).not.toContain("gpanel");
   });
 
@@ -210,7 +307,9 @@ describe("przewodnik: układ i dostępność", () => {
     expect(a).toBeGreaterThan(-1);
     expect(b).toBeGreaterThan(a);
     expect(text.indexOf("<header", a)).toBeGreaterThan(b);
-    expect(text).toContain("Po wpisaniu słowa „przejął” pole „Zmiana zadań pracownika” zaznacza się samo jako podpowiedź. Można je odznaczyć.");
+    expect(text).toContain("Słowo „przejął” zaznacza pole zmiany zadań. Można je odznaczyć.");
+    // Treść panelu przewija się z klawiatury (axe: scrollable-region-focusable).
+    expect(text.match(/<div class="gp-b" tabindex="0" role="region" aria-label="Opis kroku[^"]*"/g)?.length).toBe(2);
 
     const plain = await html(app, "/account");
     expect(plain.text).toMatch(/<aside[^>]*aria-label="Pokaz"/);
@@ -221,7 +320,7 @@ describe("przewodnik: układ i dostępność", () => {
 describe("panel przewodnika: cytowane nazwy istnieją na ekranie przystanku", () => {
   // Krok 2 cytuje tekst, który wpisuje użytkownik, i pytanie z następnego ekranu; krok 3 pokazuje podsumowanie dopiero po wpisaniu.
   const quoted = (s = "") => [...s.matchAll(/„([^”]+)”/g)].map((m) => m[1]);
-  for (const id of ["1", "1b", "4", "5", "5b"]) {
+  for (const id of ["1", "1b", "3", "4", "5", "5b"]) {
     test(`krok ${id}`, async () => {
       const { app } = createTestApp();
       const stop = stopById(id)!;

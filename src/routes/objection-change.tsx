@@ -7,7 +7,7 @@ import { getDb } from "../db";
 import { rules } from "../engine/rules";
 import { computeAssessment, POINTS } from "../engine/scoring";
 import { recordEvent, visibleEvents } from "../events";
-import { currentPerson, personById, type Person } from "../people";
+import { currentPerson, isDirectorGeneral, personById, type Person } from "../people";
 import { today } from "../settings";
 import { errorPage } from "../views/error-page";
 import { ObjectionChangeView } from "../views/objection-change";
@@ -19,26 +19,36 @@ type Ctx = { viewer: Person; cycleId: string; person: Person; first: AssessmentS
 function guard(c: Context): Ctx | Response | Promise<Response> {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  if (viewer.role !== "hr") return errorPage(c, "Tę czynność wykonują kadry.", 403);
+  if (viewer.role !== "hr" && !isDirectorGeneral(viewer)) {
+    return errorPage(c, "Tę czynność wykonują dyrektor generalny urzędu albo kadry.", 403);
+  }
   const cycle = cycleById(c.req.param("id") ?? "");
   const ev = cycle ? visibleEvents(cycle.id) : [];
   if (!cycle || !ev.some((e) => e.type === "cycle_started")) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
-  const filed = ev.findLast((e) => e.type === "objection_filed");
+  if (cycle.sheet === "A" && viewer.role !== "hr") {
+    return errorPage(c, "W arkuszu A decyzję rozpatrującego sprzeciw zapisują kadry.", 403);
+  }
   const state = assessmentState(cycle.id);
-  if (!filed || ev.some((e) => e.type === "objection_resolved") || !state.snapshot) {
+  if (!state.objection || state.objection.resolvedOn || !state.snapshot) {
     return errorPage(c, "Ten sprzeciw jest już rozpatrzony albo nie został wniesiony. Wróć do „Stan cykli”.", 409);
   }
   const person = personById(cycle.person_id);
   if (!person) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
-  return { viewer, cycleId: cycle.id, person, first: state.snapshot, filedOn: filed.date };
+  return { viewer, cycleId: cycle.id, person, first: state.snapshot, filedOn: state.objection.filedOn };
 }
 
 const isCtx = (g: unknown): g is Ctx => typeof g === "object" && g !== null && "first" in g;
 
+function decidedByFor(first: AssessmentSnapshot): string {
+  return first.sheet === "A" && first.objectionRecipient?.trim()
+    ? first.objectionRecipient.trim()
+    : rules.deadlines.objectionDays.to;
+}
+
 function screen(c: Context, g: Ctx, scores: Record<string, number>, errors?: Record<string, string>) {
   return c.html(
     <ObjectionChangeView viewer={g.viewer} person={g.person} cycleId={g.cycleId} today={today()} first={g.first} filedOn={g.filedOn} scores={scores} errors={errors}
-      decidedBy={rules.deadlines.objectionDays.to} />,
+      decidedBy={decidedByFor(g.first)} />,
     errors ? 422 : 200,
   );
 }
@@ -72,10 +82,11 @@ app.post("/cycles/:id/objection-change", async (c) => {
     scores,
     criteria: g.first.criteria.map((cr) => ({ ...cr, score: scores[cr.id] })),
     result: { mean: r.mean, overallLevel: r.overallLevel, outcome: r.outcome, reasons: r.reasons, justificationRequired: r.justificationRequired },
-    changedOnObjection: { objectionFiledOn: g.filedOn, changedOn: today(), recordedBy: g.viewer.name, decidedBy: rules.deadlines.objectionDays.to },
+    changedOnObjection: { objectionFiledOn: g.filedOn, changedOn: today(), recordedBy: g.viewer.name, decidedBy: decidedByFor(g.first) },
   };
   const ok = getDb().transaction(() => {
-    if (visibleEvents(g.cycleId).some((e) => e.type === "objection_resolved")) return false;
+    const cur = assessmentState(g.cycleId);
+    if (!cur.objection || cur.objection.resolvedOn) return false;
     if (g.first.result.outcome === "negative" && r.outcome === "positive") {
       const state = assessmentState(g.cycleId);
       const acquaintedOn = state.acknowledgement?.eventDate ?? state.fiction?.eventDate;
@@ -90,7 +101,7 @@ app.post("/cycles/:id/objection-change", async (c) => {
     return true;
   })();
   if (!ok) return errorPage(c, "Ten sprzeciw jest już rozpatrzony albo nie został wniesiony. Wróć do „Stan cykli”.", 409);
-  return c.redirect(`/cycles/${g.cycleId}/assessment`, 303);
+  return c.redirect(g.viewer.role === "hr" ? `/cycles/${g.cycleId}/assessment` : `/cycles/${g.cycleId}/objection?resolved=1`, 303);
 });
 
 export default app;

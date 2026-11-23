@@ -1,3 +1,4 @@
+import { withCycleRules } from "../assessment/rules-scope";
 import { OBJECTION_OUTCOME_TEXT as OUTCOME_TEXT, assessmentState } from "../assessment/state";
 import { cycleById, effectiveDeadline } from "../cycles";
 import { pendingRequest } from "../deadline-change";
@@ -37,16 +38,20 @@ export type CycleState = {
 };
 
 
-const D = rules.deadlines;
 
 /** Po rozstrzygnięciu „ponowne sporządzenie oceny”: termin rozpatrzenia sprzeciwu (14 dni od wniesienia, art. 83 ust. 3 ustawy) obejmuje drugą ocenę. Po jej zatwierdzeniu `null`. */
 export function reassessmentDeadline(cycleId: string): { date: string; basis: string[] } | null {
   const s = assessmentState(cycleId);
   if (!s.redo || s.stage !== "draft") return null;
-  return { date: objectionReviewDeadline(s.redo.filedOn), basis: [D.objectionReviewDays.basis] };
+  return withCycleRules(cycleId, () => ({ date: objectionReviewDeadline(s.redo!.filedOn), basis: [rules.deadlines.objectionReviewDays.basis] }));
 }
 
+/** Stan cyklu z terminami i podstawami prawnymi w wersji reguł obowiązującej oceny (zatwierdzona ocena nie przechodzi na nowszą wersję). */
 export function cycleState(cycleId: string): CycleState {
+  return withCycleRules(cycleId, () => cycleStateNow(cycleId));
+}
+
+function cycleStateNow(cycleId: string): CycleState {
   const all = visibleEvents(cycleId);
   const s0 = assessmentState(cycleId);
   // Po zatwierdzeniu drugiej oceny liczą się tylko zdarzenia po rozstrzygnięciu „ponowne sporządzenie”: pierwszy sprzeciw jest historią.
@@ -82,7 +87,7 @@ export function cycleState(cycleId: string): CycleState {
     return {
       step: "objection_filed",
       text: `Sprzeciw wniesiony ${formatDate(filed.date)} do ${filed.payload.to}`,
-      deadline: { date: objectionReviewDeadline(filed.date), basis: [D.objectionReviewDays.basis] },
+      deadline: { date: objectionReviewDeadline(filed.date), basis: [rules.deadlines.objectionReviewDays.basis] },
       deadlineLabel: "Rozpatrzenie sprzeciwu do",
       since: filed.date,
     };
@@ -97,7 +102,7 @@ export function cycleState(cycleId: string): CycleState {
     return {
       step: "fiction",
       text: `Fikcja zapoznania wpisana ${formatDate(f.eventDate)} przez oceniającego${second}: ${assessed} ${fictionReasonLabel(f.reason, gender)}. Kopię arkusza doręczono ${METHOD_LABEL[f.deliveryMethod]} ${formatDate(f.deliveredOn)}`,
-      deadline: { date: f.objectionDeadline, basis: [D.objectionDays.basis] },
+      deadline: { date: f.objectionDeadline, basis: [rules.deadlines.objectionDays.basis] },
       deadlineLabel: "Sprzeciw do",
       since: f.eventDate,
     };
@@ -106,7 +111,7 @@ export function cycleState(cycleId: string): CycleState {
     return {
       step: "acknowledged",
       text: `Zapoznanie potwierdzone ${formatDate(s.acknowledgement.eventDate)}${second}`,
-      deadline: { date: s.acknowledgement.objectionDeadline, basis: [D.objectionDays.basis] },
+      deadline: { date: s.acknowledgement.objectionDeadline, basis: [rules.deadlines.objectionDays.basis] },
       deadlineLabel: "Sprzeciw do",
       since: s.acknowledgement.eventDate,
     };
@@ -134,12 +139,15 @@ export function cycleState(cycleId: string): CycleState {
     };
   }
 
+  const started = last("cycle_started");
+  const negative = started?.payload.previousOutcome === "negative";
+  const re = negative ? " (ponowna ocena)" : "";
   const p1 = part1Status(cycleId);
   if (p1.state === "confirmed") {
     const d = effectiveDeadline(cycleId);
     const previous = part1DeadlinesAfterObjection(cycleId, d.date)?.previous;
     return {
-      step: "in_period", text: "Okres oceny trwa", deadline: d, deadlineLabel: "Termin oceny",
+      step: "in_period", text: `Okres oceny trwa${re}`, deadline: d, deadlineLabel: "Termin oceny",
       overdue: d.date < now, since: p1.confirmedOn,
       ...(previous ? { second: { label: "Termin przekazany w części I", ...previous } } : {}),
     };
@@ -148,18 +156,16 @@ export function cycleState(cycleId: string): CycleState {
     const days = p1.waitingDays ?? 0;
     return {
       step: "part1_waiting",
-      text: `Część I czeka na potwierdzenie ocenianego ${days <= 0 ? "od dziś" : days === 1 ? "od 1 dnia" : `od ${days} dni`}`,
+      text: `Część I czeka na potwierdzenie ocenianego ${days <= 0 ? "od dziś" : days === 1 ? "od 1 dnia" : `od ${days} dni`}${re}`,
       since: p1.submittedOn,
     };
   }
-  const started = last("cycle_started");
-  const negative = started?.payload.previousOutcome === "negative";
   const from: string = started?.payload.previousAssessmentOn ?? started?.payload.periodStart;
   const date = criteriaTalkDeadline(from, negative);
   return {
     step: "criteria_due",
-    text: "Kryteria do wyznaczenia",
-    deadline: { date, basis: [negative ? D.criteriaTalkAfterNegativeDays.basis : D.criteriaTalkDays.basis] },
+    text: `Kryteria do wyznaczenia${re}`,
+    deadline: { date, basis: [negative ? rules.deadlines.criteriaTalkAfterNegativeDays.basis : rules.deadlines.criteriaTalkDays.basis] },
     deadlineLabel: "Rozmowa o kryteriach do",
     overdue: date < now,
     since: started?.date,

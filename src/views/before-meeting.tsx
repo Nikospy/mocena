@@ -2,6 +2,7 @@ import type { Card } from "../content";
 import { PageHeader } from "./components";
 import type { Person } from "../people";
 import type { AfterHours, BeforeMeetingSummary, Item } from "../hr-partner/partner";
+import type { SelfPrepData } from "./self-prep";
 import { NoteItem } from "./components/note-item";
 import { Layout, formatDate } from "./layout";
 import { TaskChangeForm } from "./task-change";
@@ -63,12 +64,33 @@ export function BeforeMeetingView(props: {
   titleName: string;
   card: Card;
   summary: BeforeMeetingSummary;
+  selfPrep?: (SelfPrepData & { savedOn: string }) | null;
 }) {
   const s = props.summary;
+  const selfPrepCard = props.selfPrep ? (
+    <section class="card b-sec" aria-labelledby="h-self-prep">
+      <h2 id="h-self-prep">Wkład ocenianego przed rozmową</h2>
+      <p class="cap">
+        Zapisano {formatDate(props.selfPrep.savedOn)}. Wpis służy tylko jako materiał do rozmowy i nie trafia automatycznie do arkusza oceny.
+      </p>
+      {props.selfPrep.achievements ? (
+        <>
+          <h3>Najważniejsze osiągnięcia w tym okresie</h3>
+          <p>{props.selfPrep.achievements}</p>
+        </>
+      ) : null}
+      {props.selfPrep.topics ? (
+        <>
+          <h3>Tematy i uwagi do rozmowy</h3>
+          <p>{props.selfPrep.topics}</p>
+        </>
+      ) : null}
+    </section>
+  ) : null;
   return (
     <Layout title="Przed rozmową z pracownikiem" person={props.viewer} today={props.today}>
       <PageHeader
-        context="Przygotowanie do rozmowy · z Twoich notatek"
+        context="Przygotowanie do rozmowy · z twoich notatek"
         title={<>Przed rozmową z {props.titleName}</>}
         lead={props.card.purpose}
         links={<a href={`/cycles/${props.cycleId}/part1`}>Wróć do części I</a>}
@@ -108,9 +130,12 @@ export function BeforeMeetingView(props: {
             </section>
           </div>
         );
-        return boundary ? (
+        return boundary || selfPrepCard ? (
           <div class="o-grid">
-            <div class="o-main">{boundary}</div>
+            <div class="o-main">
+              {selfPrepCard}
+              {boundary}
+            </div>
             <aside class="side first" aria-label="Do zapytania na rozmowie">{asks}</aside>
           </div>
         ) : (

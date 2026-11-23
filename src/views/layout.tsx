@@ -1,5 +1,5 @@
 import type { Child } from "hono/jsx";
-import { DEMO_DIRECTOR_GENERAL_ID, roleLabel, type Person } from "../people";
+import { isDirectorGeneral, roleLabel, type Person } from "../people";
 import { isDemoMode } from "../settings";
 import { currentTour } from "../tour/context";
 import { stopById, stopScreenPath } from "../tour/stops";
@@ -79,7 +79,7 @@ export function navFor(person: Person): NavItem[] {
     return [
       { label: "Sprawy", href: "/", icon: ICON.tasks, section: (p) => p.startsWith("/cycles/") || (p.startsWith("/people/") && !p.endsWith("/notes/new")) },
       { label: "Notatki", href: "/notes", icon: ICON.notes, section: (p) => p.startsWith("/notes/") || p.endsWith("/notes/new") },
-      ...(person.id === DEMO_DIRECTOR_GENERAL_ID ? [{ label: "Statystyki", href: "/office/statistics", icon: ICON.cycles }] : []),
+      ...(isDirectorGeneral(person) ? [{ label: "Statystyki", href: "/office/statistics", icon: ICON.cycles }] : []),
     ];
   return [
     { label: "Sprawy", href: "/", icon: ICON.tasks, section: under("/cycles/") },

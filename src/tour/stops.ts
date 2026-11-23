@@ -13,6 +13,8 @@ export type StopContent = TourStop & {
   lead: string;
   look: Look[];
   tryIt?: string;
+  /** Miejsce działania z „Spróbuj”: przewodnik przewija do niego, gdy po wejściu nie jest widoczne. */
+  tryTarget?: string;
   note?: string;
   basis?: Basis;
   prev: TourStopId | null;
@@ -33,85 +35,93 @@ const BODY: Record<TourStopId, Body> = {
   "1": {
     title: "Kryteria na początku cyklu",
     short: "Piotr potwierdza",
-    lead: "Marek zaczyna dwuletni cykl oceny Piotra. System sam dobrał arkusz i podpowiada kryteria dodatkowe, każde z powodem. Wybór należy do Marka.",
+    lead: "System podpowiada, wybiera Marek.",
     look: [
-      { text: "Termin oceny z przepisem.", selector: ".rule" },
-      { text: "Podpowiedzi kryteriów: przerywana ramka i powód. Nic nie jest zaznaczone z góry.", selector: ".hint" },
       { text: "„Karta rozmowy o kryteriach” z tematami z przepisu.", selector: '[data-tour="opening-card"]' },
+      { text: "Termin oceny z przepisem.", selector: ".rule" },
+      { text: "Nic nie jest zaznaczone z góry.", selector: ".hint" },
     ],
-    tryIt: "Zaznacz „Orientacja na klienta/interesanta” i „Myślenie analityczne”, potem kliknij „Potwierdzam rozmowę i przekazuję część I”.",
+    tryIt: "Zaznacz dwa pierwsze kryteria z podpowiedzi i kliknij „Potwierdzam rozmowę i przekazuję część I”.",
+    tryTarget: 'label.cb:has(input[value="orientacja-na-klienta"])',
     basis: basis(d.criteriaTalkDays.basis),
     screen: (c) => `/cycles/${c}/part1`,
   },
   "1b": {
     title: "Piotr potwierdza kryteria",
     short: "notatka",
-    lead: "Piotr zna kryteria i oczekiwania na początku okresu podlegania ocenie, a nie dopiero przy ocenie. Potwierdza je jednym kliknięciem.",
+    lead: "Piotr zna kryteria i oczekiwania od początku okresu podlegania ocenie, a nie dopiero przy ocenie.",
     look: [
+      { text: "Po potwierdzeniu miejscowość, data i nazwisko wpiszą się tu same, a kryteria się zablokują.", selector: ".p1-confirmation" },
       { text: "Przycisk potwierdzenia.", selector: 'form[action$="/part1/confirm"] button' },
-      { text: "Po potwierdzeniu miejscowość, data i nazwisko wpisują się same, a kryteria się blokują.", selector: ".sheet" },
     ],
+    tryIt: "Kliknij „Potwierdzam rozmowę, kryteria i termin oceny”.",
+    tryTarget: 'form[action$="/part1/confirm"] button',
     screen: (c) => `/cycles/${c}/part1`,
   },
   "2": {
     title: "Notatka w dniu, w którym coś się stało",
     short: "nieobecność",
-    lead: "Marek zapisuje fakt w dniu, w którym się zdarzył, a nie po dwóch latach z pamięci. Asystent nie ocenia notatki. Zauważa tylko słowo „przejął” i pyta, czy to stała zmiana zadań.",
+    lead: "Fakt w dniu zdarzenia, a nie z pamięci po dwóch latach. Asystent nie ocenia notatki.",
     look: [
-      { text: "Po wpisaniu słowa „przejął” pole „Zmiana zadań pracownika” zaznacza się samo jako podpowiedź. Można je odznaczyć.", selector: ".hint" },
-      { text: "Po zapisie pytanie „To stała zmiana zadań?”, a po „Tak, stała zmiana” karta rozmowy i forma rozwoju." },
-      { text: "Przy nazwisku Piotra nie ma punktów ani etykiet." },
+      { text: "Słowo „przejął” zaznacza pole zmiany zadań. Można je odznaczyć.", selector: ".hint" },
+      { text: "Po zapisie pytanie „To stała zmiana zadań?”." },
+      { text: "Nazwisko bez punktów i etykiet." },
     ],
-    tryIt: "Wpisz „Piotr przejął kolejkę wniosków po odejściu kolegi”, wybierz kryterium Rzetelność i zapisz.",
+    tryIt: "Wpisz „Piotr przejął kolejkę po koledze”, wybierz Rzetelność i zapisz.",
+    tryTarget: "#text",
     screen: () => "/people/piotr/notes/new",
   },
   "3": {
     title: "Nieobecność przesuwa termin",
     short: "ocena",
-    lead: "Joanna wpisuje dwie nieobecności Piotra rozdzielone weekendem. System liczy je jako jedną, dłuższą niż miesiąc, i sam przesuwa termin oceny.",
+    lead: "Obie liczą się jako jedna, dłuższa niż miesiąc, bo dzieli je weekend.",
     look: [
-      { text: "Jedna ciągła nieobecność od 05.10 do 06.11.2026.", selector: ".abs-merged" },
-      { text: "Nowy termin oceny z przepisem.", selector: ".abs-sum" },
-      { text: "Na osi czasu kropka pełna to przepis, a pusta to wpis człowieka." },
+      { text: "Daty drugiej są już wpisane.", selector: ".ct-form" },
+      { text: "Pierwsza: 12 dni, termin bez zmian.", selector: ".abs-merged" },
+      { text: "Po zapisie: jedna nieobecność 05.10–06.11.2026 i nowy termin." },
     ],
-    tryIt: "Wpisz 05.10–16.10.2026 i 19.10–06.11.2026, potem otwórz oś czasu.",
+    tryIt: "Kliknij „Zapisz nieobecność”. Oś czasu otworzy się sama.",
+    tryTarget: '.abs-form button[type="submit"]',
     basis: basis(d.longAbsenceOverMonths.basis),
     screen: (c) => `/cycles/${c}/absences`,
   },
   "4": {
     title: "Jedna „1” przesądza o wyniku",
     short: "zapoznanie",
-    lead: "Ocenę wystawia się w ostatnim tygodniu, ale notatki są z 24 miesięcy. Oceny cząstkowe stawia Marek. System liczy wynik według przepisu i pilnuje braków.",
+    lead: "Szkic Marka: 5 przy sześciu kryteriach. „1” stawiamy na pokaz.",
     look: [
-      { text: "Rozwiń notatki przy kryterium, aby zobaczyć pola wyboru.", selector: ".crit-notes-d > summary" },
-      { text: "Ostrzeżenie, gdy fakty do kryterium są tylko z ostatniego miesiąca.", selector: ".st.warn" },
-      { text: "Po „1” przy Rzetelności wynik jest negatywny mimo średniej powyżej 4, a zatwierdzenie czeka na uzasadnienie i wnioski do indywidualnego programu rozwoju zawodowego.", selector: "#assessment-result" },
+      { text: "Notatki z 24 miesięcy do zaznaczenia.", selector: ".crit-notes-d > summary" },
+      { text: "Ostrzeżenie: fakty tylko z ostatniego miesiąca.", selector: ".st.warn" },
+      { text: "Ocena negatywna mimo średniej 4,43.", selector: "#assessment-result" },
     ],
     tryIt: "Postaw „1” przy Rzetelności, zaznacz notatki i kliknij „Wstaw do uzasadnienia”.",
-    note: "„1” stawiamy na pokaz, żeby było widać regułę.",
+    tryTarget: '[data-crit="rzetelnosc"] .crit-row',
     basis: basis("§ 11 ust. 1 pkt 4"),
     screen: (c) => `/cycles/${c}/assessment`,
   },
   "5": {
     title: "Zapoznanie i 7 dni na sprzeciw",
     short: "kadry",
-    lead: "Piotr czyta ocenę. Uzasadnienie napisał Marek i wstawił do niego fakty z notatek. Piotr potwierdza zapoznanie. Od tej chwili system liczy 7 dni na sprzeciw.",
+    lead: "Uzasadnienie Marek złożył z faktów z notatek. Od zapoznania system liczy 7 dni na sprzeciw.",
     look: [
-      { text: "Przycisk „Potwierdzam zapoznanie z oceną”.", selector: 'form[action$="/assessment/acknowledge"] button' },
-      { text: "Termin sprzeciwu z przepisem; gdy wypada w dzień wolny, przechodzi na następny dzień roboczy.", selector: "#objection-clock" },
+      { text: "Przycisk potwierdzenia.", selector: 'form[action$="/assessment/acknowledge"] button' },
+      { text: "Termin sprzeciwu z przepisem. Dzień wolny go przesuwa.", selector: "#objection-clock" },
     ],
     tryIt: "Kliknij „Potwierdzam zapoznanie z oceną”.",
+    tryTarget: 'form[action$="/assessment/acknowledge"] button',
     basis: basis(d.objectionDays.basis),
     screen: (c) => `/cycles/${c}/assessment`,
   },
   "5b": {
     title: "Kadry widzą cały urząd",
     short: "koniec",
-    lead: "Joanna widzi stan wszystkich cykli w urzędzie. System przypomina o obowiązku urzędu: Tomaszowi należy się kolejny stopień służbowy z mocy prawa.",
+    lead: "Joanna widzi wszystkie cykle w urzędzie i obowiązki urzędu z mocy prawa.",
     look: [
-      { text: "Karta stopnia Tomasza z terminem i przepisem.", selector: ".card.rule" },
-      { text: "Piotr ma nowy cykl. Kryteria do 30.11.2026 (§ 7 pkt 2), ponowna ocena 23.05.2027.", selector: ".hr-table" },
-      { text: "„Drukuj / pobierz PDF” przy arkuszu." },
+      { text: "Tomaszowi należy się kolejny stopień służbowy: termin i przepis.", selector: ".card.rule" },
+      { text: "Sprzeciw Katarzyny: kadry odnotowują wynik rozpatrzenia.", selector: ".hr-obj" },
+      // Nowy cykl Piotra ma identyfikator z bazy (UUID); cykle z danych pokazowych zaczynają się od „cycle-”.
+      { text: "Nowy cykl Piotra: kryteria do 30.11.2026, ponowna ocena 23.05.2027.", selector: '.hr-cycles tr:not(:has(a[href^="/cycles/cycle-"])) .hr-due' },
+      { text: "„Drukuj / pobierz PDF” przy ocenie Piotra.", selector: 'a[href="/cycles/cycle-piotr/sheet?print=1"]' },
     ],
     basis: basis(d.mandatoryGradeDays.basis),
     screen: () => "/hr",
@@ -127,6 +137,13 @@ export const STOPS: StopContent[] = TOUR_STOPS.map((s, i) => ({
 
 export function stopById(id: string): StopContent | null {
   return STOPS.find((s) => s.id === id) ?? null;
+}
+
+/** „Krok 1 z 5 · część 2 z 2”: krok z kilkoma przystankami (1 i 1b, 5 i 5b) liczy też części, żeby licznik szedł naprzód po „Dalej”. */
+export function stepLabel(stop: TourStop): string {
+  const parts = TOUR_STOPS.filter((s) => s.step === stop.step);
+  const head = `Krok ${stop.step} z 5`;
+  return parts.length > 1 ? `${head} · część ${parts.findIndex((s) => s.id === stop.id) + 1} z ${parts.length}` : head;
 }
 
 export function personLabel(personId: string): string {

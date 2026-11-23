@@ -95,7 +95,7 @@
   },
   "beforeMeeting": {
     "title": "Przed rozmową z pracownikiem",
-    "purpose": "Zestawienie z Twoich własnych notatek i dat. Niczego nie ocenia; podpowiada, o co zapytać.",
+    "purpose": "Zestawienie z twoich własnych notatek i dat. Niczego nie ocenia; podpowiada, o co zapytać.",
     "texts": {
       "boundary": "Zaznaczono zmianę zadań w notatce z {date}.",
       "bothSides": "Przy kryterium „{criterion}” są notatki sprzed zmiany zadań i po niej.",
@@ -106,7 +106,7 @@
       "teamNone": "O {loc} nie masz jeszcze żadnej notatki.",
       "teamOld": "O {loc} nie masz żadnej notatki od {n} miesięcy.",
       "teamFallback": "Nie masz żadnej notatki o osobie: {name}.",
-      "afterHours": "Od zmiany zadań w Twoich notatkach wraca praca po godzinach.",
+      "afterHours": "Od zmiany zadań w twoich notatkach wraca praca po godzinach.",
       "afterHoursAsk": "Czy zakres zadań jest do udźwignięcia?",
       "afterHoursLead": "Notatki, o których mowa:",
       "afterHoursCard": "Karta rozmowy po zmianie zadań",

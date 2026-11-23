@@ -1,4 +1,5 @@
 import { reassessmentDeadline } from "../hr/cycle-state";
+import { canViewSheet } from "../hr/sheet-data";
 import { actsAsAppraiser } from "../substitutions";
 import { Hono, type Context } from "hono";
 import "../assessment/home";
@@ -15,7 +16,7 @@ import { computeAssessment, criterion, POINTS } from "../engine/scoring";
 import { recordEvent } from "../events";
 import { shiftedDeadlineSentence } from "../deadline-shift";
 import { officeSettings } from "../office-settings";
-import { currentPerson, personById, roleLabel, type Person } from "../people";
+import { currentPerson, isDirectorGeneral, personById, roleLabel, type Person } from "../people";
 import { setting, today } from "../settings";
 import { AssessmentMessage, AssessmentView, BlockerList, ResultPanel } from "../views/assessment";
 import { FictionView } from "../views/acknowledgement-fiction";
@@ -165,6 +166,7 @@ function render(c: Context, cx: Ctx, extra: { status?: 200 | 403 | 409 | 422; er
       errorTitle={extra.errorTitle ?? (extra.errors && Object.keys(extra.errors).every((k) => k.startsWith("_")) ? "Nie zapisano" : undefined)}
       canAcknowledge={isAppraisee(cx) && state.stage === "approved"}
       canFiction={appraiser && state.stage === "approved"}
+      canExport={canViewSheet(cx.person, cx.cycle)}
       shifted={state.stage === "draft" ? shiftedDeadlineSentence(cx.cycle.id) : null}
       redo={state.stage === "draft" ? reassessmentDeadline(cx.cycle.id) : null}
     />,
@@ -177,7 +179,14 @@ const app = new Hono();
 app.get("/cycles/:id/assessment", (c) => {
   const g = guard(c);
   if (!isCtx(g)) return g;
-  if (!isAppraiser(g) && !isAppraisee(g) && g.person.role !== "hr") return errorPage(c, "Tę ocenę widzą oceniany, jego oceniający i kadry.", 403);
+  const st = assessmentState(g.cycle.id);
+  // Dyrektor generalny ma wgląd w zaskarżoną ocenę wyłącznie na czas rozpatrywania otwartego sprzeciwu (arkusze B i C);
+  // po rozstrzygnięciu wgląd wygasa (zasada minimalnego dostępu).
+  const directorReviewingObjection =
+    isDirectorGeneral(g.person) && g.cycle.sheet !== "A" && st.objection !== null && st.objection.resolvedOn === null;
+  if (!isAppraiser(g) && !isAppraisee(g) && g.person.role !== "hr" && !directorReviewingObjection) {
+    return errorPage(c, "Tę ocenę widzą oceniany, jego oceniający i kadry.", 403);
+  }
   return render(c, g);
 });
 

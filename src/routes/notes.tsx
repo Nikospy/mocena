@@ -13,7 +13,7 @@ import { developmentSummary } from "../notes/development";
 import { addNote, canWriteNoteAbout, feedbackFor, noteById, notesByAuthor, sendFeedback, type Note, type Rating } from "../notes/repo";
 import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
-import { suggestForNote } from "../suggestions";
+import { checkSensitiveData, sensitiveConfirmationToken, suggestForNote, type NoteSuggestion, type SensitiveMatch } from "../suggestions";
 import { FeedbackFormView } from "../views/feedback-form";
 import { FeedbackView } from "../views/feedback";
 import { AssessmentCardView } from "../views/assessment-card";
@@ -87,22 +87,63 @@ app.post("/people/:personId/notes", async (c) => {
   const criterionId = str(body.criterion_id);
   const rating = str(body.rating);
   const taskChange = str(body.task_change) !== "";
-  const errors: Partial<Record<"criterion_id" | "text" | "date", string>> = {};
+  const confirmNoSensitive = str(body.confirm_no_sensitive) === "1";
+  const submittedToken = str(body.confirm_sensitive_token);
+  const errors: Partial<Record<"criterion_id" | "text" | "date" | "confirm_no_sensitive", string>> = {};
   if (!CRITERIA.some((k) => k.id === criterionId)) errors.criterion_id = "Wybierz kryterium.";
   if (text.length < 1 || text.length > 2000) errors.text = text ? "Notatka może mieć najwyżej 2000 znaków." : "Wpisz, co się stało.";
   const rawDate = str(body.date).trim();
   const date = rawDate || today();
   if (!isIsoDate(date)) errors.date = "Wybierz datę z kalendarza.";
   else if (date > today()) errors.date = "Wybierz dzisiejszą albo wcześniejszą datę.";
-  const values: NoteFormValues = { criterion_id: criterionId, text: str(body.text), rating, task_change: taskChange, date };
+
+  let sensitive: SensitiveMatch[] = [];
+  let guardFailed = false;
+  if (text) {
+    try {
+      sensitive = checkSensitiveData(text);
+    } catch (err) {
+      console.error("Sensitive data guard failed:", err);
+      guardFailed = true;
+      errors.text = "Nie udało się sprawdzić notatki pod kątem danych szczególnych (art. 9 RODO). Zapis został wstrzymany.";
+    }
+  }
+
+  const expectedToken = sensitive.length > 0 ? sensitiveConfirmationToken(text) : "";
+  const tokenMatches = confirmNoSensitive && submittedToken === expectedToken;
+  if (!guardFailed && sensitive.length > 0 && !tokenMatches) {
+    errors.confirm_no_sensitive = confirmNoSensitive
+      ? "Treść notatki zmieniła się po potwierdzeniu. Sprawdź ponownie ostrzeżenie o danych szczególnych (art. 9 RODO) i potwierdź zapis albo usuń ten fragment."
+      : "Notatka może zawierać dane szczególne z art. 9 RODO (zdrowie, rodzina lub wyznanie). Usuń ten fragment albo zaznacz potwierdzenie, zanim zapiszesz.";
+  }
+
+  let suggestion: NoteSuggestion | null = null;
+  if (text && !guardFailed) {
+    try {
+      suggestion = await suggestForNote(text);
+    } catch {
+      suggestion = { source: "none", taskChange: null, matched: [], sensitiveCategories: sensitive, ...(expectedToken ? { sensitiveToken: expectedToken } : {}) };
+    }
+  } else if (sensitive.length > 0) {
+    suggestion = { source: "rules", taskChange: null, matched: [], sensitiveCategories: sensitive, sensitiveToken: expectedToken };
+  }
+
+  const values: NoteFormValues = {
+    criterion_id: criterionId,
+    text: str(body.text),
+    rating,
+    task_change: taskChange,
+    date,
+    confirm_no_sensitive: tokenMatches,
+    confirm_sensitive_token: expectedToken,
+  };
   if (Object.keys(errors).length > 0) {
-    const suggestion = taskChange ? await suggestForNote(text) : null;
     return c.html(
       <NoteFormView {...g} today={today()} groups={criteriaGroups(g.subject.id)} values={values} errors={errors} suggestion={suggestion} />,
       422,
     );
   }
-  const suggestion = await suggestForNote(text);
+  const resolved = suggestion ?? { source: "none" as const, taskChange: null, matched: [] };
   const note = addNote({
     authorId: g.viewer.id,
     subjectId: g.subject.id,
@@ -111,7 +152,7 @@ app.post("/people/:personId/notes", async (c) => {
     text,
     rating: rating === "good" || rating === "needs_improvement" ? (rating as Rating) : null,
     taskChange,
-    suggestion: { source: suggestion.source, taskChange: suggestion.taskChange },
+    suggestion: { source: resolved.source, taskChange: resolved.taskChange },
   });
   return c.redirect(afterNoteSaved(note), 303);
 });
@@ -120,7 +161,12 @@ app.post("/people/:personId/notes", async (c) => {
 app.post("/suggestions/note", async (c) => {
   if (!currentPerson(c)) return errorPage(c, "Wybierz konto, żeby dostać podpowiedź.", 403);
   const body = await c.req.parseBody();
-  return c.json(await suggestForNote(str(body.text)));
+  try {
+    return c.json(await suggestForNote(str(body.text)));
+  } catch (err) {
+    console.error("Live note suggestion failed:", err);
+    return c.json({ source: "none", taskChange: null, matched: [], sensitiveCategories: [] }, 500);
+  }
 });
 
 function subjectsFor(viewer: Person, notes: Note[]): string[] {
@@ -147,7 +193,7 @@ app.get("/notes", (c) => {
     groups.push({ person, notes: own, canWrite, cycleAction: needsCriteria ? "Wyznacz kryteria" : undefined, cycleHref: cycle && actsAsAppraiser(cycle.appraiser_id, viewer.id) ? `/cycles/${cycle.id}` : undefined });
   }
   // Oceniany bez zespołu i bez własnych notatek nie ma tu czego oglądać: strona odmowy z wyjściem do jego spraw.
-  if (groups.length === 0 && viewer.role !== "appraiser") return errorPage(c, "Notatki o zespole prowadzą oceniający i przełożeni. Twoje sprawy są na liście spraw.", 403);
+  if (groups.length === 0 && viewer.role !== "appraiser") return errorPage(c, "Notatki o zespole prowadzą oceniający i przełożeni. Sprawy do załatwienia są na liście spraw.", 403);
   const latest = (g: NoteGroup) => g.notes[0]?.date ?? "";
   groups.sort((a, b) => latest(b).localeCompare(latest(a)) || a.person.name.localeCompare(b.person.name, "pl"));
   return c.html(<NotesListView viewer={viewer} today={today()} groups={groups} saved={c.req.query("saved") !== undefined} sent={c.req.query("sent") !== undefined} />);

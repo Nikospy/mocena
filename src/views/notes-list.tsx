@@ -84,7 +84,7 @@ export function NotesListView(props: { viewer: Person; today: string; groups: No
         })}
         {without.length > 0 ? (
           <section class="card pn-none" aria-labelledby="pn-none-h">
-            <h2 id="pn-none-h">{withNotes.length ? "Bez notatek" : "Twój zespół"}</h2>
+            <h2 id="pn-none-h">{withNotes.length ? "Bez notatek" : "Zespół"}</h2>
             <ul class="pn-rows">
               {without.map((g) => {
                 const silence = silenceAbout(g.person.name, null, props.today);

@@ -77,9 +77,9 @@ function DevelopmentSection(props: { d: DevelopmentSummary; cycleId: string }) {
   const d = props.d;
   return (
     <section class="card b-sec" aria-labelledby="h-dev">
-      <p class="voice src">Z Twoich notatek</p>
+      <p class="voice src">Z twoich notatek</p>
       <h2 id="h-dev">Część rozwojowa rozmowy</h2>
-      <p class="cap">Dosłowne cytaty z Twoich notatek według Twojego zaznaczenia „dobrze / do poprawy”. System nie ocenia treści i nie przyznaje punktów.</p>
+      <p class="cap">Dosłowne cytaty z twoich notatek według twojego zaznaczenia „dobrze / do poprawy”. System nie ocenia treści i nie przyznaje punktów.</p>
       <h3>Co szło dobrze</h3>
       <Groups groups={d.good} label="Co szło dobrze" />
       <h3>Co do poprawy</h3>

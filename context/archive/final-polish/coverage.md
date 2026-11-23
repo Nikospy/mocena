@@ -334,6 +334,10 @@ Identyfikator zrzutu daje plik `<identyfikator>-<szerokość>.jpg`. Eksporty CSV
 | `/cycles/:id/invitations/:eventId{[0-9]+\.ics}` | `piotr` | pobranie ICS · podgląd treści | `calendar-piotr` | przechodzi przy wszystkich szerokościach |
 | `/cycles/:id/invitations/:eventId{[0-9]+\.ics}` | `joanna` | 403 · odmowa | `calendar-403` | nie przechodzi · 320 — T1, T2, H1, L4 / 360 — T1, T2, H1, H3, L4 / 768 — T1, T2, H1, L4 / 1024 — T1, T2, H1, L4 / 1440 — T1, T2, H1, L4 |
 | `/cycles/:id/invitations/:eventId{[0-9]+\.ics}` | `marek` | 404 · brak zasobu | `calendar-404` | nie przechodzi · 320 — T1, T2, H1, L4 / 360 — T1, T2, H1, H3, L4 / 768 — T1, T2, H1, L4 / 1024 — T1, T2, H1, L4 / 1440 — T1, T2, H1, L4 |
+| `/admin/rules/template.json` | `admin` | pobranie szablonu pakietu reguł · plik JSON | `admin-rules-template` | nowy wiersz (audit W03), bez pomiaru wyjściowego |
+| `/cycles/:id/objection/new` | `piotr` | formularz wniesienia sprzeciwu ocenianego | `objection-new` | nowy wiersz (audit Z08+Z17), bez pomiaru wyjściowego |
+| `/cycles/:id/objection` | `dyrektor-urzedu` | rozpatrzenie sprzeciwu przez dyrektora generalnego | `objection-resolve` | nowy wiersz (audit Z08+Z17), bez pomiaru wyjściowego |
+| `/cycles/:id/self-prep` | `piotr` | przygotowanie ocenianego do rozmowy (osiągnięcia i tematy) | `self-prep` | nowy wiersz (audit Z08+Z17), bez pomiaru wyjściowego |
 | `(brak trasy)` | `marek` | 404 · strona aplikacji | `error-404` | nie przechodzi · 320 — przechodzi / 360 — przechodzi / 768 — T2 / 1024 — przechodzi / 1440 — przechodzi |
 | `/` | `marek` | 500 · awaria dostępu do danych w bazie pomiarowej | `error-500` | nie przechodzi · 320 — przechodzi / 360 — przechodzi / 768 — T2 / 1024 — przechodzi / 1440 — przechodzi |
 

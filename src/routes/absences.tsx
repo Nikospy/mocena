@@ -5,6 +5,8 @@ import { getDb } from "../db";
 import { recordEvent, visibleEvents } from "../events";
 import { currentPerson, personById, type Person } from "../people";
 import { today } from "../settings";
+import { currentTour } from "../tour/context";
+import { STEP3_PREFILL } from "../tour/state";
 import { AbsenceFormView, type AbsenceFormValues, type AbsenceSummary } from "../views/absence-form";
 import { errorPage } from "../views/error-page";
 
@@ -65,10 +67,17 @@ export const FUTURE_START = "Wpisz nieobecność, która już się zaczęła: po
 const closed = (c: Context) => errorPage(c, "Cykl jest zamknięty. Nieobecność wpisuje się tylko w otwartym cyklu.", 409);
 const isOpen = (cycle: Cycle) => openCycle(cycle.person_id)?.id === cycle.id;
 
+/** Przewodnik, krok 3: druga nieobecność Piotra wpisana w formularz, dopóki jej nie zapisano. Zapisuje dopiero kliknięcie widza. */
+function tourPrefill(cycle: Cycle): AbsenceFormValues | null {
+  if (currentTour().stop !== "3" || cycle.person_id !== "piotr" || !isOpen(cycle)) return null;
+  if (visibleAbsences(cycle.person_id).some((a) => a.date_from === STEP3_PREFILL.from)) return null;
+  return { from: STEP3_PREFILL.from, to: STEP3_PREFILL.to, excused: true };
+}
+
 app.get("/cycles/:id/absences", (c) => {
   const g = guard(c);
   if (g instanceof Response) return g;
-  return render(c, g, { from: "", to: "", excused: true });
+  return render(c, g, tourPrefill(g.cycle) ?? { from: "", to: "", excused: true });
 });
 
 app.post("/cycles/:id/absences", async (c) => {

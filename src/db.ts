@@ -43,6 +43,10 @@ CREATE TABLE IF NOT EXISTS events (
 );
 CREATE INDEX IF NOT EXISTS events_date ON events (date, id);
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS rule_versions (
+  version TEXT PRIMARY KEY, seq INTEGER NOT NULL, effective_from TEXT NOT NULL, pack_json TEXT NOT NULL,
+  published_on TEXT NOT NULL, actor_id TEXT
+);
 CREATE TABLE IF NOT EXISTS notes (
   id INTEGER PRIMARY KEY AUTOINCREMENT, author_id TEXT NOT NULL, subject_id TEXT NOT NULL, cycle_id TEXT,
   criterion_id TEXT NOT NULL, date TEXT NOT NULL, text TEXT NOT NULL,
@@ -81,6 +85,11 @@ export function setDefaultDb(d: Db): void {
 
 export function hasDb(): boolean {
   return (requestDb.getStore()?.db ?? db) !== null;
+}
+
+/** Aktualna baza albo `null` (jedno wyszukiwanie zamiast `hasDb()` + `getDb()` w gorących ścieżkach). */
+export function currentDb(): Db | null {
+  return requestDb.getStore()?.db ?? db;
 }
 
 export function getDb(): Db {

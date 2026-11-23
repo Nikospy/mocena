@@ -16,7 +16,7 @@ export function FeedbackFormView(props: { viewer: Person; subject: Person; note:
           <blockquote class="note-text">{props.note.text}</blockquote>
           <p class="privacy">
             <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7.5a4 4 0 0 1 8 0V11" /></svg>
-            Twoja notatka. Pracownik nie widzi notatki na swoim koncie. Na wniosek urząd mu ją wydaje.
+            Zapisana notatka. Pracownik nie widzi notatki na swoim koncie. Na wniosek urząd mu ją wydaje.
           </p>
         </div>
         <form method="post" action={`/notes/${props.note.id}/feedback`} class="n-form">

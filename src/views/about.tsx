@@ -1,4 +1,4 @@
-import rulesJson from "../../rules/regulation-2016-470.json";
+import { activeRules } from "../engine/rules";
 import type { Person } from "../people";
 import { OFFICE_INIT_COMMAND } from "../settings";
 import { PageHeader } from "./components";
@@ -30,11 +30,11 @@ export function AboutPage(props: { person: Person | null; today: string }) {
         <section aria-labelledby="a-rules">
           <h2 id="a-rules">Reguły zamiast modelu</h2>
           <p>
-            Przepisy są w pliku <code>rules/regulation-2016-470.json</code>: wersja <b>{String(rulesJson.version)}</b>, rozporządzenie obowiązuje od{" "}
-            <b>{formatDate(String(rulesJson.effectiveFrom))}</b>. Ustawienia urzędu są osobno, w <code>rules/office-settings.json</code>, i są tak oznaczone na ekranach.
+            Przepisy wyjściowe są w pliku <code>rules/regulation-2016-470.json</code>. Obowiązuje wersja <b>{activeRules().version}</b> od{" "}
+            <b>{formatDate(activeRules().effectiveFrom)}</b>. Ustawienia urzędu są osobno, w <code>rules/office-settings.json</code>, i są tak oznaczone na ekranach.
           </p>
           <ul>
-            <li>Zmiana przepisów to nowa wersja pliku reguł. Każda wystawiona ocena zapamiętuje wersję, w której powstała, i pokazuje ją arkusz.</li>
+            <li>Zmiana przepisów to nowa wersja reguł, wgrywana przez administratora w aplikacji (z walidacją i podglądem skutków). Każda wystawiona ocena zapamiętuje wersję, w której powstała, i pokazuje ją arkusz.</li>
             <li>Silnik liczy terminy i wynik z dat i pól. Treści notatek nie czyta.</li>
           </ul>
         </section>
@@ -50,6 +50,14 @@ export function AboutPage(props: { person: Person | null; today: string }) {
           <h3>Nie ma w prototypie</h3>
           <p>
             Integracji z systemem kadrowym, z EZD (obieg pism i kopii arkusza) ani z serwerem poczty urzędu. Przy wdrożeniu te trzy miejsca urząd podłącza u siebie.
+          </p>
+        </section>
+
+        <section aria-labelledby="a-scope">
+          <h2 id="a-scope">Poza zakresem prototypu</h2>
+          <p>
+            Pierwsza ocena w służbie cywilnej (art. 37–38 ustawy o służbie cywilnej) dotyczy pracownika zatrudnionego na czas określony, ma odrębny tryb i wzór arkusza z innego
+            rozporządzenia niż ocena okresowa. Prototyp jej nie obejmuje; urząd prowadzi ją poza systemem. Pierwszy cykl oceny okresowej po zatrudnieniu na czas nieokreślony jest obsłużony.
           </p>
         </section>
 
@@ -81,6 +89,10 @@ export function AboutPage(props: { person: Person | null; today: string }) {
           <ul>
             <li>Logowanie i konta zgodne ze swoją polityką (dziś konta pokazowe są bez hasła).</li>
             <li>Okres przechowywania notatek i ocen. Jak długo przechowywać notatki po zakończeniu cyklu, ustala urząd; prototyp sam ich nie usuwa.</li>
+            <li>
+              Kopię bazy, przywracanie i aktualizację według instrukcji{" "}
+              <a href="https://github.com/Nikospy/mocena/blob/main/docs/operations.md">docs/operations.md</a>. Kontrola działania: <code>/healthz</code>.
+            </li>
             <li>Administratora danych i tryb wydawania pracownikowi jego notatek na wniosek.</li>
           </ul>
         </section>
@@ -91,6 +103,10 @@ export function AboutPage(props: { person: Person | null; today: string }) {
             <li>Repozytorium: <a href="https://github.com/Nikospy/mocena">github.com/Nikospy/mocena</a>.</li>
             <li>Prawa autorskie do kodu ma autor. Zgodnie z regulaminem zadania zwycięzca konkursu przenosi je na organizatora pisemną umową.</li>
             <li>Biblioteka, z której korzysta działająca aplikacja: Hono, na licencji MIT.</li>
+            <li>
+              Licencje wszystkich składników (bez płatnych licencji, bez modelu językowego):{" "}
+              <a href="https://github.com/Nikospy/mocena/blob/main/docs/licenses.md">docs/licenses.md</a>.
+            </li>
             <li>Font: Open Sans, licencja SIL Open Font License (plik OFL.txt w <code>public/fonts/</code>).</li>
           </ul>
         </section>

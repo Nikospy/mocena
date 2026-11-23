@@ -1,6 +1,7 @@
+import { withActiveRules } from "../engine/rules";
 import { Hono } from "hono";
 import "../hr/links";
-import { assessmentState } from "../assessment/state";
+import { assessmentState, objectionRecipientFor } from "../assessment/state";
 import { registerHomeTasks } from "../home-tasks";
 import { cycleLinks } from "../cycle-links";
 import { getDb } from "../db";
@@ -10,29 +11,31 @@ import "../hr/reassessment-task";
 import { fullNameForm } from "../hr-partner/partner";
 import { mandatoryGradeOf } from "../hr/history";
 import { latestCycles, pendingReassessmentPredecessor } from "../hr/latest-cycles";
-import { officeStats } from "../hr/stats";
+import { officeStats, protectedOfficeStats } from "../hr/stats";
 import { cycleById, previousCycleOf } from "../cycles";
-import { currentPerson, DEMO_DIRECTOR_GENERAL_ID, personById, type Person } from "../people";
+import { currentPerson, isDirectorGeneral, personById, type Person } from "../people";
 import { today } from "../settings";
 import { Layout } from "../views/layout";
 import { PageHeader } from "../views/components";
+import { HR_JSON_EXPORT_LABEL } from "../views/assessment";
 import { HrOverviewView, StatsBlock, objectionField, type StateRow } from "../views/hr-overview";
+import { ObjectionResolveView } from "../views/objection-form";
 import { errorPage } from "../views/error-page";
 
 const app = new Hono();
 
-registerHomeTasks((person) => person.id === DEMO_DIRECTOR_GENERAL_ID
+registerHomeTasks((person) => isDirectorGeneral(person)
   ? [{ title: "Terminowość w urzędzie", href: "/office/statistics", action: "Otwórz terminowość w urzędzie" }]
   : []);
 
 app.get("/office/statistics", (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  if (viewer.id !== DEMO_DIRECTOR_GENERAL_ID) return errorPage(c, "Ten ekran widzi dyrektor generalny urzędu. Zmień konto na „Barbara Szymańska”.", 403);
+  if (!isDirectorGeneral(viewer)) return errorPage(c, "Ten ekran widzi dyrektor generalny urzędu. Zmień konto na „Barbara Szymańska”.", 403);
   return c.html(
     <Layout title="Terminowość w urzędzie" person={viewer} today={today()}>
       <PageHeader title="Terminowość w urzędzie" lead="Ile ocen powstało w terminie i na jakim etapie są cykle w całym urzędzie." />
-      <StatsBlock stats={officeStats()} title="Liczby dla całego urzędu (bez nazwisk)" />
+      <StatsBlock protectedStats={protectedOfficeStats()} title="Liczby dla całego urzędu (bez nazwisk)" />
     </Layout>,
   );
 });
@@ -55,7 +58,7 @@ export function overviewData(viewer: Person) {
     today: today(),
     links: [
       ...cycleLinks(c, viewer),
-      ...(assessmentState(c.id).snapshot || assessmentState(c.id).redo ? [{ label: "Pobierz ocenę do systemu kadrowego (plik JSON)", href: `/cycles/${c.id}/assessment/export.json` }] : []),
+      ...(assessmentState(c.id).snapshot || assessmentState(c.id).redo ? [{ label: HR_JSON_EXPORT_LABEL, href: `/cycles/${c.id}/assessment/export.json` }] : []),
     ],
   }));
   // Najpierw cykle wymagające działania, zamknięte (zapoznanie, fikcja, rozpatrzony sprzeciw) na końcu; w grupie od najbliższego terminu.
@@ -107,27 +110,56 @@ app.post("/hr/grades/:personId", (c) => {
 app.post("/cycles/:id/objection-outcome", async (c) => {
   const viewer = currentPerson(c);
   if (!viewer) return c.redirect("/account");
-  if (viewer.role !== "hr") return errorPage(c, "Tę czynność wykonują kadry.", 403);
+  const isDirector = isDirectorGeneral(viewer);
+  if (viewer.role !== "hr" && !isDirector) return errorPage(c, "Sprzeciw rozstrzygają dyrektor generalny urzędu albo kadry.", 403);
   const cycle = cycleById(c.req.param("id"));
   if (!cycle || !visibleEvents(cycle.id).some((e) => e.type === "cycle_started")) return errorPage(c, "Nie ma takiego cyklu oceny. Wybierz sprawę z listy.", 404);
+  if (cycle.sheet === "A" && viewer.role !== "hr") {
+    return errorPage(c, "W arkuszu A sprzeciw kierowany jest do wskazanego adresata; rozstrzygnięcie zapisują kadry.", 403);
+  }
   const body = await c.req.parseBody();
   const outcome = typeof body.outcome === "string" ? body.outcome : "";
+  const state = assessmentState(cycle.id);
   if (!OUTCOMES.includes(outcome)) {
+    const msg = "Wybierz wynik rozpatrzenia sprzeciwu: zmiana oceny, ponowne sporządzenie oceny albo nieuwzględnienie sprzeciwu.";
+    if (isDirector && viewer.role !== "hr") {
+      const person = personById(cycle.person_id);
+      if (person && state.objection && state.snapshot) {
+        return c.html(
+          <ObjectionResolveView
+            viewer={viewer}
+            today={today()}
+            cycleId={cycle.id}
+            person={person}
+            appraiserName={personById(cycle.appraiser_id)?.name ?? cycle.appraiser_id}
+            recipient={objectionRecipientFor(state.snapshot.sheet, state.snapshot.objectionRecipient) ?? undefined}
+            snapshot={state.snapshot}
+            objection={state.objection}
+            errors={{ outcome: msg }}
+          />,
+          422,
+        );
+      }
+      return errorPage(c, msg, 422);
+    }
     // Ten sam ekran z formularzem sprzeciwu, komunikat przy polu wyboru wyniku (422).
-    const { rows, cards, stats } = overviewData(viewer);
-    // Bez formularza tego sprzeciwu na ekranie komunikat stoi tylko w podsumowaniu (klucz „_” nie robi odnośnika).
-    const field = rows.some((r) => r.cycleId === cycle.id && r.state.step === "objection_filed") ? objectionField(cycle.id) : "_outcome";
-    const errors = { [field]: "Wybierz wynik rozpatrzenia sprzeciwu: zmiana oceny, ponowne sporządzenie oceny albo nieuwzględnienie sprzeciwu." };
-    return c.html(<HrOverviewView viewer={viewer} today={today()} cards={cards} rows={rows} stats={stats} errors={errors} />, 422);
+    // Ekran zbiorczy kadr liczy się w regułach obowiązujących dziś, nie w wersji reguł tego jednego cyklu.
+    const page = withActiveRules(() => {
+      const { rows, cards, stats } = overviewData(viewer);
+      // Bez formularza tego sprzeciwu na ekranie komunikat stoi tylko w podsumowaniu (klucz „_” nie robi odnośnika).
+      const field = rows.some((r) => r.cycleId === cycle.id && r.state.step === "objection_filed") ? objectionField(cycle.id) : "_outcome";
+      const errors = { [field]: msg };
+      return String(<HrOverviewView viewer={viewer} today={today()} cards={cards} rows={rows} stats={stats} errors={errors} />);
+    });
+    return c.html(page, 422);
   }
-  const ev = visibleEvents(cycle.id);
-  if (!ev.some((e) => e.type === "objection_filed") || ev.some((e) => e.type === "objection_resolved")) {
+  if (!state.objection || state.objection.resolvedOn) {
     return errorPage(c, "Ten sprzeciw jest już rozpatrzony albo nie został wniesiony. Wróć do „Stan cykli”.", 409);
   }
   // „Zmiana oceny”: rozstrzygnięcie zapisuje się dopiero razem ze zmienionymi ocenami cząstkowymi (`/cycles/:id/objection-change`).
   if (outcome === "changed") return c.redirect(`/cycles/${cycle.id}/objection-change`, 303);
   recordEvent("objection_resolved", cycle.id, viewer.id, { outcome });
-  return c.redirect("/hr", 303);
+  return c.redirect(viewer.role === "hr" ? "/hr" : `/cycles/${cycle.id}/objection?resolved=1`, 303);
 });
 
 export default app;

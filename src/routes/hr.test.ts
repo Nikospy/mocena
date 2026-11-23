@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, test } from "bun:test";
+import { Window } from "happy-dom";
 import { createTestApp } from "../test-helpers";
 import { approveAndAcknowledgePiotr, call, html } from "./hr-test-helpers";
 
@@ -81,5 +82,29 @@ describe("karta stopnia a data systemowa", () => {
   test("cykl Anny widoczny od 16.12.2024", async () => {
     expect(await html(createTestApp({ today: "2024-12-15" }).app, "joanna", "/hr")).not.toContain("Anna Kwiatkowska</a></th>");
     expect(await html(createTestApp({ today: "2024-12-16" }).app, "joanna", "/hr")).toContain("Anna Kwiatkowska</a></th>");
+  });
+
+  test("zasada 7: dopisek „(ponowna ocena)” stoi tylko w kolumnie „Stan cyklu”, nie przy nazwisku", async () => {
+    const { app } = createTestApp({ today: "2026-11-22", seedOptions: { afterStep1: true } });
+    const ids = ["wykorzystywanie-wiedzy", "rzetelnosc", "organizacja-pracy", "wspolpraca", "komunikacja", "orientacja-na-klienta", "myslenie-analityczne"];
+    const form: Record<string, string> = { justification: "Powód.", developmentConclusions: "Kurs.", interviewDate: "2026-11-21" };
+    for (const id of ids) form[`score[${id}]`] = id === "rzetelnosc" ? "1" : "5";
+    expect((await call(app, "marek", "/cycles/cycle-piotr/assessment/approve", form)).status).toBe(303);
+    expect((await call(app, "piotr", "/cycles/cycle-piotr/assessment/acknowledge", {})).status).toBe(303);
+
+    const h = await html(app, "joanna", "/hr");
+    expect(h.toLowerCase()).not.toContain("negatyw");
+    const win = new Window();
+    win.document.body.innerHTML = h;
+    const rows = [...win.document.querySelectorAll("tr.hr-card")];
+    const piotrRows = rows.filter((tr) => tr.querySelector("th")?.textContent?.includes("Piotr Wójcik"));
+    expect(piotrRows).toHaveLength(2);
+    for (const tr of piotrRows) {
+      expect(tr.querySelector("th")!.textContent?.trim()).toBe("Piotr Wójcik");
+    }
+    const states = piotrRows.map((tr) => tr.querySelector('td[data-label="Stan cyklu"]')!.textContent?.trim() ?? "");
+    expect(states).toContain("Kryteria do wyznaczenia (ponowna ocena)");
+    expect(states.some((s) => s.startsWith("Zapoznanie potwierdzone"))).toBe(true);
+    await win.close();
   });
 });

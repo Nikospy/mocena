@@ -37,14 +37,14 @@ export function TourShell(props: { title: string; children?: Child }) {
 
 // Pięć chwil na osi: przystanki 1, 2, 3, 4, 5 (pozycje z makiety v3-entry.html, procent szerokości dwóch lat).
 const AXIS = [1.643835616438356, 64.24657534246575, 88, 93, 98];
-const MOB_GAPS: Record<number, string> = { 1: "15 miesięcy notatek", 2: "8 miesięcy notatek" };
+const MOB_GAPS: Record<number, string> = { 2: "15 miesięcy notatek", 3: "8 miesięcy notatek" };
 
 export function TourEntry() {
   const moments = STOPS.filter((s) => ["1", "2", "3", "4", "5"].includes(s.id));
   return (
     <TourShell title="Prowadzi ocenę okresową od pierwszej notatki do arkusza">
       <div class="e-head">
-        <p class="e-ctx">Pokaz dla jury · 5 kroków · około 3 minut</p>
+        <p class="e-ctx">5 kroków · 3 min · bez modelu językowego</p>
         <h1 class="e-h1">Ten asystent prowadzi ocenę od pierwszej notatki do arkusza.</h1>
         <p class="e-lead">
           Przełożony ocenia dwa lata pracy, a pamięta ostatnie tygodnie. Asystent zbiera fakty, kiedy się dzieją, i pilnuje każdego terminu z przepisu. Oceny cząstkowe stawia oceniający – asystent nie pisze ani zdania oceny.

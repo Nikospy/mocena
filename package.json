@@ -1,6 +1,7 @@
 {
   "name": "mocena",
   "scripts": {
+    "start": "bun run scripts/start.ts",
     "dev": "bun run --hot src/local.tsx",
     "init": "bun run src/init-cli.ts",
     "seed": "bun run src/seed-cli.ts",

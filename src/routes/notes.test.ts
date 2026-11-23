@@ -159,3 +159,101 @@ describe("informacja zwrotna: limit jak w notatce (ustalenie 10 audytu)", () => 
     expect((await call(app, "marek", `/notes/${note.id}/feedback`, { text: "a".repeat(2000) })).status).toBe(303);
   });
 });
+
+describe("strażnik danych wrażliwych (art. 9 RODO)", () => {
+  test("notatka o zdrowiu, rodzinie lub wyznaniu zwraca 422 z ostrzeżeniem i nie tworzy wpisu; potwierdzenie związane z treścią zapisuje 303", async () => {
+    const { app, db } = createTestApp({ today: "2026-03-11", seedOptions: { afterStep1: true, liveStep2: true } });
+    const before = count(db);
+
+    // Pole potwierdzenia jest obecne w HTML formularza od razu (ukryte `hidden`), gotowe na ostrzeżenie na żywo.
+    const emptyForm = await (await call(app, "marek", "/people/piotr/notes/new")).text();
+    expect(emptyForm).toContain('id="confirm-sensitive-wrap" hidden');
+    expect(emptyForm).toContain('name="confirm_sensitive_token"');
+
+    const samples = [
+      "Pracownik wrócił ze zwolnienia lekarskiego po chorobie.",
+      "Z powodu rozwodu prosił o zmianę terminu zadania.",
+      "Rozmawialiśmy o wyznaniu i modlitwie przed pracą.",
+    ];
+    for (const text of samples) {
+      const sug = await call(app, "marek", "/suggestions/note", { text });
+      expect(sug.status).toBe(200);
+      const j = (await sug.json()) as { sensitiveCategories?: { category: string }[]; sensitiveToken?: string };
+      expect((j.sensitiveCategories ?? []).length).toBeGreaterThan(0);
+      expect(j.sensitiveToken).toBeTruthy();
+
+      const res = await call(app, "marek", "/people/piotr/notes", { criterion_id: "rzetelnosc", text });
+      expect(res.status).toBe(422);
+      const body = await res.text();
+      expect(body).toContain("art. 9 RODO");
+      expect(body).toContain('class="st warn"');
+      expect(body).toContain('name="confirm_no_sensitive"');
+      expect(body).toContain(`value="${j.sensitiveToken}"`);
+      // Tekst autora nie jest kasowany ani zmieniany automatycznie.
+      expect(body).toContain(text);
+      expect(count(db)).toBe(before);
+    }
+
+    // Zmiana tekstu po zaznaczeniu potwierdzenia (stary token) nadal zatrzymuje zapis kodem 422.
+    const text1 = "Wspomniał o depresji w zespole projektowym.";
+    const r422 = await call(app, "marek", "/people/piotr/notes", { criterion_id: "rzetelnosc", text: text1 });
+    expect(r422.status).toBe(422);
+    const token1 = (await r422.text()).match(/name="confirm_sensitive_token" value="([a-f0-9]+)"/)?.[1] ?? "";
+    expect(token1.length).toBeGreaterThan(0);
+
+    const changedAfterConfirm = await call(app, "marek", "/people/piotr/notes", {
+      criterion_id: "rzetelnosc",
+      text: `${text1} Dodatkowo rozwód i kościół.`,
+      confirm_no_sensitive: "1",
+      confirm_sensitive_token: token1,
+    });
+    expect(changedAfterConfirm.status).toBe(422);
+    expect(await changedAfterConfirm.text()).toContain("Treść notatki zmieniła się po potwierdzeniu");
+    expect(count(db)).toBe(before);
+
+    // Świadome potwierdzenie z pasującym tokenem tej samej treści zapisuje notatkę bez automatycznego usuwania tekstu.
+    const confirmed = await call(app, "marek", "/people/piotr/notes", {
+      criterion_id: "rzetelnosc",
+      text: text1,
+      confirm_no_sensitive: "1",
+      confirm_sensitive_token: token1,
+    });
+    expect(confirmed.status).toBe(303);
+    expect(count(db)).toBe(before + 1);
+
+    // Zwykła notatka urzędowa (dawny fałszywy alarm: zwolnienie z opłaty skarbowej) zapisuje się bez potwierdzenia.
+    const normal = await call(app, "marek", "/people/piotr/notes", {
+      criterion_id: "rzetelnosc",
+      text: "Rozpatrzył wniosek o zwolnienie z opłaty skarbowej i wypełnił obowiązek ciążący na wydziale.",
+    });
+    expect(normal.status).toBe(303);
+    expect(count(db)).toBe(before + 2);
+
+    // Po 422 z odznaczonym polem „Zmiana zadań” nie zostaje tekst „Zaznaczone na podstawie listy słów”.
+    const uncheckedHint = await call(app, "marek", "/people/piotr/notes", {
+      criterion_id: "",
+      text: STEP2,
+    });
+    expect(uncheckedHint.status).toBe(422);
+    expect(await uncheckedHint.text()).not.toContain("Zaznaczone na podstawie listy słów");
+  });
+
+  test("błąd strażnika (brak słownika) blokuje zapis 422 zamiast przepuszczać po cichu (fail-closed)", async () => {
+    const { officeSettings } = await import("../office-settings");
+    const { app, db } = createTestApp({ today: "2026-03-11", seedOptions: { afterStep1: true, liveStep2: true } });
+    const before = count(db);
+    const orig = officeSettings().sensitiveDataWords;
+    try {
+      (officeSettings() as any).sensitiveDataWords = undefined;
+      const res = await call(app, "marek", "/people/piotr/notes", {
+        criterion_id: "rzetelnosc",
+        text: "Był na zwolnieniu lekarskim.",
+      });
+      expect(res.status).toBe(422);
+      expect(await res.text()).toContain("Zapis został wstrzymany");
+      expect(count(db)).toBe(before);
+    } finally {
+      (officeSettings() as any).sensitiveDataWords = orig;
+    }
+  });
+});

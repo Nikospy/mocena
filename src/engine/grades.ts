@@ -1,7 +1,7 @@
 // Art. 89 ust. 2 ustawy: stopień służbowy z mocy prawa po dwóch kolejnych ocenach pozytywnych
 // na jednym z dwóch najwyższych poziomów (każda z dwóch na którymkolwiek z nich).
 import { mandatoryGradeDeadline } from "./deadlines";
-import { rules } from "./rules";
+import { activeRules, rulesFor, withRulePack } from "./rules";
 
 export type GradeAssessment = {
   cycleId: string;
@@ -9,6 +9,8 @@ export type GradeAssessment = {
   outcome: "positive" | "negative";
   overallLevel: string;
   acknowledgedOn: string | null;
+  /** Wersja reguł, w której powstała ocena: nazwy dwóch najwyższych poziomów bierze się z niej. */
+  rulesVersion?: string;
 };
 
 export type MandatoryGradeInput = {
@@ -25,32 +27,37 @@ export type MandatoryGrade = {
   toGrade: number | null;
   assessmentDates: [string, string];
   acknowledgedOn: string;
+  /** Liczba dni na przyznanie stopnia w wersji reguł drugiej oceny. */
+  days: number;
   cycleId: string;
   overdue: boolean;
   atMaxGrade: boolean;
 };
 
-const TOP_LEVELS = rules.overallLevels.slice(-2).map((l) => l.name);
 const ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
 
 export function romanGrade(n: number): string {
   return ROMAN[n] ?? String(n);
 }
 
-const qualifies = (a: GradeAssessment) => a.outcome === "positive" && TOP_LEVELS.includes(a.overallLevel);
-
 export function mandatoryGrade(input: MandatoryGradeInput, today: string): MandatoryGrade | null {
   if (!input.isAppointed || input.currentGrade === null) return null;
+  const r = activeRules();
+  const topLevelsOf = (a: GradeAssessment) => (a.rulesVersion ? rulesFor(a.rulesVersion) : r).overallLevels.slice(-2).map((l) => l.name);
+  const qualifies = (a: GradeAssessment) => a.outcome === "positive" && topLevelsOf(a).includes(a.overallLevel);
   const since = input.currentGradeOn;
   const list = input.assessments.filter((a) => !since || a.approvedOn > since).sort((a, b) => a.approvedOn.localeCompare(b.approvedOn));
   for (let i = 0; i + 1 < list.length; i++) {
     const [first, second] = [list[i], list[i + 1]];
     if (!qualifies(first) || !qualifies(second) || !second.acknowledgedOn) continue;
-    const dueOn = mandatoryGradeDeadline(second.acknowledgedOn);
-    const atMaxGrade = input.currentGrade >= rules.approval.gradeRequest.maxGrade;
+    // Termin, podstawa i najwyższy stopień według wersji reguł, w której powstała druga ocena.
+    const pack = second.rulesVersion ? rulesFor(second.rulesVersion) : r;
+    const dueOn = withRulePack(pack, () => mandatoryGradeDeadline(second.acknowledgedOn!));
+    const atMaxGrade = input.currentGrade >= pack.approval.gradeRequest.maxGrade;
     return {
       dueOn,
-      basis: rules.deadlines.mandatoryGradeDays.basis,
+      basis: pack.deadlines.mandatoryGradeDays.basis,
+      days: pack.deadlines.mandatoryGradeDays.value,
       fromGrade: input.currentGrade,
       toGrade: atMaxGrade ? null : input.currentGrade + 1,
       assessmentDates: [first.approvedOn, second.approvedOn],

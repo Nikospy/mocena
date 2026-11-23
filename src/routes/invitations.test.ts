@@ -103,6 +103,53 @@ describe("zaproszenia na rozmowy", () => {
     expect(await html(app, "marek", `/cycles/${PIOTR}/invitations/new?kind=assessment`)).toContain("§ 10");
   });
 
+  test("odnośnik „Zaproś na rozmowę oceniającą” pojawia się dopiero po potwierdzeniu części I", async () => {
+    const { app } = createTestApp();
+    const before = await html(app, "marek", `/cycles/${PIOTR}/part1`);
+    expect(before).toContain("Zaproś na rozmowę o kryteriach");
+    expect(before).not.toContain("Zaproś na rozmowę oceniającą");
+
+    await call(app, "marek", `/cycles/${PIOTR}/part1/submit`, {});
+    const submitted = await html(app, "marek", `/cycles/${PIOTR}/part1`);
+    expect(submitted).not.toContain("Zaproś na rozmowę oceniającą");
+
+    await call(app, "piotr", `/cycles/${PIOTR}/part1/confirm`, {});
+    const confirmed = await html(app, "marek", `/cycles/${PIOTR}/part1`);
+    expect(confirmed).toContain("Zaproś na rozmowę oceniającą");
+    expect(await html(app, "marek", "/cycles/cycle-ewa/part1")).toContain("Zaproś na rozmowę oceniającą");
+  });
+
+  test("po ponownym rozpoczęciu rundy cyklu (po sprzeciwie) link „Zaproś na rozmowę oceniającą” wymaga potwierdzenia części I w bieżącej rundzie", async () => {
+    const { app, db } = createTestApp({ today: "2026-11-22" });
+    const { cycleById, openCycle, startNextCycle } = await import("../cycles");
+    const { part1Status } = await import("../cycles/part1");
+    const { recordEvent } = await import("../events");
+
+    db.query("UPDATE people SET has_account = 1 WHERE id = 'katarzyna'").run();
+    expect((await call(app, "joanna", "/cycles/cycle-katarzyna/objection-outcome", { outcome: "redone" })).status).toBe(303);
+    startNextCycle(cycleById("cycle-katarzyna")!, "katarzyna", "2026-11-16", "2026-11-17", "positive");
+    const next = openCycle("katarzyna")!;
+    expect((await call(app, "anna", `/cycles/${next.id}/part1/submit`, {})).status).toBe(303);
+    expect((await call(app, "katarzyna", `/cycles/${next.id}/part1/confirm`, {})).status).toBe(303);
+    expect(await html(app, "anna", `/cycles/${next.id}/part1`)).toContain("Zaproś na rozmowę oceniającą");
+
+    // Zatwierdzenie i zapoznanie z drugą oceną Katarzyny uruchamia restartNextCycle (nowe cycle_started w bieżącym cyklu).
+    const crits = (db.query("SELECT criterion_id AS id FROM cycle_criteria WHERE cycle_id = 'cycle-katarzyna' ORDER BY rowid").all() as { id: string }[]).map((r) => r.id);
+    const redoForm: Record<string, string> = { justification: "", developmentConclusions: "Szkolenie.", interviewDate: "2026-11-22" };
+    for (const id of crits) redoForm[`score[${id}]`] = "5";
+    expect((await call(app, "anna", "/cycles/cycle-katarzyna/assessment/approve", redoForm)).status).toBe(303);
+    expect((await call(app, "katarzyna", "/cycles/cycle-katarzyna/assessment/acknowledge", {})).status).toBe(303);
+
+    expect(part1Status(next.id, { currentRound: true }).state).toBe("not_started");
+    expect(await html(app, "anna", `/cycles/${next.id}/part1`)).not.toContain("Zaproś na rozmowę oceniającą");
+
+    // Dopiero potwierdzenie części I w bieżącej rundzie przywraca link.
+    recordEvent("part1_submitted", next.id, "anna", { sheet: "C", criteria: [], dueDate: "2028-11-22", dueDateBasis: ["art. 81 ust. 4 ustawy"], place: "Rzeszów", appraiserName: "Anna Kwiatkowska" });
+    recordEvent("part1_confirmed", next.id, "katarzyna", { place: "Rzeszów", appraiseeName: "Katarzyna Lewandowska" });
+    expect(part1Status(next.id, { currentRound: true }).state).toBe("confirmed");
+    expect(await html(app, "anna", `/cycles/${next.id}/part1`)).toContain("Zaproś na rozmowę oceniającą");
+  });
+
   test("w odpowiedziach nie ma słowa „podpis”", async () => {
     const { app, db } = createTestApp();
     await call(app, "marek", `/cycles/${PIOTR}/invitations`, OPENING);

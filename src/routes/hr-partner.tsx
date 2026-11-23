@@ -26,6 +26,7 @@ import type { Note } from "../notes/repo";
 import { AppreciationView } from "../views/appreciation";
 import { BeforeMeetingView } from "../views/before-meeting";
 import { TaskChangeCardView, TaskChangeNoView, TaskChangeQuestionView } from "../views/task-change";
+import { latestSelfPrep } from "./self-prep";
 
 /** Odnośniki pojawiają się w oknie przed terminem oceny, jak sprawa „Wystaw ocenę” (`assessmentWindowReached`). */
 registerCycleLinks((cycle, person) =>
@@ -143,6 +144,7 @@ app.get("/cycles/:id/before-meeting", (c) => {
       titleName={nameForm(g.subject.name, "ins") ?? g.subject.name}
       card={card("beforeMeeting")}
       summary={summary}
+      selfPrep={latestSelfPrep(g.cycle.id)}
     />,
   );
 });

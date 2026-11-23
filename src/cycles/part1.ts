@@ -12,19 +12,22 @@ export type Part1Result = { ok: true } | { ok: false; errors: string[] };
 export type Part1State = "not_started" | "draft" | "submitted" | "confirmed";
 export type CycleCriterion = { id: string; kind: "mandatory" | "additional"; expectation: string | null };
 
-export function part1Status(cycleId: string): {
+export function part1Status(cycleId: string, opts: { currentRound?: boolean } = {}): {
   state: Part1State;
   submittedOn?: string;
   confirmedOn?: string;
   waitingDays?: number;
 } {
-  const ev = visibleEvents(cycleId);
+  const all = visibleEvents(cycleId);
+  const startedAt = opts.currentRound ? all.findLastIndex((e) => e.type === "cycle_started") : -1;
+  const ev = startedAt >= 0 ? all.slice(startedAt + 1) : all;
   const submitted = ev.find((e) => e.type === "part1_submitted");
   const confirmed = ev.find((e) => e.type === "part1_confirmed");
   if (submitted && confirmed) return { state: "confirmed", submittedOn: submitted.date, confirmedOn: confirmed.date };
   if (submitted) {
     return { state: "submitted", submittedOn: submitted.date, waitingDays: daysBetween(submitted.date, today()) };
   }
+  if (opts.currentRound && startedAt > 0) return { state: "not_started" };
   const rows = getDb().query("SELECT 1 FROM cycle_criteria WHERE cycle_id = ? LIMIT 1").get(cycleId);
   return { state: rows ? "draft" : "not_started" };
 }

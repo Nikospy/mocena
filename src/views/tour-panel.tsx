@@ -1,4 +1,4 @@
-import { personGenitive, personLabel, stopById, type StopContent } from "../tour/stops";
+import { personGenitive, personLabel, stepLabel, stopById, type StopContent } from "../tour/stops";
 
 const ARROW = <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>;
 const BACK = <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>;
@@ -24,7 +24,7 @@ function Head(props: TourPanelProps) {
   return (
     <div class="gp-h">
       <div class="row">
-        <b>Krok {stop.step} z 5</b>
+        <b>{stepLabel(stop)}</b>
         <form method="post" action="/tour/end">
           <button class="btn text gp-end" type="submit">Zakończ pokaz</button>
         </form>
@@ -45,9 +45,15 @@ function Head(props: TourPanelProps) {
 function Body(props: TourPanelProps & { withSelectors: boolean }) {
   const { stop } = props;
   return (
-    <div class="gp-b">
+    <div class="gp-b" tabindex={0} role="region" aria-label={props.withSelectors ? "Opis kroku" : "Opis kroku (telefon)"}>
       <h2>{stop.title}</h2>
       <p>{stop.lead}</p>
+      {stop.tryIt ? (
+        <>
+          <p class="lbl">Spróbuj</p>
+          <p class="g-try" data-try-selector={props.withSelectors ? stop.tryTarget : undefined}>{stop.tryIt}</p>
+        </>
+      ) : null}
       <p class="lbl">Na co patrzeć</p>
       <ol class="g-look">
         {stop.look.map((l, i) => (
@@ -57,12 +63,6 @@ function Body(props: TourPanelProps & { withSelectors: boolean }) {
           </li>
         ))}
       </ol>
-      {stop.tryIt ? (
-        <>
-          <p class="lbl">Spróbuj</p>
-          <p class="g-try">{stop.tryIt}</p>
-        </>
-      ) : null}
       {stop.note ? <p class="cap">{stop.note}</p> : null}
       {stop.basis ? (
         <span class="basis">
@@ -127,10 +127,10 @@ export function TourPanel(props: TourPanelProps) {
         </div>
       </aside>
       <aside class="gmob" id="tour-guide-m" tabindex={-1} aria-label="Przewodnik pokazu (telefon)">
-        <details data-gmob>
+        <details open data-gmob={props.stop.id}>
           <summary>
             <span class="gm-t">{props.stop.title}</span>
-            <span class="gm-s">Krok {props.stop.step} z 5 · {personLabel(props.stop.personId)} · {props.dateLabel}</span>
+            <span class="gm-s">Opis kroku · {stepLabel(props.stop)} · {personLabel(props.stop.personId)} · {props.dateLabel}</span>
           </summary>
           <Body {...props} withSelectors={false} />
         </details>

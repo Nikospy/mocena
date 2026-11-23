@@ -6,7 +6,7 @@ describe("proces 2: wniosek ocenianego o zmianę terminu jest zawsze do znalezie
   test("Ewa 22.11.2026 ma odnośnik na stronie głównej i na osi czasu, obok innych spraw", async () => {
     const { app } = createTestApp({ today: "2026-11-22" });
     const home = await html(app, "ewa", "/");
-    expect(home).toContain("Twoje możliwości");
+    expect(home).toContain("Możliwości w cyklu");
     expect(home).toContain('href="/cycles/cycle-ewa/deadline-change/request"');
     const tl = await html(app, "ewa", "/cycles/cycle-ewa/timeline");
     expect(tl).toContain('href="/cycles/cycle-ewa/deadline-change/request"');

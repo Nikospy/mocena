@@ -2,7 +2,7 @@
   "intro": "Prototyp działa na regułach. W tych sześciu miejscach urząd może włączyć model uruchomiony u siebie jako wsparcie w tle.",
   "places": [
     { "place": "zapis notatki", "model": "wstępnie zaznacza pole „Zmiana zadań pracownika”", "prototype": "działa na liście słów" },
-    { "place": "zapis notatki", "model": "ostrzega, że notatka zawiera dane o zdrowiu", "prototype": "jeszcze nie działa, to tylko miejsce na model" },
+    { "place": "zapis notatki", "model": "ostrzega, że notatka zawiera dane szczególne (zdrowie, rodzina, wyznanie)", "prototype": "działa na liście słów" },
     { "place": "zapis notatki", "model": "podpowiada kryterium, którego notatka dotyczy", "prototype": "jeszcze nie działa, to tylko miejsce na model" },
     { "place": "zapis notatki", "model": "ostrzega, że podobna notatka już jest", "prototype": "jeszcze nie działa, to tylko miejsce na model" },
     { "place": "karta rozmowy", "model": "dopasowuje formę rozwoju z katalogu", "prototype": "działa na katalogu form rozwoju" },

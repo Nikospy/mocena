@@ -1,5 +1,8 @@
-import { Hono, type NotFoundHandler } from "hono";
+import { Hono, type MiddlewareHandler, type NotFoundHandler } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
+import { assessmentState } from "./assessment/state";
+import { cycleRulesVersion } from "./assessment/rules-scope";
+import { hasPublishedRules, resetRulesCache, rulesVersion, withRulesVersion } from "./engine/rules";
 import { getDb } from "./db";
 import { runSeed } from "./seed";
 import { homeOptions, homeTasks } from "./home-tasks";
@@ -8,7 +11,9 @@ import { isDemoMode, OFFICE_INIT_COMMAND, today } from "./settings";
 import cycleStart from "./routes/cycle-start";
 import assessment from "./routes/assessment";
 import hr from "./routes/hr";
+import objection from "./routes/objection";
 import objectionChange from "./routes/objection-change";
+import selfPrep from "./routes/self-prep";
 import sheet from "./routes/sheet";
 import history from "./routes/history";
 import notes from "./routes/notes";
@@ -140,6 +145,27 @@ function dueWords(due: string, now: string): { text: string; late: boolean } {
 
 app.use("*", tourContext);
 
+/** Cykl z zatwierdzoną oceną żyje według reguł wersji zapisanej w ocenie: nazwy, skala, poziomy i terminy z tej wersji. */
+const cycleRulesScope: MiddlewareHandler = async (c, next) => {
+  if (!hasPublishedRules()) return next();
+  const version = cycleRulesVersion(c.req.param("id") ?? "");
+  if (!version) return next();
+  return withRulesVersion(version, () => next());
+};
+app.use("/cycles/:id", cycleRulesScope);
+app.use("/cycles/:id/*", cycleRulesScope);
+
+/** Liveness and database check for monitoring: no session, no personal data. */
+app.get("/healthz", (c) => {
+  c.header("Cache-Control", "no-store");
+  try {
+    getDb().query("SELECT 1 FROM sqlite_master LIMIT 1").get();
+    return c.json({ status: "ok", rulesVersion: rulesVersion().version, db: "ok" });
+  } catch {
+    return c.json({ status: "error", rulesVersion: rulesVersion().version, db: "error" }, 503);
+  }
+});
+
 app.get("/", (c) => {
   const person = currentPerson(c);
   if (!person) return isDemoMode() ? c.html(<TourEntry />) : c.redirect("/account");
@@ -205,7 +231,7 @@ app.get("/", (c) => {
       </section>
       {options.length ? (
         <section class="home-options" aria-labelledby="h-options">
-          <h2 id="h-options">Twoje możliwości</h2>
+          <h2 id="h-options">Możliwości w cyklu</h2>
           <ul class="tasks quiet">
             {options.map((t) => (
               <li class="task">
@@ -251,6 +277,7 @@ app.post("/demo/restart", (c) => {
       .all() as { name: string }[];
     for (const t of tables) db.exec(`DELETE FROM "${t.name}"`);
     db.exec("DELETE FROM sqlite_sequence");
+    resetRulesCache();
     runSeed(db, { liveStep2: true });
   })();
   deleteCookie(c, PERSON_COOKIE, { path: "/" });
@@ -284,7 +311,9 @@ app.post("/demo/date", async (c) => {
 app.route("/", cycleStart);
 app.route("/", assessment);
 app.route("/", hr);
+app.route("/", objection);
 app.route("/", objectionChange);
+app.route("/", selfPrep);
 app.route("/", sheet);
 app.route("/", history);
 app.route("/", notes);

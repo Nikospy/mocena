@@ -14,7 +14,10 @@ export type Sheet = "A" | "B" | "C";
 export const SHEETS: Sheet[] = ["A", "B", "C"];
 const KIND_OF_SHEET: Record<Sheet, PositionKind> = { A: "head_of_office", B: "manager", C: "staff" };
 export const OUTCOME_LABEL = { positive: "pozytywna", negative: "negatywna" } as const;
-export const LEVELS: string[] = rules.overallLevels.map((l) => l.name);
+/** Nazwy poziomów ogólnych obowiązujących reguł, w chwili wywołania. */
+export function levelNames(): string[] {
+  return rules.overallLevels.map((l) => l.name);
+}
 export const GRADES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export type PersonForm = {
@@ -140,7 +143,7 @@ export function validateForm(f: PersonForm, opts: { personId?: string; hasCycle:
   if (f.prev_on && !e.prev_on) {
     if (f.prev_outcome !== "positive" && f.prev_outcome !== "negative") e.prev_outcome = "Wybierz wynik oceny: pozytywna albo negatywna.";
   }
-  if (f.prev_level && !LEVELS.includes(f.prev_level)) e.prev_level = "Wybierz poziom z listy.";
+  if (f.prev_level && !levelNames().includes(f.prev_level)) e.prev_level = "Wybierz poziom z listy.";
   if (f.grade && !GRADES.includes(Number(f.grade))) e.grade = "Wybierz stopień z listy.";
   if (f.grade && !f.grade_on) e.grade_on = "Podaj datę przyznania stopnia.";
   if (!opts.hasCycle && !opts.allowNoCycle && !f.hired_on && !f.prev_on) {

@@ -16,10 +16,10 @@ function fresh(today: string) {
 describe("stan cyklu", () => {
   test("criteria_due: 30 dni po ocenie pozytywnej, 7 dni po negatywnej", () => {
     const { db } = fresh("2024-12-09");
-    expect(cycleState("cycle-piotr")).toMatchObject({ step: "criteria_due", deadline: { date: "2024-12-27", basis: ["§ 7 pkt 1"] } });
+    expect(cycleState("cycle-piotr")).toMatchObject({ step: "criteria_due", text: "Kryteria do wyznaczenia", deadline: { date: "2024-12-27", basis: ["§ 7 pkt 1"] } });
     db.query("INSERT INTO cycles (id, person_id, appraiser_id, period_start) VALUES ('neg', 'maria', 'marek', '2024-11-27')").run();
     seedEvent("cycle_started", "neg", "marek", { periodStart: "2024-11-27", previousAssessmentOn: "2024-11-27", previousAcknowledgedOn: "2024-12-02", previousOutcome: "negative" }, "2024-11-27");
-    expect(cycleState("neg").deadline).toEqual({ date: "2024-12-04", basis: ["§ 7 pkt 2"] });
+    expect(cycleState("neg")).toMatchObject({ text: "Kryteria do wyznaczenia (ponowna ocena)", deadline: { date: "2024-12-04", basis: ["§ 7 pkt 2"] } });
   });
 
   test("part1_waiting liczy dni od przekazania części I, bez terminu", () => {

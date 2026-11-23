@@ -3,7 +3,8 @@ import { addDays } from "../engine/deadlines";
 import { rules } from "../engine/rules";
 import { romanGrade, type MandatoryGrade } from "../engine/grades";
 import type { CycleState, CycleStep } from "../hr/cycle-state";
-import type { OfficeStats } from "../hr/stats";
+import type { OfficeStats, ProtectedOfficeStats } from "../hr/stats";
+import { TOO_FEW_LABEL } from "../hr/stats-privacy";
 import type { Person } from "../people";
 import { ErrorSummary, FieldError, LegalBasis, PageHeader, errorId, invalid, type FormErrors } from "./components";
 import { Layout, formatDate } from "./layout";
@@ -17,7 +18,7 @@ export type ReminderProps = { personId: string; personName: string; grade: Manda
 /** Karta obowiązku urzędu: nazwisko tylko jako wartość pola, treść mówi o obowiązku urzędu. */
 export function ReminderCard(props: ReminderProps) {
   const g = props.grade;
-  const raw = addDays(g.acknowledgedOn, rules.deadlines.mandatoryGradeDays.value);
+  const raw = addDays(g.acknowledgedOn, g.days);
   const shifted = raw !== g.dueOn;
   const rawDay = [0, 6].includes(dow(raw)) ? DOW_ACC[dow(raw)] : "dzień wolny od pracy";
   return (
@@ -32,8 +33,8 @@ export function ReminderCard(props: ReminderProps) {
               Urząd ma obowiązek przyznać kolejny stopień służbowy, bo od ostatniego stopnia są dwie kolejne oceny pozytywne na jednym z dwóch najwyższych poziomów: {formatDate(g.assessmentDates[0])} i {formatDate(g.assessmentDates[1])}. To obowiązek, nie wniosek.
             </p>
             <p>
-              <b>Przyznać do {formatDate(g.dueOn)}</b>: 30 dni od zapoznania z oceną {formatDate(g.acknowledgedOn)}
-              {shifted ? `; 30. dzień wypada w ${rawDay} ${formatDate(raw)}, więc termin przechodzi na ${DOW_ACC[dow(g.dueOn)]}` : ""}.
+              <b>Przyznać do {formatDate(g.dueOn)}</b>: {g.days} dni od zapoznania z oceną {formatDate(g.acknowledgedOn)}
+              {shifted ? `; ${g.days}. dzień wypada w ${rawDay} ${formatDate(raw)}, więc termin przechodzi na ${DOW_ACC[dow(g.dueOn)]}` : ""}.
               {g.overdue ? ` Termin minął ${formatDate(g.dueOn)}.` : ""} <LegalBasis basis={g.basis} />
             </p>
           </>
@@ -77,18 +78,74 @@ function Chevron() {
   return <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6" /></svg>;
 }
 
-function StatRow(props: { label: string; n: number }) {
+function StatRow(props: { label: string; n: number | null; minGroup?: number }) {
   return (
     <li class="stat">
-      <span class="stat-label">{props.label}<span class="vh">:</span></span> <b class="stat-n tnum">{props.n}</b>
+      <span class="stat-label">{props.label}<span class="vh">:</span></span>{" "}
+      {props.n === null ? (
+        <span class="stat-n cap">{TOO_FEW_LABEL}{props.minGroup ? ` (poniżej progu ${props.minGroup} osób)` : ""}</span>
+      ) : (
+        <b class="stat-n tnum">{props.n}</b>
+      )}
     </li>
   );
 }
 
-/** Liczby dla całego urzędu, bez nazwisk i bez podziału na komórki. Gdy wszystkie są zerami, jedno zdanie zamiast listy. */
-export function StatsBlock(props: { stats: OfficeStats; title?: string }) {
-  const s = props.stats;
+/** Liczby dla całego urzędu, bez nazwisk. W trybie `protectedStats` ukrywa grupy poniżej progu minimalnej grupy. */
+export function StatsBlock(props: { stats?: OfficeStats; protectedStats?: ProtectedOfficeStats; title?: string }) {
   const title = props.title ?? "Terminowość w urzędzie (bez nazwisk)";
+  if (props.protectedStats) {
+    const p = props.protectedStats;
+    if (!p.hasData) {
+      return (
+        <section class="card" id="statystyki">
+          <h2>{title}</h2>
+          <p>Nie ma jeszcze cykli ani ocen do policzenia.</p>
+        </section>
+      );
+    }
+    return (
+      <section class="card hr-statcard" id="statystyki" aria-labelledby="h-stat">
+        <h2 id="h-stat">{title}</h2>
+        <p class="cap">
+          Grupy mniejsze niż {p.minGroup} różnych osób są ukrywane jako „{TOO_FEW_LABEL}”, aby nie dało się odczytać wyniku pojedynczej osoby. Gdy ukryta byłaby dokładnie jedna grupa w podziale, ukrywana jest też najmniejsza z pozostałych. Próg {p.minGroup} osób — {p.settingLabel}.
+        </p>
+        <div class="hr-statcols">
+          <div>
+            <h3>Oceny i cykle po terminie</h3>
+            <ul class="hr-stats plain-list">
+              <StatRow label="Oceny zatwierdzone w terminie" n={p.onTime} minGroup={p.minGroup} />
+              <StatRow label="Oceny zatwierdzone po terminie" n={p.late} minGroup={p.minGroup} />
+              <StatRow label="Cykle otwarte po terminie, bez oceny" n={p.overdueOpen} minGroup={p.minGroup} />
+            </ul>
+            {p.byUnit.length > 0 ? (
+              <>
+                <h3>Cykle według komórki organizacyjnej</h3>
+                <ul class="hr-stats plain-list">
+                  {p.byUnit.map((u) => (
+                    <StatRow label={u.label} n={u.value} minGroup={p.minGroup} />
+                  ))}
+                </ul>
+              </>
+            ) : null}
+          </div>
+          <div>
+            <h3>Cykle według etapu</h3>
+            <ul class="hr-stats plain-list">
+              {p.pendingReassessments !== null && p.pendingReassessments > 0 ? (
+                <StatRow label="Ponowne sporządzenie oceny lub zapoznanie z nią" n={p.pendingReassessments} minGroup={p.minGroup} />
+              ) : null}
+              {(Object.keys(STEP_LABEL) as CycleStep[]).map((k) => (
+                <StatRow label={STEP_LABEL[k]} n={p.byStep[k] ?? 0} minGroup={p.minGroup} />
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const s = props.stats!;
   const total = Object.values(s.byStep).reduce((a, n) => a + (n ?? 0), 0) + s.onTime + s.late + s.overdueOpen;
   if (total === 0) {
     return (
@@ -203,7 +260,7 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
                     <span>Arkusz {r.sheet}</span>
                     <a href={`/cycles/${r.cycleId}/sheet?print=1`}>Drukuj / pobierz PDF</a>
                     {r.links.filter((l) => l.href.endsWith("/assessment/export.json")).map((l) => (
-                      <a href={l.href} download>Ocena (plik JSON)</a>
+                      <a href={l.href} download>{l.label}</a>
                     ))}
                   </div>
                 ) : (
