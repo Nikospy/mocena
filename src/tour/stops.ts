@@ -74,7 +74,7 @@ const BODY: Record<TourStopId, Body> = {
   "3": {
     title: "Nieobecność przesuwa termin",
     short: "ocena",
-    lead: "Obie liczą się jako jedna, dłuższa niż miesiąc, bo dzieli je weekend.",
+    lead: "Dwie nieobecności dzieli weekend: to jedna, dłuższa niż miesiąc.",
     look: [
       { text: "Daty drugiej są już wpisane.", selector: ".ct-form" },
       { text: "Pierwsza: 12 dni, termin bez zmian.", selector: ".abs-merged" },
@@ -102,7 +102,7 @@ const BODY: Record<TourStopId, Body> = {
   "5": {
     title: "Zapoznanie i 7 dni na sprzeciw",
     short: "kadry",
-    lead: "Uzasadnienie Marek złożył z faktów z notatek. Od zapoznania system liczy 7 dni na sprzeciw.",
+    lead: "Marek złożył uzasadnienie z notatek. Od zapoznania system liczy 7 dni na sprzeciw.",
     look: [
       { text: "Przycisk potwierdzenia.", selector: 'form[action$="/assessment/acknowledge"] button' },
       { text: "Termin sprzeciwu z przepisem. Dzień wolny go przesuwa.", selector: "#objection-clock" },
@@ -119,8 +119,8 @@ const BODY: Record<TourStopId, Body> = {
     look: [
       { text: "Tomaszowi należy się kolejny stopień służbowy: termin i przepis.", selector: ".card.rule" },
       { text: "Sprzeciw Katarzyny: kadry odnotowują wynik rozpatrzenia.", selector: ".hr-obj" },
-      // Nowy cykl Piotra ma identyfikator z bazy (UUID); cykle z danych pokazowych zaczynają się od „cycle-”.
-      { text: "Nowy cykl Piotra: kryteria do 30.11.2026, ponowna ocena 23.05.2027.", selector: '.hr-cycles tr:not(:has(a[href^="/cycles/cycle-"])) .hr-due' },
+      // Ramka na komórce z nazwiskiem: pseudoelement na <tr> rozsuwa tabelę, a na komórce „Termin” telefon kasuje numer (style.css).
+      { text: "Nowy cykl Piotra: kryteria do 30.11.2026, ponowna ocena 23.05.2027.", selector: '[data-tour="reassessment-cycle"] > th' },
       { text: "„Drukuj / pobierz PDF” przy ocenie Piotra.", selector: 'a[href="/cycles/cycle-piotr/sheet?print=1"]' },
     ],
     basis: basis(d.mandatoryGradeDays.basis),

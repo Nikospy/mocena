@@ -16,7 +16,11 @@
         ["assessment-result", "assessment-blockers"].forEach(function (id) {
           var fresh = doc.getElementById(id);
           var old = document.getElementById(id);
-          if (fresh && old) old.replaceWith(fresh);
+          if (!fresh || !old) return;
+          // Numer ramki przewodnika pokazu (tour.js) zostaje na nowej karcie wyniku.
+          var look = old.getAttribute("data-look");
+          if (look) fresh.setAttribute("data-look", look);
+          old.replaceWith(fresh);
         });
       });
   }

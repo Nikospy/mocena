@@ -19,9 +19,7 @@
   // Przewijanie tylko do miejsca działania z „Spróbuj” i tylko wtedy, gdy nie widać go od razu; inaczej nagłówek strony zostaje na ekranie.
   function tryTarget() {
     var t = document.querySelector("[data-try-selector]");
-    var el = t ? visible(t.getAttribute("data-try-selector")) : null;
-    if (el) el.setAttribute("data-look-try", "");
-    return el;
+    return t ? visible(t.getAttribute("data-try-selector")) : null;
   }
   // Dół widocznej części strony nad dolnym paskiem przewodnika na telefonie; otwarty opis liczymy jak zwinięty, bo widz go zwija po przeczytaniu.
   function viewBottom() {
@@ -32,13 +30,24 @@
   }
   function reveal(el) {
     if (!el) return;
-    var r = el.getBoundingClientRect(), bottom = viewBottom(), gap = 16;
-    if (r.top >= 0 && r.bottom <= bottom - gap) return;
+    // Pod miejscem działania zostaje miejsce na podpis, np. „Wybrano 1: …” pod ocenami.
+    var r = el.getBoundingClientRect(), bottom = viewBottom(), gap = 16, below = 48;
+    if (r.top >= 0 && r.bottom <= bottom - below) return;
     // Blisko: najmniejsze przewinięcie, żeby było widać, co stoi nad miejscem działania. Daleko: miejsce działania w górnej części ekranu.
     var room = bottom - r.height;
-    var near = r.top < bottom * 1.5 && room > 2 * gap;
-    var y = window.scrollY + (near ? r.bottom - bottom + gap : r.top - (room > 2 * gap ? Math.min(room / 3, 160) : gap));
-    window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    var near = r.top < bottom * 1.5 && room > below + gap;
+    var delta;
+    if (near) {
+      delta = r.bottom - bottom + below;
+      if (delta < gap) return; // przesunięcie o kilka pikseli tylko rozprasza
+      // Nagłówek strony chowa się w całości albo zostaje, a nie jest ucięty w połowie.
+      var head = document.querySelector("header.top");
+      var headBottom = head ? head.getBoundingClientRect().bottom : 0;
+      if (delta < headBottom && r.top - headBottom >= 0) delta = headBottom;
+    } else {
+      delta = r.top - (room > 2 * gap ? Math.min(room / 3, 160) : gap);
+    }
+    window.scrollTo({ top: Math.max(0, window.scrollY + delta), behavior: "smooth" });
   }
   var target = tryTarget();
   var h1 = document.querySelector("main h1");
@@ -52,12 +61,16 @@
   var details = document.querySelector("[data-gmob]");
   if (details) {
     var key = "mocena_gmob_" + details.getAttribute("data-gmob");
+    var hint = details.querySelector("[data-gmob-hint]");
+    var label = function () { if (hint) hint.textContent = details.open ? "Dotknij, aby zwinąć opis" : "Dotknij, aby rozwinąć opis"; };
+    details.addEventListener("toggle", label);
     try {
       if (sessionStorage.getItem(key) === "0") details.open = false;
       details.addEventListener("toggle", function () {
         sessionStorage.setItem(key, details.open ? "1" : "0");
       });
     } catch (e) {}
+    label();
   }
   // Po wczytaniu fontów i skryptów strony: wtedy położenie miejsca działania już się nie zmienia.
   function whenSettled(fn) {

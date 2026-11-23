@@ -35,6 +35,8 @@ export type CycleState = {
   second?: { label: string; date: string; basis: string[] };
   /** Dalszy ciąg opisu stanu: w tabeli zwinięty pod „Szczegóły”. */
   more?: string;
+  /** Cykl po ocenie negatywnej (ponowna ocena, art. 81 ust. 9 ustawy). */
+  reassessment?: boolean;
 };
 
 
@@ -147,7 +149,7 @@ function cycleStateNow(cycleId: string): CycleState {
     const d = effectiveDeadline(cycleId);
     const previous = part1DeadlinesAfterObjection(cycleId, d.date)?.previous;
     return {
-      step: "in_period", text: `Okres oceny trwa${re}`, deadline: d, deadlineLabel: "Termin oceny",
+      step: "in_period", text: `Okres oceny trwa${re}`, deadline: d, deadlineLabel: "Termin oceny", ...(negative ? { reassessment: true } : {}),
       overdue: d.date < now, since: p1.confirmedOn,
       ...(previous ? { second: { label: "Termin przekazany w części I", ...previous } } : {}),
     };
@@ -156,6 +158,7 @@ function cycleStateNow(cycleId: string): CycleState {
     const days = p1.waitingDays ?? 0;
     return {
       step: "part1_waiting",
+      ...(negative ? { reassessment: true } : {}),
       text: `Część I czeka na potwierdzenie ocenianego ${days <= 0 ? "od dziś" : days === 1 ? "od 1 dnia" : `od ${days} dni`}${re}`,
       since: p1.submittedOn,
     };
@@ -164,6 +167,7 @@ function cycleStateNow(cycleId: string): CycleState {
   const date = criteriaTalkDeadline(from, negative);
   return {
     step: "criteria_due",
+    ...(negative ? { reassessment: true } : {}),
     text: `Kryteria do wyznaczenia${re}`,
     deadline: { date, basis: [negative ? rules.deadlines.criteriaTalkAfterNegativeDays.basis : rules.deadlines.criteriaTalkDays.basis] },
     deadlineLabel: "Rozmowa o kryteriach do",

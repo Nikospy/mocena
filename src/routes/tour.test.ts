@@ -124,7 +124,7 @@ describe("przewodnik pokazu", () => {
     await window.close();
   });
 
-  test("szuflada na telefonie: otwarta przy wejściu, z etykietą „Opis kroku” i „Spróbuj” przed listą", async () => {
+  test("szuflada na telefonie: otwarta przy wejściu, z podpowiedzią zwijania i „Spróbuj” przed listą", async () => {
     const { app } = createTestApp();
     const window = new Window();
     const res = await post(app, "/tour/2");
@@ -133,7 +133,7 @@ describe("przewodnik pokazu", () => {
     const details = window.document.querySelector("#tour-guide-m details")!;
     expect(details.hasAttribute("open")).toBe(true);
     expect(details.getAttribute("data-gmob")).toBe("2");
-    expect(details.querySelector("summary")!.textContent).toContain("Opis kroku");
+    expect(details.querySelector("summary")!.textContent).toContain("Dotknij, aby zwinąć opis");
     for (const panel of ["#tour-guide", "#tour-guide-m"]) {
       const labels = [...window.document.querySelectorAll(`${panel} .gp-b .lbl`)].map((l) => l.textContent);
       expect(labels).toEqual(["Spróbuj", "Na co patrzeć"]);
@@ -154,7 +154,7 @@ describe("przewodnik pokazu", () => {
       const res = await post(app, `/tour/${id}`);
       const { text } = await html(app, res.headers.get("location")!, cookies(res));
       expect(text).toContain(`<b>${label}</b>`);
-      expect(text).toContain(`Opis kroku · ${label} · `);
+      expect(text).toContain(`Dotknij, aby zwinąć opis</span> · ${label} · `);
     }
   });
 
@@ -163,7 +163,7 @@ describe("przewodnik pokazu", () => {
     const window = new Window();
     const facts: Record<string, string[]> = {
       "1b": ["Potwierdzenie części I", "Potwierdzam rozmowę, kryteria i termin oceny"],
-      "5b": ["Tomasz", "Sprzeciw do rozpatrzenia", "23.05.2027", "Drukuj / pobierz PDF"],
+      "5b": ["Tomasz", "Sprzeciw do rozpatrzenia", "Piotr Wójcik", "Drukuj / pobierz PDF"],
     };
     for (const [id, texts] of Object.entries(facts)) {
       const stop = stopById(id)!;
@@ -175,6 +175,10 @@ describe("przewodnik pokazu", () => {
         return found.length === 1 ? found[0].textContent!.includes(texts[i]) : `${l.selector}: ${found.length}`;
       })).toEqual(texts.map(() => true));
     }
+    // Wiersz z ramką 3 to cykl ponownej oceny Piotra (stabilny atrybut z widoku kadr, nie konwencja identyfikatorów).
+    const row = window.document.querySelector('main [data-tour="reassessment-cycle"]')!;
+    expect(row.textContent).toContain("23.05.2027");
+    expect(window.document.querySelectorAll('main [data-tour="reassessment-cycle"]')).toHaveLength(1);
     await window.close();
   });
 

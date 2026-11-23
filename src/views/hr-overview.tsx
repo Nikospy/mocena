@@ -237,7 +237,7 @@ export function CycleStateTable(props: { rows: StateRow[] }) {
         </thead>
         <tbody>
           {props.rows.map((r) => (
-            <tr class="hr-card">
+            <tr class="hr-card" data-tour={r.state.reassessment ? "reassessment-cycle" : undefined}>
               <th scope="row">
                 <a href={`/cycles/${r.cycleId}/part1`}>{r.personName}</a>
               </th>
