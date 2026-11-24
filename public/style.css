@@ -1502,8 +1502,17 @@ main h1[tabindex="-1"]:focus, main h1[tabindex="-1"]:focus-visible { outline: no
 .gmob .g-look { gap: var(--sp-100); }
 .gmob .g-try { padding: var(--sp-100) var(--sp-150); }
 .gmob .gm-bar { padding: var(--sp-100) var(--sp-200); }
-/* przyciski przewodnika należą do warstwy pokazu, nie do usługi: ta sama postać przycisku, kolor atramentu zamiast kobaltu,
-   żeby na ekranie kroku była jedna kobaltowa akcja główna – ta, którą juror ma kliknąć w usłudze */
+/* przyciski przewodnika należą do warstwy pokazu, nie do usługi: w krokach z „Spróbuj” neutralny obrys, żeby nie wygrywać z kobaltową akcją kroku; w krokach bez „Spróbuj” kolor atramentu */
+.gp-f .btn.tour-next, .gm-bar .btn.tour-next {
+  gap: var(--sp-100); white-space: nowrap; padding-inline: var(--sp-200);
+  background: var(--white); border-color: var(--grey-100); color: var(--text);
+}
+.gp-f .btn.tour-next { inline-size: 100%; }
+.gp-f .btn.tour-next > span, .gm-bar .btn.tour-next > span { white-space: nowrap; }
+.gp-f .btn.tour-next:not(:disabled):active, .gm-bar .btn.tour-next:not(:disabled):active { background: var(--grey-20); border-color: var(--grey-300); }
+@media (hover: hover) and (pointer: fine) {
+  .gp-f .btn.tour-next:hover, .gm-bar .btn.tour-next:hover { background: var(--grey-20); border-color: var(--grey-300); }
+}
 .gpanel .btn.primary, .gm-bar .btn.primary { background: var(--grey-400); border-color: var(--grey-400); color: var(--white); }
 .gpanel .btn.primary:not(:disabled):active, .gm-bar .btn.primary:not(:disabled):active { background: var(--grey-300); border-color: var(--grey-300); }
 @media (hover: hover) and (pointer: fine) { .gpanel .btn.primary:hover, .gm-bar .btn.primary:hover { background: var(--grey-300); border-color: var(--grey-300); } }

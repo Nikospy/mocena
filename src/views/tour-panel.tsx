@@ -92,13 +92,14 @@ function NextForm(props: { stop: StopContent; compact?: boolean }) {
       {ARROW}
     </>
   );
+  const cls = stop.tryIt ? "btn tour-next" : "btn primary tour-next";
   return stop.next === "done" ? (
     <form method="get" action="/tour/done" data-tour-next>
-      <button class="btn primary" type="submit">{inner}</button>
+      <button class={cls} type="submit">{inner}</button>
     </form>
   ) : (
     <form method="post" action={`/tour/${stop.next}`} data-tour-next>
-      <button class="btn primary" type="submit">{inner}</button>
+      <button class={cls} type="submit">{inner}</button>
     </form>
   );
 }
