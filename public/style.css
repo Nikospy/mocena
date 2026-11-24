@@ -1516,6 +1516,19 @@ main h1[tabindex="-1"]:focus, main h1[tabindex="-1"]:focus-visible { outline: no
 body.tour-on { padding-block-end: 140px; }
 @media (min-width: 900px) { body.tour-on { padding-block-end: 0; } }
 
+/* B5: kółka z numerami w prawym górnym rogu ramki – nie zasłaniają początków tekstu i nie giną w tabeli kadr na telefonie */
+[data-look]::before,
+.hr-cycles .hr-card > td[data-look][data-label]::before {
+  content: attr(data-look); position: absolute; z-index: 3;
+  inset-block-start: calc(var(--sp-150) * -1); inset-inline-start: auto; inset-inline-end: calc(var(--sp-150) * -1);
+  inline-size: var(--sp-300); block-size: var(--sp-300); border-radius: var(--pill-r);
+  background: var(--primary); color: var(--on-primary);
+  display: grid; place-items: center; font-size: var(--f-c1); line-height: 1; font-weight: var(--w-bold);
+  box-shadow: 0 0 0 3px var(--white);
+}
+.crit[data-look]::before { inset-block-start: var(--sp-50); inset-inline-start: auto; inset-inline-end: calc(var(--sp-150) * -1); }
+@media (max-width: 899px) { .crit[data-look]::before { inset-inline-end: calc(var(--sp-100) * -1); } }
+
 /* --- koniec sekcji home-tour (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
 /* . */
 /* . */
