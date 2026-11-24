@@ -152,10 +152,6 @@ export function Part1View(p: Part1ViewProps) {
         <form class="p1-form" method="post" action={`/cycles/${p.cycleId}/part1/criteria`}>
           <div class="o-grid">
             <div class="o-main">
-              <section class="card sheet">
-                {mandatoryHead}
-                {p.mandatory.map((m) => <CriterionRow id={m.id} kind="obowiązkowe" expectation={exp(m.id)} editable />)}
-              </section>
               <section class="p1-extra">
                 <div class="list-h"><h2 id="p1-extra-h" tabindex={-1}>Kryteria dodatkowe (do 3) <LegalBasis basis="§ 5 ust. 2" /></h2></div>
                 {p.errors?.length ? <div class="p1-errs">{p.errors.map((m) => <p class="field-err"><span class="vh">Błąd: </span>{m}</p>)}</div> : null}
@@ -183,6 +179,18 @@ export function Part1View(p: Part1ViewProps) {
                   </div>
                 ) : null}
               </section>
+              <details class="card sheet p1-mandatory">
+                <summary class="p1-mand-sum">
+                  <span>
+                    <span><b>Kryteria obowiązkowe ({p.mandatory.length})</b> <LegalBasis basis="§ 4" /></span>
+                    <small>Wynikają z arkusza {p.sheet}, który system dobrał do stanowiska ocenianego. Oceniający ich nie wybiera.</small>
+                  </span>
+                  <Chevron />
+                </summary>
+                <div class="p1-mand-body">
+                  {p.mandatory.map((m) => <CriterionRow id={m.id} kind="obowiązkowe" expectation={exp(m.id)} editable />)}
+                </div>
+              </details>
             </div>
             <aside class="side p1-side" aria-label="Termin i przekazanie">
               {term}
