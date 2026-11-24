@@ -43,7 +43,7 @@ describe("zapis notatki", () => {
     expect(both).toContain('href="#criterion_id"');
     expect(both).toContain('id="criterion_id"');
     expect(both).toContain('id="text-error"');
-    expect(both).toMatch(/<textarea id="text" name="text" rows="5" aria-invalid="true" aria-describedby="text-error text-privacy">/);
+    expect(both).toMatch(/<textarea id="text" name="text" rows="5"[^>]*aria-invalid="true" aria-describedby="text-error text-privacy">/);
     expect(both).toContain('value="2026-03-10"');
     expect(both).toMatch(/value="good" checked/);
 

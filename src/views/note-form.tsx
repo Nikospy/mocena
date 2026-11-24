@@ -64,7 +64,7 @@ export function NoteFormView(props: {
           <div class="card hero-field">
             <label for="text"><h2>Co się stało</h2></label>
             <FieldError id="text" errors={e} />
-            <textarea id="text" name="text" rows={5} {...invalid("text", e, "text-privacy")}>{v.text}</textarea>
+            <textarea id="text" name="text" rows={5} placeholder="Np. Piotr przejął kolejkę wniosków po odejściu kolegi" {...invalid("text", e, "text-privacy")}>{v.text}</textarea>
             <div class="hero-foot">
               <p class="cap" id="text-privacy">Pracownik nie widzi notatki na swoim koncie. Na wniosek urząd mu ją wydaje.</p>
               <p class="sign">
