@@ -69,9 +69,6 @@
   }
   if (details) {
     var key = "mocena_gmob_" + details.getAttribute("data-gmob");
-    var hint = details.querySelector("[data-gmob-hint]");
-    var label = function () { if (hint) hint.textContent = details.open ? "Dotknij, aby zwinąć opis" : "Dotknij, aby rozwinąć opis"; };
-    details.addEventListener("toggle", label);
     try {
       if (sessionStorage.getItem(key) === "0") details.open = false;
       details.addEventListener("toggle", function () {

@@ -130,7 +130,11 @@ export function TourPanel(props: TourPanelProps) {
         <details open data-gmob={props.stop.id}>
           <summary>
             <span class="gm-t">{props.stop.title}</span>
-            <span class="gm-s"><span data-gmob-hint>Dotknij, aby zwinąć opis</span> · {stepLabel(props.stop)} · {personLabel(props.stop.personId)} · {props.dateLabel}</span>
+            <span class="gm-s">Opis kroku · {stepLabel(props.stop)} · {personLabel(props.stop.personId)} · {props.dateLabel}</span>
+            <span class="gm-toggle" aria-hidden="true">
+              <span class="gm-close">Zwiń</span>
+              <span class="gm-open">Rozwiń</span>
+            </span>
           </summary>
           <Body {...props} withSelectors={false} />
         </details>

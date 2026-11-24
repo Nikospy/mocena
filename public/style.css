@@ -1481,11 +1481,17 @@ main h1[tabindex="-1"]:focus, main h1[tabindex="-1"]:focus-visible { outline: no
 
 /* panel przewodnika (telefon): tytuł kroku stoi w pasku, rozwinięta treść go nie powtarza */
 .gmob .gp-b > h2 { display: none; }
-.gmob summary { grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: var(--sp-150); min-block-size: var(--hit); }
-.gmob summary > span { grid-column: 1; }
-.gmob summary::after { content: ""; grid-column: 2; grid-row: 1 / span 2; inline-size: var(--sp-100); block-size: var(--sp-100); border-inline-end: 2px solid var(--text-2); border-block-start: 2px solid var(--text-2); transform: rotate(-45deg); margin-inline-end: var(--sp-100); }
+.gmob summary { grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; column-gap: var(--sp-100); padding: var(--sp-100) var(--sp-200); min-block-size: var(--hit); }
+.gmob summary > .gm-t, .gmob summary > .gm-s { grid-column: 1; }
+.gmob summary > .gm-toggle { grid-column: 2; grid-row: 1 / span 2; font-size: var(--f-c1); line-height: var(--lh-c1); font-weight: var(--w-bold); color: var(--primary); white-space: nowrap; }
+.gmob summary::after { content: ""; grid-column: 3; grid-row: 1 / span 2; inline-size: var(--sp-100); block-size: var(--sp-100); border-inline-end: 2px solid var(--primary); border-block-start: 2px solid var(--primary); transform: rotate(-45deg); margin-inline-end: var(--sp-50); }
 .gmob details[open] summary::after { transform: rotate(135deg); }
+.gmob details[open] .gm-open, .gmob details:not([open]) .gm-close { display: none; }
 .gmob details[open] summary { border-block-end: 1px solid var(--line); }
+.gmob details[open] .gp-b { max-block-size: 34vh; padding: var(--sp-150) var(--sp-200); gap: var(--sp-100); }
+.gmob .g-look { gap: var(--sp-100); }
+.gmob .g-try { padding: var(--sp-100) var(--sp-150); }
+.gmob .gm-bar { padding: var(--sp-100) var(--sp-200); }
 /* przyciski przewodnika należą do warstwy pokazu, nie do usługi: ta sama postać przycisku, kolor atramentu zamiast kobaltu,
    żeby na ekranie kroku była jedna kobaltowa akcja główna – ta, którą juror ma kliknąć w usłudze */
 .gpanel .btn.primary, .gm-bar .btn.primary { background: var(--grey-400); border-color: var(--grey-400); color: var(--white); }

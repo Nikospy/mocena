@@ -134,7 +134,7 @@ describe("przewodnik pokazu", () => {
     const details = window.document.querySelector("#tour-guide-m details")!;
     expect(details.hasAttribute("open")).toBe(true);
     expect(details.getAttribute("data-gmob")).toBe("2");
-    expect(details.querySelector("summary")!.textContent).toContain("Dotknij, aby zwinąć opis");
+    expect(details.querySelector("summary")!.textContent).toContain("Zwiń");
     for (const panel of ["#tour-guide", "#tour-guide-m"]) {
       const labels = [...window.document.querySelectorAll(`${panel} .gp-b .lbl`)].map((l) => l.textContent);
       expect(labels).toEqual(["Spróbuj", "Na co patrzeć"]);
@@ -155,7 +155,7 @@ describe("przewodnik pokazu", () => {
       const res = await post(app, `/tour/${id}`);
       const { text } = await html(app, res.headers.get("location")!, cookies(res));
       expect(text).toContain(`<b>${label}</b>`);
-      expect(text).toContain(`Dotknij, aby zwinąć opis</span> · ${label} · `);
+      expect(text).toContain(`Opis kroku · ${label} · `);
     }
   });
 
