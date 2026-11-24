@@ -1468,6 +1468,22 @@ main h1[tabindex="-1"]:focus, main h1[tabindex="-1"]:focus-visible { outline: no
 .e-note { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
 .axis-card .sub { font-size: var(--f-p); line-height: var(--lh-p); max-inline-size: 66ch; }
 .e-wrap > .e-foot { margin-block-start: calc(var(--sp-300) * -1); }
+/* obok wejścia: miniatura karty wyniku z kroku 4 (te same klasy co ekran oceny); na wąskim ekranie znika */
+.e-top { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-600); align-items: start; }
+.e-peek { display: none; margin: 0; }
+@media (min-width: 1100px) {
+  .e-top { grid-template-columns: minmax(0, 760px) minmax(0, 420px); justify-content: space-between; }
+  .e-peek { display: grid; gap: var(--sp-100); }
+}
+.e-peek-cap { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); font-weight: var(--w-bold); }
+.e-peek-card.res > * + * { margin-block-start: var(--sp-150); }
+.e-peek-scores { display: grid; gap: var(--sp-50); }
+.e-peek-l { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--rule-quiet); }
+.e-peek-scores ul { list-style: none; display: flex; flex-wrap: wrap; gap: var(--sp-100); }
+.e-peek-scores li { box-sizing: border-box; display: grid; place-items: center; inline-size: var(--sp-400); block-size: var(--sp-400); border-radius: var(--pill-r);
+  background: var(--white); border: 2px solid var(--cobalt-30); color: var(--primary); font-size: var(--f-c1); line-height: 1; font-weight: var(--w-bold); }
+.e-peek-scores li.low { background: var(--red-20); border-color: var(--red-100); color: var(--red-200); }
+.e-peek .verdict-box .reason .basis { white-space: nowrap; }
 @media (max-width: 899px) {
   .e-wrap { padding-block: var(--sp-400); gap: var(--sp-400); }
   .e-head { gap: var(--sp-150); }

@@ -1,5 +1,8 @@
 import type { Child } from "hono/jsx";
+import { verdictText } from "../assessment/verdict";
+import { computeAssessment, criterion, partialLevelName } from "../engine/scoring";
 import { STOPS, personLabel } from "../tour/stops";
+import { LegalBasis } from "./components";
 import { Head } from "./head";
 import { formatDateLong } from "./layout";
 
@@ -39,10 +42,71 @@ export function TourShell(props: { title: string; children?: Child }) {
 const AXIS = [1.643835616438356, 64.24657534246575, 88, 93, 98];
 const MOB_GAPS: Record<number, string> = { 2: "15 miesięcy notatek", 3: "8 miesięcy notatek" };
 
+// Miniatura wyniku z kroku 4: szkic Marka (5 przy sześciu kryteriach) i jedna „1” przy Rzetelności.
+// Wynik, średnia i przepis liczy silnik z tych samych reguł co ekran oceny, więc miniatura nie rozjedzie się z produktem.
+const PEEK_SCORES: [string, number][] = [
+  ["wykorzystywanie-wiedzy", 5],
+  ["rzetelnosc", 1],
+  ["organizacja-pracy", 5],
+  ["wspolpraca", 5],
+  ["komunikacja", 5],
+  ["orientacja-na-klienta", 5],
+  ["myslenie-analityczne", 5],
+];
+
+/** Statyczny podgląd karty wyniku obok wejścia: w 5 sekund widać, że jedna „1” przesądza mimo średniej. */
+function ResultPeek() {
+  const r = computeAssessment(Object.fromEntries(PEEK_SCORES));
+  const { verdict } = verdictText(r);
+  const ones = PEEK_SCORES.filter(([, v]) => v === 1).map(([id]) => criterion(id).name);
+  const basis = /\((§[^)]*)\)/.exec(r.reasons[0] ?? "")?.[1] ?? "";
+  return (
+    <figure class="e-peek">
+      <figcaption class="e-peek-cap">
+        Krok 4 · tak wygląda wynik po jednej „1”
+      </figcaption>
+      <div class={`rule res e-peek-card ${r.outcome === "negative" ? "neg" : "pos"}`}>
+        <p class="voice rule-v">
+          <span class="pg" aria-hidden="true">§</span>
+          <span><b>Wynik oceny</b> · wyliczony z przepisu</span>
+        </p>
+        <div class="e-peek-scores">
+          <p class="e-peek-l">Oceny cząstkowe przy {PEEK_SCORES.length} kryteriach</p>
+          <ul>
+            {PEEK_SCORES.map(([id, v]) => (
+              <li class={v === 1 ? "low" : undefined}>
+                <span class="vh">{criterion(id).name}: </span>
+                {v}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="verdict-box">
+          <p class="verdict">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3z" /><path d="M12 10v4.5M12 17.5h.01" /></svg>
+            <span>{verdict}</span>
+          </p>
+          <ul class="reason">
+            {ones.map((name) => (
+              <li>
+                {name}: 1, {partialLevelName(1)} {basis ? <LegalBasis basis={basis} /> : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p class="avg-line">
+          <b>Średnia {r.mean.toFixed(2).replace(".", ",")}</b> – nie zmienia wyniku
+        </p>
+      </div>
+    </figure>
+  );
+}
+
 export function TourEntry() {
   const moments = STOPS.filter((s) => ["1", "2", "3", "4", "5"].includes(s.id));
   return (
     <TourShell title="Prowadzi ocenę okresową od pierwszej notatki do arkusza">
+      <div class="e-top">
       <div class="e-head">
         <p class="e-ctx">5 kroków · 3 min · bez modelu językowego</p>
         <h1 class="e-h1">Ten asystent prowadzi ocenę od pierwszej notatki do arkusza.</h1>
@@ -56,6 +120,8 @@ export function TourEntry() {
           <a href="/account">Wybierz konto i klikaj samodzielnie</a>
         </div>
         <p class="e-note">Pokaz idzie po ocenie Piotra Wójcika. Każdy krok sam przełącza konto i datę.</p>
+      </div>
+      <ResultPeek />
       </div>
       <section class="card axis-card" aria-labelledby="h-ax">
         <h2 id="h-ax">Dwa lata Piotra w pięciu chwilach</h2>

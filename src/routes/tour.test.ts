@@ -36,6 +36,13 @@ describe("przewodnik pokazu", () => {
     expect(text).toContain("Rozpocznij pokaz");
     for (const n of [1, 2, 3, 4, 5]) expect(text).toContain(`action="/tour/${n}"`);
     expect(text.match(/<form[^>]*action="\/tour\/\d"/g)?.length).toBe(6); // 5 kart + „Rozpocznij pokaz”
+    // Miniatura wyniku z kroku 4 obok wejścia: wynik i średnią liczy silnik, nie tekst na sztywno.
+    const peek = text.match(/<figure class="e-peek">[\s\S]*?<\/figure>/)?.[0] ?? "";
+    expect(peek).toContain("Ocena negatywna");
+    expect(peek).toContain("Rzetelność: 1, znacznie poniżej oczekiwań");
+    expect(peek).toContain("§ 11 ust. 1 pkt 4");
+    expect(peek).toContain("Średnia 4,43");
+    expect(peek).not.toContain("<form");
   });
 
   test("oś na telefonie pokazuje odstępy „15/8 miesięcy notatek” między właściwymi krokami", async () => {
