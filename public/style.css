@@ -908,6 +908,19 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
   background: var(--surface); border: 1px solid var(--card-line); border-radius: var(--card-r); box-shadow: var(--elev-2); }
 /* Zamknięte menu nie zajmuje miejsca w układzie (część przeglądarek liczy jego prostokąt mimo zamkniętego details). */
 .pl-more:not([open]) > .pl-menu, details.user:not([open]) > .user-menu { display: none; }
+/* B7: uporządkowany pasek odnośników cyklu pod tytułem strony */
+.page-links:has(.pl-wide, .pl-narrow) { border-block: 1px solid var(--line); padding-block: var(--sp-50); gap: 0 var(--sp-300); }
+.page-links:has(.pl-wide, .pl-narrow) a { font-weight: var(--w-regular); text-decoration: none; }
+.page-links:has(.pl-wide, .pl-narrow) a[data-tour="opening-card"] { font-weight: var(--w-bold); }
+.page-links:has(.pl-wide, .pl-narrow) .pl-more > summary { font-weight: var(--w-regular); }
+@media (hover: hover) and (pointer: fine) {
+  .page-links:has(.pl-wide, .pl-narrow) a:hover,
+  .page-links:has(.pl-wide, .pl-narrow) .pl-more > summary:hover { color: var(--text); text-decoration: underline; text-underline-offset: .25em; }
+  .page-links .pl-menu a:hover { background: var(--cobalt-10); text-decoration: none; color: var(--primary); }
+}
+@media (min-width: 640px) {
+  .pl-more > .pl-menu { inset-inline-start: 0; inset-inline-end: auto; }
+}
 .page-links .pl-menu a { display: flex; padding-inline: var(--sp-200); min-block-size: var(--hit); }
 /* Część I: termin i akcja w prawej kolumnie, kryteria po lewej */
 .p1-form > * + * { margin-block-start: 0; }

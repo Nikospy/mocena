@@ -235,21 +235,32 @@ export function Part1View(p: Part1ViewProps) {
   );
 }
 
-/** Odnośniki cyklu: na komputerze jeden rząd, na telefonie dwa pierwsze i reszta w menu „Więcej”. */
+/** Odnośniki cyklu: na komputerze do trzech głównych i menu „Więcej w cyklu”, na telefonie dwa pierwsze i menu „Więcej”. */
 function CycleLinks(props: { links: JSX.Element[]; opening?: JSX.Element }) {
-  const inlineCount = props.opening ? 1 : 2;
-  const head = props.links.slice(0, inlineCount);
-  const tail = props.links.slice(inlineCount);
+  const narrowCount = props.opening ? 1 : 2;
+  const wideCount = props.opening ? 2 : 3;
+  const narrowHead = props.links.slice(0, narrowCount);
+  const narrowTail = props.links.slice(narrowCount);
+  const wideHead = props.links.slice(0, wideCount);
+  const wideTail = props.links.slice(wideCount);
   return (
     <>
       {props.opening}
-      <span class="pl-wide">{props.links}</span>
+      <span class="pl-wide">
+        {wideHead}
+        {wideTail.length ? (
+          <details class="pl-more">
+            <summary>Więcej w cyklu <Chevron /></summary>
+            <div class="pl-menu">{wideTail}</div>
+          </details>
+        ) : null}
+      </span>
       <span class="pl-narrow">
-        {head}
-        {tail.length ? (
+        {narrowHead}
+        {narrowTail.length ? (
           <details class="pl-more">
             <summary>Więcej <Chevron /></summary>
-            <div class="pl-menu">{tail}</div>
+            <div class="pl-menu">{narrowTail}</div>
           </details>
         ) : null}
       </span>
