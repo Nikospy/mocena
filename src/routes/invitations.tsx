@@ -1,4 +1,5 @@
 import { errorPage } from "../views/error-page";
+import { isoFromInput } from "../date-input";
 import { Hono, type Context } from "hono";
 import { visibleCycleById, openCycle, type Cycle } from "../cycles";
 import { part1Status } from "../cycles/part1";
@@ -128,7 +129,7 @@ app.post("/cycles/:id/invitations", async (c) => {
   const str = (k: string) => (typeof body[k] === "string" ? (body[k] as string).trim() : "");
   const kind = parseKind(str("kind"));
   if (!kind) return errorPage(c, "Nie ma takiej rozmowy. Wybierz rozmowę o kryteriach albo rozmowę oceniającą.", 422);
-  const values: InvitationInput = { kind, date: str("date"), time: str("time"), place: str("place"), note: str("note") };
+  const values: InvitationInput = { kind, date: isoFromInput(str("date")), time: str("time"), place: str("place"), note: str("note") };
   const errors = validateInvitation(values);
   if (Object.keys(errors).length) return renderForm(c, g, values, errors, 422);
   const id = recordEvent("invitation_sent", g.cycle.id, g.viewer.id, values);

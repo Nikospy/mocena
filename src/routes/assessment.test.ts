@@ -314,7 +314,7 @@ describe("fikcja zapoznania i wgląd kadr", () => {
     for (const bad of [{ deliveryMethod: "" }, { deliveredOn: "" }, { deliveredOn: "2026-11-23" }, { deliveredOn: "2026-11-20" }]) {
       const rr = await post({ ...good, ...bad });
       expect(rr.status).toBe(422);
-      expect(await rr.text()).toMatch(/Wybierz, jak doręczono kopię arkusza\.|Wybierz z kalendarza datę doręczenia kopii arkusza/);
+      expect(await rr.text()).toMatch(/Wybierz, jak doręczono kopię arkusza\.|Wpisz datę doręczenia kopii arkusza w postaci DD\.MM\.RRRR/);
     }
     expect(closing()).toHaveLength(0);
   });

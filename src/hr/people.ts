@@ -1,5 +1,6 @@
 // Dane pracowników w kadrach: lista, zapis, ocena sprzed systemu. Termin liczy zawsze silnik przez `effectiveDeadline`.
 import { effectiveDeadline, openCycle, type Cycle } from "../cycles";
+import { isoFromInput } from "../date-input";
 import { getDb } from "../db";
 import { sheetForPosition, type PositionKind } from "../engine/criteria";
 import { romanGrade } from "../engine/grades";
@@ -109,12 +110,12 @@ export function readForm(body: Record<string, unknown>): PersonForm {
     is_appraiser: s("is_appraiser") !== "",
     sheet: s("sheet"),
     supervisor_id: s("supervisor_id"),
-    hired_on: s("hired_on"),
-    prev_on: s("prev_on"),
+    hired_on: isoFromInput(s("hired_on")),
+    prev_on: isoFromInput(s("prev_on")),
     prev_outcome: s("prev_outcome"),
     prev_level: s("prev_level"),
     grade: s("grade"),
-    grade_on: s("grade_on"),
+    grade_on: isoFromInput(s("grade_on")),
   };
 }
 

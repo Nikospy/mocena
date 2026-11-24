@@ -1,6 +1,6 @@
 import { GRADES, levelNames, OUTCOME_LABEL, SHEETS, suggestSheet, type FormErrors, type PersonForm, type PersonRow, type Sort } from "../hr/people";
 import type { Person } from "../people";
-import { ErrorSummary as SharedErrorSummary, LegalBasis, PageHeader } from "./components";
+import { DateFormatHint, DateInput, ErrorSummary as SharedErrorSummary, LegalBasis, PageHeader } from "./components";
 import { Layout, formatDate } from "./layout";
 
 const SORTS: { id: Sort; label: string }[] = [
@@ -233,8 +233,8 @@ export function PersonFormView(props: {
               <FieldError id="grade" text={e.grade} />
             </div>
             <div class="person-field">
-              <label class="lbl" for="grade_on">Data przyznania stopnia</label>
-              <input class="area" type="date" id="grade_on" name="grade_on" value={v.grade_on} {...invalid("grade_on", e.grade_on)} />
+              <label class="lbl" for="grade_on">Data przyznania stopnia<DateFormatHint /></label>
+              <DateInput id="grade_on" value={v.grade_on} {...invalid("grade_on", e.grade_on)} />
               <FieldError id="grade_on" text={e.grade_on} />
             </div>
           </div>
@@ -246,9 +246,9 @@ export function PersonFormView(props: {
             <p>Pracownik ma już cykl oceny, więc termin liczy się z tego cyklu. Data zatrudnienia nie otwiera nowego.</p>
           ) : (
             <div class="person-field">
-              <label class="lbl" for="hired_on">Data zatrudnienia na czas nieokreślony</label>
+              <label class="lbl" for="hired_on">Data zatrudnienia na czas nieokreślony<DateFormatHint /></label>
               <p class="hr-hint" id="hired_on-hint">Wystarczy ona albo data ostatniej oceny niżej. Od jednej z nich system liczy termin.</p>
-              <input class="area" type="date" id="hired_on" name="hired_on" value={v.hired_on} aria-describedby={e.hired_on ? "hired_on-hint hired_on-err" : "hired_on-hint"} aria-invalid={e.hired_on ? "true" : undefined} />
+              <DateInput id="hired_on" value={v.hired_on} aria-describedby={e.hired_on ? "hired_on-hint hired_on-err" : "hired_on-hint"} aria-invalid={e.hired_on ? "true" : undefined} />
               <FieldError id="hired_on" text={e.hired_on} />
             </div>
           )}
@@ -257,8 +257,8 @@ export function PersonFormView(props: {
             <p>Ostatnia ocena wystawiona poza systemem. Trafia do historii ocen i wyznacza początek okresu, od którego liczy się termin.</p>
             <div class="dates">
               <div class="person-field">
-                <label class="lbl" for="prev_on">Data oceny</label>
-                <input class="area" type="date" id="prev_on" name="prev_on" value={v.prev_on} {...invalid("prev_on", e.prev_on)} />
+                <label class="lbl" for="prev_on">Data oceny<DateFormatHint /></label>
+                <DateInput id="prev_on" value={v.prev_on} {...invalid("prev_on", e.prev_on)} />
                 <FieldError id="prev_on" text={e.prev_on} />
               </div>
               <div class="person-field">
@@ -296,6 +296,7 @@ export function PersonFormView(props: {
           <p><a href={`/hr/people/${props.personId}/delete`}>Usuń dane pracownika</a></p>
         </section>
       ) : null}
+      <script src="/date-words.js" defer></script>
     </Layout>
   );
 }

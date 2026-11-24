@@ -1,4 +1,5 @@
 import { Hono, type Context } from "hono";
+import { isoFromInput } from "../date-input";
 import { getDb } from "../db";
 import { recordEvent } from "../events";
 import { personById, type Person } from "../people";
@@ -43,7 +44,7 @@ app.post("/hr/substitutions", async (c) => {
   if (viewer instanceof Response) return viewer;
   const body = await c.req.parseBody();
   const s = (k: string) => (typeof body[k] === "string" ? (body[k] as string).trim() : "");
-  const values: SubstitutionValues = { absent_id: s("absent_id"), substitute_id: s("substitute_id"), date_from: s("date_from"), date_to: s("date_to") };
+  const values: SubstitutionValues = { absent_id: s("absent_id"), substitute_id: s("substitute_id"), date_from: isoFromInput(s("date_from")), date_to: isoFromInput(s("date_to")) };
   const errors: Partial<Record<keyof SubstitutionValues, string>> = {};
   const ids = appraisers().map((p) => p.id);
   if (!ids.includes(values.absent_id)) errors.absent_id = "Wybierz nieobecnego oceniającego z listy.";

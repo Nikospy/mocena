@@ -1,5 +1,5 @@
 import type { Person } from "../people";
-import { PageHeader } from "./components";
+import { DateFormatHint, DateInput, PageHeader } from "./components";
 import { ErrorSummary } from "./hr-people";
 import type { Substitution } from "../substitutions";
 import { Layout, formatDate } from "./layout";
@@ -63,13 +63,13 @@ export function SubstitutionsView(props: {
               </div>
               <div class="dates subs-dates">
                 <div class="person-field">
-                  <label class="lbl" for="date_from">Od</label>
-                  <input class="area" type="date" id="date_from" name="date_from" value={v.date_from} {...inv("date_from")} />
+                  <label class="lbl" for="date_from">Od<DateFormatHint /></label>
+                  <DateInput id="date_from" value={v.date_from} {...inv("date_from")} />
                   {err("date_from")}
                 </div>
                 <div class="person-field">
-                  <label class="lbl" for="date_to">Do</label>
-                  <input class="area" type="date" id="date_to" name="date_to" value={v.date_to} {...inv("date_to")} />
+                  <label class="lbl" for="date_to">Do<DateFormatHint /></label>
+                  <DateInput id="date_to" value={v.date_to} {...inv("date_to")} />
                   {err("date_to")}
                 </div>
               </div>
@@ -107,6 +107,7 @@ export function SubstitutionsView(props: {
           </p>
         </aside>
       </div>
+      <script src="/date-words.js" defer></script>
     </Layout>
   );
 }

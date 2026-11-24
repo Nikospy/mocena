@@ -3,6 +3,7 @@ import { isDirectorGeneral, roleLabel, type Person } from "../people";
 import { isDemoMode } from "../settings";
 import { currentTour } from "../tour/context";
 import { stopById, stopScreenPath } from "../tour/stops";
+import { DATE_INPUT_FORMAT, dateInputValue } from "../date-input";
 import { Head } from "./head";
 import { TourPanel } from "./tour-panel";
 
@@ -144,15 +145,22 @@ function DemoBar(props: { today: string; withTour: boolean; dateError?: string }
           </summary>
           <form method="post" action="/demo/date" class="demo-form">
             <label>
-              <span>Przesuń datę systemową na</span>
+              <span>
+                Przesuń datę systemową na <span aria-hidden="true">({DATE_INPUT_FORMAT})</span>
+              </span>
               <input
-                type="date"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                spellcheck={false}
+                maxlength={10}
+                placeholder={DATE_INPUT_FORMAT}
+                data-date-input=""
                 name="date"
                 id="demo-date"
-                value={props.today}
-                min={props.today}
+                value={dateInputValue(props.today)}
                 required
-                aria-label="Nowa data systemowa"
+                aria-label="Nowa data systemowa (dzień, miesiąc, rok)"
                 aria-invalid={props.dateError ? "true" : undefined}
                 aria-describedby={props.dateError ? "date-error" : undefined}
               />
@@ -168,6 +176,7 @@ function DemoBar(props: { today: string; withTour: boolean; dateError?: string }
             </button>
             {tourLink ? <span class="demo-tour-m">{tourLink}</span> : null}
           </form>
+          <script src="/date-words.js" defer></script>
         </details>
         {tourLink ? <span class="demo-tour">{tourLink}</span> : null}
       </div>

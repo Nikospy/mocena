@@ -1,7 +1,8 @@
 import { INVITATION_KINDS, daysBetween, invitationMailto, invitationStatus, type Invitation, type InvitationErrors, type InvitationInput, type InvitationKind } from "../invitations";
 import type { Cycle } from "../cycles";
 import type { Person } from "../people";
-import { ErrorSummary, FieldError, LegalBasis, PageHeader, invalid } from "./components";
+import { DateFormatHint, DateInput, ErrorSummary, FieldError, LegalBasis, PageHeader, invalid } from "./components";
+import { isIsoDate } from "../date-input";
 import { Layout, formatDate, formatDateLong } from "./layout";
 
 /** „Na rozmowę o kryteriach zostało 18 dni – do 27.12.2024.” z odmianą przez liczby. */
@@ -70,10 +71,10 @@ export function InvitationFormView(props: {
           <ErrorSummary errors={{ date: e.date, time: e.time, place: e.place, note: e.note }} />
           <div class="dates">
             <div class="field">
-              <label class="lbl" for="date">Data rozmowy</label>
+              <label class="lbl" for="date">Data rozmowy<DateFormatHint /></label>
               <FieldError id="date" errors={e} />
-              <input class="area" type="date" id="date" name="date" value={v.date} {...invalid("date", e, "date-words")} />
-              <p class="date-words" id="date-words" data-date-words-for="date">{v.date && !e.date ? formatDateLong(v.date) : ""}</p>
+              <DateInput id="date" value={v.date} {...invalid("date", e, "date-words")} />
+              <p class="date-words" id="date-words" data-date-words-for="date">{isIsoDate(v.date) && !e.date ? formatDateLong(v.date) : ""}</p>
             </div>
             <div class="field">
               <label class="lbl" for="time">Godzina</label>
@@ -116,6 +117,7 @@ export function InvitationFormView(props: {
       </section>
       </aside>
       </div>
+      <script src="/date-words.js" defer></script>
     </Layout>
   );
 }

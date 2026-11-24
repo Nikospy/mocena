@@ -1,4 +1,5 @@
 import { Hono, type MiddlewareHandler, type NotFoundHandler } from "hono";
+import { isoFromInput } from "./date-input";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { assessmentState } from "./assessment/state";
 import { cycleRulesVersion } from "./assessment/rules-scope";
@@ -287,7 +288,7 @@ app.post("/demo/restart", (c) => {
 app.post("/demo/date", async (c) => {
   if (!isDemoMode()) return errorPage(c, "Ta funkcja działa tylko w trybie pokazu.", 403);
   const body = await c.req.parseBody();
-  const date = typeof body.date === "string" ? body.date : "";
+  const date = isoFromInput(typeof body.date === "string" ? body.date : "");
   const valid = /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(Date.parse(date)) && new Date(date).toISOString().slice(0, 10) === date;
   if (!valid || date <= today()) {
     // Pasek pokazu wraca rozwinięty, z komunikatem przy polu daty; podsumowanie nad treścią prowadzi do pola.

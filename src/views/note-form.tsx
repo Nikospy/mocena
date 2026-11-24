@@ -1,5 +1,6 @@
 import { allCriteria } from "../engine/scoring";
-import { ErrorSummary, FieldError, PageHeader, invalid } from "./components";
+import { DateFormatHint, DateInput, ErrorSummary, FieldError, PageHeader, invalid } from "./components";
+import { isIsoDate } from "../date-input";
 import type { Person } from "../people";
 import type { NoteSuggestion, SensitiveMatch } from "../suggestions";
 import { Layout, formatDateLong } from "./layout";
@@ -55,10 +56,10 @@ export function NoteFormView(props: {
           <ErrorSummary errors={{ date: e.date, text: e.text, confirm_no_sensitive: e.confirm_no_sensitive, criterion_id: e.criterion_id }} />
 
           <div class="field nf-date">
-            <label class="lbl" for="date">Kiedy</label>
+            <label class="lbl" for="date">Kiedy<DateFormatHint /></label>
             <FieldError id="date" errors={e} />
-            <input class="area" type="date" id="date" name="date" max={props.today} value={v.date} {...invalid("date", e, "date-words")} />
-            <p class="date-words" id="date-words" data-date-words-for="date">{v.date ? formatDateLong(v.date) : ""}</p>
+            <DateInput id="date" value={v.date} {...invalid("date", e, "date-words")} />
+            <p class="date-words" id="date-words" data-date-words-for="date">{isIsoDate(v.date) ? formatDateLong(v.date) : ""}</p>
           </div>
 
           <div class="card hero-field">

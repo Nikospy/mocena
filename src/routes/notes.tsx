@@ -1,4 +1,5 @@
 import { actsAsAppraiser } from "../substitutions";
+import { isoFromInput } from "../date-input";
 import { Hono, type Context } from "hono";
 import { assessmentPhaseOpen } from "../assessment/phase";
 import { card } from "../content";
@@ -92,9 +93,9 @@ app.post("/people/:personId/notes", async (c) => {
   const errors: Partial<Record<"criterion_id" | "text" | "date" | "confirm_no_sensitive", string>> = {};
   if (!CRITERIA.some((k) => k.id === criterionId)) errors.criterion_id = "Wybierz kryterium.";
   if (text.length < 1 || text.length > 2000) errors.text = text ? "Notatka może mieć najwyżej 2000 znaków." : "Wpisz, co się stało.";
-  const rawDate = str(body.date).trim();
+  const rawDate = isoFromInput(str(body.date));
   const date = rawDate || today();
-  if (!isIsoDate(date)) errors.date = "Wybierz datę z kalendarza.";
+  if (!isIsoDate(date)) errors.date = "Wpisz datę w postaci DD.MM.RRRR, na przykład 11.03.2026.";
   else if (date > today()) errors.date = "Wybierz dzisiejszą albo wcześniejszą datę.";
 
   let sensitive: SensitiveMatch[] = [];

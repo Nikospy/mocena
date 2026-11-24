@@ -1,4 +1,5 @@
 import { reassessmentDeadline } from "../hr/cycle-state";
+import { isoFromInput } from "../date-input";
 import { canViewSheet } from "../hr/sheet-data";
 import { actsAsAppraiser } from "../substitutions";
 import { Hono, type Context } from "hono";
@@ -62,7 +63,7 @@ function readDraft(body: Record<string, unknown>, sheet: string | null): Assessm
     const m = /^score\[(.+)\]$/.exec(k);
     if (m && typeof v === "string" && v.trim() !== "") scores[m[1]] = Number(v);
   }
-  const date = str(body.interviewDate).trim();
+  const date = isoFromInput(str(body.interviewDate));
   return {
     scores,
     justification: str(body.justification),
@@ -84,7 +85,7 @@ function draftErrors(cycleId: string, d: AssessmentDraft): Record<string, string
     else if (!scale.includes(v)) errors[`score-${id}`] = `Wybierz ocenę cząstkową 1, 3, 5, 7 albo 9: ${criterion(id).name}.`;
   }
   if (d.interviewDate !== null && (!isIsoDate(d.interviewDate) || d.interviewDate > today())) {
-    errors.interviewDate = "Wybierz z kalendarza datę rozmowy oceniającej: dzisiejszą albo wcześniejszą.";
+    errors.interviewDate = "Wpisz datę rozmowy oceniającej w postaci DD.MM.RRRR: dzisiejszą albo wcześniejszą.";
   }
   if ((d.objectionRecipient?.length ?? 0) > 200) errors.objectionRecipient = "Adresat sprzeciwu może mieć najwyżej 200 znaków. Skróć wpis.";
   return errors;
@@ -345,7 +346,7 @@ app.post("/cycles/:id/assessment/fiction", async (c) => {
   const g = fictionGuard(c);
   if (!isCtx(g)) return g;
   const body = await c.req.parseBody();
-  const values = { reason: str(body.reason), deliveryMethod: str(body.deliveryMethod), deliveredOn: str(body.deliveredOn) };
+  const values = { reason: str(body.reason), deliveryMethod: str(body.deliveryMethod), deliveredOn: isoFromInput(str(body.deliveredOn)) };
   const errors: Record<string, string> = {};
   if (!REASONS.includes(values.reason)) {
     const gender = g.appraisee.gender;
@@ -357,7 +358,7 @@ app.post("/cycles/:id/assessment/fiction", async (c) => {
   const approvedOn = assessmentState(g.cycle.id).approvedOn ?? today();
   const dateOk = isIsoDate(values.deliveredOn) && values.deliveredOn >= approvedOn && values.deliveredOn <= today();
   if (!METHODS.includes(values.deliveryMethod)) errors.deliveryMethod = "Wybierz, jak doręczono kopię arkusza.";
-  if (!dateOk) errors.deliveredOn = `Wybierz z kalendarza datę doręczenia kopii arkusza: od ${formatDate(approvedOn)} do dziś.`;
+  if (!dateOk) errors.deliveredOn = `Wpisz datę doręczenia kopii arkusza w postaci DD.MM.RRRR: od ${formatDate(approvedOn)} do dziś.`;
   if (Object.keys(errors).length) return fictionScreen(c, g, { status: 422, errors, values });
   const ok = getDb().transaction(() => {
     const state = assessmentState(g.cycle.id);

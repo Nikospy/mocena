@@ -1,7 +1,8 @@
 import { DC, type Blocked, type RequestState } from "../deadline-change";
 import type { AppEvent } from "../events";
 import type { Person } from "../people";
-import { ErrorSummary, FieldError, LegalBasis, PageHeader, invalid } from "./components";
+import { DateFormatHint, DateInput, ErrorSummary, FieldError, LegalBasis, PageHeader, invalid } from "./components";
+import { isIsoDate } from "../date-input";
 import { Layout, formatDate, formatDateLong } from "./layout";
 import { PrintButton, SheetField } from "./sheet";
 
@@ -89,10 +90,10 @@ export function ChangeFormView(props: {
             })}
           </fieldset>
           <div class="field">
-            <label class="lbl" for="newDate">Nowy termin oceny</label>
+            <label class="lbl" for="newDate">Nowy termin oceny<DateFormatHint /></label>
             <FieldError id="newDate" errors={e} />
-            <input class="area" type="date" id="newDate" name="newDate" value={v.newDate} disabled={off} {...invalid("newDate", e, "newDate-words")} />
-            <p class="date-words" id="newDate-words" data-date-words-for="newDate">{v.newDate ? formatDateLong(v.newDate) : ""}</p>
+            <DateInput id="newDate" value={v.newDate} disabled={off} {...invalid("newDate", e, "newDate-words")} />
+            <p class="date-words" id="newDate-words" data-date-words-for="newDate">{isIsoDate(v.newDate) ? formatDateLong(v.newDate) : ""}</p>
             <p class="cap">Termin w dzień wolny przechodzi na następny dzień roboczy.</p>
           </div>
           <div class="field">
@@ -201,10 +202,10 @@ export function RequestFormView(props: {
             <textarea class="area" id="reason" name="reason" rows={4} disabled={off} {...invalid("reason", e)}>{props.values.reason}</textarea>
           </div>
           <div class="field">
-            <label class="lbl" for="requestedDate">Proponowany termin (nieobowiązkowo)</label>
+            <label class="lbl" for="requestedDate">Proponowany termin (nieobowiązkowo)<DateFormatHint /></label>
             <FieldError id="requestedDate" errors={e} />
-            <input class="area" type="date" id="requestedDate" name="requestedDate" value={props.values.requestedDate} disabled={off} {...invalid("requestedDate", e, "requestedDate-words")} />
-            <p class="date-words" id="requestedDate-words" data-date-words-for="requestedDate">{props.values.requestedDate ? formatDateLong(props.values.requestedDate) : ""}</p>
+            <DateInput id="requestedDate" value={props.values.requestedDate} disabled={off} {...invalid("requestedDate", e, "requestedDate-words")} />
+            <p class="date-words" id="requestedDate-words" data-date-words-for="requestedDate">{isIsoDate(props.values.requestedDate) ? formatDateLong(props.values.requestedDate) : ""}</p>
           </div>
           <p class="ct-actions">
             <button class="btn primary" type="submit" disabled={off}>

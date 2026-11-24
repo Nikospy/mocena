@@ -1,4 +1,5 @@
 import { actsAsAppraiser } from "../substitutions";
+import { isoFromInput } from "../date-input";
 import { Hono, type Context } from "hono";
 import { visibleCycleById, effectiveDeadline, visibleAbsences, type Cycle } from "../cycles";
 import { deadlineCase, deadlineChangeBlocked, newDeadlineError, pendingRequest, requestState } from "../deadline-change";
@@ -59,7 +60,7 @@ app.post("/cycles/:id/deadline-change", async (c) => {
   const { viewer, cycle } = g;
   const blocked = deadlineChangeBlocked(cycle);
   const body = await c.req.parseBody();
-  const values = { case: str(body.case), newDate: str(body.newDate), reason: str(body.reason) };
+  const values = { case: str(body.case), newDate: isoFromInput(str(body.newDate)), reason: str(body.reason) };
   if (blocked) return blocked.code === "six_months" ? renderChange(c, g, values, { case: blocked.message }, 422) : errorPage(c, blocked.message, 409);
   const pending = pendingRequest(cycle.id);
   const errors: ChangeFormErrors = {};
@@ -124,7 +125,7 @@ app.post("/cycles/:id/deadline-change/request", async (c) => {
   if (blocked) return errorPage(c, blocked.message, blocked.code === "six_months" ? 422 : 409);
   if (pendingRequest(cycle.id)) return errorPage(c, "Wniosek czeka już na decyzję oceniającego.", 409);
   const body = await c.req.parseBody();
-  const values = { reason: str(body.reason), requestedDate: str(body.requestedDate) };
+  const values = { reason: str(body.reason), requestedDate: isoFromInput(str(body.requestedDate)) };
   const errors: { reason?: string; requestedDate?: string } = {};
   if (!values.reason) errors.reason = "Podaj uzasadnienie wniosku.";
   if (values.requestedDate) {

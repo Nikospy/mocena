@@ -1,4 +1,5 @@
 import { Hono, type Context } from "hono";
+import { isoFromInput } from "../date-input";
 import { visibleCycleById, effectiveDeadline, cycleDeadlineDetails, openCycle, visibleAbsences, type Cycle } from "../cycles";
 import { addDays } from "../engine/deadlines";
 import { getDb } from "../db";
@@ -86,14 +87,14 @@ app.post("/cycles/:id/absences", async (c) => {
   const { viewer, cycle } = g;
   if (!isOpen(cycle)) return closed(c);
   const body = await c.req.parseBody();
-  const from = typeof body.from === "string" ? body.from : "";
-  const to = typeof body.to === "string" ? body.to : "";
+  const from = isoFromInput(typeof body.from === "string" ? body.from : "");
+  const to = isoFromInput(typeof body.to === "string" ? body.to : "");
   const excused = body.excused !== undefined;
   const errors: Partial<Record<"from" | "to", string>> = {};
-  if (!validDate(from)) errors.from = "Wybierz z kalendarza datę początku nieobecności.";
+  if (!validDate(from)) errors.from = "Wpisz datę początku nieobecności w postaci DD.MM.RRRR, na przykład 05.10.2026.";
   // Art. 81 ust. 7 przedłuża termin o nieobecność, która już trwa; przewidywaną załatwia zmiana terminu (art. 81 ust. 8 pkt 2).
   else if (from > today()) errors.from = FUTURE_START;
-  if (!validDate(to)) errors.to = "Wybierz z kalendarza datę końca nieobecności.";
+  if (!validDate(to)) errors.to = "Wpisz datę końca nieobecności w postaci DD.MM.RRRR, na przykład 16.10.2026.";
   else if (!errors.from && to < from) errors.to = "Wybierz datę końca równą dacie początku albo późniejszą.";
   if (errors.from || errors.to) return render(c, g, { from, to, excused }, errors, 422);
 

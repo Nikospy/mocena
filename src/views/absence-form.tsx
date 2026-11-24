@@ -1,5 +1,6 @@
 import type { Absence } from "../cycles";
-import { ErrorSummary, FieldError, LegalBasis, PageHeader, invalid } from "./components";
+import { DateFormatHint, DateInput, ErrorSummary, FieldError, LegalBasis, PageHeader, invalid } from "./components";
+import { isIsoDate } from "../date-input";
 import type { Person } from "../people";
 import { Layout, formatDate, formatDateLong } from "./layout";
 
@@ -56,16 +57,16 @@ export function AbsenceFormView(props: {
           />
           <div class="dates">
             <div class="field">
-              <label class="lbl" for="from">Od</label>
+              <label class="lbl" for="from">Od<DateFormatHint /></label>
               <FieldError id="from" errors={e} />
-              <input class="area" type="date" id="from" name="from" value={v.from} max={props.today} {...invalid("from", e, "from-words")} />
-              <p class="date-words" id="from-words" data-date-words-for="from">{v.from ? formatDateLong(v.from) : ""}</p>
+              <DateInput id="from" value={v.from} {...invalid("from", e, "from-words")} />
+              <p class="date-words" id="from-words" data-date-words-for="from">{isIsoDate(v.from) ? formatDateLong(v.from) : ""}</p>
             </div>
             <div class="field">
-              <label class="lbl" for="to">Do</label>
+              <label class="lbl" for="to">Do<DateFormatHint /></label>
               <FieldError id="to" errors={e} />
-              <input class="area" type="date" id="to" name="to" value={v.to} {...invalid("to", e, "to-words")} />
-              <p class="date-words" id="to-words" data-date-words-for="to">{v.to ? formatDateLong(v.to) : ""}</p>
+              <DateInput id="to" value={v.to} {...invalid("to", e, "to-words")} />
+              <p class="date-words" id="to-words" data-date-words-for="to">{isIsoDate(v.to) ? formatDateLong(v.to) : ""}</p>
             </div>
           </div>
           <label class="cb">

@@ -1,7 +1,7 @@
 import { rules } from "../engine/rules";
 import { fictionReasonLabel } from "./assessment";
 import type { Person } from "../people";
-import { ErrorSummary, FieldError, LegalBasis, PageHeader, invalid, type FormErrors } from "./components";
+import { DateFormatHint, DateInput, ErrorSummary, FieldError, LegalBasis, PageHeader, invalid, type FormErrors } from "./components";
 import { Layout, formatDate } from "./layout";
 
 export type FictionViewProps = {
@@ -60,9 +60,9 @@ export function FictionView(p: FictionViewProps) {
           </div>
           </div>
           <div class="field">
-          <label class="lbl" for="deliveredOn">Data doręczenia kopii arkusza</label>
+          <label class="lbl" for="deliveredOn">Data doręczenia kopii arkusza<DateFormatHint /></label>
           <FieldError id="deliveredOn" errors={e} />
-          <input class="area date-field" type="date" id="deliveredOn" name="deliveredOn" min={p.approvedOn} max={p.today} value={v.deliveredOn} {...invalid("deliveredOn", e)} />
+          <DateInput class="area date-field" id="deliveredOn" value={v.deliveredOn} {...invalid("deliveredOn", e)} />
           </div>
           <div class="btns">
             <button type="submit" class="btn primary">Zapisz fikcję zapoznania</button>
@@ -80,6 +80,7 @@ export function FictionView(p: FictionViewProps) {
           </section>
         </aside>
       </div>
+      <script src="/date-words.js" defer></script>
     </Layout>
   );
 }

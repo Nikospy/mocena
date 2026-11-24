@@ -86,7 +86,7 @@ function validDate(s: string): boolean {
 
 export function validateInvitation(v: InvitationInput): InvitationErrors {
   const e: InvitationErrors = {};
-  if (!validDate(v.date)) e.date = "Wybierz datę rozmowy z kalendarza.";
+  if (!validDate(v.date)) e.date = "Wpisz datę rozmowy w postaci DD.MM.RRRR, na przykład 21.11.2026.";
   if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(v.time)) e.time = "Podaj godzinę, na przykład 10:00.";
   if (!v.place) e.place = "Podaj miejsce, na przykład „pokój 214” albo „wideo”.";
   else if (v.place.length > 120) e.place = "Miejsce może mieć najwyżej 120 znaków.";

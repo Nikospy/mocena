@@ -44,7 +44,7 @@ describe("zapis notatki", () => {
     expect(both).toContain('id="criterion_id"');
     expect(both).toContain('id="text-error"');
     expect(both).toMatch(/<textarea id="text" name="text" rows="5"[^>]*aria-invalid="true" aria-describedby="text-error text-privacy">/);
-    expect(both).toContain('value="2026-03-10"');
+    expect(both).toContain('value="10.03.2026"');
     expect(both).toMatch(/value="good" checked/);
 
     const ok = await call(app, "marek", "/people/piotr/notes", { criterion_id: "wspolpraca", text: STEP2, rating: "good" });

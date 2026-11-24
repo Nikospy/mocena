@@ -33,6 +33,6 @@ describe("review-polish-2 faza 2: kadry i fikcja zapoznania", () => {
     const h = await html(app, "marek", "/cycles/cycle-piotr/assessment/fiction");
     expect(h).toMatch(/value="in_person"\s+checked/);
     expect(h).not.toMatch(/value="could_not"\s+checked/);
-    expect(h).toContain('value="2026-11-21"');
+    expect(h).toContain('value="21.11.2026"');
   });
 });

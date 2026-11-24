@@ -144,7 +144,7 @@ try {
       const text = await (await b.request(base, "/")).text();
       if (!text.includes("9 grudnia 2024")) return "brak „9 grudnia 2024”";
       if (text.includes("11 marca 2026")) return "wyciek daty z sesji A";
-      if (/<input[^>]*type="date"/.test(text) && !text.includes('min="2024-12-09"')) return "brak min=2024-12-09";
+      if (text.includes('id="demo-date"') && !text.includes('value="09.12.2024"')) return "brak value=09.12.2024 w polu daty pokazu";
       return null;
     });
   }

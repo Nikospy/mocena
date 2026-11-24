@@ -6,7 +6,7 @@ import type { Blocker, GradeRequestOption } from "../engine/approval";
 import { rules, rulesVersion } from "../engine/rules";
 import { criterion, POINTS, type AssessmentResult } from "../engine/scoring";
 import { isDirectorGeneral, type Person } from "../people";
-import { ConfirmationBlock, ErrorSummary, FieldError, type FormErrors, LegalBasis, PageHeader, RulesVersion, invalid } from "./components";
+import { ConfirmationBlock, DateFormatHint, DateInput, ErrorSummary, FieldError, type FormErrors, LegalBasis, PageHeader, RulesVersion, invalid } from "./components";
 import { Layout, formatDate } from "./layout";
 import { romanGrade } from "../engine/grades";
 import type { JSX } from "hono/jsx/jsx-runtime";
@@ -319,9 +319,10 @@ function EditForm(p: AssessmentViewProps) {
             <section class="card tx-card">
               <label for="interviewDate">
                 <h2>Data rozmowy oceniającej</h2>
+                <span class="lbl"><DateFormatHint /></span>
               </label>
               <FieldError id="interviewDate" errors={e} />
-              <input class="area date-field" type="date" id="interviewDate" name="interviewDate" max={p.today} value={d.interviewDate ?? p.today} {...invalid("interviewDate", e)} />
+              <DateInput class="area date-field" id="interviewDate" value={d.interviewDate ?? p.today} {...invalid("interviewDate", e)} />
             </section>
 
             <section class="card tx-card">
@@ -400,6 +401,7 @@ function EditForm(p: AssessmentViewProps) {
         </div>
       </form>
       <script src="/assessment.js" defer></script>
+      <script src="/date-words.js" defer></script>
       <script src="/score-caption.js" defer></script>
     </>
   );

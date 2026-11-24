@@ -68,7 +68,7 @@ describe("zaproszenia na rozmowy", () => {
     expect(r.status).toBe(303);
     expect(sent(db)).toHaveLength(1);
     const again = await html(app, "marek", `/cycles/${PIOTR}/invitations/new?kind=opening`);
-    expect(again).toContain('value="2024-12-30"');
+    expect(again).toContain('value="30.12.2024"');
   });
 
   test("oceniany i obcy nie wysyłają zaproszeń, brak cyklu to 404", async () => {

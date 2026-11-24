@@ -466,8 +466,8 @@ const tourStops: TourStopCheck[] = [
       includes(r.html, 'action="/cycles/cycle-piotr/absences"', "formularz nieobecności");
       includes(r.html, "05.10.2026–16.10.2026", "pierwsza nieobecność Piotra już wpisana");
       excludes(r.html, "Liczone jako jedna", "złączenie przed zapisem drugiej nieobecności");
-      includes(r.html, /id="from"[^>]*value="2026-10-19"/, "formularz z datą początku drugiej nieobecności 19.10.2026");
-      includes(r.html, /id="to"[^>]*value="2026-11-06"/, "formularz z datą końca drugiej nieobecności 06.11.2026");
+      includes(r.html, /id="from"[^>]*value="19.10.2026"/, "formularz z datą początku drugiej nieobecności 19.10.2026");
+      includes(r.html, /id="to"[^>]*value="06.11.2026"/, "formularz z datą końca drugiej nieobecności 06.11.2026");
       const saved = await s.post("/cycles/cycle-piotr/absences", [["from", "2026-10-19"], ["to", "2026-11-06"], ["excused", "1"]]);
       equal(saved.location, "/cycles/cycle-piotr/timeline?saved=extended", "jedno kliknięcie „Zapisz nieobecność” przedłuża termin");
       const tl = await s.get(saved.location!);
@@ -476,7 +476,7 @@ const tourStops: TourStopCheck[] = [
       includes(absences[0], "05.10.2026–06.11.2026", "jedna nieobecność 05.10–06.11.2026");
       const again = await s.get("/cycles/cycle-piotr/absences");
       includes(again.html, "Liczone jako jedna: 05.10.2026–06.11.2026", "ekran nieobecności: złączenie po zapisie");
-      excludes(again.html, 'value="2026-10-19"', "formularz wpisany drugi raz po zapisie");
+      excludes(again.html, 'value="19.10.2026"', "formularz wpisany drugi raz po zapisie");
       return "10.11.2026, pierwsza nieobecność wpisana, druga w formularzu; po jednym zapisie jedna nieobecność 05.10–06.11.2026";
     },
   },

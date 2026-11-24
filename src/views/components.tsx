@@ -1,6 +1,7 @@
 import type { Child } from "hono/jsx";
 import { rulesVersionLabel } from "../engine/rules";
 import { formatDate } from "./layout";
+import { DATE_INPUT_FORMAT, dateInputValue } from "../date-input";
 
 /** Wersja zasad po ludzku („Zasady z rozporządzenia z 2016 r., wersja 1”); identyfikator zostaje w `title`. */
 export function RulesVersion(props: { version: string; effectiveFrom?: string; href?: string }) {
@@ -130,5 +131,51 @@ export function FieldError(props: { id: string; errors?: FormErrors; message?: s
       <span class="vh">Błąd: </span>
       {message}
     </p>
+  );
+}
+
+/**
+ * Pole daty jako tekst DD.MM.RRRR: <input type="date"> pokazuje format języka przeglądarki (np. 11/03/2026),
+ * a atrybut lang tego nie zmienia. Serwer przyjmuje wpis przez isoFromInput; /date-words.js wstawia kropki
+ * przy wpisywaniu samych cyfr i pokazuje datę słownie.
+ */
+export function DateInput(props: {
+  id: string;
+  name?: string;
+  value: string | null | undefined;
+  class?: string;
+  disabled?: boolean;
+  required?: boolean;
+  "aria-invalid"?: "true";
+  "aria-describedby"?: string;
+  "aria-label"?: string;
+}) {
+  const { id, value, class: cls, name, ...rest } = props;
+  return (
+    <input
+      class={cls ?? "area"}
+      type="text"
+      id={id}
+      name={name ?? id}
+      value={dateInputValue(value)}
+      inputmode="decimal"
+      autocomplete="off"
+      spellcheck={false}
+      maxlength={10}
+      placeholder={DATE_INPUT_FORMAT}
+      data-date-input=""
+      {...rest}
+    />
+  );
+}
+
+/** Dopisek w etykiecie pola daty: widać format, czytnik ekranu słyszy go słowami. */
+export function DateFormatHint() {
+  return (
+    <span class="lbl-fmt">
+      {" "}
+      <span aria-hidden="true">{DATE_INPUT_FORMAT}</span>
+      <span class="vh">(dzień, miesiąc, rok)</span>
+    </span>
   );
 }

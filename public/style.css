@@ -860,6 +860,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* review-polish-2-4 */
 .date-words { margin-block: var(--sp-100) 0; font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); overflow-wrap: anywhere; }
 .date-words:empty { display: none; }
+/* Pole daty jako tekst DD.MM.RRRR (komponent DateInput): format w etykiecie zwykłym krojem, cyfry równej szerokości. */
+.lbl-fmt { font-weight: var(--w-regular); }
+input[data-date-input] { font-variant-numeric: tabular-nums; }
 
 /* S-15 deadline-change */
 .dc-cases { border: 0; padding: 0; margin: 0; display: grid; gap: var(--sp-50); min-inline-size: 0; }
