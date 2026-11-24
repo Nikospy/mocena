@@ -76,7 +76,6 @@
         syncMobBarHeight();
       });
     } catch (e) {}
-    label();
   }
   syncMobBarHeight();
   window.addEventListener("resize", syncMobBarHeight);
