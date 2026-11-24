@@ -940,7 +940,7 @@ fieldset.crit-keep { border: 0; margin: 0; min-inline-size: 0; }
 .crit-notes-d > summary { color: var(--text); font-weight: var(--w-bold); }
 .crit-notes-d > .note-list { margin-block-start: var(--sp-100); }
 /* wersja reguł w wyniku: cel kliknięcia co najmniej 24 px */
-.res .cap a { display: inline-block; min-block-size: var(--sp-300); }
+.res .cap a, .side > .cap a { display: inline-flex; align-items: center; min-block-size: var(--sp-300); }
 /* fakty oceny: etykieta 14 px nad wartością 16 px; każde potwierdzenie ma swoją etykietę */
 .o-facts > div + div { margin-block-start: var(--sp-200); }
 .o-facts dt { font-size: var(--f-c1); line-height: var(--lh-c1); color: var(--text-2); }
@@ -1039,6 +1039,34 @@ section[aria-labelledby="h-dev"] > .voice + h2 { margin-block-start: var(--sp-50
 section[aria-labelledby="h-dev"] > h2 + .cap { font-size: var(--f-p); line-height: var(--lh-p); }
 section[aria-labelledby="h-dev"] > h3 { margin-block-start: var(--sp-300); padding-block-start: var(--sp-300); border-block-start: 1px solid var(--line); }
 .crit .cb .box .ico { pointer-events: none; }
+/* B2: zwarty pasek wyniku oceny na wąskim ekranie (< 1000 px), w przewodniku i poza nim */
+.res-bar { display: none; }
+@media (max-width: 999px) {
+  .res-bar {
+    position: fixed; inset-inline: 0; inset-block-end: 0; z-index: 25;
+    margin-block-start: 0;
+    display: flex; align-items: center; gap: var(--sp-100);
+    padding: var(--sp-100) var(--gutter);
+    background: var(--rule-surface); color: var(--rule-ink);
+    border-block-start: 2px solid var(--rule-line);
+    box-shadow: var(--elev-1);
+    font-size: var(--f-c1); line-height: var(--lh-c1);
+  }
+  .res-bar.neg { background: var(--red-20); color: var(--red-200); border-block-start-color: var(--red-100); }
+  .res-bar.neg .res-bar-ico { color: var(--red-100); }
+  .res-bar.pos { background: var(--green-20); color: var(--green-200); border-block-start-color: var(--green-100); }
+  .res-bar.pos .res-bar-ico { color: var(--green-100); }
+  .res-bar-ico { flex: none; display: inline-flex; }
+  .res-bar-ico .ico { inline-size: var(--sp-250); block-size: var(--sp-250); }
+  .res-bar-txt { flex: 1 1 auto; min-inline-size: 0; }
+  .res-bar a { flex: none; display: inline-flex; align-items: center; min-block-size: var(--sp-500); font-weight: var(--w-bold); color: inherit; }
+  body.tour-on .res-bar { inset-block-end: var(--gmob-bar-h, 136px); }
+  body:has(#assessment-result-bar) { padding-block-end: calc(var(--sp-800) + var(--sp-600)); }
+  body.tour-on:has(#assessment-result-bar) { padding-block-end: calc(var(--gmob-bar-h, 136px) + var(--sp-800)); }
+}
+@media (max-width: 899px) {
+  body:not(.tour-on) .res-bar { inset-block-end: calc(var(--nav-h) + env(safe-area-inset-bottom)); }
+}
 
 /* --- koniec sekcji cycle (tej linii i pięciu następnych nie ruszaj: odstęp chroni przed konfliktami scalania) --- */
 /* . */

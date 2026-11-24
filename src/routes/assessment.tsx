@@ -296,6 +296,8 @@ app.post("/cycles/:id/assessment/preview", async (c) => {
         result={d.result}
         scores={d.criteria.filter((x) => draft.scores[x.id] !== undefined).map((x) => ({ name: criterion(x.id).name, score: draft.scores[x.id] }))}
         cycleId={g.cycle.id}
+        stickyBar
+        missing={d.criteria.length - Object.keys(draft.scores).length}
       />
       <BlockerList blockers={d.blockers} />
     </div>,

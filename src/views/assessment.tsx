@@ -70,7 +70,7 @@ function splitReason(r: string): { text: string; basis: string | null } {
  * Wynik, przyczyna z przepisem, jedna linia o średniej (słowo „średnia” pada raz). Poziom ogólny stoi przy wyniku
  * tylko wtedy, gdy mu nie przeczy (`verdictText`). `scores` pozwala nazwać kryteria z oceną „1”.
  */
-export function ResultPanel(props: { result: ResultLike | null; scores?: { name: string; score: number }[]; cycleId?: string; version?: string }) {
+export function ResultPanel(props: { result: ResultLike | null; scores?: { name: string; score: number }[]; cycleId?: string; version?: string; stickyBar?: boolean; missing?: number }) {
   const r = props.result;
   if (!r) {
     return (
@@ -80,6 +80,7 @@ export function ResultPanel(props: { result: ResultLike | null; scores?: { name:
           <span><b>Wynik oceny</b> · wyliczony z przepisu</span>
         </p>
         <p>Wynik pojawi się, gdy każde kryterium będzie miało ocenę.</p>
+        {props.stickyBar ? <ResultBar result={null} missing={props.missing} /> : null}
       </section>
     );
   }
@@ -118,7 +119,36 @@ export function ResultPanel(props: { result: ResultLike | null; scores?: { name:
       <p class="cap">
         <RulesVersion version={version} href={props.cycleId ? `/cycles/${props.cycleId}/timeline` : undefined} />
       </p>
+      {props.stickyBar ? <ResultBar result={r} /> : null}
     </section>
+  );
+}
+
+/** Zwarty pasek wyniku na wąskim ekranie (< 1000 px): pokazuje wyliczony wynik bez przewijania do dołu formularza. */
+export function ResultBar(props: { result: ResultLike | null; missing?: number }) {
+  const r = props.result;
+  if (!r) {
+    const left = props.missing ?? 0;
+    return (
+      <div class="res-bar pending" id="assessment-result-bar" role="status" aria-live="polite">
+        <span class="res-bar-txt">
+          <b>Wynik oceny</b> · {left > 0 ? `brakuje ocen: ${left}` : "uzupełnij oceny cząstkowe"}
+        </span>
+        <a href="#assessment-result">Szczegóły</a>
+      </div>
+    );
+  }
+  const neg = r.outcome === "negative";
+  const { verdict } = verdictText(r);
+  const meanDoesNotDecide = neg && r.mean > 4;
+  return (
+    <div class={`res-bar ${neg ? "neg" : "pos"}`} id="assessment-result-bar" role="status" aria-live="polite">
+      <span class="res-bar-ico" aria-hidden="true">{neg ? <WarnIco /> : <OkIco />}</span>
+      <span class="res-bar-txt">
+        <b>{verdict}</b> · {mean2(r.mean)}{meanDoesNotDecide ? " – nie zmienia wyniku" : ""}
+      </span>
+      <a href="#assessment-result">Szczegóły</a>
+    </div>
   );
 }
 
@@ -358,7 +388,7 @@ function EditForm(p: AssessmentViewProps) {
           </div>
 
           <aside class="side" aria-label="Wynik i zatwierdzenie">
-            <ResultPanel result={p.result} scores={scoreRows(p.criteria, d.scores)} cycleId={p.cycleId} />
+            <ResultPanel result={p.result} scores={scoreRows(p.criteria, d.scores)} cycleId={p.cycleId} stickyBar missing={p.criteria.length - Object.keys(d.scores).length} />
             <BlockerList blockers={p.blockers} />
             <div class="decide">
               <button type="submit" class="btn full">Zapisz szkic oceny</button>

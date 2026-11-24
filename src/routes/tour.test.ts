@@ -71,6 +71,7 @@ describe("przewodnik pokazu", () => {
     expect(res.status).toBe(200);
     expect(text).toContain("Jedna „1” przesądza o wyniku");
     expect(text).toContain("Krok 4 z 5");
+    expect(text).toContain('id="assessment-result-bar"');
     expect(text).toContain('action="/tour/5"');
     expect(text).toContain('src="/tour.js"');
     expect(text).not.toContain('action="/demo/date"');

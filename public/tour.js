@@ -59,6 +59,14 @@
 
   // Szuflada na telefonie jest otwarta przy pierwszym wejściu w przystanek; pamiętamy tylko jej zwinięcie na tym przystanku.
   var details = document.querySelector("[data-gmob]");
+  function syncMobBarHeight() {
+    var m = document.querySelector(".gmob");
+    if (!m || getComputedStyle(m).display === "none") return;
+    var sum = m.querySelector("summary");
+    var bar = m.querySelector(".gm-bar");
+    var h = (sum ? sum.getBoundingClientRect().height : 0) + (bar ? bar.getBoundingClientRect().height : 0);
+    if (h > 0) document.documentElement.style.setProperty("--gmob-bar-h", Math.ceil(h) + "px");
+  }
   if (details) {
     var key = "mocena_gmob_" + details.getAttribute("data-gmob");
     var hint = details.querySelector("[data-gmob-hint]");
@@ -68,10 +76,13 @@
       if (sessionStorage.getItem(key) === "0") details.open = false;
       details.addEventListener("toggle", function () {
         sessionStorage.setItem(key, details.open ? "1" : "0");
+        syncMobBarHeight();
       });
     } catch (e) {}
     label();
   }
+  syncMobBarHeight();
+  window.addEventListener("resize", syncMobBarHeight);
   // Po wczytaniu fontów i skryptów strony: wtedy położenie miejsca działania już się nie zmienia.
   function whenSettled(fn) {
     var go = function () { (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(fn, fn); };
